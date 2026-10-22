@@ -1,0 +1,114 @@
+# CounterSign: Decisions Log
+
+Project was called OnceGuard Money Ops until Oct 23, 2026; older rows keep the old name.
+
+Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23, 2026 is listed with the decision and a one line reason. Sources: GPT review, Gemini review, and the planning chat (Claude). "Verified" means checked against official PayPal documentation, not yet tested in our sandbox.
+
+## Verified API facts introduced by reviewers
+
+| Fact | Source | Status |
+| --- | --- | --- |
+| Balances API returns total, available and withheld balances with a last refresh time; can lag up to 3 hours | GPT | Verified |
+| Payout item webhooks include HELD, SUCCEEDED, RETURNED, CANCELED, BLOCKED, FAILED, REFUNDED, UNCLAIMED, DENIED; batch webhooks carry no item info | GPT | Verified |
+| Webhook HELD vs item status ONHOLD; webhook SUCCEEDED vs item status SUCCESS | GPT | Verified |
+| Agent Toolkit dispute tools are list_disputes, get_dispute, accept_dispute_claim; tracking is get_shipment_tracking; no payout or provide evidence tools | GPT (names), Claude (no payout or evidence tools) | Verified |
+| Transaction IDs are not unique in PayPal reporting | GPT | Verified |
+| Unclaimed payout money is not part of available balance | Both | Consistent with PayPal docs; confirm in sandbox |
+| Sandbox webhooks lag or drop; sandbox balance may not reflect dispute holds promptly | Gemini | Unverified opinion; designed around it anyway (poller, resource state reconciliation) |
+
+## Story and positioning
+
+| Suggestion | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Fix demo arithmetic ($1,500 before or after the $300 payout was ambiguous) | Both | Accept | A math error in a money product destroys judge trust |
+| Narrow persona | Both | Accept | Vague persona weakens Potential Impact |
+| Persona: 3 person agency or micro marketplace | Gemini | Accept the micro marketplace variant | Payouts to sellers is a textbook Payouts use |
+| Persona: small physical goods seller | GPT | Partly accept | Kept physical goods (tracking evidence) inside the marketplace persona |
+| Old story had little economic interaction between decisions | GPT | Accept, fixed by persona change | In a marketplace, a dispute changes who gets paid, not just cash level |
+| Rename "payroll" to "payout run" | Both | Accept | Payroll implies employees and tax |
+| Replace absolute safety claims with named invariants and test results | GPT | Accept | Absolute claims are indefensible |
+| Do not claim "nothing shows it" | GPT | Accept | PayPal has a Resolution Center; claim the missing connection instead |
+| Cite "disputes cost 2x to 3x" stat | Gemini | Reject unless a primary source is found | Unsourced numbers are a liability with PayPal judges |
+| Three user interviews | GPT | Defer | Hard to reach PayPal Payouts merchants in this window; use public community threads instead |
+| "Already qualifies for Best Use of Agentic Commerce" | Gemini | Reject as a pitch point | Every eligible project qualifies; not a differentiator |
+
+## Architecture and scope
+
+| Suggestion | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Cut FalkorDB; money graph in PostgreSQL | Both | Accept | Tiny data; two stores can disagree about money |
+| Cut separate queue; PostgreSQL transactional inbox | Gemini | Accept | Exactly once processing in the same transaction as ledger writes |
+| Cut intent receipts (Layer 2) | Both | Accept | Different user; splits the product |
+| Cut Invoicing and Subscriptions | Both | Accept | Setup cost, no proof of the core idea |
+| Cut dispute offers | GPT (cut), Gemini (keep, owner gated) | Move to stretch goal A with a real buyer side | Fragile in sandbox now; worth doing properly if time allows |
+| Cut appeals and conversational negotiation | GPT | Accept | Not central |
+| Cash connection must be in the first working flow | GPT | Accept | It is the differentiator; must not slip to the end |
+| Start build now, not after Oct 26 | Claude | Accept | Submission period is open; day one checks are needed regardless |
+| Smarter shortfall prioritisation | Claude | Stretch goal B | Real treasury reasoning; only after the core is done |
+| Autonomy tiers: no money out = autonomous; money out or refund = owner | Gemini (tiers), GPT (owner authorises money actions, executor retries automatically) | Accept, merged | Shows real agency without autonomous payouts or refunds |
+| Make the AI's role concrete (evidence strength, injection flagging, plain English briefs) | Gemini | Accept | Answers "why not just if else" |
+
+## Safety and correctness
+
+| Suggestion | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| "One live payout per obligation" allows paying again after success; add terminal SETTLED state | GPT | Accept | Closes the biggest duplicate payment hole |
+| Write ahead operation record; UNKNOWN state resolved by querying PayPal | GPT | Accept | Crash after PayPal accepts must never cause a second payout |
+| Re-check all rules at execution inside a locked transaction | Both | Accept | Prevents stale approvals and time of check vs time of use bugs |
+| Approvals bound to payload hash, record versions, expiry, single use | GPT | Accept | Stale or replayed approvals |
+| Reserve cash for pending proposals and approved runs | Both | Accept | Two plans must not spend the same money |
+| One payout item per attempt; keys from obligation id and attempt number | Gemini | Accept | Partial batch failure cannot double pay |
+| Reconcile each item; never mark obligations paid from batch events | GPT | Accept | Batch webhooks have no item info |
+| Verify webhook signature and confirm state by GET before unlocking a replacement | Both | Accept | Forged or stale cancel events |
+| Use cancellation outcome plus refreshed item state (claim during cancel race) | GPT | Accept | A previous UNCLAIMED read is not enough |
+| ACCEPT_CLAIM always needs the owner | Gemini | Accept | Prevents sub threshold injected refunds |
+| Aggregate refund limits per order and per day | GPT | Accept | Many small harmful refunds |
+| Evidence must match merchant, transaction, order and amount; dispute status and action link checked | GPT | Accept | Real evidence on the wrong case |
+| Reconcile against resource states, not only the balance API | Gemini | Accept | Balance lags; resource states are authoritative |
+| Balance API shown with freshness; never subtract holds twice | GPT | Accept | Available already excludes withheld money |
+| Fail closed only for the affected obligation or dispute | GPT | Accept | Global blocking would miss dispute deadlines |
+| DEFER only payouts not yet sent; owner top up is an external task confirmed by observed funds | GPT | Accept | No API to delay sent payouts or fund the account |
+| Restrict read tools; no free SQL, URLs or credentials | GPT | Accept | Read tool injection and leakage |
+| Keep sandbox test controls out of agent tools | GPT | Accept | Agent must not settle its own disputes |
+| Do not deduplicate imports on transaction id alone | GPT | Accept | Transaction IDs are not unique in reporting |
+| Polling fallback for webhooks | Gemini | Accept | Sandbox delivery is unreliable |
+
+## Evaluation and presentation
+
+| Suggestion | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Run the big fault benchmark on a local mock from recorded payloads; live sandbox for the demo | Gemini | Accept | Rate limits and webhook lag make hundreds of live runs impractical |
+| Report mock and sandbox results separately | GPT | Accept | Honesty |
+| Fair baseline with normal idempotency handling | GPT | Accept | Otherwise we only prove careful beats careless |
+| Rules only baseline for unstructured tasks | GPT | Accept | Shows what the AI adds |
+| Report task completion next to safety | GPT | Accept | A system that blocks everything is safe and useless |
+| Naive vs OnceGuard replay in the UI | Gemini | Accept, using the fair baseline | Strong visual for Presentation |
+| AG Grid incident table and demo week control bar | Gemini | Accept | Covers frontend weakness; sponsor prize; judges never see an empty dashboard |
+| Video target 2:45 with on screen labels for staged actions | GPT | Accept | Margin under the 3 minute limit; honesty about sandbox staging |
+| Hook with a visible failure in the first 15 to 20 seconds | Gemini | Accept | Stronger opening |
+| Show a schema valid proposal paying an already settled obligation being blocked | GPT | Accept | A realistic failure, not a strawman |
+
+## Scores given by reviewers (for reference)
+
+* Gemini: 39 of 50 (Tech 8.5, Design 6.5, Impact 8, Innovation 8.5, Presentation 7.5)
+* GPT: 30 of 50 (Tech 7, Design 5, Impact 6, Innovation 6, Presentation 6)
+* Plan against the stricter score; both scored the pre review design.
+
+## Oct 23 owner decisions after the plan review (docs/PLAN.md)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Rename OnceGuard Money Ops to CounterSign | Owner | Accept | OnceGuard is the separate Airwallex project; CounterSign names this project's core principle: the AI proposes, the code countersigns |
+| F1: UNKNOWN resolved only by identical replay (same keys and body) within 25 days, then owner | Plan review | Accept | PayPal has no lookup by sender_batch_id and the create response has no item ids; keys last 30 days |
+| F2: cancel before replace requires GET showing RETURNED | Plan review | Accept | CANCELED is a webhook name, not an item transaction_status |
+| F5: open sandbox disputes as the buyer in the Resolution Center, labelled staged | Plan review | Accept | API creation needs a DISPUTE_CREATE scope only a PayPal account manager can add |
+| F6: pain 1 reworded to "may freeze"; cash reads actual withheld amount | Plan review | Accept | PayPal documents no-hold disputes, and chargebacks are reversals |
+| F4: "available excludes unclaimed money" moved to verify (D4) | Plan review | Accept | Not stated in PayPal docs |
+| F12: explicit funding formula (snapshot minus outflows after last_refresh_time) | Plan review | Accept | Balance lags up to 3 hours; avoids subtracting payouts twice or not at all |
+| F15 + payout lines: keys from payout line id (UUIDv7) and attempt number | Plan review | Accept | One payout item pays many obligations; UUIDs prevent key reuse after a database reset |
+| F16: DISPUTE_LOST_PARTIAL with an ADJUSTMENT obligation | Plan review | Accept | Disputes can end in partial refunds |
+| F18: evaluation baseline runs only on the mock, with documented idempotency, never sandbox credentials | Owner | Accept | Keeps the hard rule that no agent calls money moving PayPal APIs, while staying a fair baseline |
+| F10, F13, F11, F17: tracking is merchant uploaded; unsupported states synthesised and labelled; test-only webhook signer; accept claim funding verified | Plan review | Accept | Honest evidence claims and evaluation |
+| Agent tools via the toolkit's LangChain adapter behind an exact allowlist; model swappable, chosen at core step 5 | Owner | Accept | Python toolkit has no Anthropic module; a cheap model can run the large evaluation |
+| Vertical slice first; DB transition triggers, allowed_transitions and property tests deferred until it works | Owner | Accept | Get one sandbox flow working end to end by Nov 5 before hardening |
+| Day one checks timeboxed to Oct 25; BLOCKED is recorded, not chased | Owner | Accept | Protect build time |
