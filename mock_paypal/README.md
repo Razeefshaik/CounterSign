@@ -105,3 +105,19 @@ nine contract config flags:
 
 These defaults are contract fixtures, not sandbox-verified findings.
 No dependencies beyond M01/C01's approved libraries were added.
+
+
+## M03 faults and ground truth
+
+Request faults match method, regex path, nth and count. Delay/timeout waits
+resolve only when the mock clock advances. A dropped response sends an
+incomplete HTTP body and closes the connection; a real TCP acceptance test
+checks that the client receives a protocol error while the committed payout
+survives and replays once. Fault logs retain keys and statuses, never auth headers.
+Transition/claim controls include the claim-during-next-cancel race.
+
+D7 names follow the project fixture codes and the official reference:
+https://developer.paypal.com/api/payouts/test-go-live
+HTTP codes remain configurable via create_app(negative_values=...) pending
+recordings. Legacy ERRPYO015 is supported as the contract's item fixture.
+These are mock fixtures, not observed sandbox responses.

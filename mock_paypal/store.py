@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from mock_paypal.clock import MockClock
 from mock_paypal.config import MockConfig
+from mock_paypal.faults import FaultState
 from mock_paypal.payouts import PayoutState
 
 TOKEN_LIFETIME_SECONDS = 32400
@@ -30,6 +31,9 @@ class MockStore:
         self.tokens = {}
         self.records = {}
         self.payouts = PayoutState()
+        self.faults = FaultState()
+        self.refunds = []
+        self.emit = lambda *args, **kwargs: None
         self._ids = 0
 
     def new_id(self, prefix: str = "MOCK") -> str:

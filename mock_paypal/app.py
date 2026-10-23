@@ -16,6 +16,8 @@ from starlette.exceptions import HTTPException
 
 from mock_paypal.clock import timestamp
 from mock_paypal.config import MockConfig
+from mock_paypal.faults import FaultMiddleware
+from mock_paypal.faults import router as fault_router
 from mock_paypal.payout_routes import router as payout_router
 from mock_paypal.payouts import PayoutBehavior, PayoutError, PayoutService
 from mock_paypal.store import DEFAULT_SCOPE, TOKEN_LIFETIME_SECONDS, MockStore
@@ -58,6 +60,7 @@ def create_app(
     control_enabled: bool | None = None,
     oauth_scope: str = DEFAULT_SCOPE,
     payout_behavior: PayoutBehavior | None = None,
+    negative_values: dict | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="CounterSign mock PayPal", docs_url=None, redoc_url=None, openapi_url=None
@@ -68,6 +71,7 @@ def create_app(
         app.state.store, payout_behavior or PayoutBehavior()
     )
     app.include_router(payout_router)
+    app.include_router(fault_router)
     enabled = (
         os.environ.get("MOCK_CONTROL") == "1"
         if control_enabled is None
@@ -232,6 +236,9 @@ def create_app(
             app.state.payout_service.reprice_unclaimed()
             return updated.model_dump()
 
+    app.add_middleware(
+        FaultMiddleware, store=app.state.store, negative_values=negative_values
+    )
     return app
 
 

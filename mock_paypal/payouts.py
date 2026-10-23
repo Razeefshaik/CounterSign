@@ -54,6 +54,7 @@ class PayoutItem:
     cancelled: bool = False
     synthesised: bool = False
     revision: int = 0
+    claim_during_cancel: bool = False
 
 
 @dataclass
@@ -186,7 +187,14 @@ class PayoutService:
         self.store.clock.schedule(self.store.config.payout_processing_seconds, process)
         return batch
 
-    def transition(self, item: PayoutItem, target: str, *, synthesised: bool = False):
+    def transition(
+        self,
+        item: PayoutItem,
+        target: str,
+        *,
+        synthesised: bool = False,
+        emit_webhook: bool = True,
+    ):
         allowed = {
             "PENDING",
             "SUCCESS",
@@ -213,6 +221,12 @@ class PayoutService:
         item.synthesised |= synthesised
         if previous == target:
             return
+        if emit_webhook:
+            suffix = {"SUCCESS": "SUCCEEDED", "ONHOLD": "HELD"}.get(target, target)
+            self.store.emit(
+                "PAYMENT.PAYOUTS-ITEM." + suffix,
+                self.item_doc(item, "http://localhost:8099"),
+            )
         item.revision += 1
         item.processed_at = self.store.clock.now
         if target == "UNCLAIMED":
@@ -231,6 +245,9 @@ class PayoutService:
 
     def cancel(self, item_id: str) -> PayoutItem:
         item = self.get_item(item_id)
+        if item.claim_during_cancel:
+            item.claim_during_cancel = False
+            self.transition(item, "SUCCESS")
         if item.cancelled:
             raise PayoutError(
                 400, "ITEM_ALREADY_CANCELLED", "Item was already cancelled"
