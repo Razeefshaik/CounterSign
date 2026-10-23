@@ -8,6 +8,7 @@ import httpx
 import pytest
 
 from scripts.sandbox_checks import __main__ as cli
+from scripts.sandbox_checks import checks
 from scripts.sandbox_checks.checks import CheckUnavailable, get_steps
 from scripts.sandbox_checks.client import SandboxClient
 from scripts.sandbox_checks.env import SandboxSettings
@@ -177,7 +178,8 @@ async def test_changed_step_definition_refuses_silent_replay(tmp_path, settings)
     assert calls == []
 
 
-def test_future_registry_checks_fail_clearly_and_prior_data_is_available(tmp_path):
+def test_future_registry_checks_fail_clearly_and_prior_data_is_available(tmp_path, monkeypatch):
+    monkeypatch.setitem(checks.CHECK_MODULES, "D8", "_missing_check_for_registry_test")
     with pytest.raises(CheckUnavailable, match="D8 is not implemented"):
         get_steps("D8")
     assert load_check_data(tmp_path, "D1") == {}
