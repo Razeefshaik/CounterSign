@@ -1,0 +1,59 @@
+{
+  "method": "GET",
+  "path": "/v1/reporting/balances",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f9246279c22a9-a447eb35d2892bed-01\"",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "server": "nginx",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "paypal-debug-id": "f9246279c22a9",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Fri, 23 Oct 2026 13:40:36 GMT",
+    "x-served-by": "cache-sin-wsss1830062-SIN, cache-sin-wsss1830062-SIN, cache-maa10238-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792762835.373553,VS0,VE817",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "balances": [
+      {
+        "currency": "USD",
+        "total_balance": {
+          "currency_code": "USD",
+          "value": "5000.00"
+        },
+        "available_balance": {
+          "currency_code": "USD",
+          "value": "5000.00"
+        },
+        "withheld_balance": {
+          "currency_code": "USD",
+          "value": "0.00"
+        }
+      }
+    ],
+    "account_id": "B23JM5BDGPAF8",
+    "as_of_time": "2026-10-23T11:59:59Z",
+    "last_refresh_time": "2026-10-23T11:59:59Z"
+  },
+  "t_sent": "2026-10-23T13:40:37.098289Z",
+  "t_recv": "2026-10-23T13:40:37.966389Z"
+}
