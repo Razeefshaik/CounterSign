@@ -299,3 +299,28 @@ def test_pending_response_switches():
         response = client.post(PATH, json=body())
         assert response.status_code == 201
         assert len(response.json()["items"]) == 1
+
+
+@pytest.mark.parametrize(
+    "target", ["ONHOLD", "BLOCKED", "FAILED", "REFUNDED", "REVERSED", "RETURNED"]
+)
+def test_cancellation_rejects_every_other_item_state(client, target):
+    batch_id = create(client)
+    service = client.app.state.payout_service
+    payout = service.get_item(item(client, batch_id)["payout_item_id"])
+    service.transition(payout, target, synthesised=True)
+    before = client.app.state.store.payouts.available_minor
+    check_error(
+        client.post(f"/v1/payments/payouts-item/{payout.id}/cancel"),
+        400,
+        "ITEM_INCORRECT_STATUS",
+    )
+    assert client.app.state.store.payouts.available_minor == before
+
+
+def test_zero_processing_delay_runs_on_clock_advance_zero(client):
+    client.post("/_mock/config", json={"payout_processing_seconds": 0})
+    batch_id = create(client)
+    assert item(client, batch_id)["transaction_status"] == "PENDING"
+    advance(client, 0)
+    assert item(client, batch_id)["transaction_status"] == "SUCCESS"

@@ -19,6 +19,13 @@ class PayoutBehavior:
     create_includes_items: bool = False  # pending D3
     cancel_item_status: str = "RETURNED"  # pending D5
     insufficient_funds_status: int = 422  # pending D7
+    concurrent_duplicate_status: int = 409  # pending D6d
+    concurrent_duplicate_name: str = "DUPLICATE_REQUEST_ID"
+    duplicate_batch_status: int = 400  # pending D6b
+    duplicate_batch_name: str = "USER_BUSINESS_ERROR"
+    duplicate_batch_issue: str = "DUPLICATE_SENDER_BATCH_ID"
+    replay_current_header: bool = True  # pending D6a
+    replay_original_body_wins: bool = True  # pending D6c
 
 
 class PayoutError(Exception):
@@ -57,10 +64,21 @@ class PayoutBatch:
     created_at: datetime
     status: str = "PENDING"
     completed_at: datetime | None = None
+    request_id: str | None = None
+
+
+@dataclass
+class RequestKey:
+    batch_id: str
+    original_body: dict
+    initial_header: dict
+    in_progress: bool = True
 
 
 @dataclass
 class PayoutState:
+    request_keys: dict[str, RequestKey] = field(default_factory=dict)
+    sender_keys: dict[str, str] = field(default_factory=dict)
     available_minor: int = 0
     withheld_minor: int = 0
     registered_receivers: set[str] = field(default_factory=set)
@@ -72,6 +90,36 @@ class PayoutService:
     def __init__(self, store: "MockStore", behavior: PayoutBehavior):
         self.store = store
         self.behavior = behavior
+
+    def remember_keys(
+        self, batch: PayoutBatch, request_id: str | None, body: CreatePayout
+    ) -> RequestKey:
+        state = self.store.payouts
+        sender_id = batch.sender_header["sender_batch_id"]
+        state.sender_keys[sender_id] = batch.id
+        record = RequestKey(
+            batch.id,
+            body.model_dump(exclude_none=True),
+            deepcopy(self.create_doc(batch, "")["batch_header"]),
+        )
+        if request_id:
+            state.request_keys[request_id] = record
+
+        def forget():
+            if state.sender_keys.get(sender_id) == batch.id:
+                del state.sender_keys[sender_id]
+            if request_id and state.request_keys.get(request_id) is record:
+                del state.request_keys[request_id]
+
+        seconds = self.store.config.key_retention_days * 86400
+        self.store.clock.schedule(seconds, forget)
+        return record
+
+    def replay_doc(self, record: RequestKey, base: str) -> dict:
+        doc = self.create_doc(self.get_batch(record.batch_id), base)
+        if not self.behavior.replay_current_header:
+            doc["batch_header"] = deepcopy(record.initial_header)
+        return doc
 
     def get_batch(self, batch_id: str) -> PayoutBatch:
         try:
