@@ -1,5 +1,6 @@
 """Stateful stub PayPal: no network, runtime .env, or real browser actions."""
 
+import asyncio
 import json
 import re
 from datetime import UTC, datetime, timedelta
@@ -109,6 +110,7 @@ class FakePayPal:
                 amount = common.cents(unit["amount"]["value"])
                 capture_id = "CAP" + order_id.removeprefix("ORDER")
                 capture = {
+                    "update_time": NOW.isoformat(),
                     "id": capture_id,
                     "status": "COMPLETED",
                     "seller_receivable_breakdown": {
@@ -299,6 +301,12 @@ async def test_d2_saves_exact_capture_tracking_keys_and_net_timeline(settings, r
     assert data["tracking"] == {"inr_400": {"carrier": "USPS", "tracking_number": TRACKING}}
     assert [e["amount_minor"] for e in data["timeline"]] == [39900, 5900, 2400]
     assert all(e["event"] == "CAPTURE_COMPLETED" for e in data["timeline"])
+    assert all(e["paypal_time"] == NOW.isoformat() for e in data["timeline"])
+    assert all(
+        r.headers.get("prefer") == "return=representation"
+        for r in fake.requests
+        if r.method == "POST" and r.url.path.startswith("/v2/checkout/orders")
+    )
     assert len(fake.posts("/v2/checkout/orders")) == 3
     assert data["balance"]["first_reflected_at"]
     assert data["tracking_read"]["trackers"][0]["tracking_number_validated"] is False
@@ -558,3 +566,186 @@ async def test_d5_does_not_cancel_without_prerequisites(settings, root):
     state = await make_runner(settings, root, fake, operator, clock).run("D5")
     assert state["data"]["verdict"] == "BLOCKED"
     assert not [r for r in fake.requests if r.url.path.endswith("/cancel")]
+
+
+def lose_short_timeout_response(fake):
+    original = fake.respond
+    dropped = []
+
+    def respond(request):
+        result = original(request)
+        if (
+            request.url.path == "/v1/payments/payouts"
+            and request.method == "POST"
+            and request.extensions["timeout"]["read"] == 0.05
+            and not dropped
+        ):
+            dropped.append(request)
+            raise httpx.ReadTimeout("simulated accepted payout with lost response", request=request)
+        return result
+
+    fake.respond = respond
+    return dropped
+
+
+@pytest.mark.asyncio
+async def test_d6_all_experiments_checkpoint_keys_and_confirm_one_item(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    dropped = lose_short_timeout_response(fake)
+
+    def inspect_saved(request):
+        state = json.loads((root / "2026-10-24/D6/state.json").read_text())
+        matches = [
+            entry
+            for entry in state["data"]["writes"].values()
+            if entry["request_id"] == request.headers["paypal-request-id"]
+            and entry["body_sha256"] == common.digest(json.loads(request.content))
+            and entry["state"] == "UNKNOWN"
+        ]
+        assert matches, "The exact request must be checkpointed before POST"
+
+    fake.before_post = inspect_saved
+    state = await make_runner(settings, root, fake, operator, clock).run("D6")
+    data = state["data"]
+    assert data["verdict"] == "CONFIRMED"
+    experiments = data["experiments"]
+    assert set(experiments) == set("abcde")
+    assert experiments["a"]["same_batch"]
+    assert experiments["b"]["link_points_to_original"]
+    assert experiments["b"]["error_name"] == "DUPLICATE_BATCH_ID"
+    assert experiments["c"]["winning_body"] == "original"
+    assert len(experiments["d"]["responses"]) == 2
+    assert experiments["e"]["initial_unknown"]
+    assert experiments["e"]["initial"]["state"] == "UNKNOWN"
+    assert experiments["e"]["balance"]["first_reflected_at"]
+    assert len(dropped) == 1 and dropped[0].extensions["timeout"] == {
+        "connect": 30,
+        "read": 0.05,
+        "write": 30,
+        "pool": 30,
+    }
+    assert len(fake.batches) == len(fake.items) == 5
+    assert len(fake.posts("/v1/payments/payouts")) == 10
+    assert len(fake.batch_keys) == 5
+    assert fake.available == 500000 - 500
+    assert all(e["verified_single_item"] for e in experiments.values())
+    assert_clean(root, operator)
+
+
+@pytest.mark.asyncio
+async def test_d6_pair_is_actually_concurrent(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    lose_short_timeout_response(fake)
+    arrived, concurrent_requests = asyncio.Event(), []
+
+    async def handle(request):
+        if request.url.path == "/v1/payments/payouts" and request.method == "POST":
+            state = json.loads((root / "2026-10-24/D6/state.json").read_text())
+            concurrent = (state["data"].get("writes") or {}).get("d_concurrent")
+            if concurrent and concurrent["request_id"] == request.headers["paypal-request-id"]:
+                concurrent_requests.append(request)
+                if len(concurrent_requests) == 2:
+                    arrived.set()
+                await asyncio.wait_for(arrived.wait(), timeout=2)
+        return fake.handle(request)
+
+    runner = make_runner(settings, root, fake, operator, clock)
+    runner.transport = httpx.MockTransport(handle)
+    await runner.run("D6")
+    assert len(concurrent_requests) == 2
+    first, second = concurrent_requests
+    assert first.content == second.content
+    assert first.headers["paypal-request-id"] == second.headers["paypal-request-id"]
+
+
+@pytest.mark.asyncio
+async def test_d6_does_not_claim_a_lost_response_if_the_call_was_fast(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    state = await make_runner(settings, root, fake, operator, clock).run("D6")
+    assert state["data"]["verdict"] == "BLOCKED"
+    assert state["data"]["experiments"]["e"]["initial_unknown"] is False
+
+
+@pytest.mark.asyncio
+async def test_d6_interrupted_lost_response_recovers_without_new_keys(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    original = fake.respond
+    failed = []
+
+    def accepted_then_interrupted(request):
+        response = original(request)
+        if (
+            request.url.path == "/v1/payments/payouts"
+            and request.method == "POST"
+            and request.extensions["timeout"]["read"] == 0.05
+            and not failed
+        ):
+            failed.append(request)
+            raise RuntimeError("simulated process interruption after acceptance")
+        return response
+
+    fake.respond = accepted_then_interrupted
+    with pytest.raises(CheckFailed):
+        await make_runner(settings, root, fake, operator, clock).run("D6")
+    state = await make_runner(settings, root, fake, operator, clock).run("D6")
+    assert len(fake.batches) == 5
+    assert state["data"]["experiments"]["e"]["initial_unknown"]
+    original_request = failed[0]
+    replays = [
+        r
+        for r in fake.posts("/v1/payments/payouts")
+        if r.headers["paypal-request-id"] == original_request.headers["paypal-request-id"]
+    ]
+    assert len(replays) == 2
+    assert all(r.content == original_request.content for r in replays)
+    assert_clean(root, operator)
+
+
+@pytest.mark.asyncio
+async def test_total_items_cannot_hide_a_second_item_on_another_page(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    original = fake.respond
+
+    def hidden_second_item(request):
+        response = original(request)
+        if request.method == "GET" and request.url.path.startswith("/v1/payments/payouts/"):
+            return httpx.Response(200, json={**response.json(), "total_items": 2})
+        return response
+
+    fake.respond = hidden_second_item
+    with pytest.raises(CheckFailed):
+        await make_runner(settings, root, fake, operator, clock).run("D3")
+
+
+@pytest.mark.asyncio
+async def test_capture_webhook_delay_is_correlated_without_matching_missing_ids(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    directory = root / "webhooks"
+    directory.mkdir()
+    for name, capture in (("matching", "CAP1"), ("unrelated", "SOMETHING_ELSE")):
+        (directory / f"{name}.json").write_text(
+            json.dumps(
+                {
+                    "event_id": name,
+                    "event_type": "PAYMENT.CAPTURE.COMPLETED",
+                    "create_time": NOW.isoformat(),
+                    "received_at": (NOW + timedelta(seconds=2)).isoformat(),
+                    "body": {"resource": {"id": capture}},
+                }
+            )
+        )
+    state = await make_runner(settings, root, fake, operator, clock).run("D2")
+    assert [event["event_id"] for event in state["data"]["webhooks"]] == ["matching"]
+    assert state["data"]["webhooks"][0]["delay_seconds"] == 2
+    from types import SimpleNamespace
+
+    assert [
+        event["event_id"] for event in common.webhooks(SimpleNamespace(root=root), ["CAP1", None])
+    ] == ["matching"]
+    assert common.webhooks(SimpleNamespace(root=root), [None]) == []

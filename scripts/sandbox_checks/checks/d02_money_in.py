@@ -120,6 +120,7 @@ async def capture_orders(ctx):
             "net_minor": common.cents(net.get("value")),
             "currency": net.get("currency_code"),
             "observed_at": common.now(ctx),
+            "paypal_time": capture.get("update_time") or capture.get("create_time"),
         }
         ctx.checkpoint(captures=captures)
     # Also executes on resume after a capture was checkpointed but before its event was saved.
@@ -132,6 +133,7 @@ async def capture_orders(ctx):
                 amount_minor=capture["net_minor"],
                 currency=capture["currency"],
                 at=capture["observed_at"],
+                paypal_time=capture.get("paypal_time"),
             )
     return {"captures": captures}
 

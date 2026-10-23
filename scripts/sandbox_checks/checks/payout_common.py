@@ -125,6 +125,9 @@ async def send(ctx, name, *, replay=False, timeout=None):
             entry["path"],
             step=name,
             request_id=entry["request_id"],
+            headers={"Prefer": "return=representation"}
+            if entry["path"].startswith("/v2/checkout/orders")
+            else None,
             json=body,
             timeout=timeout,
         )
@@ -216,6 +219,7 @@ async def create_payout(ctx, name, receiver, amount):
     found = batch_id(response) or batch_link(response)
     if found:
         found = resource_id(found)
+    if found and result["state"] == "SUCCEEDED":
         timeline.record(
             ctx,
             "PAYOUT_SUBMITTED",
@@ -279,7 +283,12 @@ async def poll_payout(ctx, name, batch, *, target=TERMINAL):
             "total_items": body.get("total_items"),
         }
         if response.status_code == 200 and items:
-            if len(items) != 1 or not matching_item(ctx, items[0], expected):
+            total = body.get("total_items")
+            if (
+                len(items) != 1
+                or (total is not None and str(total) != "1")
+                or not matching_item(ctx, items[0], expected)
+            ):
                 raise PayoutCheckError("Batch item identity or count mismatch; adoption refused.")
             response = await ctx.client.request(
                 "GET",
@@ -290,6 +299,14 @@ async def poll_payout(ctx, name, batch, *, target=TERMINAL):
                 last = payload(response)
                 if not matching_item(ctx, last, expected):
                     raise PayoutCheckError("Payout item identity mismatch; adoption refused.")
+                timeline.record(
+                    ctx,
+                    "PAYOUT_SUBMITTED",
+                    resource_id=batch,
+                    amount_minor=cents(expected["amount"].get("value")),
+                    currency=expected["amount"].get("currency"),
+                    paypal_time=(body.get("batch_header") or {}).get("time_created"),
+                )
                 sample.update(
                     item_id=last.get("payout_item_id"), status=last.get("transaction_status")
                 )
@@ -334,7 +351,9 @@ async def observe_balance(ctx, name, baseline, delta):
 
 def webhooks(ctx, resource_ids):
     """C04 public deliveries, with elapsed time from the event's own PayPal timestamp."""
-    wanted = set(resource_ids)
+    wanted = {value for value in resource_ids if value}
+    if not wanted:
+        return []
     events = []
     for path in sorted((ctx.root / "webhooks").glob("*.json")):
         try:
