@@ -246,10 +246,15 @@ class PayoutService:
         item.revision += 1
         item.processed_at = self.store.clock.now
         if target == "UNCLAIMED":
+            state = self.store.payouts
             revision = item.revision
 
             def expire():
-                if item.status == "UNCLAIMED" and item.revision == revision:
+                if (
+                    self.store.payouts is state
+                    and item.status == "UNCLAIMED"
+                    and item.revision == revision
+                ):
                     self.transition(item, "RETURNED")
 
             self.store.clock.schedule(30 * 86400, expire)

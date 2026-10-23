@@ -305,3 +305,47 @@ def test_pending_behavior_switches():
         client.post("/_mock/config", json={"evidence_allowed_stages": ["INQUIRY"]})
         d = staged(client)
         assert "provide_evidence" not in [link["rel"] for link in d["links"]]
+
+
+def test_negative_available_minor_unit_is_reported_exactly(client):
+    seed = {
+        **SEED,
+        "balances": {"available": "0.00", "withheld": "0.00", "currency_code": "USD"},
+    }
+    assert client.post("/_mock/seed", json=seed).status_code == 200
+    response = client.post(
+        "/_mock/disputes",
+        json={"capture_id": "MOCKCAP400", "amount": "0.01", "reason": "TEST"},
+    )
+    assert response.status_code == 200
+    assert truth(client)["balances"]["available"]["value"] == "-0.01"
+    assert (
+        client.post(
+            "/_mock/disputes/" + response.json()["dispute_id"] + "/buyer-close", json={}
+        ).status_code
+        == 200
+    )
+    assert truth(client)["balances"]["available"]["value"] == "0.00"
+
+
+@pytest.mark.parametrize("status", ["PENDING", "UNCLAIMED"])
+def test_reseed_invalidates_old_item_timers(client, status):
+    seed = {
+        **SEED,
+        "payout_items": [
+            {
+                "payout_item_id": "OLD",
+                "receiver": "typo@example.com",
+                "amount": "1.00",
+                "status": status,
+                "created_at": "2026-10-04T09:00:00Z",
+            }
+        ],
+    }
+    assert client.post("/_mock/seed", json=seed).status_code == 200
+    old = client.app.state.store.payouts.items["OLD"]
+    assert client.post("/_mock/seed", json=SEED).status_code == 200
+    advance(client, 86400)
+    assert truth(client)["balances"]["available"]["value"] == "1500.00"
+    assert truth(client)["payout_items"] == []
+    assert old.status == status

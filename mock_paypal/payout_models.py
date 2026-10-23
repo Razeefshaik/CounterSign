@@ -14,7 +14,9 @@ def minor(value: str) -> int:
 
 
 def amount(value: int) -> dict[str, str]:
-    return {"value": f"{value // 100}.{value % 100:02d}", "currency": "USD"}
+    sign = "-" if value < 0 else ""
+    absolute = abs(value)
+    return {"value": f"{sign}{absolute // 100}.{absolute % 100:02d}", "currency": "USD"}
 
 
 class PayPalBody(BaseModel):

@@ -303,7 +303,7 @@ class ResourceService:
                     due,
                     lambda item=item: (
                         self.payouts.transition(item, "RETURNED")
-                        if item.status == "UNCLAIMED"
+                        if self.store.payouts is funds and item.status == "UNCLAIMED"
                         else None
                     ),
                 )
@@ -317,7 +317,7 @@ class ResourceService:
                             if item.payload["receiver"] in funds.registered_receivers
                             else "UNCLAIMED",
                         )
-                        if item.status == "PENDING"
+                        if self.store.payouts is funds and item.status == "PENDING"
                         else None
                     ),
                 )
@@ -417,7 +417,7 @@ class ResourceService:
             min(held, value) if refund and self.behavior.refund_uses_withheld else 0
         )
         needed = value - from_held if refund else 0
-        if self.store.payouts.available_minor < needed:
+        if needed > 0 and self.store.payouts.available_minor < needed:
             raise PayoutError(422, "INSUFFICIENT_FUNDS", "Insufficient refund funds")
         self.store.payouts.withheld_minor -= held
         self.store.payouts.available_minor += held - from_held - needed
