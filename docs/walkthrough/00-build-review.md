@@ -1,5 +1,7 @@
 # CounterSign: what we have built so far (review guide)
 
+> **Note:** this page is a snapshot from Oct 23, before the history cleanup on Oct 24. Commit hashes in it are pre-cleanup; `git log --oneline main` shows the current ones (same subjects).
+
 **As of:** Oct 23, 2026 (day one of the build). **Deadline:** Nov 13, 2026, 1:30 AM IST.
 
 This guide explains what exists in the repository and in open work, how each piece works, and what still needs a decision. Diagrams are Mermaid: GitHub renders them, and VS Code shows them in the Markdown preview once a Mermaid preview extension is installed.

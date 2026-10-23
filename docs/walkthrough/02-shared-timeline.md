@@ -1,6 +1,6 @@
 # Step 1: the shared timeline ("what happened when")
 
-**Commit:** `f094649`. **File:** `scripts/sandbox_checks/timeline.py`.
+**Commit:** `6b83518`. **File:** `scripts/sandbox_checks/timeline.py`.
 
 ## What problem it solves
 
