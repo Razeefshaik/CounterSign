@@ -398,6 +398,7 @@ async def test_d10_settles_every_dispute_and_catalogues_outcomes(settings, root)
     assert data["spare_25"]["evidence"]["stage"] == "CHARGEBACK"
     assert data["buyer_close"] == {"skipped": True}
     assert data["withheld_back_to_baseline_at"]
+    assert data["release_evidence"] == "RELEASED"
     catalogue = json.loads((root / "outcome_codes.json").read_text())
     assert set(catalogue["codes"]) == {"RESOLVED_SELLER_FAVOUR", "RESOLVED_BUYER_FAVOUR"}
     final = findings(root, "D10")
@@ -639,6 +640,21 @@ async def test_lost_accept_claim_that_never_shows_up_stays_unknown(settings, roo
     snad = state["data"]["snad_60"]
     assert len(fake.posts("/accept-claim")) == 1
     assert snad["accept_claim_outcome"] == "UNKNOWN" and snad["resolved"] is False
+
+
+@pytest.mark.asyncio
+async def test_d10_release_without_balance_evidence_is_blocked(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake, answers={"or type skip": "skip"})
+    await run_checks(settings, root, fake, operator, clock, "D8", "D9")
+    fake.balance_mode = "error"
+
+    state = await runner(settings, root, fake, operator, clock).run("D10")
+
+    assert state["data"]["withheld_back_to_baseline_at"] is None
+    assert state["data"]["release_evidence"] == "BLOCKED"
+    assert state["data"]["release_valid_observations"] == 0
+    assert findings(root, "D10")["release_evidence"] == "BLOCKED"
 
 
 @pytest.mark.asyncio

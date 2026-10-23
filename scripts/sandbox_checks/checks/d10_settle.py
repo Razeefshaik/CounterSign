@@ -20,13 +20,13 @@ from .d08_dispute_create import (
     balance_snapshot,
     find_dispute,
     has_rel,
-    minor,
     now,
     poll_dispute,
     post_action,
     rels,
     summarize,
     webhook_deliveries,
+    withheld_minor,
     write_findings,
 )
 from .d09_evidence import submit_evidence
@@ -323,11 +323,11 @@ async def buyer_close_fallback(ctx: CheckContext) -> dict:
 async def observe_release(ctx: CheckContext) -> dict:
     """Balances every 5 minutes, up to 3 hours, until withheld is back to D8's baseline."""
     observations = list(ctx.data.get("release_observations") or [])
-    baseline = minor(ctx.data["baseline_balance"].get("withheld"))
+    baseline = withheld_minor(ctx.data["baseline_balance"])
     total = HOLD_OBSERVE_SECONDS // HOLD_INTERVAL_SECONDS + 1
 
     def released(observation) -> bool:
-        withheld = minor(observation.get("withheld"))
+        withheld = withheld_minor(observation)
         return baseline is not None and withheld is not None and withheld <= baseline
 
     while len(observations) < total and not (observations and released(observations[-1])):
@@ -336,7 +336,20 @@ async def observe_release(ctx: CheckContext) -> dict:
         observations.append(await balance_snapshot(ctx, step="release_balance"))
         ctx.checkpoint(release_observations=observations)
     first = next((o["fetched_at"] for o in observations if released(o)), None)
-    return {"release_observations": observations, "withheld_back_to_baseline_at": first}
+    valid = sum(withheld_minor(o) is not None for o in observations)
+    # Failed reads or no baseline are missing evidence, not "never released".
+    if first:
+        evidence = "RELEASED"
+    elif baseline is None or not valid:
+        evidence = "BLOCKED"
+    else:
+        evidence = "NOT_RELEASED"
+    return {
+        "release_observations": observations,
+        "withheld_back_to_baseline_at": first,
+        "release_evidence": evidence,
+        "release_valid_observations": valid,
+    }
 
 
 def outcomes(ctx: CheckContext) -> list[dict]:
@@ -409,6 +422,7 @@ async def findings(ctx: CheckContext) -> dict:
             "buyer_close": fallback,
             "outcome_codes": ctx.data["outcome_codes"],
             "withheld_back_to_baseline_at": ctx.data["withheld_back_to_baseline_at"],
+            "release_evidence": ctx.data["release_evidence"],
             "resolved_webhooks": webhook_deliveries(
                 ctx, "CUSTOMER.DISPUTE.RESOLVED", [i for i in dispute_ids if i]
             ),
