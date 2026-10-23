@@ -119,4 +119,3 @@ CREATE TABLE policies (key text PRIMARY KEY, value jsonb NOT NULL, version int N
 CREATE TABLE audit_log (id bigserial PRIMARY KEY, at timestamptz NOT NULL DEFAULT now(),
   actor text NOT NULL CHECK (actor IN ('agent','owner','shield','executor','system')),
   kind text NOT NULL, proposal_id uuid, operation_id uuid, rule text, verdict text, details jsonb);  -- guardrail monitor
-
