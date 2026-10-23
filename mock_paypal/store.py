@@ -6,6 +6,7 @@ from datetime import timedelta
 
 from mock_paypal.clock import MockClock
 from mock_paypal.config import MockConfig
+from mock_paypal.payouts import PayoutState
 
 TOKEN_LIFETIME_SECONDS = 32400
 # pending D1: override through create_app(oauth_scope=...) after sandbox findings.
@@ -28,6 +29,7 @@ class MockStore:
         self.config = MockConfig()
         self.tokens = {}
         self.records = {}
+        self.payouts = PayoutState()
         self._ids = 0
 
     def new_id(self, prefix: str = "MOCK") -> str:
