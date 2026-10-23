@@ -112,3 +112,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Agent tools via the toolkit's LangChain adapter behind an exact allowlist; model swappable, chosen at core step 5 | Owner | Accept | Python toolkit has no Anthropic module; a cheap model can run the large evaluation |
 | Vertical slice first; DB transition triggers, allowed_transitions and property tests deferred until it works | Owner | Accept | Get one sandbox flow working end to end by Nov 5 before hardening |
 | Day one checks timeboxed to Oct 25; BLOCKED is recorded, not chased | Owner | Accept | Protect build time |
+| Work split across core and mate with folder ownership (AGENTS.md); interfaces fixed in docs/CONTRACTS.md | Owner | Accept | Three parallel workers need stable boundaries |
+| Dashboard data comes from core-owned `v_dash_*` views with a `doc jsonb` column shaped exactly as the API item | Plan | Accept | Mate serves the API without importing core internals; fixtures first, views later |
+| Core exposes `countersign.harness.Engine` as the only module mate code imports | Plan | Accept | Eval and the demo bar need one stable entry point |
+| Demo control bar endpoints live in mate's `api/dashboard.py` and reuse the eval runner | Plan | Accept | The demo week is just an eval scenario played step by step |
+| Eval invariants computed from `mock_paypal` ground truth, not from system traces | Plan | Accept | A system cannot grade itself |
+| Mate also owns tests/mock_paypal/, tests/eval/ and tests/dashboard/ | Owner | Accept | Mate's tests live next to its ownership boundary, outside core's tests/ |
+| Demo mode shows a persistent "Simulated: mock PayPal" banner whenever the demo bar replays the week (CONTRACTS 1.0.1) | Owner | Accept | Nobody may mistake simulated activity for live sandbox activity |

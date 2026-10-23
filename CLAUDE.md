@@ -3,6 +3,7 @@
 PayPal AI Hackathon project. Deadline: Nov 13, 2026, 1:30 AM IST.
 
 Before any design or build work, read docs/HANDOFF.md and docs/DECISIONS.md fully.
+Also follow AGENTS.md: folder ownership, branch rules and the stop-and-ask rules apply to you too.
 HANDOFF.md is the source of truth for the design. docs/PLAN.md holds the approved day one plan, schema and state machines.
 
 Hard rules:
