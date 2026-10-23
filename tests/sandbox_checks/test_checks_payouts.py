@@ -191,6 +191,14 @@ class FakePayPal:
         match = re.fullmatch(r"/v1/payments/payouts-item/(ITEM\d+)", path)
         if match and method == "GET":
             return httpx.Response(200, json=self.items[match.group(1)])
+        match = re.fullmatch(r"/v1/payments/payouts-item/(ITEM\d+)/cancel", path)
+        if match and method == "POST":
+            item = self.items[match.group(1)]
+            if item["transaction_status"] != "UNCLAIMED":
+                return httpx.Response(422, json={"name": "CANNOT_CANCEL_COMPLETED_PAYMENT"})
+            item["transaction_status"] = "RETURNED"
+            self.available += common.cents(item["payout_item"]["amount"]["value"])
+            return httpx.Response(200, json=item)
         return httpx.Response(404, json={"name": "RESOURCE_NOT_FOUND"})
 
     def posts(self, path):
@@ -213,6 +221,8 @@ class Operator:
                     order["status"] = "APPROVED"
 
     def input(self, _):
+        if "Type yes or no" in self.prompt:
+            return "no"
         if "carrier code" in self.prompt:
             return "USPS"
         if "tracking number" in self.prompt:
@@ -489,3 +499,62 @@ async def test_d4_missing_addresses_blocks_before_any_payout(settings, root):
     ).run("D4")
     assert state["data"]["verdict"] == "BLOCKED"
     assert not fake.posts("/v1/payments/payouts")
+
+
+async def prerequisites(settings, root, fake, operator, clock):
+    states = {}
+    for check in ("D3", "D4"):
+        states[check] = await make_runner(settings, root, fake, operator, clock).run(check)
+    return states
+
+
+@pytest.mark.asyncio
+async def test_d5_cancel_get_negatives_and_uncancelled_monitor(settings, root, monkeypatch):
+    from scripts.sandbox_checks.checks import d05_cancel as d5
+
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    prior = await prerequisites(settings, root, fake, operator, clock)
+    monkeypatch.setattr(d5, "MONITOR_DEADLINE", clock.now() + timedelta(minutes=10))
+    state = await make_runner(settings, root, fake, operator, clock).run("D5")
+    data = state["data"]
+    assert data["verdict"] == "CONFIRMED"
+    assert data["cancel"]["response_transaction_status"] == "RETURNED"
+    assert data["cancel"]["final"]["transaction_status"] == "RETURNED"
+    assert set(data["negative_cases"]) == {"cancel_again", "cancel_success"}
+    assert all(case["status"] == 422 for case in data["negative_cases"].values())
+    assert data["balance"]["first_reflected_at"]
+    control = prior["D4"]["data"]["payouts"]["unreg_2"]["item_id"]
+    assert not fake.posts(f"/v1/payments/payouts-item/{control}/cancel")
+    assert len(data["control_observations"]) >= 3
+    assert all(s["status"] == "UNCLAIMED" for s in data["control_observations"])
+    assert any(e["event"] == "PAYOUT_ITEM_RETURNED" for e in data["timeline"])
+    assert_clean(root, operator)
+
+
+@pytest.mark.asyncio
+async def test_d5_lost_cancel_is_get_reconciled_and_only_negative_case_resends(
+    settings, root, monkeypatch
+):
+    from scripts.sandbox_checks.checks import d05_cancel as d5
+
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    prior = await prerequisites(settings, root, fake, operator, clock)
+    item_id = prior["D4"]["data"]["payouts"]["unreg_1"]["item_id"]
+    fake.drop = ("POST", f"/v1/payments/payouts-item/{item_id}/cancel")
+    monkeypatch.setattr(d5, "MONITOR_DEADLINE", clock.now())
+    state = await make_runner(settings, root, fake, operator, clock).run("D5")
+    assert state["data"]["cancel"]["write_state"] == "UNKNOWN"
+    assert state["data"]["cancel"]["final"]["transaction_status"] == "RETURNED"
+    assert len(fake.posts(f"/v1/payments/payouts-item/{item_id}/cancel")) == 2
+    assert state["data"]["negative_cases"]["cancel_again"]["status"] == 422
+
+
+@pytest.mark.asyncio
+async def test_d5_does_not_cancel_without_prerequisites(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    state = await make_runner(settings, root, fake, operator, clock).run("D5")
+    assert state["data"]["verdict"] == "BLOCKED"
+    assert not [r for r in fake.requests if r.url.path.endswith("/cancel")]
