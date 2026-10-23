@@ -6,6 +6,7 @@ import httpx
 import pytest
 
 from scripts.sandbox_checks.checks import d08_dispute_create as d08
+from scripts.sandbox_checks.checks import d10_settle as d10
 from scripts.sandbox_checks.env import SandboxSettings
 from scripts.sandbox_checks.manual import ManualSteps
 from scripts.sandbox_checks.redact import Redactor
@@ -236,7 +237,7 @@ def root(tmp_path):
 @pytest.fixture(autouse=True)
 def short_observation(monkeypatch):
     # Real defaults (asserted below) are 5 minutes for 3 hours; three samples are enough here.
-    for module in (d08,):
+    for module in (d08, d10):
         monkeypatch.setattr(module, "HOLD_OBSERVE_SECONDS", 600)
 
 
@@ -353,6 +354,35 @@ async def test_d9_submits_tracking_evidence_at_inquiry(settings, root):
 
 
 @pytest.mark.asyncio
+async def test_d10_settles_every_dispute_and_catalogues_outcomes(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake, answers={"or type skip": "skip"})
+
+    states = await run_checks(settings, root, fake, operator, clock, "D8", "D9", "D10")
+
+    data = states["D10"]["data"]
+    assert data["inr_400"]["resolved"] and data["inr_400"]["reached_under_review"]
+    assert [step["after"] for step in data["inr_400"]["path"]] == [
+        "start",
+        "escalate",
+        "adjudicate",
+    ]
+    assert data["snad_60"]["final"]["dispute_outcome"]["outcome_code"] == "RESOLVED_BUYER_FAVOUR"
+    assert [a["format"] for a in data["snad_60"]["attempts"]] == ["json"]
+    assert data["spare_25"]["require_evidence"]["status"] == 200
+    assert data["spare_25"]["evidence"]["stage"] == "CHARGEBACK"
+    assert data["buyer_close"] == {"skipped": True}
+    assert data["withheld_back_to_baseline_at"]
+    catalogue = json.loads((root / "outcome_codes.json").read_text())
+    assert set(catalogue["codes"]) == {"RESOLVED_SELLER_FAVOUR", "RESOLVED_BUYER_FAVOUR"}
+    final = findings(root, "D10")
+    assert final["verdict"] == "CONFIRMED" and final["settle_from_under_review"] is True
+    assert final["evidence_accepted_stages"] == ["spare_25:CHARGEBACK"]
+    assert len(fake.posts("/accept-claim")) == 1
+    assert_no_private_values(root, operator)
+
+
+@pytest.mark.asyncio
 async def test_api_route_runs_only_with_scope_and_hides_the_assertion(settings, root):
     seed(root, "D1", {"verdict": "CONFIRMED", "permissions": {"disputes_create": True}})
     fake, clock = FakePayPal(), FakeClock()
@@ -404,3 +434,73 @@ async def test_interrupted_api_create_is_never_resent_and_is_found_by_polling(se
     assert state["data"]["api_route"]["verdict"] == "UNKNOWN"
     assert state["data"]["disputes"]["spare_25"]["dispute_id"] == "PP-D-0001"
     assert sum("Report a problem" in line for line in operator.lines) == 2
+
+
+@pytest.mark.asyncio
+async def test_d9_records_absent_link_without_posting(settings, root):
+    fake = FakePayPal(evidence_at_inquiry=False, escalate_status="WAITING_FOR_SELLER_RESPONSE")
+    clock, operator = FakeClock(), Operator(fake)
+    await runner(settings, root, fake, operator, clock).run("D8")
+
+    state = await runner(settings, root, fake, operator, clock).run("D9")
+
+    assert not fake.posts("/provide-evidence")
+    assert state["data"]["evidence"] == {
+        "submitted": False,
+        "reason": "provide_evidence link absent",
+        "stage": "INQUIRY",
+        "status": "WAITING_FOR_SELLER_RESPONSE",
+    }
+    assert findings(root, "D9")["verdict"] == "DIFFERENT"
+
+    d10_state = await runner(settings, root, fake, operator, clock).run("D10")
+
+    # D10 escalates; evidence then lands at the claim stage and the stage is recorded.
+    assert d10_state["data"]["inr_400"]["evidence"]["stage"] == "CHARGEBACK"
+    assert "inr_400:CHARGEBACK" in findings(root, "D10")["evidence_accepted_stages"]
+
+
+@pytest.mark.asyncio
+async def test_d10_buyer_close_fallback_when_under_review_is_unreachable(settings, root):
+    fake, clock = FakePayPal(escalate_status="WAITING_FOR_BUYER_RESPONSE"), FakeClock()
+    operator = Operator(fake)
+    for check in ("D8", "D9"):
+        await runner(settings, root, fake, operator, clock).run(check)
+
+    state = await runner(settings, root, fake, operator, clock).run("D10")
+
+    data = state["data"]
+    assert not data["inr_400"]["reached_under_review"] and not data["inr_400"]["resolved"]
+    assert not fake.posts("/adjudicate")
+    assert data["buyer_close"]["role"] == "inr_400"
+    assert data["buyer_close"]["final"]["dispute_outcome"]["outcome_code"] == "CANCELED_BY_BUYER"
+    assert findings(root, "D10")["verdict"] == "DIFFERENT"
+    catalogue = json.loads((root / "outcome_codes.json").read_text())
+    assert "CANCELED_BY_BUYER" in catalogue["codes"]
+
+
+@pytest.mark.asyncio
+async def test_interrupted_accept_claim_is_not_resent_on_resume(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake, answers={"or type skip": "skip"})
+    for check in ("D8", "D9"):
+        await runner(settings, root, fake, operator, clock).run(check)
+    snad = next(i for i, d in fake.disputes.items() if d["capture"] == "CAP60")
+    real_handle = fake.handle
+
+    def accept_then_drop(request):
+        if request.url.path.endswith("/accept-claim"):
+            real_handle(request)  # PayPal refunds, then the response is lost.
+            raise httpx.ReadTimeout("fake lost response")
+        return real_handle(request)
+
+    fake.handle = accept_then_drop
+    with pytest.raises(CheckFailed):
+        await runner(settings, root, fake, operator, clock).run("D10")
+    fake.handle = real_handle
+
+    state = await runner(settings, root, fake, operator, clock).run("D10")
+
+    assert len(fake.posts("/accept-claim")) == 1
+    assert fake.disputes[snad]["status"] == "RESOLVED"
+    assert state["data"]["snad_60"]["resolved"] is True
