@@ -12,10 +12,12 @@ import json
 
 from ..runner import CheckContext, Step
 from .d08_dispute_create import (
+    classify,
     get_dispute,
     has_rel,
     poll_dispute,
     resource_id,
+    send_once,
     summarize,
     webhook_deliveries,
     write_findings,
@@ -44,26 +46,39 @@ def evidence_body(tracking: dict) -> dict:
 
 
 async def submit_evidence(ctx: CheckContext, dispute_id: str, tracking: dict, *, step: str):
-    """Try multipart with an input JSON part, then a JSON body; stop at the first 2xx.
+    """Multipart with an input JSON part first; a JSON body only after a definite rejection.
 
-    Evidence moves no money, so trying the second format after a failure is safe.
+    Each attempt is checkpointed before it is sent and never re-sent on resume. An
+    ambiguous attempt (lost response, interruption, 5xx) stays UNKNOWN for the caller to
+    reconcile by GET, so PayPal never receives the same evidence twice.
     """
     body = evidence_body(tracking)
-    path = f"/v1/customer/disputes/{resource_id(dispute_id)}/provide-evidence"
     attempts = []
     for fmt, kwargs in (
         ("multipart", {"files": {"input": (None, json.dumps(body), "application/json")}}),
-        ("json", {"json": body}),
+        ("json", {"body": body}),
     ):
-        response = await ctx.client.request("POST", path, step=f"{step}_{fmt}", **kwargs)
-        try:
-            error_name = response.json().get("name")
-        except (ValueError, AttributeError):
-            error_name = None
-        attempts.append({"format": fmt, "status": response.status_code, "error_name": error_name})
-        if 200 <= response.status_code < 300:
-            return {"submitted": True, "format": fmt, "attempts": attempts}
-    return {"submitted": False, "format": None, "attempts": attempts}
+        result = await send_once(
+            ctx, resource_id(dispute_id), "provide-evidence", key=f"{step}:{fmt}", **kwargs
+        )
+        outcome = classify(result)
+        attempts.append(
+            {
+                "format": fmt,
+                "status": result["status"],
+                "error_name": result.get("error_name"),
+                "outcome": outcome,
+            }
+        )
+        if outcome != "REJECTED":
+            break
+    last = attempts[-1]
+    return {
+        "submitted": last["outcome"] == "SENT",
+        "outcome": last["outcome"],
+        "format": last["format"] if last["outcome"] in ("SENT", "UNKNOWN") else None,
+        "attempts": attempts,
+    }
 
 
 async def load_inputs(ctx: CheckContext) -> dict:
@@ -115,8 +130,13 @@ async def provide_evidence(ctx: CheckContext) -> dict:
     return {"evidence": result}
 
 
+def accepted(evidence: dict) -> bool:
+    return bool(evidence.get("submitted") or evidence.get("reconciled") == "ACCEPTED")
+
+
 async def observe_after(ctx: CheckContext) -> dict:
-    if not ctx.data["evidence"].get("submitted"):
+    evidence = dict(ctx.data["evidence"])
+    if not evidence.get("submitted") and evidence.get("outcome") != "UNKNOWN":
         return {"after": None, "after_history": []}
     status = ctx.data["before"]["status"]
     detail, history = await poll_dispute(
@@ -126,12 +146,15 @@ async def observe_after(ctx: CheckContext) -> dict:
         step="after_evidence",
         max_polls=AFTER_MAX_POLLS,
     )
-    return {"after": summarize(detail), "after_history": history}
+    if evidence.get("outcome") == "UNKNOWN":
+        # The response was lost: a status change after the attempt shows PayPal took it.
+        evidence["reconciled"] = "ACCEPTED" if detail.get("status") != status else "UNKNOWN"
+    return {"after": summarize(detail), "after_history": history, "evidence": evidence}
 
 
 async def findings(ctx: CheckContext) -> dict:
     evidence = ctx.data["evidence"]
-    if evidence.get("submitted"):
+    if accepted(evidence):
         verdict = "CONFIRMED" if evidence["stage"] == "INQUIRY" else "DIFFERENT"
     elif evidence.get("reason") == "provide_evidence link absent":
         verdict = "DIFFERENT"
@@ -144,7 +167,7 @@ async def findings(ctx: CheckContext) -> dict:
             "check_id": "D9",
             "verdict": verdict,
             "dispute_id": ctx.data["dispute_id"],
-            "evidence_accepted_stage": evidence.get("stage") if evidence.get("submitted") else None,
+            "evidence_accepted_stage": evidence.get("stage") if accepted(evidence) else None,
             "evidence": evidence,
             "before": ctx.data["before"],
             "after": ctx.data["after"],

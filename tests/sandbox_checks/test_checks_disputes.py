@@ -5,6 +5,7 @@ from datetime import UTC, datetime, timedelta
 import httpx
 import pytest
 
+from scripts.sandbox_checks import timeline
 from scripts.sandbox_checks.checks import d08_dispute_create as d08
 from scripts.sandbox_checks.checks import d10_settle as d10
 from scripts.sandbox_checks.env import SandboxSettings
@@ -675,3 +676,110 @@ async def test_definite_json_rejection_falls_back_to_multipart_once(settings, ro
         ("multipart", "SENT"),
     ]
     assert snad["accept_claim_outcome"] == "RESOLVED"
+
+
+def evidence_dispute(request) -> str:
+    return request.url.path.split("/")[-2]
+
+
+@pytest.mark.asyncio
+async def test_lost_evidence_response_is_reconciled_by_get_not_resent(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    await runner(settings, root, fake, operator, clock).run("D8")
+    real_handle = fake.handle
+
+    def accept_then_drop(request):
+        # PayPal takes the evidence, then the response is lost.
+        response = real_handle(request)
+        if request.url.path.endswith("/provide-evidence"):
+            raise httpx.ReadTimeout("fake lost response")
+        return response
+
+    fake.handle = accept_then_drop
+    with pytest.raises(CheckFailed):
+        await runner(settings, root, fake, operator, clock).run("D9")
+
+    state = await runner(settings, root, fake, operator, clock).run("D9")
+
+    assert len(fake.posts("/provide-evidence")) == 1
+    evidence = state["data"]["evidence"]
+    assert evidence["submitted"] is False and evidence["outcome"] == "UNKNOWN"
+    assert evidence["reconciled"] == "ACCEPTED"
+    finding = findings(root, "D9")
+    assert finding["verdict"] == "CONFIRMED"
+    assert finding["evidence_accepted_stage"] == "INQUIRY"
+    assert_no_private_values(root, operator)
+
+
+@pytest.mark.asyncio
+async def test_evidence_server_error_stays_unknown_and_is_not_retried_as_json(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    await runner(settings, root, fake, operator, clock).run("D8")
+    real_handle = fake.handle
+
+    def server_error(request):
+        if request.url.path.endswith("/provide-evidence"):
+            fake.requests.append(request)
+            return httpx.Response(503, json={"name": "SERVICE_UNAVAILABLE"})
+        return real_handle(request)
+
+    fake.handle = server_error
+    state = await runner(settings, root, fake, operator, clock).run("D9")
+
+    assert len(fake.posts("/provide-evidence")) == 1
+    evidence = state["data"]["evidence"]
+    assert [(a["format"], a["outcome"]) for a in evidence["attempts"]] == [
+        ("multipart", "UNKNOWN")
+    ]
+    assert evidence["reconciled"] == "UNKNOWN"
+    finding = findings(root, "D9")
+    assert finding["verdict"] == "BLOCKED" and finding["evidence_accepted_stage"] is None
+
+
+@pytest.mark.asyncio
+async def test_definite_multipart_rejection_falls_back_to_json_evidence_once(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    await runner(settings, root, fake, operator, clock).run("D8")
+    real_handle = fake.handle
+
+    def json_only(request):
+        if request.url.path.endswith("/provide-evidence"):
+            fake.requests.append(request)
+            if request.headers["content-type"].startswith("multipart/form-data"):
+                return httpx.Response(415, json={"name": "UNSUPPORTED_MEDIA_TYPE"})
+            fake.disputes[evidence_dispute(request)]["status"] = "WAITING_FOR_BUYER_RESPONSE"
+            return httpx.Response(200, json={"links": []})
+        return real_handle(request)
+
+    fake.handle = json_only
+    state = await runner(settings, root, fake, operator, clock).run("D9")
+
+    assert len(fake.posts("/provide-evidence")) == 2
+    evidence = state["data"]["evidence"]
+    assert [(a["format"], a["outcome"]) for a in evidence["attempts"]] == [
+        ("multipart", "REJECTED"),
+        ("json", "SENT"),
+    ]
+    assert evidence["submitted"] is True and evidence["format"] == "json"
+    assert findings(root, "D9")["verdict"] == "CONFIRMED"
+
+
+@pytest.mark.asyncio
+async def test_dispute_checks_record_timeline_events_for_d11_and_d12(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake, answers={"or type skip": "skip"})
+
+    await run_checks(settings, root, fake, operator, clock, "D8", "D9", "D10")
+
+    events = timeline.load_all(root)
+    created = {e["resource_id"]: e for e in events if e["event"] == "DISPUTE_CREATED"}
+    resolved = {e["resource_id"] for e in events if e["event"] == "DISPUTE_RESOLVED"}
+    refunds = {e["resource_id"]: e["amount_minor"] for e in events if e["event"] == "CAPTURE_REFUNDED"}
+    assert sorted(e["amount_minor"] for e in created.values()) == sorted(AMOUNTS.values())
+    assert {e["source"] for e in created.values()} == {"D8"}
+    assert resolved == set(created)
+    # The $60 claim was accepted and the $25 adjudicated for the buyer; the $400 was won.
+    assert refunds == {"CAP60": 6000, "CAP25": 2500}

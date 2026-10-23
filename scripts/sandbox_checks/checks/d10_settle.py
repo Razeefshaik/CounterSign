@@ -11,6 +11,7 @@ Every write is checkpointed before it is sent and never re-sent on resume.
 
 import json
 
+from .. import timeline
 from ..runner import CheckContext, Step
 from .d08_dispute_create import (
     HOLD_INTERVAL_SECONDS,
@@ -18,12 +19,14 @@ from .d08_dispute_create import (
     RESOLUTION_CENTER,
     STAGED,
     balance_snapshot,
+    classify,
     find_dispute,
     has_rel,
+    minor,
     now,
     poll_dispute,
-    post_action,
     rels,
+    send_once,
     summarize,
     webhook_deliveries,
     withheld_minor,
@@ -44,45 +47,21 @@ def stage(detail: dict) -> str | None:
     return detail.get("dispute_life_cycle_stage")
 
 
-FORMAT_REJECTIONS = (400, 415, 422)
-
-
 def succeeded(result: dict) -> bool:
     return isinstance(result.get("status"), int) and 200 <= result["status"] < 300
-
-
-def classify(result: dict) -> str:
-    """SENT (2xx), REJECTED (definite format rejection), FAILED (other definite 4xx), or
-    UNKNOWN (no status: lost response or interrupted after sending; or 5xx)."""
-    code = result.get("status")
-    if not isinstance(code, int) or code >= 500:
-        return "UNKNOWN"
-    if 200 <= code < 300:
-        return "SENT"
-    return "REJECTED" if code in FORMAT_REJECTIONS else "FAILED"
 
 
 async def act_once(
     ctx: CheckContext, role: str, action: str, *, key: str | None = None, body=None, files=None
 ) -> dict:
-    """Send one dispute write at most once; on resume return what was saved instead."""
-    actions = dict(ctx.data.get("actions") or {})
-    key = key or f"{role}:{action}"
-    if key in actions:
-        return actions[key]
-    actions[key] = {"sent_at": now(ctx), "status": None}
-    ctx.checkpoint(actions=actions)
-    result = await post_action(
+    return await send_once(
         ctx,
         ctx.data["disputes"][role],
         action,
-        step=key.replace(":", "_").replace("-", "_"),
+        key=key or f"{role}:{action}",
         body=body,
         files=files,
     )
-    actions[key] = {**actions[key], **result}
-    ctx.checkpoint(actions=actions)
-    return actions[key]
 
 
 async def wait(ctx, role, entry, *, after: str, done, max_polls=REVIEW_MAX_POLLS) -> dict:
@@ -320,8 +299,53 @@ async def buyer_close_fallback(ctx: CheckContext) -> dict:
     return {"buyer_close": entry}
 
 
+def record_resolutions(ctx: CheckContext):
+    """Timeline entries for D11 and D12: when each dispute was first seen RESOLVED."""
+    fallback = ctx.data.get("buyer_close") or {}
+    entries = [
+        (role, ctx.data["disputes"].get(role), ctx.data.get(role) or {}) for role in SETTLE_ROLES
+    ]
+    entries.append((fallback.get("role"), fallback.get("dispute_id"), fallback))
+    for role, dispute_id, entry in entries:
+        histories = [step["history"] for step in entry.get("path") or []]
+        histories.append(entry.get("history") or [])
+        seen = next(
+            (
+                change["at"]
+                for history in histories
+                for change in history
+                if change["status"] == "RESOLVED"
+            ),
+            None,
+        )
+        if not dispute_id or not seen:
+            continue
+        final = entry.get("final") or {}
+        amount = final.get("dispute_amount") or {}
+        timeline.record(
+            ctx,
+            "DISPUTE_RESOLVED",
+            resource_id=dispute_id,
+            amount_minor=minor(amount.get("value")),
+            currency=amount.get("currency_code"),
+            at=seen,
+        )
+        refund = (final.get("dispute_outcome") or {}).get("amount_refunded") or {}
+        capture = ctx.data["captures"].get(role) or entry.get("capture_id")
+        if minor(refund.get("value")) and capture:
+            timeline.record(
+                ctx,
+                "CAPTURE_REFUNDED",
+                resource_id=capture,
+                amount_minor=minor(refund.get("value")),
+                currency=refund.get("currency_code"),
+                at=seen,
+            )
+
+
 async def observe_release(ctx: CheckContext) -> dict:
     """Balances every 5 minutes, up to 3 hours, until withheld is back to D8's baseline."""
+    record_resolutions(ctx)
     observations = list(ctx.data.get("release_observations") or [])
     baseline = withheld_minor(ctx.data["baseline_balance"])
     total = HOLD_OBSERVE_SECONDS // HOLD_INTERVAL_SECONDS + 1

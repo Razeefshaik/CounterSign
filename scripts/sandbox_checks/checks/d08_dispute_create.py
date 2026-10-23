@@ -15,6 +15,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
+from .. import timeline
 from ..recorder import timestamp
 from ..runner import CheckContext, Step
 
@@ -145,6 +146,46 @@ async def post_action(
     )
     data = payload(response)
     return {"status": response.status_code, "error_name": data.get("name")}
+
+
+FORMAT_REJECTIONS = (400, 415, 422)
+
+
+def classify(result: dict) -> str:
+    """SENT (2xx), REJECTED (definite format rejection), FAILED (other definite 4xx), or
+    UNKNOWN (no status: lost response or interrupted after sending; or 5xx)."""
+    code = result.get("status")
+    if not isinstance(code, int) or code >= 500:
+        return "UNKNOWN"
+    if 200 <= code < 300:
+        return "SENT"
+    return "REJECTED" if code in FORMAT_REJECTIONS else "FAILED"
+
+
+async def send_once(
+    ctx: CheckContext, dispute_id: str, action: str, *, key: str, body=None, files=None
+) -> dict:
+    """Send one dispute write at most once; on resume return what was saved instead.
+
+    A saved entry with status None was sent (or may have been) without a recorded answer:
+    callers treat it as UNKNOWN and reconcile by GET, never by sending again.
+    """
+    actions = dict(ctx.data.get("actions") or {})
+    if key in actions:
+        return actions[key]
+    actions[key] = {"sent_at": now(ctx), "status": None}
+    ctx.checkpoint(actions=actions)
+    result = await post_action(
+        ctx,
+        dispute_id,
+        action,
+        step=key.replace(":", "_").replace("-", "_"),
+        body=body,
+        files=files,
+    )
+    actions[key] = {**actions[key], **result}
+    ctx.checkpoint(actions=actions)
+    return actions[key]
 
 
 async def balance_snapshot(ctx: CheckContext, *, step: str) -> dict:
@@ -404,6 +445,16 @@ async def inspect_disputes(ctx: CheckContext) -> dict:
             detail = await get_dispute(ctx, entry["dispute_id"], step=f"inspect_{role}")
             entry["initial"] = summarize(detail)
             entry["disputed_transactions"] = detail.get("disputed_transactions")
+            amount = detail.get("dispute_amount") or {}
+            timeline.record(
+                ctx,
+                "DISPUTE_CREATED",
+                resource_id=entry["dispute_id"],
+                amount_minor=minor(amount.get("value")),
+                currency=amount.get("currency_code"),
+                paypal_time=detail.get("create_time"),
+                at=entry.get("first_seen_at") or entry["submitted_at"],
+            )
     return {"disputes": disputes}
 
 
