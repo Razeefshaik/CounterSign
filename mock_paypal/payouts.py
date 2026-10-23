@@ -175,6 +175,11 @@ class PayoutService:
             # Reset replaces state and clock, so old events cannot affect a new run.
             if self.store.payouts is not state:
                 return
+            batch.status = "PROCESSING"
+            self.store.emit(
+                "PAYMENT.PAYOUTSBATCH.PROCESSING",
+                self.create_doc(batch, "http://localhost:8099"),
+            )
             for item_id in batch.item_ids:
                 item = state.items[item_id]
                 if item.status == "PENDING":
@@ -186,6 +191,10 @@ class PayoutService:
                     self.transition(item, target)
             batch.status = "SUCCESS"  # Batch processed; individual outcomes can differ.
             batch.completed_at = self.store.clock.now
+            self.store.emit(
+                "PAYMENT.PAYOUTSBATCH.SUCCESS",
+                self.create_doc(batch, "http://localhost:8099"),
+            )
 
         self.store.clock.schedule(self.store.config.payout_processing_seconds, process)
         return batch
@@ -263,7 +272,12 @@ class PayoutService:
             raise PayoutError(
                 400, "ITEM_INCORRECT_STATUS", "Only UNCLAIMED items can be cancelled"
             )
-        self.transition(item, self.behavior.cancel_item_status)
+        self.transition(item, self.behavior.cancel_item_status, emit_webhook=False)
+        for suffix in self.store.config.cancel_emits:
+            self.store.emit(
+                "PAYMENT.PAYOUTS-ITEM." + suffix,
+                self.item_doc(item, "http://localhost:8099"),
+            )
         item.cancelled = True
         return item
 

@@ -23,6 +23,8 @@ from mock_paypal.payouts import PayoutBehavior, PayoutError, PayoutService
 from mock_paypal.resources import ResourceBehavior, ResourceService
 from mock_paypal.resources import router as resource_router
 from mock_paypal.store import DEFAULT_SCOPE, TOKEN_LIFETIME_SECONDS, MockStore
+from mock_paypal.webhooks import WebhookService
+from mock_paypal.webhooks import router as webhook_router
 
 
 class ControlBody(BaseModel):
@@ -64,6 +66,8 @@ def create_app(
     payout_behavior: PayoutBehavior | None = None,
     negative_values: dict | None = None,
     resource_behavior: ResourceBehavior | None = None,
+    webhook_delivery=None,
+    mock_base_url: str = "http://localhost:8099",
 ) -> FastAPI:
     app = FastAPI(
         title="CounterSign mock PayPal", docs_url=None, redoc_url=None, openapi_url=None
@@ -82,6 +86,11 @@ def create_app(
     )
     app.state.store.record_transaction = app.state.resource_service.transaction
     app.include_router(resource_router)
+    app.state.webhook_service = WebhookService(
+        app.state.store, webhook_delivery, mock_base_url
+    )
+    app.state.store.emit = app.state.webhook_service.emit
+    app.include_router(webhook_router)
     enabled = (
         os.environ.get("MOCK_CONTROL") == "1"
         if control_enabled is None

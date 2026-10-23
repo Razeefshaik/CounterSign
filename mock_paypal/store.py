@@ -9,6 +9,7 @@ from mock_paypal.config import MockConfig
 from mock_paypal.faults import FaultState
 from mock_paypal.payouts import PayoutState
 from mock_paypal.resources import ResourceState
+from mock_paypal.webhooks import WebhookState
 
 TOKEN_LIFETIME_SECONDS = 32400
 # pending D1: override through create_app(oauth_scope=...) after sandbox findings.
@@ -35,6 +36,7 @@ class MockStore:
         self.faults = FaultState()
         self.refunds = []
         self.resources = ResourceState()
+        self.webhooks = WebhookState()
         self.emit = getattr(self, "emit", lambda *args, **kwargs: None)
         self.record_transaction = getattr(
             self, "record_transaction", lambda *args: None

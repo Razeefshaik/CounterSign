@@ -321,6 +321,8 @@ class ResourceService:
                         else None
                     ),
                 )
+        for capture in state.captures.values():
+            self.store.emit("PAYMENT.CAPTURE.COMPLETED", capture)
         self.snapshot()
         self.schedule_snapshots()
 

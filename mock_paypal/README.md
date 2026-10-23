@@ -138,3 +138,19 @@ with Python's standard email parser. No multipart dependency is required.
 Only status/stage-allowed actions receive HATEOAS links. Held refunds consume
 withheld funds by default, and seller wins/buyer-close release holds once.
 ResourceBehavior exposes pending D8/D9/D10 choices through create_app.
+
+
+## M05 webhook signing and delivery
+
+Events are signed with the explicitly PUBLIC mock-only RSA fixture in
+test_signing_fixture.py. It contains no PayPal keys or real credentials.
+The implementation uses standard-library SHA256/PKCS1-v1_5 with this fixed
+test key, with an independent OpenSSL certificate verification test.
+OpenSSL generated the fixture once; the server does not require it at runtime.
+
+Only local HTTP(S) callback URLs are accepted, and redirects are disabled.
+Delivery, duplicate, drop, delay and reorder faults run through mock-clock
+events. Duplicate copies is the total number of deliveries; delay adds to
+the normal delivery delay. Reorder holds an event until its target is emitted.
+The verify API binds event ID, stored raw bytes, webhook ID and transmission
+headers. Authentic replays still verify; inbox deduplication belongs to core.
