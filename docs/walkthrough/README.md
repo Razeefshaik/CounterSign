@@ -45,6 +45,8 @@ The first working version of the product itself, built step by step. Hashes belo
 | 16 | [c11-dashboard-views.md](c11-dashboard-views.md) | **Dashboard views**: read-only data shaped for the incident desk; the AI's database role can only read these | Codex | `cc1a9f2` |
 | 17 | [c12-database-layer.md](c12-database-layer.md) | **Safe updates**: change a row only if nobody changed it first | Codex | `4e5c8d5` |
 | 18 | [05-state-guards.md](05-state-guards.md) | **Closing a gap**: version numbers on every row a state machine moves, and a test that keeps database and code in step | Claude | `da027ac` |
+| 19 | [c16-ledger.md](c16-ledger.md) | **Bookkeeping and cash**: every money move balanced and booked once; dispute earmarks never reduce free cash; demo Thursday gives exactly $254 free | Claude (+ helper) | `c5a67e5`, `2930804` |
+| 20 | [c17-shield.md](c17-shield.md) | **The shield**: 10 safety rules every AI proposal must pass (no double pay, only verified emails, enough free cash, approvals bound to exact records) | Claude (helper) | `e6f2218` |
 
 ## Words used everywhere
 

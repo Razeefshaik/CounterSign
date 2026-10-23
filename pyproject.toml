@@ -61,3 +61,9 @@ name = "Only the executor may import the PayPal write adapter"
 type = "protected"
 protected_modules = ["*.paypal.write"]
 allowed_importers = ["*.executor"]
+
+[[tool.importlinter.contracts]]
+name = "The shield stays pure: no database, PayPal, executor or agent imports"
+type = "forbidden"
+source_modules = ["*.shield"]
+forbidden_modules = ["*.db", "*.paypal", "*.executor", "*.agent"]
