@@ -8,8 +8,19 @@ from countersign.fsm import Machine
 
 from .pool import Connection
 
-# PLAN 2.2 only gives these state-bearing tables both id and version columns.
-CAS_TABLES = frozenset({"obligations", "payout_runs", "payout_lines", "incidents"})
+# Tables with id, state and version columns (operations, payout_attempts and proposals got
+# their version in migration 0003). Disputes are mirrored from PayPal, not moved by CAS.
+CAS_TABLES = frozenset(
+    {
+        "obligations",
+        "payout_runs",
+        "payout_lines",
+        "incidents",
+        "operations",
+        "payout_attempts",
+        "proposals",
+    }
+)
 
 
 class StaleRow(RuntimeError):

@@ -80,7 +80,7 @@ async def test_illegal_transition_happens_before_any_sql_or_table_validation():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "table", ["operations", "proposals", "payout_attempts", "makers; SELECT 1"]
+    "table", ["disputes", "makers", "approvals", "makers; SELECT 1"]
 )
 async def test_cas_rejects_tables_without_state_and_version(table):
     with pytest.raises(ValueError, match="approved table"):

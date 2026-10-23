@@ -58,13 +58,13 @@ TABLES = MappingProxyType(
         ),
         "operations": _spec(
             "id kind target_type target_id payload payload_hash proposal_id approval_id state response "
-            "paypal_debug_id error created_at submitted_at completed_at",
+            "paypal_debug_id error created_at submitted_at completed_at version",
             json="payload response",
         ),
         "payout_attempts": _spec(
             "id line_id attempt_no operation_id sender_batch_id request_id sender_item_id payee_email "
             "amount_minor currency state paypal_batch_id paypal_item_id paypal_raw prepared_at "
-            "last_checked_at",
+            "last_checked_at version",
             json="paypal_raw",
         ),
         "disputes": _spec(
@@ -85,7 +85,7 @@ TABLES = MappingProxyType(
         "incidents": _spec("id kind subject state opened_at closed_at version", json="subject"),
         "proposals": _spec(
             "id incident_id action params evidence_refs rationale expected_effect model raw_output "
-            "verdict verdict_rules verdict_details state created_at",
+            "verdict verdict_rules verdict_details state created_at version",
             json="params evidence_refs expected_effect raw_output verdict_details",
         ),
         "approvals": _spec(
