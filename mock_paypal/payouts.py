@@ -166,6 +166,9 @@ class PayoutService:
             state.items[item.id] = item
             batch.item_ids.append(item.id)
         state.available_minor -= total
+        for id in batch.item_ids:
+            item = state.items[id]
+            self.store.record_transaction(-item.debited_minor, item.transaction_id)
         state.batches[batch.id] = batch
 
         def process():
@@ -216,6 +219,10 @@ class PayoutService:
         if target == "UNCLAIMED" and self.store.config.unclaimed_counts_in_available:
             desired_debit = 0
         self.store.payouts.available_minor += item.debited_minor - desired_debit
+        if item.debited_minor != desired_debit:
+            self.store.record_transaction(
+                item.debited_minor - desired_debit, item.transaction_id
+            )
         item.debited_minor = desired_debit
         item.status = target
         item.synthesised |= synthesised

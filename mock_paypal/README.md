@@ -121,3 +121,20 @@ https://developer.paypal.com/api/payouts/test-go-live
 HTTP codes remain configurable via create_app(negative_values=...) pending
 recordings. Legacy ERRPYO015 is supported as the contract's item fixture.
 These are mock fixtures, not observed sandbox responses.
+
+
+## M04 resource fixtures
+
+The seed endpoint loads balances, receiver registry, orders, captures,
+trackers, raw dispute documents and historical payout items. Seed balances
+already include existing holds and payouts; importing them never debits twice.
+Invalid seed data is staged before replacement. Resources and transactions
+remain in memory. No deduplication uses transaction ID alone.
+
+Balance snapshots refresh on the mock clock; actual funds change immediately.
+Reporting transactions remain hidden until transactions_lag_seconds elapses.
+Evidence defaults to multipart with an application/json input part, parsed
+with Python's standard email parser. No multipart dependency is required.
+Only status/stage-allowed actions receive HATEOAS links. Held refunds consume
+withheld funds by default, and seller wins/buyer-close release holds once.
+ResourceBehavior exposes pending D8/D9/D10 choices through create_app.

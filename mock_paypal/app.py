@@ -20,6 +20,8 @@ from mock_paypal.faults import FaultMiddleware
 from mock_paypal.faults import router as fault_router
 from mock_paypal.payout_routes import router as payout_router
 from mock_paypal.payouts import PayoutBehavior, PayoutError, PayoutService
+from mock_paypal.resources import ResourceBehavior, ResourceService
+from mock_paypal.resources import router as resource_router
 from mock_paypal.store import DEFAULT_SCOPE, TOKEN_LIFETIME_SECONDS, MockStore
 
 
@@ -61,6 +63,7 @@ def create_app(
     oauth_scope: str = DEFAULT_SCOPE,
     payout_behavior: PayoutBehavior | None = None,
     negative_values: dict | None = None,
+    resource_behavior: ResourceBehavior | None = None,
 ) -> FastAPI:
     app = FastAPI(
         title="CounterSign mock PayPal", docs_url=None, redoc_url=None, openapi_url=None
@@ -72,6 +75,13 @@ def create_app(
     )
     app.include_router(payout_router)
     app.include_router(fault_router)
+    app.state.resource_service = ResourceService(
+        app.state.store,
+        app.state.payout_service,
+        resource_behavior or ResourceBehavior(),
+    )
+    app.state.store.record_transaction = app.state.resource_service.transaction
+    app.include_router(resource_router)
     enabled = (
         os.environ.get("MOCK_CONTROL") == "1"
         if control_enabled is None
@@ -234,6 +244,7 @@ def create_app(
                 )
             app.state.store.config = updated
             app.state.payout_service.reprice_unclaimed()
+            app.state.resource_service.schedule_snapshots()
             return updated.model_dump()
 
     app.add_middleware(
