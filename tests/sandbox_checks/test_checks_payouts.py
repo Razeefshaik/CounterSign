@@ -43,6 +43,9 @@ class FakePayPal:
         self.tracking = {}
         self.drop = None
         self.before_post = lambda request: None
+        self.batches = {}
+        self.items = {}
+        self.batch_keys = {}
 
     def handle(self, request):
         self.requests.append(request)
@@ -134,6 +137,60 @@ class FakePayPal:
         if path == "/v1/shipping/trackers":
             item = self.tracking.get(request.url.params["transaction_id"])
             return httpx.Response(200, json={"trackers": [item] if item else []})
+        if path == "/v1/payments/payouts" and method == "POST":
+            body = json.loads(request.content)
+            sender = body["sender_batch_header"]["sender_batch_id"]
+            if sender in self.batch_keys:
+                return httpx.Response(
+                    400,
+                    json={
+                        "name": "DUPLICATE_BATCH_ID",
+                        "links": [
+                            {
+                                "rel": "self",
+                                "method": "GET",
+                                "href": "https://api-m.sandbox.paypal.com/v1/payments/payouts/"
+                                + self.batch_keys[sender],
+                            }
+                        ],
+                    },
+                )
+            batch_id, item_id = f"BATCH{len(self.batches) + 1}", f"ITEM{len(self.items) + 1}"
+            payout = body["items"][0]
+            self.items[item_id] = {
+                "payout_item_id": item_id,
+                "payout_batch_id": batch_id,
+                "payout_item": payout,
+                "transaction_status": "PENDING",
+            }
+            response = {
+                "batch_header": {
+                    "payout_batch_id": batch_id,
+                    "batch_status": "PENDING",
+                    "sender_batch_header": body["sender_batch_header"],
+                }
+            }
+            self.batches[batch_id] = {**response, "item_id": item_id, "reads": 0}
+            self.batch_keys[sender] = batch_id
+            self.idempotency[key] = response
+            self.available -= common.cents(payout["amount"]["value"])
+            return httpx.Response(201, json=response)
+        match = re.fullmatch(r"/v1/payments/payouts/(BATCH\d+)", path)
+        if match and method == "GET":
+            batch = self.batches[match.group(1)]
+            batch["reads"] += 1
+            item = self.items[batch["item_id"]]
+            if batch["reads"] >= 2 and item["transaction_status"] == "PENDING":
+                item["transaction_status"] = (
+                    "UNCLAIMED" if "unreg" in item["payout_item"]["receiver"] else "SUCCESS"
+                )
+                batch["batch_header"]["batch_status"] = "SUCCESS"
+            return httpx.Response(
+                200, json={"batch_header": batch["batch_header"], "items": [item], "total_items": 1}
+            )
+        match = re.fullmatch(r"/v1/payments/payouts-item/(ITEM\d+)", path)
+        if match and method == "GET":
+            return httpx.Response(200, json=self.items[match.group(1)])
         return httpx.Response(404, json={"name": "RESOURCE_NOT_FOUND"})
 
     def posts(self, path):
@@ -316,3 +373,63 @@ async def test_d2_completed_run_makes_no_network_calls(settings, root):
     count = len(fake.requests)
     await make_runner(settings, root, fake, operator, clock).run("D2")
     assert len(fake.requests) == count
+
+
+@pytest.mark.asyncio
+async def test_d3_records_create_batch_poll_item_and_balance(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    state = await make_runner(settings, root, fake, operator, clock).run("D3")
+    data = state["data"]
+    assert data["verdict"] == "CONFIRMED"
+    assert data["payout"]["item_status"] == "SUCCESS"
+    assert data["create_had_item_ids"] is False
+    assert [h["status"] for h in data["payout"]["history"]] == ["PENDING", "SUCCESS"]
+    assert [e["event"] for e in data["timeline"]] == ["PAYOUT_SUBMITTED", "PAYOUT_ITEM_SUCCESS"]
+    assert data["balance"]["first_reflected_at"]
+    assert len(fake.batches) == 1
+    assert_clean(root, operator)
+
+
+@pytest.mark.asyncio
+async def test_d3_lost_create_restores_aliases_and_reuses_exact_body_and_keys(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    fake.drop = ("POST", "/v1/payments/payouts")
+    with pytest.raises(CheckFailed):
+        await make_runner(settings, root, fake, operator, clock).run("D3")
+    state = await make_runner(settings, root, fake, operator, clock).run("D3")
+    first, replay = fake.posts("/v1/payments/payouts")
+    assert first.content == replay.content
+    assert first.headers["paypal-request-id"] == replay.headers["paypal-request-id"]
+    assert len(fake.batches) == 1 and state["data"]["verdict"] == "CONFIRMED"
+    assert_clean(root, operator)
+
+
+@pytest.mark.asyncio
+async def test_changed_payee_settings_refuse_resumed_write(settings, root):
+    from dataclasses import replace
+
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    fake.drop = ("POST", "/v1/payments/payouts")
+    with pytest.raises(CheckFailed):
+        await make_runner(settings, root, fake, operator, clock).run("D3")
+    changed = replace(settings, maker_a_email="changed@fake.example")
+    with pytest.raises(CheckFailed):
+        await make_runner(changed, root, fake, operator, clock).run("D3")
+    assert len(fake.posts("/v1/payments/payouts")) == 1
+
+
+@pytest.mark.asyncio
+async def test_linked_duplicate_batch_is_not_adopted_without_matching_payee(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    fake.drop = ("POST", "/v1/payments/payouts")
+    with pytest.raises(CheckFailed):
+        await make_runner(settings, root, fake, operator, clock).run("D3")
+    fake.idempotency.clear()  # model a duplicate-batch error rather than a cached 201
+    fake.items["ITEM1"]["payout_item"]["receiver"] = MAKER_B
+    with pytest.raises(CheckFailed):
+        await make_runner(settings, root, fake, operator, clock).run("D3")
+    assert len(fake.batches) == 1
