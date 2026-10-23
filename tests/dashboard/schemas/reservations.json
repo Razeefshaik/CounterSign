@@ -1,0 +1,108 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "affects_cash": {
+                "type": "boolean"
+              },
+              "state": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "obligation_id": {
+                "type": "string"
+              },
+              "dispute_id": {
+                "type": "string"
+              },
+              "proposal_id": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              },
+              "run_id": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              },
+              "reason": {
+                "type": "string"
+              },
+              "created_at": {
+                "type": "string"
+              },
+              "closed_at": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "affects_cash",
+              "state",
+              "amount",
+              "obligation_id",
+              "dispute_id",
+              "proposal_id",
+              "run_id",
+              "reason",
+              "created_at",
+              "closed_at"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "items",
+    "next_cursor"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

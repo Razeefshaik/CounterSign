@@ -1,4 +1,4 @@
-"""M01 HTTP skeleton. Run with python -m mock_paypal."""
+"""Local mock PayPal HTTP server. Run with python -m mock_paypal."""
 
 import asyncio
 import base64
@@ -16,7 +16,15 @@ from starlette.exceptions import HTTPException
 
 from mock_paypal.clock import timestamp
 from mock_paypal.config import MockConfig
+from mock_paypal.faults import FaultMiddleware
+from mock_paypal.faults import router as fault_router
+from mock_paypal.payout_routes import router as payout_router
+from mock_paypal.payouts import PayoutBehavior, PayoutError, PayoutService
+from mock_paypal.resources import ResourceBehavior, ResourceService
+from mock_paypal.resources import router as resource_router
 from mock_paypal.store import DEFAULT_SCOPE, TOKEN_LIFETIME_SECONDS, MockStore
+from mock_paypal.webhooks import WebhookService
+from mock_paypal.webhooks import router as webhook_router
 
 
 class ControlBody(BaseModel):
@@ -35,7 +43,9 @@ class SetBody(ControlBody):
     now: str
 
 
-def error(request: Request, status: int, name: str, message: str) -> JSONResponse:
+def error(
+    request: Request, status: int, name: str, message: str, *, details=None, links=None
+) -> JSONResponse:
     return JSONResponse(
         status_code=status,
         content={
@@ -43,20 +53,44 @@ def error(request: Request, status: int, name: str, message: str) -> JSONRespons
             "message": message,
             "debug_id": request.state.debug_id,
             "information_link": "https://developer.paypal.com/api/rest/responses/",
-            "details": [],
-            "links": [],
+            "details": details or [],
+            "links": links or [],
         },
     )
 
 
 def create_app(
-    *, control_enabled: bool | None = None, oauth_scope: str = DEFAULT_SCOPE
+    *,
+    control_enabled: bool | None = None,
+    oauth_scope: str = DEFAULT_SCOPE,
+    payout_behavior: PayoutBehavior | None = None,
+    negative_values: dict | None = None,
+    resource_behavior: ResourceBehavior | None = None,
+    webhook_delivery=None,
+    mock_base_url: str = "http://localhost:8099",
 ) -> FastAPI:
     app = FastAPI(
         title="CounterSign mock PayPal", docs_url=None, redoc_url=None, openapi_url=None
     )
     app.state.store = MockStore()
     app.state.control_lock = asyncio.Lock()
+    app.state.payout_service = PayoutService(
+        app.state.store, payout_behavior or PayoutBehavior()
+    )
+    app.include_router(payout_router)
+    app.include_router(fault_router)
+    app.state.resource_service = ResourceService(
+        app.state.store,
+        app.state.payout_service,
+        resource_behavior or ResourceBehavior(),
+    )
+    app.state.store.record_transaction = app.state.resource_service.transaction
+    app.include_router(resource_router)
+    app.state.webhook_service = WebhookService(
+        app.state.store, webhook_delivery, mock_base_url
+    )
+    app.state.store.emit = app.state.webhook_service.emit
+    app.include_router(webhook_router)
     enabled = (
         os.environ.get("MOCK_CONTROL") == "1"
         if control_enabled is None
@@ -87,6 +121,17 @@ def create_app(
             response = await call_next(request)
         response.headers["paypal-debug-id"] = request.state.debug_id
         return response
+
+    @app.exception_handler(PayoutError)
+    async def payout_error(request: Request, exc: PayoutError):
+        return error(
+            request,
+            exc.status,
+            exc.name,
+            exc.message,
+            details=exc.details,
+            links=exc.links,
+        )
 
     @app.exception_handler(HTTPException)
     async def http_error(request: Request, exc: HTTPException):
@@ -207,8 +252,13 @@ def create_app(
                     request, 422, "INVALID_REQUEST", "Invalid mock configuration"
                 )
             app.state.store.config = updated
+            app.state.payout_service.reprice_unclaimed()
+            app.state.resource_service.schedule_snapshots()
             return updated.model_dump()
 
+    app.add_middleware(
+        FaultMiddleware, store=app.state.store, negative_values=negative_values
+    )
     return app
 
 

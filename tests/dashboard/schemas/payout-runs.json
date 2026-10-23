@@ -1,0 +1,104 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "week_start": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "total": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "line_count": {
+                "type": "integer"
+              },
+              "replacement_count": {
+                "type": "integer"
+              },
+              "reserved_not_paid": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "approval": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              },
+              "created_at": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "week_start",
+              "state",
+              "total",
+              "line_count",
+              "replacement_count",
+              "reserved_not_paid",
+              "approval",
+              "created_at"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "items",
+    "next_cursor"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

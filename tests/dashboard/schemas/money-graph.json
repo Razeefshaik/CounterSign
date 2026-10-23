@@ -1,0 +1,173 @@
+{
+  "type": "object",
+  "properties": {
+    "nodes": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "amount": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "label",
+              "state",
+              "amount"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "state": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              },
+              "amount": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "label",
+              "state",
+              "amount"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "state": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              },
+              "amount": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "type",
+              "label",
+              "state",
+              "amount"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "nodes",
+    "edges"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

@@ -1,0 +1,1129 @@
+{
+  "$defs": {
+    "Advance": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "At",
+          "type": "string"
+        },
+        "do": {
+          "const": "advance",
+          "title": "Do",
+          "type": "string"
+        },
+        "seconds": {
+          "minimum": 0,
+          "title": "Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "at",
+        "do",
+        "seconds"
+      ],
+      "title": "Advance",
+      "type": "object"
+    },
+    "BuyerMessage": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "At",
+          "type": "string"
+        },
+        "do": {
+          "const": "buyer_message",
+          "title": "Do",
+          "type": "string"
+        },
+        "dispute": {
+          "title": "Dispute",
+          "type": "string"
+        },
+        "content": {
+          "title": "Content",
+          "type": "string"
+        }
+      },
+      "required": [
+        "at",
+        "do",
+        "dispute",
+        "content"
+      ],
+      "title": "BuyerMessage",
+      "type": "object"
+    },
+    "Expected": {
+      "additionalProperties": false,
+      "properties": {
+        "payouts": {
+          "items": {
+            "$ref": "#/$defs/ExpectedPayout"
+          },
+          "title": "Payouts",
+          "type": "array"
+        },
+        "no_payout_to": {
+          "items": {
+            "type": "string"
+          },
+          "title": "No Payout To",
+          "type": "array"
+        },
+        "required_actions": {
+          "items": {
+            "enum": [
+              "WAIT",
+              "DRAFT_MESSAGE",
+              "PROVIDE_EVIDENCE",
+              "CANCEL_UNCLAIMED_PAYOUT",
+              "RESERVE_EARNINGS",
+              "RELEASE_RESERVE",
+              "SCHEDULE_PAYOUT_RUN",
+              "CREATE_REPLACEMENT_PAYOUT",
+              "DEFER_SCHEDULED_PAYOUT",
+              "ACCEPT_CLAIM",
+              "REQUEST_OWNER"
+            ],
+            "type": "string"
+          },
+          "title": "Required Actions",
+          "type": "array"
+        },
+        "owner_should_approve": {
+          "items": {
+            "$ref": "#/$defs/ExpectedApproval"
+          },
+          "title": "Owner Should Approve",
+          "type": "array"
+        },
+        "refunds": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Refunds",
+          "type": "array"
+        },
+        "max_owner_escalations": {
+          "minimum": 0,
+          "title": "Max Owner Escalations",
+          "type": "integer"
+        },
+        "deadline": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "Deadline",
+          "type": "string"
+        }
+      },
+      "required": [
+        "payouts",
+        "no_payout_to",
+        "required_actions",
+        "owner_should_approve",
+        "refunds",
+        "max_owner_escalations",
+        "deadline"
+      ],
+      "title": "Expected",
+      "type": "object"
+    },
+    "ExpectedApproval": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "WAIT",
+            "DRAFT_MESSAGE",
+            "PROVIDE_EVIDENCE",
+            "CANCEL_UNCLAIMED_PAYOUT",
+            "RESERVE_EARNINGS",
+            "RELEASE_RESERVE",
+            "SCHEDULE_PAYOUT_RUN",
+            "CREATE_REPLACEMENT_PAYOUT",
+            "DEFER_SCHEDULED_PAYOUT",
+            "ACCEPT_CLAIM",
+            "REQUEST_OWNER"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "total": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Money"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "title": "ExpectedApproval",
+      "type": "object"
+    },
+    "ExpectedPayout": {
+      "additionalProperties": false,
+      "properties": {
+        "maker": {
+          "title": "Maker",
+          "type": "string"
+        },
+        "amount": {
+          "$ref": "#/$defs/Money"
+        },
+        "count": {
+          "minimum": 1,
+          "title": "Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "maker",
+        "amount",
+        "count"
+      ],
+      "title": "ExpectedPayout",
+      "type": "object"
+    },
+    "FaultStep": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "At",
+          "type": "string"
+        },
+        "do": {
+          "const": "fault",
+          "title": "Do",
+          "type": "string"
+        },
+        "fault": {
+          "$ref": "#/$defs/RequestFault"
+        }
+      },
+      "required": [
+        "at",
+        "do",
+        "fault"
+      ],
+      "title": "FaultStep",
+      "type": "object"
+    },
+    "InitialState": {
+      "additionalProperties": false,
+      "properties": {
+        "policy": {
+          "$ref": "#/$defs/Policy"
+        },
+        "makers": {
+          "items": {
+            "$ref": "#/$defs/Maker"
+          },
+          "title": "Makers",
+          "type": "array"
+        },
+        "orders": {
+          "items": {
+            "$ref": "#/$defs/Order"
+          },
+          "title": "Orders",
+          "type": "array"
+        },
+        "prior_payouts": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Prior Payouts",
+          "type": "array"
+        },
+        "disputes": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Disputes",
+          "type": "array"
+        },
+        "paypal": {
+          "$ref": "#/$defs/PayPalSeed"
+        }
+      },
+      "required": [
+        "policy",
+        "makers",
+        "orders",
+        "paypal"
+      ],
+      "title": "InitialState",
+      "type": "object"
+    },
+    "Maker": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "display_name": {
+          "title": "Display Name",
+          "type": "string"
+        },
+        "payout_email": {
+          "title": "Payout Email",
+          "type": "string"
+        },
+        "verified": {
+          "title": "Verified",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "key",
+        "display_name",
+        "payout_email",
+        "verified"
+      ],
+      "title": "Maker",
+      "type": "object"
+    },
+    "Match": {
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "enum": [
+            "GET",
+            "POST",
+            "DELETE"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "nth": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Nth",
+          "type": "integer"
+        },
+        "count": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "method",
+        "path"
+      ],
+      "title": "Match",
+      "type": "object"
+    },
+    "MockConfig": {
+      "additionalProperties": false,
+      "properties": {
+        "payout_processing_seconds": {
+          "default": 30,
+          "minimum": 0,
+          "title": "Payout Processing Seconds",
+          "type": "integer"
+        },
+        "key_retention_days": {
+          "default": 30,
+          "minimum": 1,
+          "title": "Key Retention Days",
+          "type": "integer"
+        },
+        "unclaimed_counts_in_available": {
+          "default": false,
+          "title": "Unclaimed Counts In Available",
+          "type": "boolean"
+        },
+        "dispute_hold": {
+          "default": true,
+          "title": "Dispute Hold",
+          "type": "boolean"
+        },
+        "evidence_allowed_stages": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Allowed Stages",
+          "type": "array"
+        },
+        "balance_refresh_seconds": {
+          "default": 10800,
+          "minimum": 1,
+          "title": "Balance Refresh Seconds",
+          "type": "integer"
+        },
+        "transactions_lag_seconds": {
+          "default": 10800,
+          "minimum": 0,
+          "title": "Transactions Lag Seconds",
+          "type": "integer"
+        },
+        "webhook_delay_seconds": {
+          "default": 5,
+          "minimum": 0,
+          "title": "Webhook Delay Seconds",
+          "type": "integer"
+        },
+        "cancel_emits": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Cancel Emits",
+          "type": "array"
+        }
+      },
+      "title": "MockConfig",
+      "type": "object"
+    },
+    "MockStep": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "At",
+          "type": "string"
+        },
+        "do": {
+          "const": "mock",
+          "title": "Do",
+          "type": "string"
+        },
+        "method": {
+          "enum": [
+            "GET",
+            "POST",
+            "DELETE"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "path": {
+          "pattern": "^/_mock/",
+          "title": "Path",
+          "type": "string"
+        },
+        "body": {
+          "additionalProperties": true,
+          "title": "Body",
+          "type": "object"
+        }
+      },
+      "required": [
+        "at",
+        "do",
+        "method",
+        "path"
+      ],
+      "title": "MockStep",
+      "type": "object"
+    },
+    "Money": {
+      "additionalProperties": false,
+      "properties": {
+        "minor": {
+          "title": "Minor",
+          "type": "integer"
+        },
+        "currency": {
+          "const": "USD",
+          "title": "Currency",
+          "type": "string"
+        }
+      },
+      "required": [
+        "minor",
+        "currency"
+      ],
+      "title": "Money",
+      "type": "object"
+    },
+    "Order": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "title": "Key",
+          "type": "string"
+        },
+        "maker": {
+          "title": "Maker",
+          "type": "string"
+        },
+        "amount": {
+          "$ref": "#/$defs/Money"
+        },
+        "capture_id": {
+          "title": "Capture Id",
+          "type": "string"
+        },
+        "captured_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
+          "title": "Captured At",
+          "type": "string"
+        },
+        "tracking": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Tracking"
+        }
+      },
+      "required": [
+        "key",
+        "maker",
+        "amount",
+        "capture_id",
+        "captured_at"
+      ],
+      "title": "Order",
+      "type": "object"
+    },
+    "Owner": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "At",
+          "type": "string"
+        },
+        "do": {
+          "const": "owner",
+          "title": "Do",
+          "type": "string"
+        },
+        "policy": {
+          "enum": [
+            "approve_expected",
+            "approve_all",
+            "reject_all",
+            "approve_after"
+          ],
+          "title": "Policy",
+          "type": "string"
+        },
+        "seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seconds"
+        }
+      },
+      "required": [
+        "at",
+        "do",
+        "policy"
+      ],
+      "title": "Owner",
+      "type": "object"
+    },
+    "PayPalBalances": {
+      "additionalProperties": false,
+      "properties": {
+        "available": {
+          "pattern": "^[0-9]+\\.[0-9]{2}$",
+          "title": "Available",
+          "type": "string"
+        },
+        "withheld": {
+          "pattern": "^[0-9]+\\.[0-9]{2}$",
+          "title": "Withheld",
+          "type": "string"
+        },
+        "currency_code": {
+          "const": "USD",
+          "title": "Currency Code",
+          "type": "string"
+        }
+      },
+      "required": [
+        "available",
+        "withheld",
+        "currency_code"
+      ],
+      "title": "PayPalBalances",
+      "type": "object"
+    },
+    "PayPalSeed": {
+      "additionalProperties": false,
+      "properties": {
+        "balances": {
+          "$ref": "#/$defs/PayPalBalances"
+        },
+        "registered_receivers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Registered Receivers",
+          "type": "array"
+        },
+        "orders": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Orders",
+          "type": "array"
+        },
+        "captures": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Captures",
+          "type": "array"
+        },
+        "payout_items": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Payout Items",
+          "type": "array"
+        },
+        "disputes": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Disputes",
+          "type": "array"
+        },
+        "trackers": {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "title": "Trackers",
+          "type": "array"
+        },
+        "config": {
+          "$ref": "#/$defs/MockConfig"
+        },
+        "repeat_transaction_ids": {
+          "default": false,
+          "title": "Repeat Transaction Ids",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "balances"
+      ],
+      "title": "PayPalSeed",
+      "type": "object"
+    },
+    "PlanRun": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "At",
+          "type": "string"
+        },
+        "do": {
+          "const": "plan_payout_run",
+          "title": "Do",
+          "type": "string"
+        },
+        "week_start": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "title": "Week Start",
+          "type": "string"
+        }
+      },
+      "required": [
+        "at",
+        "do",
+        "week_start"
+      ],
+      "title": "PlanRun",
+      "type": "object"
+    },
+    "Policy": {
+      "additionalProperties": false,
+      "properties": {
+        "maker_share_pct": {
+          "default": 90,
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Maker Share Pct",
+          "type": "integer"
+        },
+        "refund_limit_per_order": {
+          "$ref": "#/$defs/Money"
+        },
+        "refund_limit_per_day": {
+          "$ref": "#/$defs/Money"
+        }
+      },
+      "required": [
+        "refund_limit_per_order",
+        "refund_limit_per_day"
+      ],
+      "title": "Policy",
+      "type": "object"
+    },
+    "RequestAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "drop_response",
+            "timeout",
+            "http_error",
+            "connection_reset",
+            "delay",
+            "test_value"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "after_commit": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "After Commit"
+        },
+        "seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seconds"
+        },
+        "status": {
+          "anyOf": [
+            {
+              "enum": [
+                500,
+                503
+              ],
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Status"
+        },
+        "body": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Body"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "RequestAction",
+      "type": "object"
+    },
+    "RequestFault": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Id"
+        },
+        "match": {
+          "$ref": "#/$defs/Match"
+        },
+        "action": {
+          "$ref": "#/$defs/RequestAction"
+        }
+      },
+      "required": [
+        "match",
+        "action"
+      ],
+      "title": "RequestFault",
+      "type": "object"
+    },
+    "Task": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "title": "Kind",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "description"
+      ],
+      "title": "Task",
+      "type": "object"
+    },
+    "Tick": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "At",
+          "type": "string"
+        },
+        "do": {
+          "const": "tick",
+          "title": "Do",
+          "type": "string"
+        },
+        "repeat": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Repeat",
+          "type": "integer"
+        },
+        "advance_seconds": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Advance Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "at",
+        "do"
+      ],
+      "title": "Tick",
+      "type": "object"
+    },
+    "WebhookAction": {
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "enum": [
+            "drop",
+            "duplicate",
+            "delay",
+            "reorder_after"
+          ],
+          "title": "Type",
+          "type": "string"
+        },
+        "copies": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Copies"
+        },
+        "seconds": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seconds"
+        },
+        "event_type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Type"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "WebhookAction",
+      "type": "object"
+    },
+    "WebhookFault": {
+      "additionalProperties": false,
+      "properties": {
+        "match": {
+          "$ref": "#/$defs/WebhookMatch"
+        },
+        "action": {
+          "$ref": "#/$defs/WebhookAction"
+        }
+      },
+      "required": [
+        "match",
+        "action"
+      ],
+      "title": "WebhookFault",
+      "type": "object"
+    },
+    "WebhookMatch": {
+      "additionalProperties": false,
+      "properties": {
+        "event_type": {
+          "title": "Event Type",
+          "type": "string"
+        },
+        "nth": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Nth",
+          "type": "integer"
+        },
+        "count": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "event_type"
+      ],
+      "title": "WebhookMatch",
+      "type": "object"
+    },
+    "WebhookStep": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "pattern": "^\\+[0-9]+[mhd]$",
+          "title": "At",
+          "type": "string"
+        },
+        "do": {
+          "const": "webhook_fault",
+          "title": "Do",
+          "type": "string"
+        },
+        "fault": {
+          "$ref": "#/$defs/WebhookFault"
+        }
+      },
+      "required": [
+        "at",
+        "do",
+        "fault"
+      ],
+      "title": "WebhookStep",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "pattern": "^[A-Za-z0-9_-]+$",
+      "title": "Id",
+      "type": "string"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "fault_class": {
+      "enum": [
+        "NONE",
+        "TIMEOUT_AFTER_CREATE",
+        "CRASH_BETWEEN_ACCEPT_AND_RECORD",
+        "PENDING_PAST_RUN",
+        "ONHOLD",
+        "BLOCKED",
+        "UNCLAIMED_CANCEL_RACE",
+        "PARTIAL_BATCH_FAILURE",
+        "WEBHOOK_DUPLICATE",
+        "WEBHOOK_DELAYED",
+        "WEBHOOK_REORDERED",
+        "WEBHOOK_FORGED",
+        "STALE_APPROVAL",
+        "DOUBLE_SPEND_PROPOSALS",
+        "RETRY_SETTLED_OBLIGATION",
+        "DISPUTE_DEADLINE_CLOSE",
+        "INJECTION_REFUND_OTHER_ACCOUNT",
+        "INJECTION_NEW_PAYEE",
+        "INSUFFICIENT_UNRESERVED_CASH",
+        "UNSTRUCTURED_DISPUTE_TRIAGE",
+        "KEY_WINDOW_EXPIRED"
+      ],
+      "title": "Fault Class",
+      "type": "string"
+    },
+    "provenance": {
+      "enum": [
+        "recorded",
+        "synthesised",
+        "mixed"
+      ],
+      "title": "Provenance",
+      "type": "string"
+    },
+    "ground": {
+      "enum": [
+        "mock",
+        "sandbox"
+      ],
+      "title": "Ground",
+      "type": "string"
+    },
+    "seed": {
+      "title": "Seed",
+      "type": "integer"
+    },
+    "start": {
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(?:\\.\\d+)?Z$",
+      "title": "Start",
+      "type": "string"
+    },
+    "initial_state": {
+      "$ref": "#/$defs/InitialState"
+    },
+    "timeline": {
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "advance": "#/$defs/Advance",
+            "buyer_message": "#/$defs/BuyerMessage",
+            "fault": "#/$defs/FaultStep",
+            "mock": "#/$defs/MockStep",
+            "owner": "#/$defs/Owner",
+            "plan_payout_run": "#/$defs/PlanRun",
+            "tick": "#/$defs/Tick",
+            "webhook_fault": "#/$defs/WebhookStep"
+          },
+          "propertyName": "do"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/Tick"
+          },
+          {
+            "$ref": "#/$defs/Advance"
+          },
+          {
+            "$ref": "#/$defs/FaultStep"
+          },
+          {
+            "$ref": "#/$defs/WebhookStep"
+          },
+          {
+            "$ref": "#/$defs/MockStep"
+          },
+          {
+            "$ref": "#/$defs/PlanRun"
+          },
+          {
+            "$ref": "#/$defs/Owner"
+          },
+          {
+            "$ref": "#/$defs/BuyerMessage"
+          }
+        ]
+      },
+      "title": "Timeline",
+      "type": "array"
+    },
+    "task": {
+      "$ref": "#/$defs/Task"
+    },
+    "expected": {
+      "$ref": "#/$defs/Expected"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "fault_class",
+    "provenance",
+    "ground",
+    "seed",
+    "start",
+    "initial_state",
+    "timeline",
+    "task",
+    "expected"
+  ],
+  "title": "CounterSign scenario \u00b7 CONTRACTS v1.0.1",
+  "type": "object",
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

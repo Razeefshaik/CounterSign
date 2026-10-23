@@ -1,4 +1,4 @@
-# Mock PayPal — M01
+# Mock PayPal - M01 and M02
 
 Local, in-memory test server implementing CONTRACTS v1.0.1. It does not
 connect to PayPal, load .env, or need sandbox credentials.
@@ -15,7 +15,8 @@ unless MOCK_CONTROL=1; tests can use create_app(control_enabled=True).
 
 Implemented: OAuth client_credentials, bearer checks, PayPal error envelopes
 and debug IDs, reset, clock GET/advance/set, and config GET/POST.
-Payouts, seed, faults, disputes and webhooks belong to subsequent task cards.
+Payout creation, batch/item lookup, cancellation and idempotency are implemented.
+Seed, faults, dispute and webhook endpoints belong to subsequent cards.
 
 OAuth accepts any nonempty mock client ID and secret via Basic auth.
 Use dummy values only. Tokens expire after 32400 seconds of mock time;
@@ -41,3 +42,115 @@ python -m ruff check --no-cache mock_paypal tests/mock_paypal
 Dependencies are the libraries already planned in C01: fastapi, uvicorn,
 httpx and pytest; pydantic is supplied by FastAPI. Shared pyproject.toml,
 import-linter contracts and the countersign package have not landed yet.
+
+## M02 payout behavior
+
+The payout routes implement CONTRACTS section 5.2. Internally, balances and
+payout amounts are integer USD minor units; API amounts are decimal strings.
+Fees are zero, matching the contract examples. A reset starts with zero
+available/withheld funds and no registered receivers. Until the broader seed
+API is implemented, tests fund app.state.store.payouts.available_minor and
+populate registered_receivers directly.
+
+Creation debits available funds atomically. Processing uses
+payout_processing_seconds: registered receivers reach SUCCESS; other
+receivers reach UNCLAIMED. Batch SUCCESS means processing finished, so it can
+contain UNCLAIMED items. Cancel permits only UNCLAIMED and defaults to RETURNED.
+An unclaimed item's automatic return timer starts when it enters UNCLAIMED
+and expires after 30 mock days. Amounts are credited once even if the same
+state is applied repeatedly. Synthetic states have a domain transition helper;
+their HTTP control endpoints and claim/cancel race controls belong to M03.
+
+The unclaimed_counts_in_available flag defaults to false. Switching it
+reprices existing UNCLAIMED items immediately; a later claim or return
+accounts for the amount once.
+
+Request-ID replay takes precedence over new body validation and sender keys.
+Completed replays return 201 with the current batch header; changed bodies
+are ignored by default. Concurrent overlapping duplicates return 409
+DUPLICATE_REQUEST_ID. A new or absent request ID with a retained sender key
+returns 400 USER_BUSINESS_ERROR and a link to the original batch.
+
+Both keys expire exactly key_retention_days after creation (30 by default).
+Replays do not extend expiry. Historical resources remain readable afterward.
+An asyncio zero-duration checkpoint allows overlapping requests to observe
+the in-progress response; it introduces no mock delay or wall-clock timer.
+Clock/reset/config mutations and payout writes share a lock.
+
+GET batch defaults to page 1, page_size 1000; pages accept up to 15000 items.
+total_required=true includes total_items/total_pages. HATEOAS links use
+the local request base URL. No outbound API request is made.
+
+Pending D3/D5/D6/D7 response defaults can be overridden without changing the
+nine contract config flags:
+
+    from mock_paypal.app import create_app
+    from mock_paypal.payouts import PayoutBehavior
+
+    app = create_app(
+        control_enabled=True,
+        payout_behavior=PayoutBehavior(
+            create_includes_items=False,
+            cancel_item_status="RETURNED",
+            insufficient_funds_status=422,
+            concurrent_duplicate_status=409,
+            concurrent_duplicate_name="DUPLICATE_REQUEST_ID",
+            duplicate_batch_status=400,
+            duplicate_batch_name="USER_BUSINESS_ERROR",
+            duplicate_batch_issue="DUPLICATE_SENDER_BATCH_ID",
+            replay_current_header=True,
+            replay_original_body_wins=True,
+        ),
+    )
+
+These defaults are contract fixtures, not sandbox-verified findings.
+No dependencies beyond M01/C01's approved libraries were added.
+
+
+## M03 faults and ground truth
+
+Request faults match method, regex path, nth and count. Delay/timeout waits
+resolve only when the mock clock advances. A dropped response sends an
+incomplete HTTP body and closes the connection; a real TCP acceptance test
+checks that the client receives a protocol error while the committed payout
+survives and replays once. Fault logs retain keys and statuses, never auth headers.
+Transition/claim controls include the claim-during-next-cancel race.
+
+D7 names follow the project fixture codes and the official reference:
+https://developer.paypal.com/api/payouts/test-go-live
+HTTP codes remain configurable via create_app(negative_values=...) pending
+recordings. Legacy ERRPYO015 is supported as the contract's item fixture.
+These are mock fixtures, not observed sandbox responses.
+
+
+## M04 resource fixtures
+
+The seed endpoint loads balances, receiver registry, orders, captures,
+trackers, raw dispute documents and historical payout items. Seed balances
+already include existing holds and payouts; importing them never debits twice.
+Invalid seed data is staged before replacement. Resources and transactions
+remain in memory. No deduplication uses transaction ID alone.
+
+Balance snapshots refresh on the mock clock; actual funds change immediately.
+Reporting transactions remain hidden until transactions_lag_seconds elapses.
+Evidence defaults to multipart with an application/json input part, parsed
+with Python's standard email parser. No multipart dependency is required.
+Only status/stage-allowed actions receive HATEOAS links. Held refunds consume
+withheld funds by default, and seller wins/buyer-close release holds once.
+ResourceBehavior exposes pending D8/D9/D10 choices through create_app.
+
+
+## M05 webhook signing and delivery
+
+Events are signed with the explicitly PUBLIC mock-only RSA fixture in
+test_signing_fixture.py. It contains no PayPal keys or real credentials.
+The implementation uses standard-library SHA256/PKCS1-v1_5 with this fixed
+test key, with an independent OpenSSL certificate verification test.
+OpenSSL generated the fixture once; the server does not require it at runtime.
+
+Only local HTTP(S) callback URLs are accepted, and redirects are disabled.
+Delivery, duplicate, drop, delay and reorder faults run through mock-clock
+events. Duplicate copies is the total number of deliveries; delay adds to
+the normal delivery delay. Reorder holds an event until its target is emitted.
+The verify API binds event ID, stored raw bytes, webhook ID and transmission
+headers. Authentic replays still verify; inbox deduplication belongs to core.

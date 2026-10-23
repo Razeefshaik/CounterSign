@@ -1,0 +1,325 @@
+{
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "paypal_dispute_id": {
+          "type": "string"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "ref": {
+              "type": "string"
+            },
+            "maker_id": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "object",
+              "required": [
+                "minor",
+                "currency"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "minor": {
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string",
+                  "enum": [
+                    "USD"
+                  ]
+                }
+              }
+            }
+          },
+          "required": [
+            "id",
+            "ref",
+            "maker_id",
+            "amount"
+          ],
+          "additionalProperties": false
+        },
+        "reason": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "lifecycle_stage": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "seller_response_due_date": {
+          "type": "string"
+        },
+        "outcome_code": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "amount_refunded": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "hold_observed": {
+          "type": "boolean"
+        },
+        "reserved": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "available_actions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "staged": {
+          "type": "boolean"
+        },
+        "last_synced_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "paypal_dispute_id",
+        "order",
+        "reason",
+        "status",
+        "lifecycle_stage",
+        "phase",
+        "amount",
+        "seller_response_due_date",
+        "outcome_code",
+        "amount_refunded",
+        "hold_observed",
+        "reserved",
+        "available_actions",
+        "staged",
+        "last_synced_at",
+        "updated_at"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "paypal_dispute_id": {
+          "type": "string"
+        },
+        "order": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "ref": {
+              "type": "string"
+            },
+            "maker_id": {
+              "type": "string"
+            },
+            "amount": {
+              "type": "object",
+              "required": [
+                "minor",
+                "currency"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "minor": {
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string",
+                  "enum": [
+                    "USD"
+                  ]
+                }
+              }
+            }
+          },
+          "required": [
+            "id",
+            "ref",
+            "maker_id",
+            "amount"
+          ],
+          "additionalProperties": false
+        },
+        "reason": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "lifecycle_stage": {
+          "type": "string"
+        },
+        "phase": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "seller_response_due_date": {
+          "type": "string"
+        },
+        "outcome_code": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "amount_refunded": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "hold_observed": {
+          "type": "boolean"
+        },
+        "reserved": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "available_actions": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "string"
+              }
+            ]
+          }
+        },
+        "staged": {
+          "type": "boolean"
+        },
+        "last_synced_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "paypal_dispute_id",
+        "order",
+        "reason",
+        "status",
+        "lifecycle_stage",
+        "phase",
+        "amount",
+        "seller_response_due_date",
+        "outcome_code",
+        "amount_refunded",
+        "hold_observed",
+        "reserved",
+        "available_actions",
+        "staged",
+        "last_synced_at",
+        "updated_at"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

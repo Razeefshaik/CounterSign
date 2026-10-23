@@ -1,0 +1,438 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "object",
+                "properties": {
+                  "dispute_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "paypal_dispute_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "order_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "maker_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "payout_item_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "run_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "dispute_id",
+                  "paypal_dispute_id",
+                  "order_id",
+                  "maker_id",
+                  "payout_item_id",
+                  "run_id"
+                ],
+                "additionalProperties": false
+              },
+              "amount_at_risk": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "deadline": {
+                "type": "string"
+              },
+              "latest_proposal": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "verdict": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "action",
+                  "verdict",
+                  "state"
+                ],
+                "additionalProperties": false
+              },
+              "opened_at": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "closed_at": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "state",
+              "title",
+              "subject",
+              "amount_at_risk",
+              "deadline",
+              "latest_proposal",
+              "opened_at",
+              "updated_at",
+              "closed_at"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "object",
+                "properties": {
+                  "dispute_id": {
+                    "type": "string"
+                  },
+                  "paypal_dispute_id": {
+                    "type": "string"
+                  },
+                  "order_id": {
+                    "type": "string"
+                  },
+                  "maker_id": {
+                    "type": "string"
+                  },
+                  "payout_item_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "run_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  }
+                },
+                "required": [
+                  "dispute_id",
+                  "paypal_dispute_id",
+                  "order_id",
+                  "maker_id",
+                  "payout_item_id",
+                  "run_id"
+                ],
+                "additionalProperties": false
+              },
+              "amount_at_risk": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "deadline": {
+                "type": "string"
+              },
+              "latest_proposal": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "verdict": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "action",
+                  "verdict",
+                  "state"
+                ],
+                "additionalProperties": false
+              },
+              "opened_at": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "closed_at": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "state",
+              "title",
+              "subject",
+              "amount_at_risk",
+              "deadline",
+              "latest_proposal",
+              "opened_at",
+              "updated_at",
+              "closed_at"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "state": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "object",
+                "properties": {
+                  "dispute_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "paypal_dispute_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "order_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "maker_id": {
+                    "type": "string"
+                  },
+                  "payout_item_id": {
+                    "type": "string"
+                  },
+                  "run_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  }
+                },
+                "required": [
+                  "dispute_id",
+                  "paypal_dispute_id",
+                  "order_id",
+                  "maker_id",
+                  "payout_item_id",
+                  "run_id"
+                ],
+                "additionalProperties": false
+              },
+              "amount_at_risk": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "deadline": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              },
+              "latest_proposal": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "verdict": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "action",
+                  "verdict",
+                  "state"
+                ],
+                "additionalProperties": false
+              },
+              "opened_at": {
+                "type": "string"
+              },
+              "updated_at": {
+                "type": "string"
+              },
+              "closed_at": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "state",
+              "title",
+              "subject",
+              "amount_at_risk",
+              "deadline",
+              "latest_proposal",
+              "opened_at",
+              "updated_at",
+              "closed_at"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "items",
+    "next_cursor"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

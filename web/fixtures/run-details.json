@@ -1,0 +1,108 @@
+[
+  {
+    "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000601",
+    "week_start": "2026-11-02",
+    "state": "AWAITING_OWNER",
+    "total": {
+      "minor": 108600,
+      "currency": "USD"
+    },
+    "line_count": 2,
+    "replacement_count": 1,
+    "reserved_not_paid": {
+      "minor": 41400,
+      "currency": "USD"
+    },
+    "approval": null,
+    "created_at": "2026-11-06T08:00:00Z",
+    "lines": [
+      {
+        "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000701",
+        "maker": {
+          "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000302",
+          "display_name": "Maker B"
+        },
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "state": "APPROVED",
+        "obligations": [
+          {
+            "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000801",
+            "order_ref": "#1051",
+            "kind": "ORDER_SHARE",
+            "amount": {
+              "minor": 48600,
+              "currency": "USD"
+            },
+            "state": "SCHEDULED",
+            "dispute_id": null
+          }
+        ],
+        "attempts": [
+          {
+            "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000901",
+            "attempt_no": 1,
+            "state": "PENDING",
+            "sender_batch_id": "cs-0192f1c4-7a10-7c3e-9b1a-5d2f00000701-a1",
+            "request_id": "cs-0192f1c4-7a10-7c3e-9b1a-5d2f00000701-a1",
+            "paypal_batch_id": "5UXD2E8A7EBQJ",
+            "paypal_item_id": null,
+            "payee_email_masked": "m***@example.com",
+            "amount": {
+              "minor": 48600,
+              "currency": "USD"
+            },
+            "prepared_at": "2026-11-06T09:01:00Z",
+            "last_checked_at": "2026-11-06T09:02:10Z"
+          }
+        ]
+      }
+    ],
+    "replacements": [
+      {
+        "line_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000699",
+        "from_run_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000600",
+        "attempt_no": 2,
+        "maker": {
+          "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000303",
+          "display_name": "Maker C"
+        },
+        "amount": {
+          "minor": 30000,
+          "currency": "USD"
+        },
+        "previous_attempt_state": "RETURNED"
+      }
+    ],
+    "reserved": [
+      {
+        "maker": {
+          "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000301",
+          "display_name": "Maker A"
+        },
+        "obligation_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000802",
+        "amount": {
+          "minor": 36000,
+          "currency": "USD"
+        },
+        "reason": "DISPUTE",
+        "dispute_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000101"
+      },
+      {
+        "maker": {
+          "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000302",
+          "display_name": "Maker B"
+        },
+        "obligation_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000803",
+        "amount": {
+          "minor": 5400,
+          "currency": "USD"
+        },
+        "reason": "DISPUTE",
+        "dispute_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000102"
+      }
+    ]
+  }
+]

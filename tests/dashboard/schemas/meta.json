@@ -1,0 +1,37 @@
+{
+  "type": "object",
+  "properties": {
+    "mode": {
+      "type": "string"
+    },
+    "paypal_env": {
+      "type": "string"
+    },
+    "simulated": {
+      "type": "boolean"
+    },
+    "simulation_label": {
+      "type": "string"
+    },
+    "clock": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "contract_version": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "mode",
+    "paypal_env",
+    "simulated",
+    "simulation_label",
+    "clock",
+    "version",
+    "contract_version"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

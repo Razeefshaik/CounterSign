@@ -1,0 +1,152 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "display_name": {
+                "type": "string"
+              },
+              "payout_email_masked": {
+                "type": "string"
+              },
+              "payout_email_verified": {
+                "type": "boolean"
+              },
+              "payout_email_verified_at": {
+                "type": "string"
+              },
+              "owed_open": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "reserved": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "scheduled": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "in_flight": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              },
+              "settled_last_30d": {
+                "type": "object",
+                "required": [
+                  "minor",
+                  "currency"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "minor": {
+                    "type": "integer"
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": [
+                      "USD"
+                    ]
+                  }
+                }
+              }
+            },
+            "required": [
+              "id",
+              "display_name",
+              "payout_email_masked",
+              "payout_email_verified",
+              "payout_email_verified_at",
+              "owed_open",
+              "reserved",
+              "scheduled",
+              "in_flight",
+              "settled_last_30d"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "items",
+    "next_cursor"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

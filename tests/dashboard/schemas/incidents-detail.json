@@ -1,0 +1,1443 @@
+{
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "dispute_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "paypal_dispute_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "order_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "maker_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "payout_item_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "run_id": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "dispute_id",
+            "paypal_dispute_id",
+            "order_id",
+            "maker_id",
+            "payout_item_id",
+            "run_id"
+          ],
+          "additionalProperties": false
+        },
+        "amount_at_risk": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "deadline": {
+          "type": "string"
+        },
+        "latest_proposal": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string"
+            },
+            "verdict": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "action",
+            "verdict",
+            "state"
+          ],
+          "additionalProperties": false
+        },
+        "opened_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "closed_at": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "proposals": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "incident_id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "params": {
+                    "type": "object",
+                    "properties": {
+                      "run_id": {
+                        "type": "string"
+                      },
+                      "lines": {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "line_id": {
+                                  "type": "string"
+                                },
+                                "maker_id": {
+                                  "type": "string"
+                                },
+                                "amount": {
+                                  "type": "object",
+                                  "required": [
+                                    "minor",
+                                    "currency"
+                                  ],
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "minor": {
+                                      "type": "integer"
+                                    },
+                                    "currency": {
+                                      "type": "string",
+                                      "enum": [
+                                        "USD"
+                                      ]
+                                    }
+                                  }
+                                }
+                              },
+                              "required": [
+                                "line_id",
+                                "maker_id",
+                                "amount"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      },
+                      "replacements": {
+                        "type": "array",
+                        "items": {
+                          "anyOf": [
+                            {
+                              "type": "object",
+                              "properties": {
+                                "line_id": {
+                                  "type": "string"
+                                },
+                                "from_run_id": {
+                                  "type": "string"
+                                },
+                                "attempt_no": {
+                                  "type": "integer"
+                                },
+                                "maker": {
+                                  "type": "object",
+                                  "properties": {
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "display_name": {
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "display_name"
+                                  ],
+                                  "additionalProperties": false
+                                },
+                                "amount": {
+                                  "type": "object",
+                                  "required": [
+                                    "minor",
+                                    "currency"
+                                  ],
+                                  "additionalProperties": false,
+                                  "properties": {
+                                    "minor": {
+                                      "type": "integer"
+                                    },
+                                    "currency": {
+                                      "type": "string",
+                                      "enum": [
+                                        "USD"
+                                      ]
+                                    }
+                                  }
+                                },
+                                "previous_attempt_state": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "line_id",
+                                "from_run_id",
+                                "attempt_no",
+                                "maker",
+                                "amount",
+                                "previous_attempt_state"
+                              ],
+                              "additionalProperties": false
+                            }
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "run_id",
+                      "lines",
+                      "replacements"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "expected_effect": {
+                    "type": "object",
+                    "properties": {
+                      "available_change": {
+                        "type": "object",
+                        "required": [
+                          "minor",
+                          "currency"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "minor": {
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "enum": [
+                              "USD"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "available_change"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tier": {
+                    "type": "string"
+                  },
+                  "verdict": {
+                    "type": "string"
+                  },
+                  "rule_results": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "rule": {
+                              "type": "string"
+                            },
+                            "outcome": {
+                              "type": "string"
+                            },
+                            "detail": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "rule",
+                            "outcome",
+                            "detail"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "flags": {
+                    "type": "array",
+                    "items": {}
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "approval": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "operation": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string"
+                  },
+                  "approval_request": {
+                    "type": "object",
+                    "properties": {
+                      "payload_hash": {
+                        "type": "string"
+                      },
+                      "record_versions": {
+                        "type": "object",
+                        "properties": {},
+                        "required": [],
+                        "additionalProperties": false
+                      },
+                      "expires_at": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "payload_hash",
+                      "record_versions",
+                      "expires_at"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "incident_id",
+                  "action",
+                  "params",
+                  "evidence_refs",
+                  "rationale",
+                  "expected_effect",
+                  "tier",
+                  "verdict",
+                  "rule_results",
+                  "flags",
+                  "state",
+                  "model",
+                  "approval",
+                  "operation",
+                  "created_at",
+                  "approval_request"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "state",
+        "title",
+        "subject",
+        "amount_at_risk",
+        "deadline",
+        "latest_proposal",
+        "opened_at",
+        "updated_at",
+        "closed_at",
+        "proposals",
+        "timeline"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "dispute_id": {
+              "type": "string"
+            },
+            "paypal_dispute_id": {
+              "type": "string"
+            },
+            "order_id": {
+              "type": "string"
+            },
+            "maker_id": {
+              "type": "string"
+            },
+            "payout_item_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "run_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            }
+          },
+          "required": [
+            "dispute_id",
+            "paypal_dispute_id",
+            "order_id",
+            "maker_id",
+            "payout_item_id",
+            "run_id"
+          ],
+          "additionalProperties": false
+        },
+        "amount_at_risk": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "deadline": {
+          "type": "string"
+        },
+        "latest_proposal": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string"
+            },
+            "verdict": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "action",
+            "verdict",
+            "state"
+          ],
+          "additionalProperties": false
+        },
+        "opened_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "closed_at": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "proposals": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "incident_id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "params": {
+                    "type": "object",
+                    "properties": {
+                      "paypal_dispute_id": {
+                        "type": "string"
+                      },
+                      "refund_to": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "paypal_dispute_id",
+                      "refund_to"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "expected_effect": {
+                    "type": "object",
+                    "properties": {
+                      "available_change": {
+                        "type": "object",
+                        "required": [
+                          "minor",
+                          "currency"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "minor": {
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "enum": [
+                              "USD"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "available_change"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tier": {
+                    "type": "string"
+                  },
+                  "verdict": {
+                    "type": "string"
+                  },
+                  "rule_results": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "rule": {
+                              "type": "string"
+                            },
+                            "outcome": {
+                              "type": "string"
+                            },
+                            "detail": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "rule",
+                            "outcome",
+                            "detail"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "flags": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "type": {
+                              "type": "string"
+                            },
+                            "source": {
+                              "type": "string"
+                            },
+                            "excerpt": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "type",
+                            "source",
+                            "excerpt"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "approval": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "operation": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "incident_id",
+                  "action",
+                  "params",
+                  "evidence_refs",
+                  "rationale",
+                  "expected_effect",
+                  "tier",
+                  "verdict",
+                  "rule_results",
+                  "flags",
+                  "state",
+                  "model",
+                  "approval",
+                  "operation",
+                  "created_at"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "state",
+        "title",
+        "subject",
+        "amount_at_risk",
+        "deadline",
+        "latest_proposal",
+        "opened_at",
+        "updated_at",
+        "closed_at",
+        "proposals",
+        "timeline"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "dispute_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "paypal_dispute_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "order_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "maker_id": {
+              "type": "string"
+            },
+            "payout_item_id": {
+              "type": "string"
+            },
+            "run_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            }
+          },
+          "required": [
+            "dispute_id",
+            "paypal_dispute_id",
+            "order_id",
+            "maker_id",
+            "payout_item_id",
+            "run_id"
+          ],
+          "additionalProperties": false
+        },
+        "amount_at_risk": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "deadline": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "latest_proposal": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string"
+            },
+            "verdict": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "action",
+            "verdict",
+            "state"
+          ],
+          "additionalProperties": false
+        },
+        "opened_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "closed_at": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "proposals": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "incident_id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "params": {
+                    "type": "object",
+                    "properties": {
+                      "payout_item_id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "payout_item_id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "expected_effect": {
+                    "type": "object",
+                    "properties": {
+                      "available_change": {
+                        "type": "object",
+                        "required": [
+                          "minor",
+                          "currency"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "minor": {
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "enum": [
+                              "USD"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "available_change"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tier": {
+                    "type": "string"
+                  },
+                  "verdict": {
+                    "type": "string"
+                  },
+                  "rule_results": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "rule": {
+                              "type": "string"
+                            },
+                            "outcome": {
+                              "type": "string"
+                            },
+                            "detail": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "rule",
+                            "outcome",
+                            "detail"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "flags": {
+                    "type": "array",
+                    "items": {}
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "approval": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "operation": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "kind": {
+                        "type": "string"
+                      },
+                      "state": {
+                        "type": "string"
+                      },
+                      "paypal_refs": {
+                        "type": "object",
+                        "properties": {
+                          "payout_item_id": {
+                            "type": "string"
+                          },
+                          "debug_id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "payout_item_id",
+                          "debug_id"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "kind",
+                      "state",
+                      "paypal_refs"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "created_at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "incident_id",
+                  "action",
+                  "params",
+                  "evidence_refs",
+                  "rationale",
+                  "expected_effect",
+                  "tier",
+                  "verdict",
+                  "rule_results",
+                  "flags",
+                  "state",
+                  "model",
+                  "approval",
+                  "operation",
+                  "created_at"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "integer"
+                  },
+                  "at": {
+                    "type": "string"
+                  },
+                  "actor": {
+                    "type": "string"
+                  },
+                  "kind": {
+                    "type": "string"
+                  },
+                  "proposal_id": {
+                    "type": "string"
+                  },
+                  "operation_id": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "rule": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "verdict": {
+                    "type": "string"
+                  },
+                  "details": {
+                    "type": "object",
+                    "properties": {
+                      "rules_evaluated": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "rules_evaluated"
+                    ],
+                    "additionalProperties": false
+                  }
+                },
+                "required": [
+                  "id",
+                  "at",
+                  "actor",
+                  "kind",
+                  "proposal_id",
+                  "operation_id",
+                  "rule",
+                  "verdict",
+                  "details"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "state",
+        "title",
+        "subject",
+        "amount_at_risk",
+        "deadline",
+        "latest_proposal",
+        "opened_at",
+        "updated_at",
+        "closed_at",
+        "proposals",
+        "timeline"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "kind": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "dispute_id": {
+              "type": "string"
+            },
+            "paypal_dispute_id": {
+              "type": "string"
+            },
+            "order_id": {
+              "type": "string"
+            },
+            "maker_id": {
+              "type": "string"
+            },
+            "payout_item_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            },
+            "run_id": {
+              "type": [
+                "null",
+                "string",
+                "object"
+              ]
+            }
+          },
+          "required": [
+            "dispute_id",
+            "paypal_dispute_id",
+            "order_id",
+            "maker_id",
+            "payout_item_id",
+            "run_id"
+          ],
+          "additionalProperties": false
+        },
+        "amount_at_risk": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "deadline": {
+          "type": "string"
+        },
+        "latest_proposal": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "action": {
+              "type": "string"
+            },
+            "verdict": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "id",
+            "action",
+            "verdict",
+            "state"
+          ],
+          "additionalProperties": false
+        },
+        "opened_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "closed_at": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "proposals": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "incident_id": {
+                    "type": "string"
+                  },
+                  "action": {
+                    "type": "string"
+                  },
+                  "params": {
+                    "type": "object",
+                    "properties": {
+                      "paypal_dispute_id": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "paypal_dispute_id"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "evidence_refs": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        }
+                      ]
+                    }
+                  },
+                  "rationale": {
+                    "type": "string"
+                  },
+                  "expected_effect": {
+                    "type": "object",
+                    "properties": {
+                      "available_change": {
+                        "type": "object",
+                        "required": [
+                          "minor",
+                          "currency"
+                        ],
+                        "additionalProperties": false,
+                        "properties": {
+                          "minor": {
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string",
+                            "enum": [
+                              "USD"
+                            ]
+                          }
+                        }
+                      }
+                    },
+                    "required": [
+                      "available_change"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "tier": {
+                    "type": "string"
+                  },
+                  "verdict": {
+                    "type": "string"
+                  },
+                  "rule_results": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "rule": {
+                              "type": "string"
+                            },
+                            "outcome": {
+                              "type": "string"
+                            },
+                            "detail": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "rule",
+                            "outcome",
+                            "detail"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "flags": {
+                    "type": "array",
+                    "items": {}
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "model": {
+                    "type": "string"
+                  },
+                  "approval": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "operation": {
+                    "type": [
+                      "null",
+                      "string",
+                      "object"
+                    ]
+                  },
+                  "created_at": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "incident_id",
+                  "action",
+                  "params",
+                  "evidence_refs",
+                  "rationale",
+                  "expected_effect",
+                  "tier",
+                  "verdict",
+                  "rule_results",
+                  "flags",
+                  "state",
+                  "model",
+                  "approval",
+                  "operation",
+                  "created_at"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "timeline": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "state",
+        "title",
+        "subject",
+        "amount_at_risk",
+        "deadline",
+        "latest_proposal",
+        "opened_at",
+        "updated_at",
+        "closed_at",
+        "proposals",
+        "timeline"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

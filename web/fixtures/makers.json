@@ -1,0 +1,86 @@
+{
+  "items": [
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000301",
+      "display_name": "Maker A",
+      "payout_email_masked": "m***@example.com",
+      "payout_email_verified": true,
+      "payout_email_verified_at": "2026-11-04T12:00:00Z",
+      "owed_open": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "reserved": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "scheduled": {
+        "minor": 60000,
+        "currency": "USD"
+      },
+      "in_flight": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "settled_last_30d": {
+        "minor": 0,
+        "currency": "USD"
+      }
+    },
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000302",
+      "display_name": "Maker B",
+      "payout_email_masked": "m***@example.com",
+      "payout_email_verified": true,
+      "payout_email_verified_at": "2026-11-04T12:00:00Z",
+      "owed_open": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "reserved": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "scheduled": {
+        "minor": 60000,
+        "currency": "USD"
+      },
+      "in_flight": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "settled_last_30d": {
+        "minor": 0,
+        "currency": "USD"
+      }
+    },
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000303",
+      "display_name": "Maker C",
+      "payout_email_masked": "m***@example.com",
+      "payout_email_verified": true,
+      "payout_email_verified_at": "2026-11-04T12:00:00Z",
+      "owed_open": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "reserved": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "scheduled": {
+        "minor": 60000,
+        "currency": "USD"
+      },
+      "in_flight": {
+        "minor": 0,
+        "currency": "USD"
+      },
+      "settled_last_30d": {
+        "minor": 0,
+        "currency": "USD"
+      }
+    }
+  ],
+  "next_cursor": null
+}

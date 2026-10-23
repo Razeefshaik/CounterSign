@@ -1,0 +1,114 @@
+{
+  "id": "F_unclaimed_cancel_race",
+  "title": "Recipient claims while cancellation is attempted; never replace",
+  "fault_class": "UNCLAIMED_CANCEL_RACE",
+  "provenance": "synthesised",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "C",
+        "display_name": "Maker C",
+        "payout_email": "maker-c@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [],
+    "prior_payouts": [
+      {
+        "key": "C-prior",
+        "maker": "C",
+        "amount": {
+          "minor": 30000,
+          "currency": "USD"
+        },
+        "status": "UNCLAIMED",
+        "payout_item_id": "MOCKI-C-prior"
+      }
+    ],
+    "disputes": [],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-c@example.com"
+      ],
+      "captures": [],
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI-C-prior",
+          "payout_batch_id": "MOCKB-C-prior",
+          "sender_batch_id": "prior-C-prior",
+          "request_id": "prior-request-C-prior",
+          "receiver": "maker-c@example.com",
+          "amount": "300.00",
+          "status": "UNCLAIMED",
+          "created_at": "2026-10-30T09:00:00Z",
+          "synthesised": true
+        }
+      ],
+      "disputes": [],
+      "trackers": [],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "mock",
+      "method": "POST",
+      "path": "/_mock/payout-items/MOCKI-C-prior/claim",
+      "body": {
+        "when": "during_next_cancel"
+      }
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 5,
+      "advance_seconds": 60
+    }
+  ],
+  "task": {
+    "kind": "RECOVER_PAYOUT",
+    "description": "Recipient claims while cancellation is attempted; never replace"
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "C",
+        "amount": {
+          "minor": 30000,
+          "currency": "USD"
+        },
+        "count": 1
+      }
+    ],
+    "no_payout_to": [],
+    "required_actions": [
+      "CANCEL_UNCLAIMED_PAYOUT"
+    ],
+    "owner_should_approve": [],
+    "refunds": [],
+    "max_owner_escalations": 1,
+    "deadline": "+2h"
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "id": "demo_week",
+  "title": "Demo week: reserve disputed shares and pay $1,086 once",
+  "fault_class": "NONE",
+  "provenance": "synthesised",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "A",
+        "display_name": "Maker A",
+        "payout_email": "maker-a@example.com",
+        "verified": true
+      },
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      },
+      {
+        "key": "C",
+        "display_name": "Maker C",
+        "payout_email": "maker-c@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1042",
+        "maker": "A",
+        "amount": {
+          "minor": 40000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP400",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1052",
+        "maker": "B",
+        "amount": {
+          "minor": 6000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP60",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1060",
+        "maker": "C",
+        "amount": {
+          "minor": 33333,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAPC",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [
+      {
+        "key": "C-last-week",
+        "maker": "C",
+        "amount": {
+          "minor": 30000,
+          "currency": "USD"
+        },
+        "status": "UNCLAIMED",
+        "payout_item_id": "MOCKI-C-last-week"
+      }
+    ],
+    "disputes": [],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-a@example.com",
+        "maker-b@example.com",
+        "maker-c@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP400",
+          "order_id": "MOCKORD-o1042",
+          "amount": "400.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP60",
+          "order_id": "MOCKORD-o1052",
+          "amount": "60.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAPC",
+          "order_id": "MOCKORD-o1060",
+          "amount": "333.33",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI-C-last-week",
+          "payout_batch_id": "MOCKB-C-last-week",
+          "sender_batch_id": "prior-C-last-week",
+          "request_id": "prior-request-C-last-week",
+          "receiver": "maker-c@example.com",
+          "amount": "300.00",
+          "status": "UNCLAIMED",
+          "created_at": "2026-10-30T09:00:00Z",
+          "synthesised": true
+        }
+      ],
+      "disputes": [],
+      "trackers": [
+        {
+          "transaction_id": "MOCKCAP400",
+          "tracking_number": "9400100000000000000000",
+          "status": "DELIVERED",
+          "carrier": "USPS",
+          "shipment_uploader": "MERCHANT",
+          "tracking_number_validated": true,
+          "last_updated_time": "2026-10-30T12:00:00Z",
+          "links": []
+        }
+      ],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "mock",
+      "method": "POST",
+      "path": "/_mock/disputes",
+      "body": {
+        "capture_id": "MOCKCAP400",
+        "amount": "400.00",
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "messages": [
+          "My parcel has not arrived, although tracking says delivered."
+        ]
+      }
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 2,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+48h",
+      "do": "mock",
+      "method": "POST",
+      "path": "/_mock/disputes",
+      "body": {
+        "capture_id": "MOCKCAP60",
+        "amount": "60.00",
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+        "messages": [
+          "The pottery arrived with a crack and a different glaze."
+        ]
+      }
+    },
+    {
+      "at": "+48h",
+      "do": "tick",
+      "repeat": 2,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+72h",
+      "do": "tick",
+      "repeat": 3,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+96h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+96h",
+      "do": "owner",
+      "policy": "approve_expected"
+    },
+    {
+      "at": "+96h",
+      "do": "tick",
+      "repeat": 10,
+      "advance_seconds": 60
+    }
+  ],
+  "task": {
+    "kind": "PAY_RUN",
+    "description": "Demo week: reserve disputed shares and pay $1,086 once. The prior C receiver is already owner verified; tracking is merchant uploaded, not carrier proof."
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "B",
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "count": 1
+      },
+      {
+        "maker": "C",
+        "amount": {
+          "minor": 30000,
+          "currency": "USD"
+        },
+        "count": 2
+      }
+    ],
+    "no_payout_to": [
+      "A"
+    ],
+    "required_actions": [
+      "RESERVE_EARNINGS",
+      "CANCEL_UNCLAIMED_PAYOUT",
+      "SCHEDULE_PAYOUT_RUN"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 108600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [],
+    "max_owner_escalations": 1,
+    "deadline": "+5d"
+  }
+}
