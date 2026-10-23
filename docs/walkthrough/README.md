@@ -30,7 +30,21 @@ Claude keeps this index. Codex and the helper agents write their own pages (`c05
 
 D1 (scopes, done and CONFIRMED on Oct 23) and D8 to D10 (disputes) are explained in [00-build-review.md](00-build-review.md), sections 5 and 9.
 
-All commit hashes are as they appear on `main`.
+All commit hashes above are as they appear on `main`.
+
+## Phase 2: the vertical slice (started Oct 24, milestone Nov 5)
+
+The first working version of the product itself, built step by step. Hashes below are on branch `razeef/fsm-core` until it is merged into `main`.
+
+| # | Page | What it is | Who | Commit |
+| --- | --- | --- | --- | --- |
+| 12 | [c10-money.md](c10-money.md) | **Money**: always whole cents; splits never lose or invent a cent; strict PayPal amount parsing | Claude (helper) | `726339f` |
+| 13 | [c10-payout-state-machines.md](c10-payout-state-machines.md) | **Payout rules**: a maker is "paid" only when PayPal says SUCCESS; unclaimed never counts | Claude (helper + lead fix) | `f2a7d19` |
+| 14 | [c10-control-state-machines.md](c10-control-state-machines.md) | **Control rules**: lost writes stay UNKNOWN, only approved proposals execute, unknown dispute outcomes keep the money reserved | Claude (helper) | `ebf9866` |
+| 15 | [c11-schema.md](c11-schema.md) | **Database tables**: one live payout attempt per line, ledger journals must balance | Codex | `2e97840` |
+| 16 | [c11-dashboard-views.md](c11-dashboard-views.md) | **Dashboard views**: read-only data shaped for the incident desk; the AI's database role can only read these | Codex | `cc1a9f2` |
+| 17 | [c12-database-layer.md](c12-database-layer.md) | **Safe updates**: change a row only if nobody changed it first | Codex | `4e5c8d5` |
+| 18 | [05-state-guards.md](05-state-guards.md) | **Closing a gap**: version numbers on every row a state machine moves, and a test that keeps database and code in step | Claude | `da027ac` |
 
 ## Words used everywhere
 
