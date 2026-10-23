@@ -1,7 +1,8 @@
 """State machines: one StrEnum of states, one of events, and a transition table per entity.
 
-Every entity module (obligation, line, attempt, operation, dispute, proposal, incident)
-exposes a Machine. The database layer persists a move with
+Every entity module (obligation, line, attempt, operation, proposal, incident) exposes a
+Machine. Disputes have none: PayPal owns their status, and dispute.phase() derives what
+CounterSign acts on from the mirrored fields. The database layer persists a move with
 cas_transition(conn, machine, ..., expected_state, expected_version, event), which asks
 machine.next() for the target state and raises before touching the row if the move is
 illegal. PLAN section 2.3 is the source for every table.
