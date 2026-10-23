@@ -1,0 +1,85 @@
+{
+  "type": "object",
+  "properties": {
+    "items": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "at": {
+                "type": "string"
+              },
+              "actor": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "proposal_id": {
+                "type": "string"
+              },
+              "operation_id": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              },
+              "rule": {
+                "type": [
+                  "null",
+                  "string",
+                  "object"
+                ]
+              },
+              "verdict": {
+                "type": "string"
+              },
+              "details": {
+                "type": "object",
+                "properties": {
+                  "rules_evaluated": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "rules_evaluated"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "id",
+              "at",
+              "actor",
+              "kind",
+              "proposal_id",
+              "operation_id",
+              "rule",
+              "verdict",
+              "details"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "items",
+    "next_cursor"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

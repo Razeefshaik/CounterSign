@@ -1,0 +1,307 @@
+{
+  "type": "object",
+  "properties": {
+    "currency": {
+      "type": "string"
+    },
+    "paypal": {
+      "type": "object",
+      "properties": {
+        "available": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "withheld": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "total": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "last_refresh_time": {
+          "type": "string"
+        },
+        "as_of_time": {
+          "type": "string"
+        },
+        "fetched_at": {
+          "type": "string"
+        },
+        "age_seconds": {
+          "type": "integer"
+        },
+        "stale": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "available",
+        "withheld",
+        "total",
+        "last_refresh_time",
+        "as_of_time",
+        "fetched_at",
+        "age_seconds",
+        "stale"
+      ],
+      "additionalProperties": false
+    },
+    "outflows_after_refresh": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "items": {
+          "type": "array",
+          "items": {}
+        }
+      },
+      "required": [
+        "total",
+        "items"
+      ],
+      "additionalProperties": false
+    },
+    "effective_available": {
+      "type": "object",
+      "required": [
+        "minor",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor": {
+          "type": "integer"
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "USD"
+          ]
+        }
+      }
+    },
+    "cash_reservations": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "by_kind": {
+          "type": "object",
+          "properties": {
+            "RUN_CASH": {
+              "type": "object",
+              "required": [
+                "minor",
+                "currency"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "minor": {
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string",
+                  "enum": [
+                    "USD"
+                  ]
+                }
+              }
+            },
+            "PROPOSAL_CASH": {
+              "type": "object",
+              "required": [
+                "minor",
+                "currency"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "minor": {
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string",
+                  "enum": [
+                    "USD"
+                  ]
+                }
+              }
+            }
+          },
+          "required": [
+            "RUN_CASH",
+            "PROPOSAL_CASH"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "total",
+        "by_kind"
+      ],
+      "additionalProperties": false
+    },
+    "unreserved": {
+      "type": "object",
+      "required": [
+        "minor",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor": {
+          "type": "integer"
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "USD"
+          ]
+        }
+      }
+    },
+    "earmarks_not_subtracted": {
+      "type": "object",
+      "properties": {
+        "dispute": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        }
+      },
+      "required": [
+        "dispute"
+      ],
+      "additionalProperties": false
+    },
+    "unclaimed_outstanding": {
+      "type": "object",
+      "required": [
+        "minor",
+        "currency"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "minor": {
+          "type": "integer"
+        },
+        "currency": {
+          "type": "string",
+          "enum": [
+            "USD"
+          ]
+        }
+      }
+    },
+    "formula": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "currency",
+    "paypal",
+    "outflows_after_refresh",
+    "effective_available",
+    "cash_reservations",
+    "unreserved",
+    "earmarks_not_subtracted",
+    "unclaimed_outstanding",
+    "formula"
+  ],
+  "additionalProperties": false,
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}

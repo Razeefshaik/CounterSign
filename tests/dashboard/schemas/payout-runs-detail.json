@@ -1,0 +1,483 @@
+{
+  "anyOf": [
+    {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "week_start": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "total": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "line_count": {
+          "type": "integer"
+        },
+        "replacement_count": {
+          "type": "integer"
+        },
+        "reserved_not_paid": {
+          "type": "object",
+          "required": [
+            "minor",
+            "currency"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "minor": {
+              "type": "integer"
+            },
+            "currency": {
+              "type": "string",
+              "enum": [
+                "USD"
+              ]
+            }
+          }
+        },
+        "approval": {
+          "type": [
+            "null",
+            "string",
+            "object"
+          ]
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "lines": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "maker": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "display_name"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "amount": {
+                    "type": "object",
+                    "required": [
+                      "minor",
+                      "currency"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "minor": {
+                        "type": "integer"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "enum": [
+                          "USD"
+                        ]
+                      }
+                    }
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "obligations": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "order_ref": {
+                              "type": "string"
+                            },
+                            "kind": {
+                              "type": "string"
+                            },
+                            "amount": {
+                              "type": "object",
+                              "required": [
+                                "minor",
+                                "currency"
+                              ],
+                              "additionalProperties": false,
+                              "properties": {
+                                "minor": {
+                                  "type": "integer"
+                                },
+                                "currency": {
+                                  "type": "string",
+                                  "enum": [
+                                    "USD"
+                                  ]
+                                }
+                              }
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "dispute_id": {
+                              "type": [
+                                "null",
+                                "string",
+                                "object"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "order_ref",
+                            "kind",
+                            "amount",
+                            "state",
+                            "dispute_id"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "attempts": {
+                    "type": "array",
+                    "items": {
+                      "anyOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "attempt_no": {
+                              "type": "integer"
+                            },
+                            "state": {
+                              "type": "string"
+                            },
+                            "sender_batch_id": {
+                              "type": "string"
+                            },
+                            "request_id": {
+                              "type": "string"
+                            },
+                            "paypal_batch_id": {
+                              "type": "string"
+                            },
+                            "paypal_item_id": {
+                              "type": [
+                                "null",
+                                "string",
+                                "object"
+                              ]
+                            },
+                            "payee_email_masked": {
+                              "type": "string"
+                            },
+                            "amount": {
+                              "type": "object",
+                              "required": [
+                                "minor",
+                                "currency"
+                              ],
+                              "additionalProperties": false,
+                              "properties": {
+                                "minor": {
+                                  "type": "integer"
+                                },
+                                "currency": {
+                                  "type": "string",
+                                  "enum": [
+                                    "USD"
+                                  ]
+                                }
+                              }
+                            },
+                            "prepared_at": {
+                              "type": "string"
+                            },
+                            "last_checked_at": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "attempt_no",
+                            "state",
+                            "sender_batch_id",
+                            "request_id",
+                            "paypal_batch_id",
+                            "paypal_item_id",
+                            "payee_email_masked",
+                            "amount",
+                            "prepared_at",
+                            "last_checked_at"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  }
+                },
+                "required": [
+                  "id",
+                  "maker",
+                  "amount",
+                  "state",
+                  "obligations",
+                  "attempts"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "maker": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "display_name"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "amount": {
+                    "type": "object",
+                    "required": [
+                      "minor",
+                      "currency"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "minor": {
+                        "type": "integer"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "enum": [
+                          "USD"
+                        ]
+                      }
+                    }
+                  },
+                  "state": {
+                    "type": "string"
+                  },
+                  "obligations": {
+                    "type": "array",
+                    "items": {}
+                  },
+                  "attempts": {
+                    "type": "array",
+                    "items": {}
+                  }
+                },
+                "required": [
+                  "id",
+                  "maker",
+                  "amount",
+                  "state",
+                  "obligations",
+                  "attempts"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "replacements": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "line_id": {
+                    "type": "string"
+                  },
+                  "from_run_id": {
+                    "type": "string"
+                  },
+                  "attempt_no": {
+                    "type": "integer"
+                  },
+                  "maker": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "display_name"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "amount": {
+                    "type": "object",
+                    "required": [
+                      "minor",
+                      "currency"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "minor": {
+                        "type": "integer"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "enum": [
+                          "USD"
+                        ]
+                      }
+                    }
+                  },
+                  "previous_attempt_state": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "line_id",
+                  "from_run_id",
+                  "attempt_no",
+                  "maker",
+                  "amount",
+                  "previous_attempt_state"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "reserved": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "maker": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "display_name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "display_name"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "obligation_id": {
+                    "type": "string"
+                  },
+                  "amount": {
+                    "type": "object",
+                    "required": [
+                      "minor",
+                      "currency"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "minor": {
+                        "type": "integer"
+                      },
+                      "currency": {
+                        "type": "string",
+                        "enum": [
+                          "USD"
+                        ]
+                      }
+                    }
+                  },
+                  "reason": {
+                    "type": "string"
+                  },
+                  "dispute_id": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "maker",
+                  "obligation_id",
+                  "amount",
+                  "reason",
+                  "dispute_id"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "required": [
+        "id",
+        "week_start",
+        "state",
+        "total",
+        "line_count",
+        "replacement_count",
+        "reserved_not_paid",
+        "approval",
+        "created_at",
+        "lines",
+        "replacements",
+        "reserved"
+      ],
+      "additionalProperties": false
+    }
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema"
+}
