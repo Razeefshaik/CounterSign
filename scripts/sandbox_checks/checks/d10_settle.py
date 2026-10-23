@@ -44,8 +44,22 @@ def stage(detail: dict) -> str | None:
     return detail.get("dispute_life_cycle_stage")
 
 
+FORMAT_REJECTIONS = (400, 415, 422)
+
+
 def succeeded(result: dict) -> bool:
     return isinstance(result.get("status"), int) and 200 <= result["status"] < 300
+
+
+def classify(result: dict) -> str:
+    """SENT (2xx), REJECTED (definite format rejection), FAILED (other definite 4xx), or
+    UNKNOWN (no status: lost response or interrupted after sending; or 5xx)."""
+    code = result.get("status")
+    if not isinstance(code, int) or code >= 500:
+        return "UNKNOWN"
+    if 200 <= code < 300:
+        return "SENT"
+    return "REJECTED" if code in FORMAT_REJECTIONS else "FAILED"
 
 
 async def act_once(
@@ -181,7 +195,10 @@ async def accept_claim_60(ctx: CheckContext) -> dict:
     entry: dict = {"path": [], "attempts": []}
     detail = await wait(ctx, "snad_60", entry, after="start", done=lambda _: True, max_polls=1)
     body = {"note": STAGED, "accept_claim_type": "REFUND"}
-    # The docs disagree on JSON vs multipart; try JSON, then multipart only if unresolved.
+    # The docs disagree on JSON vs multipart. This POST refunds the buyer, so the next
+    # format is sent only after a definite format rejection. An ambiguous attempt (lost
+    # response, interruption, 5xx) stays UNKNOWN and is reconciled by GET, never re-sent:
+    # a stale unresolved GET must not trigger a second accept-claim.
     for fmt, kwargs in (
         ("json", {"body": body}),
         ("multipart", {"files": {"input": (None, json.dumps(body), "application/json")}}),
@@ -191,15 +208,26 @@ async def accept_claim_60(ctx: CheckContext) -> dict:
         result = await act_once(
             ctx, "snad_60", "accept-claim", key=f"snad_60:accept-claim:{fmt}", **kwargs
         )
-        entry["attempts"].append({"format": fmt, **result})
-        detail = await wait(
-            ctx,
-            "snad_60",
-            entry,
-            after=f"accept_claim_{fmt}",
-            done=lambda d: status(d) == "RESOLVED",
-            max_polls=RESOLVE_MAX_POLLS if succeeded(result) else 1,
-        )
+        outcome = classify(result)
+        entry["attempts"].append({"format": fmt, **result, "outcome": outcome})
+        if outcome != "REJECTED":
+            if outcome in ("SENT", "UNKNOWN"):
+                detail = await wait(
+                    ctx,
+                    "snad_60",
+                    entry,
+                    after=f"accept_claim_{fmt}",
+                    done=lambda d: status(d) == "RESOLVED",
+                    max_polls=RESOLVE_MAX_POLLS,
+                )
+            break
+    entry["accept_claim_outcome"] = (
+        "RESOLVED"
+        if status(detail) == "RESOLVED"
+        else entry["attempts"][-1]["outcome"]
+        if entry["attempts"]
+        else "NOT_SENT"
+    )
     return {"snad_60": close(entry, detail)}
 
 

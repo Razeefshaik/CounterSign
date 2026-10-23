@@ -58,6 +58,9 @@ class FakePayPal:
         self.withheld = 0
         self.list_calls = 0
         self.create_scope = False
+        self.accept_claim_json = True  # False: a JSON accept-claim is rejected with 400
+        self.accept_visible_after_gets = 0  # >0: accept-claim shows up only after N GETs
+        self.pending_accepts: dict[str, int] = {}
 
     # Buyer actions in the Resolution Center (triggered from operator instructions).
     def open(self, capture_id, reason="MERCHANDISE_OR_SERVICE_NOT_RECEIVED"):
@@ -168,7 +171,9 @@ class FakePayPal:
         if match and match.group(1) in self.disputes:
             dispute_id, action = match.groups()
             if action is None:
-                return httpx.Response(200, json=self.detail(dispute_id))
+                stale = self.detail(dispute_id)
+                self.settle_pending(dispute_id)
+                return httpx.Response(200, json=stale)
             return self.act(dispute_id, action, request)
         return httpx.Response(404, json={"name": "RESOURCE_NOT_FOUND"})
 
@@ -195,8 +200,22 @@ class FakePayPal:
             else:
                 self.resolve(dispute_id, "RESOLVED_BUYER_FAVOUR", refund=True)
         elif action == "accept-claim":
-            self.resolve(dispute_id, "RESOLVED_BUYER_FAVOUR", refund=True)
+            is_json = request.headers["content-type"].startswith("application/json")
+            if is_json and not self.accept_claim_json:
+                return httpx.Response(400, json={"name": "INVALID_REQUEST"})
+            if self.accept_visible_after_gets:
+                self.pending_accepts[dispute_id] = self.accept_visible_after_gets
+            else:
+                self.resolve(dispute_id, "RESOLVED_BUYER_FAVOUR", refund=True)
         return httpx.Response(200, json={"links": []})
+
+    def settle_pending(self, dispute_id):
+        """Accepted claims become visible to GET only after a delay, like a lagging read."""
+        if dispute_id in self.pending_accepts:
+            self.pending_accepts[dispute_id] -= 1
+            if self.pending_accepts[dispute_id] <= 0:
+                del self.pending_accepts[dispute_id]
+                self.resolve(dispute_id, "RESOLVED_BUYER_FAVOUR", refund=True)
 
     def posts(self, suffix):
         return [r for r in self.requests if r.method == "POST" and r.url.path.endswith(suffix)]
@@ -504,3 +523,71 @@ async def test_interrupted_accept_claim_is_not_resent_on_resume(settings, root):
     assert len(fake.posts("/accept-claim")) == 1
     assert fake.disputes[snad]["status"] == "RESOLVED"
     assert state["data"]["snad_60"]["resolved"] is True
+
+
+async def d10_with_lost_accept_claim(settings, root, fake):
+    """Run D8 and D9, lose the accept-claim response in D10, then resume D10."""
+    clock, operator = FakeClock(), Operator(fake, answers={"or type skip": "skip"})
+    for check in ("D8", "D9"):
+        await runner(settings, root, fake, operator, clock).run(check)
+    real_handle = fake.handle
+
+    def accept_then_drop(request):
+        if request.url.path.endswith("/accept-claim"):
+            real_handle(request)  # PayPal accepts the claim, then the response is lost.
+            raise httpx.ReadTimeout("fake lost response")
+        return real_handle(request)
+
+    fake.handle = accept_then_drop
+    with pytest.raises(CheckFailed):
+        await runner(settings, root, fake, operator, clock).run("D10")
+    fake.handle = real_handle
+    return await runner(settings, root, fake, operator, clock).run("D10")
+
+
+@pytest.mark.asyncio
+async def test_lost_accept_claim_with_delayed_visibility_is_reconciled_not_resent(settings, root):
+    fake = FakePayPal()
+    fake.accept_visible_after_gets = 3  # the resumed run's first GETs still show it open
+
+    state = await d10_with_lost_accept_claim(settings, root, fake)
+
+    snad = state["data"]["snad_60"]
+    assert len(fake.posts("/accept-claim")) == 1
+    assert [a["format"] for a in snad["attempts"]] == ["json"]
+    assert snad["attempts"][0]["outcome"] == "UNKNOWN"
+    assert snad["accept_claim_outcome"] == "RESOLVED" and snad["resolved"] is True
+    stale_polls = snad["path"][-1]["history"]
+    assert stale_polls[0]["status"] != "RESOLVED" and stale_polls[-1]["status"] == "RESOLVED"
+
+
+@pytest.mark.asyncio
+async def test_lost_accept_claim_that_never_shows_up_stays_unknown(settings, root):
+    fake = FakePayPal()
+    fake.accept_visible_after_gets = 10_000
+
+    state = await d10_with_lost_accept_claim(settings, root, fake)
+
+    snad = state["data"]["snad_60"]
+    assert len(fake.posts("/accept-claim")) == 1
+    assert snad["accept_claim_outcome"] == "UNKNOWN" and snad["resolved"] is False
+
+
+@pytest.mark.asyncio
+async def test_definite_json_rejection_falls_back_to_multipart_once(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    fake.accept_claim_json = False
+    operator = Operator(fake, answers={"or type skip": "skip"})
+
+    states = await run_checks(settings, root, fake, operator, clock, "D8", "D9", "D10")
+
+    snad = states["D10"]["data"]["snad_60"]
+    posts = fake.posts("/accept-claim")
+    assert len(posts) == 2
+    assert posts[0].headers["content-type"].startswith("application/json")
+    assert posts[1].headers["content-type"].startswith("multipart/form-data")
+    assert [(a["format"], a["outcome"]) for a in snad["attempts"]] == [
+        ("json", "REJECTED"),
+        ("multipart", "SENT"),
+    ]
+    assert snad["accept_claim_outcome"] == "RESOLVED"
