@@ -23,7 +23,7 @@ function update() {
 function setupGrid() {
   api = agGrid.createGrid($("grid"), {
     rowData: [], rowHeight: 69, headerHeight: 40, animateRows: false,
-    rowSelection: "single", suppressCellFocus: false,
+    rowSelection: {mode: "singleRow", checkboxes: false, enableClickSelection: true}, suppressCellFocus: false,
     defaultColDef: {sortable: true, resizable: true},
     getRowId: p => p.data.id,
     columnDefs: [
