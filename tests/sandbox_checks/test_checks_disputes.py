@@ -337,6 +337,22 @@ async def test_d8_opens_disputes_in_the_resolution_center_and_records_the_hold(s
 
 
 @pytest.mark.asyncio
+async def test_d9_submits_tracking_evidence_at_inquiry(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+
+    states = await run_checks(settings, root, fake, operator, clock, "D8", "D9")
+
+    evidence = states["D9"]["data"]["evidence"]
+    assert evidence["submitted"] is True and evidence["format"] == "multipart"
+    assert evidence["stage"] == "INQUIRY"
+    [upload] = fake.posts("/provide-evidence")
+    assert b'name="input"' in upload.content and b"PROOF_OF_FULFILLMENT" in upload.content
+    assert findings(root, "D9")["verdict"] == "CONFIRMED"
+    assert_no_private_values(root, operator)
+
+
+@pytest.mark.asyncio
 async def test_api_route_runs_only_with_scope_and_hides_the_assertion(settings, root):
     seed(root, "D1", {"verdict": "CONFIRMED", "permissions": {"disputes_create": True}})
     fake, clock = FakePayPal(), FakeClock()
