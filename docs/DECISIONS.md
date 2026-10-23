@@ -119,3 +119,7 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Eval invariants computed from `mock_paypal` ground truth, not from system traces | Plan | Accept | A system cannot grade itself |
 | Mate also owns tests/mock_paypal/, tests/eval/ and tests/dashboard/ | Owner | Accept | Mate's tests live next to its ownership boundary, outside core's tests/ |
 | Demo mode shows a persistent "Simulated: mock PayPal" banner whenever the demo bar replays the week (CONTRACTS 1.0.1) | Owner | Accept | Nobody may mistake simulated activity for live sandbox activity |
+| D7 probes ERRPYO015 on both the batch and the item GET path | Day one harness | Accept | PayPal's test-values page lists 015 under the batch call while PLAN and the mock use the item call; the recording settles it |
+| D13 installs paypal-agent-toolkit 1.11.0 with --no-deps plus langchain, requests and pydantic | Day one harness | Accept | The full install pulls crewai-tools, which does not build on Windows with Python 3.12; the LangChain adapter needs only these |
+| The Agent Toolkit is always built with Context(sandbox=True), and the base URL is checked before any call | Day one harness | Accept | Context() defaults to the live PayPal API |
+| Toolkit processes run without PAYPAL_, LANGCHAIN_ or LANGSMITH_ variables and with tracing off | Day one harness | Accept | LangChain could otherwise upload tool traces holding PayPal data to LangSmith; C23's agent must do the same |
