@@ -1,0 +1,79 @@
+{
+  "items": [
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000101",
+      "paypal_dispute_id": "PP-D-27803",
+      "order": {
+        "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000201",
+        "ref": "#1042",
+        "maker_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000301",
+        "amount": {
+          "minor": 40000,
+          "currency": "USD"
+        }
+      },
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "status": "WAITING_FOR_SELLER_RESPONSE",
+      "lifecycle_stage": "INQUIRY",
+      "phase": "ACTIVE",
+      "amount": {
+        "minor": 40000,
+        "currency": "USD"
+      },
+      "seller_response_due_date": "2026-11-12T23:59:59Z",
+      "outcome_code": null,
+      "amount_refunded": null,
+      "hold_observed": true,
+      "reserved": {
+        "minor": 36000,
+        "currency": "USD"
+      },
+      "available_actions": [
+        "provide_evidence",
+        "accept_claim",
+        "escalate"
+      ],
+      "staged": true,
+      "last_synced_at": "2026-11-02T10:30:00Z",
+      "updated_at": "2026-11-02T10:30:00Z"
+    },
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000102",
+      "paypal_dispute_id": "PP-D-27811",
+      "order": {
+        "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000202",
+        "ref": "#1052",
+        "maker_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000302",
+        "amount": {
+          "minor": 6000,
+          "currency": "USD"
+        }
+      },
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+      "status": "WAITING_FOR_SELLER_RESPONSE",
+      "lifecycle_stage": "INQUIRY",
+      "phase": "ACTIVE",
+      "amount": {
+        "minor": 6000,
+        "currency": "USD"
+      },
+      "seller_response_due_date": "2026-11-12T23:59:59Z",
+      "outcome_code": null,
+      "amount_refunded": null,
+      "hold_observed": true,
+      "reserved": {
+        "minor": 5400,
+        "currency": "USD"
+      },
+      "available_actions": [
+        "provide_evidence",
+        "accept_claim",
+        "escalate"
+      ],
+      "staged": true,
+      "last_synced_at": "2026-11-02T10:30:00Z",
+      "updated_at": "2026-11-02T10:30:00Z"
+    }
+  ],
+  "next_cursor": null
+}

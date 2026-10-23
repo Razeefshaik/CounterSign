@@ -1,0 +1,64 @@
+{
+  "currency": "USD",
+  "paypal": {
+    "available": {
+      "minor": 134000,
+      "currency": "USD"
+    },
+    "withheld": {
+      "minor": 46000,
+      "currency": "USD"
+    },
+    "total": {
+      "minor": 180000,
+      "currency": "USD"
+    },
+    "last_refresh_time": "2026-11-06T06:00:00Z",
+    "as_of_time": "2026-11-06T06:00:00Z",
+    "fetched_at": "2026-11-06T08:55:00Z",
+    "age_seconds": 10500,
+    "stale": false
+  },
+  "outflows_after_refresh": {
+    "total": {
+      "minor": 0,
+      "currency": "USD"
+    },
+    "items": []
+  },
+  "effective_available": {
+    "minor": 134000,
+    "currency": "USD"
+  },
+  "cash_reservations": {
+    "total": {
+      "minor": 108600,
+      "currency": "USD"
+    },
+    "by_kind": {
+      "RUN_CASH": {
+        "minor": 108600,
+        "currency": "USD"
+      },
+      "PROPOSAL_CASH": {
+        "minor": 0,
+        "currency": "USD"
+      }
+    }
+  },
+  "unreserved": {
+    "minor": 25400,
+    "currency": "USD"
+  },
+  "earmarks_not_subtracted": {
+    "dispute": {
+      "minor": 41400,
+      "currency": "USD"
+    }
+  },
+  "unclaimed_outstanding": {
+    "minor": 0,
+    "currency": "USD"
+  },
+  "formula": "effective_available = available - outflows_after_refresh; unreserved = effective_available - cash_reservations"
+}

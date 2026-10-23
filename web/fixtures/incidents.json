@@ -1,0 +1,117 @@
+{
+  "items": [
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000042",
+      "kind": "DISPUTE",
+      "state": "AWAITING_OWNER",
+      "title": "Item not received: Maker A order #1042",
+      "subject": {
+        "dispute_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000101",
+        "paypal_dispute_id": "PP-D-27803",
+        "order_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000201",
+        "maker_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000301",
+        "payout_item_id": null,
+        "run_id": null
+      },
+      "amount_at_risk": {
+        "minor": 40000,
+        "currency": "USD"
+      },
+      "deadline": "2026-11-12T23:59:59Z",
+      "latest_proposal": {
+        "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000401",
+        "action": "PROVIDE_EVIDENCE",
+        "verdict": "ALLOW",
+        "state": "EXECUTED"
+      },
+      "opened_at": "2026-11-02T10:14:00Z",
+      "updated_at": "2026-11-02T10:31:00Z",
+      "closed_at": null
+    },
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000043",
+      "kind": "PAYOUT_ITEM",
+      "state": "WAITING_EXTERNAL",
+      "title": "Unclaimed payout: Maker C",
+      "subject": {
+        "dispute_id": null,
+        "paypal_dispute_id": null,
+        "order_id": null,
+        "maker_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000303",
+        "payout_item_id": "5KUDKLF8SDC7S",
+        "run_id": null
+      },
+      "amount_at_risk": {
+        "minor": 30000,
+        "currency": "USD"
+      },
+      "deadline": null,
+      "latest_proposal": {
+        "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000402",
+        "action": "CANCEL_UNCLAIMED_PAYOUT",
+        "verdict": "ALLOW",
+        "state": "EXECUTED"
+      },
+      "opened_at": "2026-11-02T10:14:00Z",
+      "updated_at": "2026-11-02T10:31:00Z",
+      "closed_at": null
+    },
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000044",
+      "kind": "DISPUTE",
+      "state": "AWAITING_OWNER",
+      "title": "Refund request: Maker B order #1052",
+      "subject": {
+        "dispute_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000102",
+        "paypal_dispute_id": "PP-D-27811",
+        "order_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000201",
+        "maker_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000302",
+        "payout_item_id": null,
+        "run_id": null
+      },
+      "amount_at_risk": {
+        "minor": 6000,
+        "currency": "USD"
+      },
+      "deadline": "2026-11-12T23:59:59Z",
+      "latest_proposal": {
+        "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000403",
+        "action": "ACCEPT_CLAIM",
+        "verdict": "BLOCK",
+        "state": "BLOCKED"
+      },
+      "opened_at": "2026-11-02T10:14:00Z",
+      "updated_at": "2026-11-02T10:31:00Z",
+      "closed_at": null
+    },
+    {
+      "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000045",
+      "kind": "RUN_AT_RISK",
+      "state": "AWAITING_OWNER",
+      "title": "Friday maker payout run",
+      "subject": {
+        "dispute_id": null,
+        "paypal_dispute_id": null,
+        "order_id": null,
+        "maker_id": null,
+        "payout_item_id": null,
+        "run_id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000601"
+      },
+      "amount_at_risk": {
+        "minor": 108600,
+        "currency": "USD"
+      },
+      "deadline": "2026-11-12T23:59:59Z",
+      "latest_proposal": {
+        "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000404",
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "verdict": "NEEDS_OWNER",
+        "state": "NEEDS_OWNER"
+      },
+      "opened_at": "2026-11-02T10:14:00Z",
+      "updated_at": "2026-11-02T10:31:00Z",
+      "closed_at": null
+    }
+  ],
+  "next_cursor": null
+}

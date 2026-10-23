@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "id": "dispute:0192f1c4-7a10-7c3e-9b1a-5d2f00000101",
+      "type": "dispute",
+      "label": "PP-D-27803 INR",
+      "state": "ACTIVE",
+      "amount": {
+        "minor": 40000,
+        "currency": "USD"
+      }
+    },
+    {
+      "id": "order:0192f1c4-7a10-7c3e-9b1a-5d2f00000201",
+      "type": "order",
+      "label": "#1042",
+      "state": null,
+      "amount": {
+        "minor": 40000,
+        "currency": "USD"
+      }
+    },
+    {
+      "id": "obligation:0192f1c4-7a10-7c3e-9b1a-5d2f00000802",
+      "type": "obligation",
+      "label": "Maker A share",
+      "state": "RESERVED",
+      "amount": {
+        "minor": 36000,
+        "currency": "USD"
+      }
+    },
+    {
+      "id": "reservation:0192f1c4-7a10-7c3e-9b1a-5d2f00000b01",
+      "type": "reservation",
+      "label": "Dispute earmark",
+      "state": "ACTIVE",
+      "amount": {
+        "minor": 36000,
+        "currency": "USD"
+      }
+    },
+    {
+      "id": "maker:0192f1c4-7a10-7c3e-9b1a-5d2f00000301",
+      "type": "maker",
+      "label": "Maker A",
+      "state": null,
+      "amount": null
+    }
+  ],
+  "edges": [
+    {
+      "from": "dispute:0192f1c4-7a10-7c3e-9b1a-5d2f00000101",
+      "to": "order:0192f1c4-7a10-7c3e-9b1a-5d2f00000201",
+      "type": "disputes"
+    },
+    {
+      "from": "order:0192f1c4-7a10-7c3e-9b1a-5d2f00000201",
+      "to": "obligation:0192f1c4-7a10-7c3e-9b1a-5d2f00000802",
+      "type": "creates"
+    },
+    {
+      "from": "reservation:0192f1c4-7a10-7c3e-9b1a-5d2f00000b01",
+      "to": "obligation:0192f1c4-7a10-7c3e-9b1a-5d2f00000802",
+      "type": "holds"
+    },
+    {
+      "from": "obligation:0192f1c4-7a10-7c3e-9b1a-5d2f00000802",
+      "to": "maker:0192f1c4-7a10-7c3e-9b1a-5d2f00000301",
+      "type": "owed_to"
+    }
+  ]
+}
