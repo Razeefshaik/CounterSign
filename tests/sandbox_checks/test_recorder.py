@@ -70,13 +70,21 @@ def test_raw_retention_is_explicit_and_stays_under_raw_directory(recorder):
         step="raw",
         method="POST",
         path="/v1/example",
-        request_headers={"Authorization": "Bearer FAKE-RAW-TOKEN"},
+        request_headers={
+            "Authorization": "Bearer FAKE-RAW-TOKEN",
+            "Proxy-Authorization": "Basic FAKE-PROXY",
+        },
         request_body=b"FAKE-ORIGINAL-BYTES",
+        response_headers={"AUTHORIZATION": "Bearer FAKE-RESPONSE-TOKEN", "paypal-debug-id": "debug"},
     )
     raw_file = recorder.root / "raw" / "2026-10-23" / "D1" / public.name
     raw = json.loads(raw_file.read_text(encoding="utf-8"))
 
-    assert raw["request_headers"]["Authorization"] == "Bearer FAKE-RAW-TOKEN"
+    assert raw["request_headers"] == {}
+    assert raw["response_headers"] == {"paypal-debug-id": "debug"}
+    assert "FAKE-RAW-TOKEN" not in raw_file.read_text(encoding="utf-8")
+    assert "FAKE-PROXY" not in raw_file.read_text(encoding="utf-8")
+    assert "FAKE-RESPONSE-TOKEN" not in raw_file.read_text(encoding="utf-8")
     assert base64.b64decode(raw["request_body"]["data"]) == b"FAKE-ORIGINAL-BYTES"
     assert "FAKE-RAW-TOKEN" not in public.read_text(encoding="utf-8")
 

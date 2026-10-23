@@ -7,7 +7,7 @@ from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 
-from .redact import Redactor
+from .redact import AUTHORIZATION_KEYS, Redactor, normalized_key
 
 
 def utc_now() -> datetime:
@@ -64,10 +64,18 @@ class Recorder:
         exchange = {
             "method": method.upper(),
             "path": path,
-            "request_headers": dict(request_headers or {}),
+            "request_headers": {
+                key: value
+                for key, value in (request_headers or {}).items()
+                if normalized_key(key) not in AUTHORIZATION_KEYS
+            },
             "request_body": request_body,
             "response_status": response_status,
-            "response_headers": dict(response_headers or {}),
+            "response_headers": {
+                key: value
+                for key, value in (response_headers or {}).items()
+                if normalized_key(key) not in AUTHORIZATION_KEYS
+            },
             "response_body": response_body,
             "t_sent": timestamp(sent),
             "t_recv": timestamp(received),
