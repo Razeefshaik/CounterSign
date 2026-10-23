@@ -61,6 +61,8 @@ class FakePayPal:
         self.accept_claim_json = True  # False: a JSON accept-claim is rejected with 400
         self.accept_visible_after_gets = 0  # >0: accept-claim shows up only after N GETs
         self.pending_accepts: dict[str, int] = {}
+        self.hold_on_dispute = True  # False: a "no hold" dispute leaves withheld unchanged
+        self.balance_mode = "ok"  # "error": HTTP 503; "no_withheld": withheld field missing
 
     # Buyer actions in the Resolution Center (triggered from operator instructions).
     def open(self, capture_id, reason="MERCHANDISE_OR_SERVICE_NOT_RECEIVED"):
@@ -75,16 +77,21 @@ class FakePayPal:
             "outcome": None,
             "visible_after": self.list_calls + self.appear_after,
         }
-        self.available -= amount
-        self.withheld += amount
+        self.disputes[dispute_id]["held"] = self.hold_on_dispute
+        if self.hold_on_dispute:
+            self.available -= amount
+            self.withheld += amount
         return dispute_id
 
     def resolve(self, dispute_id, code, *, refund):
         dispute = self.disputes[dispute_id]
         dispute.update(status="RESOLVED", outcome=code, refunded=dispute["amount"] if refund else 0)
-        self.withheld -= dispute["amount"]
-        if not refund:
-            self.available += dispute["amount"]
+        if dispute["held"]:
+            self.withheld -= dispute["amount"]
+            if not refund:
+                self.available += dispute["amount"]
+        elif refund:
+            self.available -= dispute["amount"]
 
     def detail(self, dispute_id):
         d = self.disputes[dispute_id]
@@ -131,20 +138,19 @@ class FakePayPal:
                 200, json={"access_token": TOKEN, "expires_in": 32400, "scope": scope}
             )
         if path == "/v1/reporting/balances":
+            if self.balance_mode == "error":
+                return httpx.Response(503, json={"name": "SERVICE_UNAVAILABLE"})
             usd = lambda cents: {"currency_code": "USD", "value": dollars(cents)}
+            balance = {
+                "currency": "USD",
+                "available_balance": usd(self.available),
+                "withheld_balance": usd(self.withheld),
+                "total_balance": usd(self.available + self.withheld),
+            }
+            if self.balance_mode == "no_withheld":
+                del balance["withheld_balance"]
             return httpx.Response(
-                200,
-                json={
-                    "balances": [
-                        {
-                            "currency": "USD",
-                            "available_balance": usd(self.available),
-                            "withheld_balance": usd(self.withheld),
-                            "total_balance": usd(self.available + self.withheld),
-                        }
-                    ],
-                    "last_refresh_time": "2026-10-24T08:00:00Z",
-                },
+                200, json={"balances": [balance], "last_refresh_time": "2026-10-24T08:00:00Z"}
             )
         if path.startswith("/v2/payments/captures/"):
             return httpx.Response(200, json={"id": path.rsplit("/", 1)[-1], "status": "COMPLETED"})
@@ -399,6 +405,68 @@ async def test_d10_settles_every_dispute_and_catalogues_outcomes(settings, root)
     assert final["evidence_accepted_stages"] == ["spare_25:CHARGEBACK"]
     assert len(fake.posts("/accept-claim")) == 1
     assert_no_private_values(root, operator)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("balance_mode", ["error", "no_withheld"])
+async def test_d8_missing_balance_evidence_is_blocked_not_no_hold(settings, root, balance_mode):
+    fake, clock = FakePayPal(), FakeClock()
+    fake.balance_mode = balance_mode
+    operator = Operator(fake)
+
+    state = await runner(settings, root, fake, operator, clock).run("D8")
+
+    finding = findings(root, "D8")
+    hold = finding["hold"]
+    assert hold["hold_observed"] is None
+    assert hold["hold_verdict"] == "BLOCKED"
+    assert hold["valid_observations"] == 0 and hold["total_observations"] == 3
+    assert "no valid baseline withheld balance" in hold["missing_evidence"]
+    assert "no valid withheld balance after the disputes" in hold["missing_evidence"]
+    assert finding["creation_verdict"] == "CONFIRMED"
+    assert finding["verdict"] == state["data"]["verdict"] == "BLOCKED"
+
+
+@pytest.mark.asyncio
+async def test_d8_valid_balances_without_a_hold_are_different_not_blocked(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    fake.hold_on_dispute = False
+    operator = Operator(fake)
+
+    await runner(settings, root, fake, operator, clock).run("D8")
+
+    finding = findings(root, "D8")
+    hold = finding["hold"]
+    assert hold["hold_observed"] is False
+    assert hold["hold_verdict"] == "DIFFERENT"
+    assert hold["valid_observations"] == 3
+    assert hold["largest_withheld_increase_minor"] == 0
+    assert "missing_evidence" not in hold
+    assert finding["verdict"] == "DIFFERENT"
+
+
+@pytest.mark.asyncio
+async def test_d8_ignores_failed_reads_when_valid_ones_show_the_hold(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    real_handle = fake.handle
+    balance_calls = []
+
+    def flaky_balances(request):
+        # Fail every other hold-window balance read; the baseline read succeeds.
+        if request.url.path == "/v1/reporting/balances" and fake.disputes:
+            balance_calls.append(request)
+            if len(balance_calls) % 2:
+                return httpx.Response(503, json={"name": "SERVICE_UNAVAILABLE"})
+        return real_handle(request)
+
+    fake.handle = flaky_balances
+
+    await runner(settings, root, fake, operator, clock).run("D8")
+
+    hold = findings(root, "D8")["hold"]
+    assert 0 < hold["valid_observations"] < hold["total_observations"]
+    assert hold["hold_observed"] is True and hold["hold_verdict"] == "CONFIRMED"
 
 
 @pytest.mark.asyncio

@@ -437,36 +437,64 @@ async def observe_hold(ctx: CheckContext) -> dict:
     return {"hold_observations": observations}
 
 
+def withheld_minor(snapshot: dict) -> int | None:
+    """Withheld cents from a successful balance read; None means no evidence."""
+    if not isinstance(snapshot, dict) or snapshot.get("status") != 200:
+        return None
+    return minor(snapshot.get("withheld"))
+
+
 def hold_result(ctx: CheckContext) -> dict:
-    disputes = ctx.data["disputes"]
-    expected = sum(
-        minor((entry.get("initial") or {}).get("dispute_amount", {}).get("value")) or 0
-        for entry in disputes.values()
+    """True/False/PARTIAL only from valid reads; missing evidence is None and BLOCKED.
+
+    A failed balance call or a missing withheld value is not evidence of "no hold".
+    """
+    observations = ctx.data["hold_observations"]
+    amounts = [
+        minor(((entry.get("initial") or {}).get("dispute_amount") or {}).get("value"))
+        for entry in ctx.data["disputes"].values()
         if entry.get("dispute_id")
-    )
-    baseline = minor(ctx.data["baseline_balance"].get("withheld"))
+    ]
+    expected = sum(amounts) if amounts and None not in amounts else None
+    baseline = withheld_minor(ctx.data["baseline_balance"])
+    valid = [
+        (observation["at"], withheld)
+        for observation in observations
+        if (withheld := withheld_minor(observation["balance"])) is not None
+    ]
+    missing = []
     if baseline is None:
-        baseline = 0
-    first_full = None
-    largest = 0
-    for observation in ctx.data["hold_observations"]:
-        withheld = minor(observation["balance"].get("withheld"))
-        if withheld is None:
-            continue
-        largest = max(largest, withheld - baseline)
-        if first_full is None and expected and withheld - baseline >= expected:
-            first_full = observation["at"]
-    if expected and largest >= expected:
-        observed = True
-    elif largest == 0:
-        observed = False
-    else:
-        observed = "PARTIAL"
-    return {
-        "hold_observed": observed,
+        missing.append("no valid baseline withheld balance")
+    if not valid:
+        missing.append("no valid withheld balance after the disputes")
+    if expected is None:
+        missing.append("no dispute amounts to compare with")
+    result = {
+        "valid_observations": len(valid),
+        "total_observations": len(observations),
         "expected_withheld_increase_minor": expected,
-        "largest_withheld_increase_minor": largest,
-        "first_full_hold_seen_at": first_full,
+        "largest_withheld_increase_minor": None,
+        "first_full_hold_seen_at": None,
+    }
+    if missing:
+        result.update(hold_observed=None, hold_verdict="BLOCKED", missing_evidence=missing)
+    else:
+        largest = max(withheld - baseline for _, withheld in valid)
+        first_full = next((at for at, w in valid if w - baseline >= expected), None)
+        if largest >= expected:
+            observed, verdict = True, "CONFIRMED"
+        elif largest <= 0:
+            observed, verdict = False, "DIFFERENT"
+        else:
+            observed, verdict = "PARTIAL", "DIFFERENT"
+        result.update(
+            hold_observed=observed,
+            hold_verdict=verdict,
+            largest_withheld_increase_minor=largest,
+            first_full_hold_seen_at=first_full,
+        )
+    return {
+        **result,
         "capture_statuses_seen": sorted(
             {
                 f"{role}:{status}"
@@ -484,8 +512,15 @@ async def findings(ctx: CheckContext) -> dict:
     }
     hold = hold_result(ctx)
     if not found:
+        creation = "BLOCKED"
+    elif len(found) == len(ROLES):
+        creation = "CONFIRMED"
+    else:
+        creation = "DIFFERENT"
+    verdicts = {creation, hold["hold_verdict"]}
+    if "BLOCKED" in verdicts:
         verdict = "BLOCKED"
-    elif len(found) == len(ROLES) and hold["hold_observed"] is True:
+    elif verdicts == {"CONFIRMED"}:
         verdict = "CONFIRMED"
     else:
         verdict = "DIFFERENT"
@@ -494,6 +529,8 @@ async def findings(ctx: CheckContext) -> dict:
         {
             "check_id": "D8",
             "verdict": verdict,
+            "creation_verdict": creation,
+            "hold_verdict": hold["hold_verdict"],
             "api_route": ctx.data["api_route"],
             "disputes": disputes,
             "not_found": sorted(set(ROLES) - set(found)),
