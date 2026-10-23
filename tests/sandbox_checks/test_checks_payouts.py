@@ -433,3 +433,59 @@ async def test_linked_duplicate_batch_is_not_adopted_without_matching_payee(sett
     with pytest.raises(CheckFailed):
         await make_runner(settings, root, fake, operator, clock).run("D3")
     assert len(fake.batches) == 1
+
+
+@pytest.mark.asyncio
+async def test_d4_all_three_unclaimed_and_balance_effects_are_recorded(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    state = await make_runner(settings, root, fake, operator, clock).run("D4")
+    data = state["data"]
+    assert data["verdict"] == data["unclaimed_verdict"] == "CONFIRMED"
+    assert set(data["payouts"]) == {"unreg_1", "unreg_2", "unreg_3"}
+    assert all(p["item_status"] == "UNCLAIMED" for p in data["payouts"].values())
+    assert data["balance_effect"]["available_delta_minor"] == -300
+    assert data["balance_effect"]["withheld_delta_minor"] == 0
+    assert sum(e["event"] == "PAYOUT_ITEM_UNCLAIMED" for e in data["timeline"]) == 3
+    assert len(fake.batches) == 3
+    assert_clean(root, operator)
+
+
+@pytest.mark.asyncio
+async def test_d4_resume_does_not_recreate_the_other_payouts(settings, root):
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    original = fake.respond
+
+    def drop_second(request):
+        result = original(request)
+        if (
+            request.method == "POST"
+            and request.url.path == "/v1/payments/payouts"
+            and len(fake.batches) == 2
+        ):
+            fake.respond = original
+            raise httpx.ReadTimeout("simulated lost second response")
+        return result
+
+    fake.respond = drop_second
+    with pytest.raises(CheckFailed):
+        await make_runner(settings, root, fake, operator, clock).run("D4")
+    state = await make_runner(settings, root, fake, operator, clock).run("D4")
+    assert len(fake.batches) == 3
+    assert len(fake.posts("/v1/payments/payouts")) == 4
+    assert state["data"]["verdict"] == "CONFIRMED"
+    assert_clean(root, operator)
+
+
+@pytest.mark.asyncio
+async def test_d4_missing_addresses_blocks_before_any_payout(settings, root):
+    from dataclasses import replace
+
+    fake, clock = FakePayPal(), FakeClock()
+    operator = Operator(fake)
+    state = await make_runner(
+        replace(settings, unregistered_emails=()), root, fake, operator, clock
+    ).run("D4")
+    assert state["data"]["verdict"] == "BLOCKED"
+    assert not fake.posts("/v1/payments/payouts")
