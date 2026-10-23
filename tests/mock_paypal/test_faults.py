@@ -168,3 +168,13 @@ def test_invalid_fault_and_control_gate(client):
     )
     with TestClient(create_app(control_enabled=False)) as off:
         assert off.get("/_mock/ground-truth").status_code == 404
+
+
+def test_overlapping_faults_count_all_matching_requests(client):
+    first = inject(client, {"type": "http_error", "status": 500}, nth=1, count=1)
+    second = inject(client, {"type": "http_error", "status": 503}, nth=2, count=1)
+    assert client.post(PATH, json=body()).status_code == 500
+    assert client.post(PATH, json=body()).status_code == 503
+    assert client.post(PATH, json=body()).status_code == 201
+    requests = client.get("/_mock/ground-truth").json()["requests"]
+    assert [r["fault_id"] for r in requests] == [first, second, None]

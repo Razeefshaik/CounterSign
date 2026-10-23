@@ -223,12 +223,12 @@ class FaultMiddleware:
                 ):
                     candidate.seen += 1
                     if (
-                        candidate.seen >= match["nth"]
+                        fault is None
+                        and candidate.seen >= match["nth"]
                         and candidate.used < match["count"]
                     ):
                         candidate.used += 1
                         fault = candidate
-                        break
         action = fault.doc["action"] if fault else None
         messages = []
 
