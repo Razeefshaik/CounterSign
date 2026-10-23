@@ -2,3 +2,10 @@
 __pycache__/
 .venv/
 *.pyc
+.pytest_cache/
+.ruff_cache/
+.import_linter_cache/
+*.egg-info/
+build/
+dist/
+recordings/**/raw/

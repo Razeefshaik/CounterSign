@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "countersign"
+version = "0.1.0"
+description = "AI proposes, code countersigns: safe marketplace money operations."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+
+[project.optional-dependencies]
+dev = [
+    "httpx",
+    "fastapi",
+    "uvicorn",
+    "python-dotenv",
+    "pytest",
+    "pytest-asyncio",
+    "ruff",
+    "import-linter",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["countersign*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "strict"
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.importlinter]
+root_package = "countersign"
+
+# The sole root package is countersign. Root wildcards let the skeleton pass
+# before these planned modules exist, while enforcing the rules as they arrive.
+[[tool.importlinter.contracts]]
+name = "Agent cannot reach money writes or core execution internals"
+type = "forbidden"
+source_modules = ["*.agent"]
+forbidden_modules = [
+    "*.paypal.write",
+    "*.paypal.sandbox_controls",
+    "*.executor",
+    "*.db",
+]
+
+[[tool.importlinter.contracts]]
+name = "Only the executor may import the PayPal write adapter"
+type = "protected"
+protected_modules = ["*.paypal.write"]
+allowed_importers = ["*.executor"]
