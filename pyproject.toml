@@ -19,6 +19,7 @@ dev = [
     "python-dotenv",
     "pytest",
     "pytest-asyncio",
+    "hypothesis",
     "ruff",
     "import-linter",
     "alembic",
