@@ -38,7 +38,7 @@ def test_schema_is_generated_from_validator():
     schema = json.loads(path.read_text())
     expected = Scenario.model_json_schema()
     expected["$schema"] = "https://json-schema.org/draft/2020-12/schema"
-    expected["title"] = "CounterSign scenario · CONTRACTS v1.0.1"
+    expected["title"] = "CounterSign scenario · CONTRACTS v1.0.2"
     assert schema == expected
     assert len(schema["$defs"]["FaultStep"]["properties"]) == 3
     assert len(schema["properties"]["fault_class"]["enum"]) == 21
@@ -65,6 +65,25 @@ def test_reference_checks():
         change(data)
         with pytest.raises(ValidationError):
             validate(data)
+
+
+def test_optional_deadline_policy_matches_core_default_and_preserves_override():
+    data = scenario()
+    assert "deadline_close_seconds" not in data["initial_state"]["policy"]
+    assert validate(data).initial_state.policy.deadline_close_seconds == 172800
+    data["initial_state"]["policy"]["deadline_close_seconds"] = 3600
+    assert validate(data).model_dump()["initial_state"]["policy"]["deadline_close_seconds"] == 3600
+    policy_schema = Scenario.model_json_schema()["$defs"]["Policy"]
+    assert "deadline_close_seconds" not in policy_schema["required"]
+    assert policy_schema["properties"]["deadline_close_seconds"]["default"] == 172800
+
+
+@pytest.mark.parametrize("value", [0, -1, True, 1.5, "172800", None])
+def test_deadline_policy_requires_a_positive_strict_integer(value):
+    data = scenario()
+    data["initial_state"]["policy"]["deadline_close_seconds"] = value
+    with pytest.raises(ValidationError):
+        validate(data)
 
 
 @pytest.mark.parametrize(

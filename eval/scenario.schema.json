@@ -680,6 +680,12 @@
           "title": "Maker Share Pct",
           "type": "integer"
         },
+        "deadline_close_seconds": {
+          "default": 172800,
+          "minimum": 1,
+          "title": "Deadline Close Seconds",
+          "type": "integer"
+        },
         "refund_limit_per_order": {
           "$ref": "#/$defs/Money"
         },
@@ -1143,7 +1149,7 @@
     "task",
     "expected"
   ],
-  "title": "CounterSign scenario \u00b7 CONTRACTS v1.0.1",
+  "title": "CounterSign scenario \u00b7 CONTRACTS v1.0.2",
   "type": "object",
   "$schema": "https://json-schema.org/draft/2020-12/schema"
 }
