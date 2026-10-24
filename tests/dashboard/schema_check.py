@@ -18,16 +18,37 @@ def validate(value, schema):
         "minimum",
         "$schema",
         "title",
+        "if",
+        "then",
+        "else",
+        "not",
     }
     assert not schema.keys() - allowed, "Unsupported schema keyword"
     if "anyOf" in schema:
         for option in schema["anyOf"]:
             try:
                 validate(value, option)
-                return
+                break
             except AssertionError:
                 pass
-        raise AssertionError("No schema variant matches")
+        else:
+            raise AssertionError("No schema variant matches")
+    if "not" in schema:
+        try:
+            validate(value, schema["not"])
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError("Forbidden schema matches")
+    if "if" in schema:
+        try:
+            validate(value, schema["if"])
+        except AssertionError:
+            branch = "else"
+        else:
+            branch = "then"
+        if branch in schema:
+            validate(value, schema[branch])
     types = schema.get("type")
     if types:
         types = [types] if isinstance(types, str) else types
@@ -46,15 +67,15 @@ def validate(value, schema):
     if "minimum" in schema:
         assert value >= schema["minimum"], "Below minimum"
     if isinstance(value, dict):
-        assert set(schema.get("required", [])) <= value.keys(), (
-            "Missing required property"
-        )
+        assert set(schema.get("required", [])) <= value.keys(), "Missing required property"
         props = schema.get("properties", {})
         if schema.get("additionalProperties") is False:
             assert not value.keys() - props.keys(), "Unexpected property"
         for key, item in value.items():
             if key in props:
                 validate(item, props[key])
+            elif isinstance(schema.get("additionalProperties"), dict):
+                validate(item, schema["additionalProperties"])
     if isinstance(value, list) and "items" in schema:
         for item in value:
             validate(item, schema["items"])

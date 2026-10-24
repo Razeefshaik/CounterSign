@@ -242,8 +242,7 @@
         },
         "prior_payouts": {
           "items": {
-            "additionalProperties": true,
-            "type": "object"
+            "$ref": "#/$defs/PriorPayout"
           },
           "title": "Prior Payouts",
           "type": "array"
@@ -693,6 +692,27 @@
         "refund_limit_per_day"
       ],
       "title": "Policy",
+      "type": "object"
+    },
+    "PriorPayout": {
+      "additionalProperties": true,
+      "properties": {
+        "maker": {
+          "title": "Maker",
+          "type": "string"
+        },
+        "order_keys": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Order Keys",
+          "type": "array"
+        }
+      },
+      "required": [
+        "maker"
+      ],
+      "title": "PriorPayout",
       "type": "object"
     },
     "RequestAction": {

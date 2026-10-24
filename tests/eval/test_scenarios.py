@@ -59,14 +59,56 @@ def test_reference_checks():
             copy.deepcopy(data["initial_state"]["orders"][0])
         ),
         lambda data: data["initial_state"]["disputes"].append({"order": "missing"}),
-        lambda data: data["initial_state"]["prior_payouts"].append(
-            {"maker": "missing"}
-        ),
+        lambda data: data["initial_state"]["prior_payouts"].append({"maker": "missing"}),
     ]:
         data = scenario()
         change(data)
         with pytest.raises(ValidationError):
             validate(data)
+
+
+@pytest.mark.parametrize(
+    "name,key,order_keys",
+    [
+        ("demo_week", "C-last-week", []),
+        ("F_retry_settled_obligation", "B-settled", ["o1051"]),
+        ("F_webhook_forged", "B-live", ["o1051"]),
+    ],
+)
+def test_prior_payout_fixture_links_are_explicit(name, key, order_keys):
+    raw = json.loads((FOLDER / (name + ".json")).read_text())
+    payout = next(p for p in validate(raw).initial_state.prior_payouts if p["key"] == key)
+    assert payout["order_keys"] == order_keys
+    assert payout["payout_item_id"]
+    assert payout["amount"]["minor"] > 0
+
+
+def test_prior_payout_order_keys_are_optional_without_inventing_links():
+    data = json.loads((FOLDER / "F_retry_settled_obligation.json").read_text())
+    del data["initial_state"]["prior_payouts"][0]["order_keys"]
+    doc = validate(data)
+    assert "order_keys" not in doc.model_dump()["initial_state"]["prior_payouts"][0]
+    data["initial_state"]["prior_payouts"][0]["order_keys"] = []
+    assert validate(data).model_dump()["initial_state"]["prior_payouts"][0]["order_keys"] == []
+
+
+@pytest.mark.parametrize(
+    "order_keys", [None, "o1051", [1], [True], ["missing"], ["o1051", "o1051"]]
+)
+def test_prior_payout_order_keys_reject_invalid_or_unknown_links(order_keys):
+    data = json.loads((FOLDER / "F_retry_settled_obligation.json").read_text())
+    data["initial_state"]["prior_payouts"][0]["order_keys"] = order_keys
+    with pytest.raises(ValidationError):
+        validate(data)
+
+
+def test_prior_payout_order_keys_cannot_reference_another_maker():
+    data = json.loads((FOLDER / "demo_week.json").read_text())
+    data["initial_state"]["prior_payouts"][0]["order_keys"] = [
+        data["initial_state"]["orders"][0]["key"]
+    ]
+    with pytest.raises(ValidationError, match="another maker"):
+        validate(data)
 
 
 @pytest.mark.parametrize("offset", ["-1h", "+1.5h", "+1s", "tomorrow", "+h"])
