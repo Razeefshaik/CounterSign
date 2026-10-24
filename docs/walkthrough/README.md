@@ -54,6 +54,12 @@ The first working version of the product itself, built step by step. Hashes belo
 | 25 | [c15-reconciliation.md](c15-reconciliation.md) | **Reconciliation poller**: regularly asks PayPal for the truth about every payout, dispute and balance, corrects our records, and opens an incident when something moves unexpectedly | Codex | `37747c9`, `13c93d8` |
 | 26 | [c20-engine-facade.md](c20-engine-facade.md) | **Engine facade**: the one stable door the evaluation, the demo bar and Aman's code use; it can wipe only a database named `_test` or `_eval`, and the worker now runs the poller and the unknown-payout sweep | Codex | `3872557`, `18613fb` |
 
+## After the slice
+
+| Page | What it explains |
+| --- | --- |
+| [c24-rules-incidents-simulator.md](c24-rules-incidents-simulator.md) | Dispute rules, reconciliation-only incident closure and read-only payout cash comparisons |
+
 ## Words used everywhere
 
 - **Check (D1 to D13):** one experiment against the PayPal sandbox, run from the terminal. It records every request and response and ends with a verdict.
