@@ -25,7 +25,13 @@ from countersign.fsm.proposal import PROPOSAL, ProposalEvent
 from countersign.ledger.journal import payout_submitted, post_journal, serialize_on
 from countersign.ledger.reservations import consume_reservation, release_reservation
 from countersign.money import Money, MoneyError
-from countersign.paypal.http import Ambiguous, DefiniteError, Ok, canonical_payload_hash
+from countersign.paypal.http import (
+    Ambiguous,
+    DefiniteError,
+    Ok,
+    PayPalHTTP,
+    canonical_payload_hash,
+)
 from countersign.paypal.read import PayPalRead
 from countersign.paypal.write import PayPalWrite
 from countersign.shield import snapshot as model
@@ -67,6 +73,11 @@ class Executor:
         self.database, self.writer, self.reader = database, writer, reader
         self.clock = clock or (lambda: datetime.now(UTC))
         self.stale_after = stale_after
+
+    @classmethod
+    def from_http(cls, database: Database, http: PayPalHTTP, *, clock=None, **options):
+        """Build the adapters here, so callers outside the executor never import the writer."""
+        return cls(database, PayPalWrite(http), PayPalRead(http), clock=clock, **options)
 
     # -- execution ---------------------------------------------------------------------
 

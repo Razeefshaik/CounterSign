@@ -261,6 +261,14 @@ async def test_unknown_past_the_replay_window_goes_to_the_owner_without_a_call(w
     assert (await executor.status(proposal_id))["proposal_state"] == "EXECUTING"
 
 
+async def test_from_http_builds_its_own_adapters_on_the_given_client(world):
+    database, _, executor, _, clock = world
+    built = Executor.from_http(database, executor.writer.http, clock=clock)
+    assert isinstance(built.writer, PayPalWrite) and isinstance(built.reader, PayPalRead)
+    assert built.writer.http is built.reader.http is executor.writer.http
+    assert built.clock is clock and built.stale_after == executor.stale_after
+
+
 async def test_non_paying_actions_are_refused_before_any_change(world):
     database, _, executor, _, _ = world
     async with database.tx() as conn:
