@@ -1,8 +1,8 @@
 """The rule registry: pure functions (proposal, snapshot) -> RuleResult | None, in CONTRACTS order.
 
-The ten C17 slice rules. REFUND_POLICY, EVIDENCE_INTEGRITY, DEADLINE_GUARD, RECHECK_AT_EXECUTION
-and WEBHOOK_AUTHENTICITY come after the slice (RECHECK_AT_EXECUTION is the executor running this
-same registry with at_execution set).
+The ten C17 slice rules plus C23's INJECTION_GUARD. REFUND_POLICY, EVIDENCE_INTEGRITY,
+DEADLINE_GUARD, RECHECK_AT_EXECUTION and WEBHOOK_AUTHENTICITY come after the slice
+(RECHECK_AT_EXECUTION is the executor running this same registry with at_execution set).
 """
 
 from countersign.shield.engine import Rule, RuleName
@@ -12,6 +12,7 @@ from countersign.shield.rules import (
     dispute_reserve,
     funding,
     idempotency,
+    injection_guard,
     payee_integrity,
     payout_state_machine,
     settlement,
@@ -32,5 +33,6 @@ RULES: tuple[tuple[RuleName, Rule], ...] = tuple(
         payee_integrity,
         unknown_scoped,
         approval_binding,
+        injection_guard,
     )
 )

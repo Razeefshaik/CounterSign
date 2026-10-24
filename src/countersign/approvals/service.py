@@ -298,7 +298,10 @@ async def load_context(conn, row: dict, *, now: datetime | None = None):
         ),
     )
     return (
-        model.Proposal(str(row["id"]), action, params, canonical_payload_hash(payload)),
+        model.Proposal(
+            str(row["id"]), action, params, canonical_payload_hash(payload),
+            flags=tuple((row.get("raw_output") or {}).get("flags", ())),
+        ),
         snap,
         payload,
     )

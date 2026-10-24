@@ -10,6 +10,8 @@ import math
 import os
 from dataclasses import dataclass
 
+from countersign.shield.snapshot import PAYING
+
 logger = logging.getLogger(__name__)
 
 
@@ -69,15 +71,34 @@ async def execute_pending(database, executor, *, limit: int = 100) -> dict:
     """Route ready proposals, counting only newly created operation records.
 
     Selecting a proposal does not grant permission: execute() locks, rechecks and
-    owns all financial state changes. Unsupported C19b actions remain untouched.
+    owns all financial state changes. PAYING is the same capability set checked
+    by the current executor. Other actions retain their state and approval;
+    their one-time deferral audit never consumes a supported proposal's slot.
     """
     if type(limit) is not int or not 1 <= limit <= 1000:
         raise WorkerSettingsError("Worker proposal limit must be an integer from 1 to 1000")
     async with database.tx() as conn:
+        # Serialize the audit existence check so parallel workers cannot record
+        # the same deferral twice. This lock grants no financial permission.
+        await conn.execute(
+            "SELECT pg_advisory_xact_lock(hashtextextended('countersign:worker-deferrals',0))"
+        )
+        actions = sorted(str(action) for action in PAYING)
+        await conn.execute(
+            "INSERT INTO audit_log(actor,kind,proposal_id,details) "
+            "SELECT 'system','STATE_TRANSITION',p.id,"
+            "jsonb_build_object('reason','EXECUTION_DEFERRED','action',p.action) "
+            "FROM proposals p WHERE p.state IN ('ALLOWED','APPROVED') "
+            "AND NOT (p.action=ANY(%s)) AND NOT EXISTS "
+            "(SELECT 1 FROM audit_log a WHERE a.proposal_id=p.id AND a.actor='system' "
+            "AND a.kind='STATE_TRANSITION' AND a.details->>'reason'='EXECUTION_DEFERRED')",
+            (actions,),
+        )
         cursor = await conn.execute(
             "SELECT id FROM proposals WHERE state IN ('ALLOWED','APPROVED') "
+            "AND action=ANY(%s) "
             "ORDER BY created_at,id LIMIT %s",
-            (limit,),
+            (actions, limit),
         )
         identifiers = [row["id"] for row in await cursor.fetchall()]
     result = {"proposals": 0, "operations": 0, "errors": 0}
@@ -108,12 +129,14 @@ async def _execute_and_sweep(database, executor, *, limit):
     return result
 
 
-async def worker_once(database, inbox, reconciler, executor, *, limit: int = 100) -> dict:
+async def worker_once(database, inbox, reconciler, executor, *, limit: int = 100, commander=None) -> dict:
     """One explicit facade tick, using only the public service boundaries.
 
     proposals counts ready proposals successfully routed to execute(); operations
     counts new operation IDs, never replay calls or status transitions. errors is
-    a count, so private exception values never enter the facade response.
+    a count, so private exception values never enter the facade response. An
+    optional commander callback investigates once after reconciliation and before
+    routing ready proposals; it grants no execution permission of its own.
     """
     result = {"processed_webhooks": 0, "proposals": 0, "operations": 0, "errors": 0}
     try:
@@ -128,6 +151,11 @@ async def worker_once(database, inbox, reconciler, executor, *, limit: int = 100
         )
     except Exception:  # noqa: BLE001 - safe counts only; reconciler retains pending resources.
         result["errors"] += 1
+    if commander is not None:
+        try:
+            await commander()
+        except Exception:  # noqa: BLE001 - private model/tool errors become a safe count only.
+            result["errors"] += 1
     try:
         executed = await _execute_and_sweep(database, executor, limit=limit)
         for key in ("proposals", "operations", "errors"):

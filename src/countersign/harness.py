@@ -18,16 +18,22 @@ from uuid import UUID
 from psycopg import sql
 from psycopg.conninfo import conninfo_to_dict
 
+from countersign.agent.models import ChatModel, ChatModelConfig, ModelError, create_model
+from countersign.agent.session import AgentSession, AgentSessionError
 from countersign.approvals import ApprovalError, ApprovalService
+from countersign.approvals.service import load_context
 from countersign.config import PayPalSettings
 from countersign.db import Database, Repositories, cas_transition
 from countersign.db.ids import uuid7
 from countersign.db.repositories import TABLES
 from countersign.executor import Executor, ExecutorError
 from countersign.fsm.attempt import PAYPAL_STATUSES
+from countersign.fsm.incident import INCIDENT, IncidentEvent
 from countersign.fsm.obligation import OBLIGATION, ObligationEvent
+from countersign.fsm.proposal import PROPOSAL, VERDICT_EVENT, ProposalEvent
 from countersign.inbox import Inbox, InboxError
 from countersign.ledger import journal
+from countersign.ledger.reservations import create_reservation
 from countersign.money import Money
 from countersign.paypal.http import PayPalHTTP, canonical_payload_hash, resource_id
 from countersign.paypal.read import PayPalRead
@@ -36,7 +42,11 @@ from countersign.reconcile import Reconciler
 from countersign.reconcile.attempts import reconcile_attempts
 from countersign.reconcile.balances import reconcile_balances
 from countersign.reconcile.disputes import ingest_dispute
+from countersign.shield.engine import Verdict, evaluate
+from countersign.shield.snapshot import NON_FINANCIAL, PAYING, Action
 from countersign.worker import worker_once
+
+__all__ = ["ChatModelConfig", "Engine", "EngineError", "EngineSettings"]
 
 
 class EngineError(RuntimeError):
@@ -51,7 +61,7 @@ class EngineSettings:
     paypal_client_secret: str = field(repr=False)
     webhook_id: str = field(repr=False)
     clock: Callable[[], datetime] = field(repr=False)
-    llm: object | None = field(default=None, repr=False)
+    llm: ChatModelConfig | ChatModel | None = field(default=None, repr=False)
 
     def __post_init__(self):
         try:
@@ -67,7 +77,10 @@ class EngineSettings:
         except Exception:  # noqa: BLE001 - never include a private DSN or credential in errors.
             raise EngineError("INVALID_ENGINE_SETTINGS") from None
         if self.llm is not None:
-            raise EngineError("AGENT_NOT_IMPLEMENTED")
+            try:
+                create_model(self.llm)
+            except ModelError as exc:
+                raise EngineError(str(exc)) from None
 
     def __repr__(self):
         return "EngineSettings(values=<REDACTED>)"
@@ -118,11 +131,16 @@ class Engine:
         reader=None,
         verifier=None,
         executor=None,
+        agent_tools=None,
+        simulator=None,
     ):
         self.settings = settings
         self._database, self._http = database, http
         self._transport, self._reader, self._verifier = transport, reader, verifier
         self._executor = executor
+        self._agent_tools, self._simulator = agent_tools, simulator
+        self._agent = None
+        self._agent_lock = asyncio.Lock()
         self._stack = AsyncExitStack()
         self._ready = False
         self._closed = False
@@ -191,6 +209,21 @@ class Engine:
                     self._database, self._reader, clock=self.settings.clock
                 )
                 self._approvals = ApprovalService(self._database, clock=self.settings.clock)
+                if self.settings.llm is not None:
+                    async with self._database.tx() as conn:
+                        cursor = await conn.execute("SELECT current_schema() AS schema")
+                        schema = (await cursor.fetchone())["schema"]
+                    self._agent = await self._stack.enter_async_context(
+                        AgentSession(
+                            self.settings.llm, paypal=PayPalSettings(
+                                self.settings.paypal_base_url,
+                                self.settings.paypal_client_id,
+                                self.settings.paypal_client_secret,
+                                self.settings.webhook_id,
+                            ), reader=self._reader, database_url=self.settings.database_url,
+                            schema=schema, tools=self._agent_tools, simulator=self._simulator,
+                        )
+                    )
                 self._ready = True
             except Exception:
                 await self._stack.aclose()
@@ -204,6 +237,8 @@ class Engine:
             yield
         except EngineError:
             raise
+        except AgentSessionError as exc:
+            raise EngineError(str(exc)) from None
         except ApprovalError as exc:
             raise EngineError(exc.code) from None
         except ExecutorError as exc:
@@ -248,7 +283,186 @@ class Engine:
 
     async def tick(self) -> dict:
         async with self._public():
-            return await worker_once(self._database, self._inbox, self._reconciler, self._executor)
+            return await worker_once(
+                self._database, self._inbox, self._reconciler, self._executor,
+                commander=self._agent_once if self._agent is not None else None,
+            )
+
+    async def _agent_once(self):
+        """Investigate outside locks, then persist one fresh shield-judged proposal.
+
+        Model calls never hold a database transaction. A second process may read
+        the same incident; the financial lock and incident version check permit
+        only one result to commit. The agent package never receives our database.
+        """
+        async with self._agent_lock:
+            async with self._database.tx() as conn:
+                await self._resume_agent_incident(conn)
+                cursor = await conn.execute(
+                    "SELECT i.* FROM incidents i WHERE i.state IN ('OPEN','INVESTIGATING') "
+                    "AND NOT EXISTS (SELECT 1 FROM proposals p WHERE p.incident_id=i.id AND "
+                    "(p.state IN ('CREATED','ALLOWED','NEEDS_OWNER','APPROVED','EXECUTING') OR "
+                    "p.raw_output#>>'{agent_context,incident_version}'=i.version::text)) "
+                    "ORDER BY i.opened_at,i.id LIMIT 1"
+                )
+                observed = await cursor.fetchone()
+                if observed is None:
+                    return
+                cursor = await conn.execute(
+                    "SELECT doc FROM v_dash_incidents WHERE id=%s", (observed["id"],)
+                )
+                document = (await cursor.fetchone())["doc"]
+                subject = observed["subject"]
+                cursor = await conn.execute(
+                    "SELECT raw FROM disputes WHERE id::text=%s OR paypal_dispute_id=%s",
+                    (str(subject.get("dispute_id", "")), subject.get("paypal_dispute_id", "")),
+                )
+                disputes = [row["raw"] for row in await cursor.fetchall()]
+                # The commander labels and redacts these observations as data;
+                # raw buyer messages never become the trusted system prompt.
+                context = {"incident_subject": subject, "disputes": disputes}
+            proposed = await self._agent.step(document, context)
+            await self._store_agent_proposal(observed, proposed)
+
+    async def _resume_agent_incident(self, conn):
+        """Resume a rejected/expired owner decision, including HTTP-side decisions.
+
+        Recovery is in the next tick rather than only Engine.reject(), so a
+        crash after rejection or an owner decision made through the API follows
+        the same path. REQUEST_OWNER questions have no rejection and stay pending.
+        """
+        await journal.serialize_on(conn, "countersign:owner-decisions")
+        cursor = await conn.execute(
+            "SELECT i.id,i.state,i.version,p.state AS proposal_state,p.id AS proposal_id "
+            "FROM incidents i JOIN LATERAL (SELECT id,state,raw_output FROM proposals "
+            "WHERE incident_id=i.id ORDER BY created_at DESC,id DESC LIMIT 1) p ON true "
+            "WHERE i.state='AWAITING_OWNER' AND p.state IN ('REJECTED','EXPIRED') "
+            "AND p.raw_output ? 'agent_context' AND NOT EXISTS (SELECT 1 FROM proposals a "
+            "WHERE a.incident_id=i.id AND a.state IN "
+            "('CREATED','ALLOWED','NEEDS_OWNER','APPROVED','EXECUTING')) "
+            "ORDER BY i.opened_at,i.id LIMIT 1 FOR UPDATE OF i"
+        )
+        row = await cursor.fetchone()
+        if row is None:
+            return
+        event = (IncidentEvent.OWNER_REJECTED if row["proposal_state"] == "REJECTED"
+                 else IncidentEvent.APPROVAL_EXPIRED)
+        await cas_transition(
+            conn, INCIDENT, "incidents", row["id"], row["state"], row["version"], event,
+        )
+        await Repositories(conn).audit_log.insert(
+            actor="system", kind="STATE_TRANSITION", proposal_id=row["proposal_id"],
+            details={"incident_id": str(row["id"]), "event": str(event),
+                     "state": "INVESTIGATING"},
+        )
+
+    async def _store_agent_proposal(self, observed, proposed):
+        async with self._database.tx() as conn:
+            await journal.serialize_on(conn, "countersign:owner-decisions")
+            repos = Repositories(conn)
+            incident = await repos.incidents.get(observed["id"], for_update=True)
+            if (incident is None or incident["version"] != observed["version"]
+                    or incident["state"] not in {"OPEN", "INVESTIGATING"}):
+                return
+            cursor = await conn.execute(
+                "SELECT 1 FROM proposals WHERE incident_id=%s AND "
+                "(state IN ('CREATED','ALLOWED','NEEDS_OWNER','APPROVED','EXECUTING') OR "
+                "raw_output#>>'{agent_context,incident_version}'=%s) LIMIT 1",
+                (incident["id"], str(incident["version"])),
+            )
+            if await cursor.fetchone():
+                return
+            if incident["state"] == "OPEN":
+                await cas_transition(
+                    conn, INCIDENT, "incidents", incident["id"], incident["state"],
+                    incident["version"], IncidentEvent.INVESTIGATION_STARTED,
+                )
+                incident = await repos.incidents.get(incident["id"])
+            document = proposed.to_dict()
+            raw = {**proposed.raw_output, "flags": list(proposed.flags)}
+            row = await repos.proposals.insert(
+                incident_id=incident["id"], action=document["action"], params=document["params"],
+                evidence_refs=document["evidence_refs"], rationale=document["rationale"],
+                expected_effect=document["expected_effect"], model=self._agent.model_id,
+                raw_output=raw, state="CREATED", created_at=_time(self.settings.clock()),
+            )
+            proposal, snap, payload = await load_context(conn, row, now=_time(self.settings.clock()))
+            decision = evaluate(proposal, snap)
+            details = {"rule_results": decision.rule_results(), "operation_payload": payload}
+            if decision.verdict is Verdict.NEEDS_OWNER:
+                binding = {
+                    "payload_hash": proposal.payload_hash,
+                    "record_versions": snap.record_versions(),
+                    "expires_at": (snap.now + self._approvals.lifetime).isoformat(),
+                }
+                details["approval_request"] = binding
+                raw["approval_request"] = binding
+            row = await repos.proposals.update(
+                row["id"], verdict=str(decision.verdict),
+                verdict_rules=[str(rule) for rule in decision.rules], verdict_details=details,
+            )
+            state = await cas_transition(
+                conn, PROPOSAL, "proposals", row["id"], row["state"], row["version"],
+                VERDICT_EVENT[str(decision.verdict)],
+            )
+            if decision.verdict is Verdict.NEEDS_OWNER:
+                await cas_transition(
+                    conn, INCIDENT, "incidents", incident["id"], incident["state"],
+                    incident["version"], IncidentEvent.OWNER_NEEDED,
+                )
+            elif decision.verdict is Verdict.ALLOW and proposal.action in NON_FINANCIAL:
+                for event in (ProposalEvent.EXECUTION_STARTED, ProposalEvent.EXECUTION_SUCCEEDED):
+                    current = await repos.proposals.get(row["id"])
+                    state = await cas_transition(
+                        conn, PROPOSAL, "proposals", row["id"], state, current["version"], event,
+                    )
+                event = {Action.WAIT: IncidentEvent.WAIT_STARTED,
+                         Action.REQUEST_OWNER: IncidentEvent.OWNER_NEEDED}.get(proposal.action)
+                if event is not None:
+                    await cas_transition(
+                        conn, INCIDENT, "incidents", incident["id"], incident["state"],
+                        incident["version"], event,
+                    )
+                # A stored draft is not a sent message; a recorded owner question
+                # is not an approval. These local steps never create operations.
+                await repos.audit_log.insert(
+                    actor="agent", kind="STATE_TRANSITION", proposal_id=row["id"],
+                    details={"action": str(proposal.action), "recorded_only": True,
+                             "delivered": False, "state": str(state)},
+                )
+            if decision.verdict is not Verdict.BLOCK and proposal.action in PAYING:
+                run_id = row["params"].get("run_id")
+                own_cash = [
+                    r for r in snap.reservations if r.state == "ACTIVE"
+                    and r.kind in {"PROPOSAL_CASH", "RUN_CASH"}
+                    and run_id is not None and r.run_id == run_id
+                ]
+                if not own_cash:
+                    amount = sum((item.amount for item in snap.payouts),
+                                 Money.zero(snap.cash.unreserved.currency))
+                    if amount.minor > 0:
+                        await create_reservation(
+                            conn, "PROPOSAL_CASH", amount, proposal_id=row["id"],
+                            run_id=UUID(run_id) if run_id else None,
+                        )
+            current_incident = await repos.incidents.get(incident["id"])
+            raw["agent_context"] = {"incident_version": current_incident["version"]}
+            await repos.proposals.update(row["id"], raw_output=raw)
+            await repos.audit_log.insert(
+                actor="agent", kind="PROPOSAL_CREATED", proposal_id=row["id"],
+                details={"incident_id": str(incident["id"]), "action": document["action"],
+                         "model": self._agent.model_id},
+            )
+            await repos.audit_log.insert(
+                actor="shield", kind="SHIELD_VERDICT", proposal_id=row["id"],
+                verdict=str(decision.verdict), details={"rule_results": decision.rule_results(),
+                                                      "at_execution": False},
+            )
+            if any(flag["type"] == "PROMPT_INJECTION" for flag in proposed.flags):
+                await repos.audit_log.insert(
+                    actor="agent", kind="INJECTION_FLAGGED", proposal_id=row["id"],
+                    details={"types": sorted({flag["type"] for flag in proposed.flags})},
+                )
 
     async def plan_payout_run(self, week_start: date) -> str:
         if type(week_start) is not date:

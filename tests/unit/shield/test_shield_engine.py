@@ -34,6 +34,7 @@ SLICE = [
     "PAYEE_INTEGRITY",
     "UNKNOWN_SCOPED",
     "APPROVAL_BINDING",
+    "INJECTION_GUARD",
 ]
 
 
@@ -63,7 +64,7 @@ def test_names_match_contracts():
     assert [a.value for a in Action] == contracts_enum("Actions")
 
 
-def test_registry_holds_the_ten_slice_rules_in_contracts_order():
+def test_registry_holds_slice_and_injection_rules_in_contracts_order():
     assert [name.value for name, _ in RULES] == SLICE
 
 
@@ -86,7 +87,7 @@ def test_every_rule_outcome_is_returned_including_pass(world):
     assert set(outcomes.values()) == {Outcome.PASS}
 
 
-def test_all_ten_rules_run_at_execution(world):
+def test_all_registered_rules_run_at_execution(world):
     decision = evaluate(world.proposal(), world.executing())
     assert [r.rule.value for r in decision.results] == SLICE
     assert {r.outcome for r in decision.results} == {Outcome.PASS}
@@ -139,6 +140,7 @@ def test_autonomous_cancel_is_allowed_and_names_its_rules(world):
         RuleName.PAYOUT_STATE_MACHINE,
         RuleName.PAYEE_INTEGRITY,
         RuleName.UNKNOWN_SCOPED,
+        RuleName.INJECTION_GUARD,
     ]
     snap = replace(
         world.cancel_c(),
