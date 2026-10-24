@@ -12,7 +12,7 @@ Tracking is merchant-uploaded. The detail says when `tracking_number_validated` 
 
 Evidence is autonomous only when the dispute is `WAITING_FOR_SELLER_RESPONSE` and has a `provide_evidence` action link. There is no lifecycle-stage restriction. D8 had this link at CHARGEBACK; D9 did not. A missing link blocks the proposal.
 
-`DEADLINE_GUARD` uses the stored `seller_response_due_date`. An absent deadline or a reached deadline blocks the dispute action. A close deadline flags owner-tier actions, while valid autonomous evidence can still proceed before the deadline. The positive integer policy `deadline_close_seconds` defines close. No value is silently installed; the owner must choose it. A missing or invalid threshold requires owner attention. Waiting, drafting and asking the owner remain available.
+`DEADLINE_GUARD` uses the stored `seller_response_due_date`. An absent deadline or a reached deadline blocks the dispute action. A close deadline flags owner-tier actions, while valid autonomous evidence can still proceed before the deadline. The positive integer policy `deadline_close_seconds` defines close. The core facade and demo-script seeds install the owner-approved value `172800` (48 hours). Explicit input overrides it, and reseeding never overwrites a later owner change. A missing or invalid threshold requires owner attention. Waiting, drafting and asking the owner remain available.
 
 The snapshot adds trailing fields with empty or None defaults. `load_rule_facts` enriches it from database rows inside the existing transaction. This helper does not change the canonical payload or its hash. The executor must continue to use `load_context` and re-run the entire registry before sending a write.
 
@@ -73,9 +73,9 @@ Tests use an isolated random PostgreSQL schema and fake PayPal HTTP through the 
 
 From this worktree, use `CounterSign-db/.venv` and `PYTHONPATH=src`. Set `COUNTERSIGN_TEST_DATABASE_URL` to a dedicated PostgreSQL 16 test database, then run `python -m pytest -q`, `ruff check .` and `lint-imports`.
 
-C19b owns actual evidence sending, cancellation and claim acceptance. It must consume authoritative records and the new rule facts, preserve canonical payload binding, and re-check immediately before sending. The combined end-to-end evidence test follows the C19b-first merge. No dashboard contract or Aman-owned file changes are needed. The new policy threshold must be configured by trusted application setup; a model cannot supply it.
+C19b supplies evidence sending, cancellation and claim acceptance. Its trusted request construction, canonical binding and execution checks are preserved. The combined facade test now sends exactly one stored-tracking evidence request through the shield, worker, executor and mock at CHARGEBACK. No live PayPal or model calls are used. A model cannot supply or change the deadline policy.
 
-This branch is not pushed or merged. Rebase onto main after C19b lands, preserving its executable-action registry and payload construction, then run the combined checks again.
+This branch has been rebased onto `main` at `505e213`, after C19b merged. It has not been pushed or merged back to main.
 
 
 ## Changed files
@@ -87,27 +87,51 @@ This branch is not pushed or merged. Rebase onto main after C19b lands, preservi
 | `src/countersign/approvals/service.py` | `load_rule_facts` helper and its single call in `load_context`; existing payload and hash construction preserved |
 | `src/countersign/incidents/{__init__,checks,service}.py` | Incident discovery, FSM/CAS lifecycle, reconciliation checks and poller composition |
 | `src/countersign/simulator/{__init__,service}.py` | Read-only integer cash comparisons |
-| `src/countersign/harness.py` | Lifecycle and simulator dependency wiring only |
+| `src/countersign/harness.py` | Lifecycle/simulator wiring and the owner-approved deadline seed default; C19b behavior wiring preserved |
+| `scripts/seed_marketplace.py` | The same 48-hour policy default for the core demo-script seed |
 | `tests/unit/shield/{test_c24_rules,test_shield_engine}.py` | New rule cases and updated registry expectations |
 | `tests/unit/agent/test_injection_guard.py` | Keep injection assertions while supplying the added authoritative-fact query and fields |
 | `tests/integration/{test_c24,test_c24_simulator}.py` | Database/mock checks for facts, cash simulation, commander verdicts and incident closure |
 | `tests/integration/test_agent_harness.py` | Reuse discovered incidents and supply explicit policy in approval fixtures |
 | `tests/integration/approvals/test_approvals.py` | Supply the linked order, deadline, link and policy required by claim approval |
+| `tests/integration/executor/test_actions.py` | Supply authoritative C24 facts while retaining C19b execution assertions |
+| `tests/integration/inbox/test_inbox.py` | Verify the script seed default, explicit override and preservation of owner changes |
 | `docs/DECISIONS.md`, this page and `docs/walkthrough/README.md` | Design reasons, usage and walkthrough index |
 
-The policy keys are `refund_limit_per_order`, `refund_limit_per_day` (both already named in CONTRACTS), and the new `deadline_close_seconds`. For example, trusted setup may choose `3600` for an hour; this is an example, not an installed default. Missing refund policies block; a missing deadline threshold requires owner attention.
+The policy keys are `refund_limit_per_order`, `refund_limit_per_day` (both already named in CONTRACTS), and the new `deadline_close_seconds`. Both core seeds default the threshold to `172800` (48 hours); owner can change it. Explicit policy input wins over the default. Missing refund policies block; a missing deadline threshold requires owner attention.
 
 
-## Final verification on Oct 24
+## Rebase onto C19b
 
-- Full `python -m pytest -q --tb=short -rs`: **2,009 passed, 6 skipped, 0 failed**, with one existing Starlette/httpx deprecation warning; 281.91 seconds.
-- The six skips are one C09 recording/index test and five checks requiring the optional PayPal Agent Toolkit/LangChain installation. No dependencies were added to bypass those skips.
+The branch was rebased onto `main` at `505e213`. Four files conflicted:
+
+| Conflict | Resolution |
+| --- | --- |
+| `docs/DECISIONS.md` | Retained every C19b and C24 row |
+| `src/countersign/approvals/service.py` | Retained C19b's `behavior` argument, payload/hash/request binding and all existing code; C24 facts remain in `load_rule_facts`, called once |
+| `src/countersign/harness.py` | Retained C19b executor/behavior wiring alongside C24 incident, commander and simulator wiring |
+| `tests/integration/approvals/test_approvals.py` | Retained the claim-link prerequisite and supplied C24's linked order, response deadline and limits |
+
+`shield/snapshot.py` merged automatically. The existing dataclass fields remain in their original order; C24 adds trailing fields only. `PAYING` and C19b's `EXECUTABLE` are unchanged. The C19b executor, worker and request-builder files are byte-for-byte unchanged from main. An AST comparison verifies that removing the one C24 helper call makes `load_context` identical to main, including its request and hash construction.
+
+The combined fixtures now supply real stored capture/tracking identities, action links, seller deadlines and policies. The commander integration test verifies an autonomous ALLOW at CHARGEBACK followed by exactly one successful stored-tracking evidence operation through C19b. Missing links still fail closed in C19b's preserved precondition check.
+
+## Policy seed and Aman handoff
+
+The two core seed paths are `Engine._seed_marketplace` in `harness.py` and `scripts/seed_marketplace.py`. Both default `deadline_close_seconds` to `172800` and let explicit input win. Tests cover the default, a scenario override and a later owner edit surviving an idempotent reseed. The shield has no hardcoded fallback: a missing row outside these seeds still requires the owner.
+
+Aman's `eval/validate.py` `Policy` model and generated `eval/scenario.schema.json` currently allow only maker share and refund limits; the schema rejects extra keys. Core fallback already covers CounterSign runs, so existing scenarios work. To encode the threshold explicitly for reproducible eval policies, Aman must add an optional positive-integer `deadline_close_seconds` field with default `172800`, regenerate the schema, and then add scenario values where desired. No Aman-owned file was edited.
+
+No further C19b runtime change was needed. Refund source and unresolved D10 outcome facts remain governed by their existing verification switches.
+
+
+## Verification after rebase and the 48-hour seed change
+
+- Full `python -m pytest -q --tb=short -rs`: **2,066 passed, 6 skipped, 0 failed**, one existing Starlette/httpx deprecation warning; 285.55 seconds.
+- Skips: one C09 recording/index test and five optional PayPal Agent Toolkit/LangChain checks. No dependencies were added.
+- Focused combined integration run: **101 passed**, including all C19b action tests, commander evidence execution, approvals, lifecycle and core/script seed defaults.
 - `ruff check .`: **0 issues**.
-- `lint-imports`: **3 contracts kept, 0 broken**; 84 files and 269 dependencies analyzed.
+- `lint-imports`: **3 contracts kept, 0 broken**; 86 files and 285 dependencies analyzed.
 - `git diff --check`: clean.
 
-The full run used a temporary PostgreSQL 16 container with memory-backed storage and default durability settings. All application calls used the local mock or stubbed HTTP. The earlier disk-backed run was superseded because repeated database-drop checkpoints were slow. No live PayPal or model call was made.
-
-At verification, main remains `0c16564`; C19b has not merged. No rebase has been attempted, so there are no encountered rebase conflicts. Likely overlap points after C19b lands are `approvals/service.py`, `harness.py`, `shield/snapshot.py`, the approval and agent integration fixtures, and `docs/DECISIONS.md`. Preserve C19b's request/hash construction, behavior wiring and executable-action set when rebasing, then rerun the combined suite.
-
-C19b fixtures for evidence must supply stored tracking references, a response deadline and an explicit `deadline_close_seconds` policy. Claim fixtures must also supply the refund limits. Actual evidence submission remains C19b's responsibility and needs the combined end-to-end check after the C19b-first merge. Aman needs no interface change.
+Verification used isolated random schemas in a temporary PostgreSQL 16 container with memory-backed storage and default durability settings. PayPal calls used only the local mock or stubbed HTTP; model output was scripted. The temporary container is removed after verification. Main stays at `505e213`; this branch is not pushed or merged.
