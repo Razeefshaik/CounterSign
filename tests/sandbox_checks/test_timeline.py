@@ -1,9 +1,10 @@
 import json
 from datetime import UTC, datetime
+from pathlib import Path
 
 import pytest
 
-from scripts.sandbox_checks import timeline
+from scripts.sandbox_checks import runner, timeline
 from scripts.sandbox_checks.recorder import Recorder
 from scripts.sandbox_checks.redact import Redactor
 from scripts.sandbox_checks.runner import CheckContext
@@ -46,6 +47,35 @@ def test_record_checkpoints_once_and_load_all_merges_checks_in_time_order(tmp_pa
     d2 = context(tmp_path, "D2")
     timeline.record(d2, "CAPTURE_COMPLETED", resource_id="CAP1", at="2026-10-24T08:00:00Z")
     assert [entry["resource_id"] for entry in timeline.load_all(tmp_path)] == ["CAP1", "BATCH1"]
+
+
+def test_checkpoint_retries_while_another_check_holds_the_file(tmp_path, monkeypatch):
+    ctx = context(tmp_path, "D4")
+    real_replace, calls = Path.replace, []
+
+    def busy_twice(self, target):
+        calls.append(target)
+        if len(calls) <= 2:
+            raise PermissionError("file in use")
+        return real_replace(self, target)
+
+    monkeypatch.setattr(Path, "replace", busy_twice)
+    monkeypatch.setattr(runner.time, "sleep", lambda _: None)
+    ctx.checkpoint(payouts={"unreg_3": "saved"})
+    assert len(calls) == 3
+    assert json.loads(ctx.state_path.read_text(encoding="utf-8"))["data"]["payouts"] == {
+        "unreg_3": "saved"
+    }
+
+
+def test_checkpoint_gives_up_after_a_persistent_lock(tmp_path, monkeypatch):
+    def always_busy(self, target):
+        raise PermissionError("file in use")
+
+    monkeypatch.setattr(Path, "replace", always_busy)
+    monkeypatch.setattr(runner.time, "sleep", lambda _: None)
+    with pytest.raises(PermissionError):
+        context(tmp_path, "D4").checkpoint(payouts={})
 
 
 def test_unknown_events_are_rejected(tmp_path):

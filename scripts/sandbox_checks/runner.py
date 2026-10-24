@@ -9,6 +9,7 @@ reuse them after an interruption. ctx.load_check_data("D1") reads earlier checks
 import asyncio
 import json
 import re
+import time
 from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -22,6 +23,9 @@ from .manual import ManualSteps
 from .poller import BalancePoller
 from .recorder import Recorder, timestamp, utc_now
 from .redact import Redactor
+
+REPLACE_ATTEMPTS = 40
+REPLACE_PAUSE_SECONDS = 0.05
 
 
 class CheckFailed(RuntimeError):
@@ -93,7 +97,15 @@ class CheckContext:
         )
         temporary = destination.with_suffix(destination.suffix + ".tmp")
         temporary.write_text(content, encoding="utf-8")
-        temporary.replace(destination)
+        # Windows refuses the replace while another check (D11, D12) is reading the file.
+        for attempt in range(REPLACE_ATTEMPTS):
+            try:
+                temporary.replace(destination)
+                return
+            except PermissionError:
+                if attempt == REPLACE_ATTEMPTS - 1:
+                    raise
+                time.sleep(REPLACE_PAUSE_SECONDS)
 
     def checkpoint(self, **updates):
         """Persist JSON data immediately; call before writes or lengthy manual handoffs."""
