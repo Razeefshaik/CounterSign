@@ -103,12 +103,36 @@ class LangChainModel:
     def __repr__(self):
         return "LangChainModel(values=<REDACTED>)"
 
+    async def prepare(self) -> None:
+        """Check optional packages/provider setup locally, without a model call.
+
+        Agent startup calls this before opening its other resources. Merely
+        constructing settings or a model still imports no provider and does no
+        I/O. Successful preparation is cached for subsequent steps.
+        """
+        if self._client is not None:
+            return
+        try:
+            self.config.validate()
+            with _tracing_disabled():
+                client = self._factory(self.config)
+                if not callable(getattr(client, "bind_tools", None)) or not callable(
+                    getattr(client, "ainvoke", None)
+                ):
+                    raise ModelError("MODEL_CONFIGURATION_INVALID")
+            self._client = client
+        except ModelError:
+            raise
+        except ImportError:
+            raise ModelError("MODEL_DEPENDENCIES_REQUIRED") from None
+        except Exception:  # noqa: BLE001 - provider setup errors may contain the configured key.
+            raise ModelError("MODEL_CONFIGURATION_INVALID") from None
+
     async def complete(self, request: dict) -> dict:
         try:
+            await self.prepare()
             clean = sanitize(request, (self.config.api_key,))
             with _tracing_disabled():
-                if self._client is None:
-                    self._client = self._factory(self.config)
                 client = self._client.bind_tools(clean["tools"])
                 # Untrusted text is only a JSON human message. It is never
                 # promoted into the trusted system prompt or a tool definition.

@@ -4,10 +4,17 @@ import asyncio
 from contextlib import AsyncExitStack
 
 from countersign.agent.commander import Commander
-from countersign.agent.models import create_model
-from countersign.agent.reads import MoneyGraphQueries, custom_tools
+from countersign.agent.models import LangChainModel, ModelError, create_model
+from countersign.agent.reads import MoneyGraphQueries, ReadToolError, custom_tools
 from countersign.agent.toolkit import ToolkitGateway
-from countersign.agent.tools import ToolRegistry
+from countersign.agent.tools import ToolError, ToolRegistry
+
+_STARTUP_CODES = frozenset({
+    "MODEL_DEPENDENCIES_REQUIRED", "MODEL_CONFIGURATION_INVALID",
+    "MONEY_GRAPH_ROLE_REFUSED", "MONEY_GRAPH_UNAVAILABLE",
+    "TOOLKIT_DEPENDENCIES_MISSING", "TOOLKIT_VERSION_UNSUPPORTED",
+    "TOOLKIT_SET_MISMATCH", "TOOLKIT_CONFIG_INVALID", "TOOL_SET_MISMATCH",
+})
 
 
 class AgentSessionError(RuntimeError):
@@ -46,6 +53,8 @@ class AgentSession:
             if self._commander is not None:
                 return self
             try:
+                if isinstance(self._model, LangChainModel):
+                    await self._model.prepare()
                 tools = self._tools
                 if tools is None:
                     graph = MoneyGraphQueries(self._database_url, self._schema)
@@ -59,10 +68,15 @@ class AgentSession:
                              self._paypal.webhook_id),
                 )
                 return self
-            except Exception:  # noqa: BLE001 - startup errors can contain private connection values.
-                await self._stack.aclose()
+            except Exception as exc:  # noqa: BLE001 - dependency errors can contain private values.
+                code = str(exc) if isinstance(exc, (ModelError, ReadToolError, ToolError)) else ""
                 self._closed = True
-                raise AgentSessionError("AGENT_STARTUP_FAILED") from None
+                try:
+                    await self._stack.aclose()
+                finally:
+                    raise AgentSessionError(
+                        code if code in _STARTUP_CODES else "AGENT_STARTUP_FAILED"
+                    ) from None
 
     async def __aexit__(self, *args):
         await self.aclose()

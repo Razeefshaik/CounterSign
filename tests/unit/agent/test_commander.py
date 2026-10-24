@@ -158,3 +158,22 @@ async def test_model_call_has_a_deadline_and_private_errors_do_not_escape():
 async def test_real_model_json_response_uses_strict_proposal_parser():
     model = ScriptedModel([{"proposal_json": json.dumps(proposal())}])
     assert (await Commander(model, Tools()).step({"id": "incident-1"})).action == "WAIT"
+
+
+@pytest.mark.parametrize("identifier", [None, {}, [], 1, "", " ", " model", "model\nname", "x" * 201])
+def test_model_id_must_be_a_bounded_plain_string(identifier):
+    model = ScriptedModel([])
+    model.model_id = identifier
+    with pytest.raises(CommanderError, match="INVALID_MODEL_ID"):
+        _ = Commander(model, Tools()).model_id
+
+
+def test_injected_model_id_defaults_and_known_private_values_are_masked():
+    class Model:
+        async def complete(self, request):
+            return proposal()
+
+    assert Commander(Model(), Tools()).model_id == "injected"
+    model = ScriptedModel([])
+    model.model_id = "FAKE-PRIVATE-MODEL-ID"
+    assert Commander(model, Tools(), secrets=(model.model_id,)).model_id == "<REDACTED>"

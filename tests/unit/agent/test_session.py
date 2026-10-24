@@ -143,8 +143,24 @@ async def test_unsafe_database_role_fails_before_child_or_model(monkeypatch):
 async def test_tool_drift_closes_child_without_calling_model(monkeypatch):
     observed = dependencies(monkeypatch, missing_tool=True)
     model = ScriptedModel([proposal()])
-    with pytest.raises(AgentSessionError, match="AGENT_STARTUP_FAILED"):
+    with pytest.raises(AgentSessionError, match="TOOL_SET_MISMATCH"):
         async with configured(model):
             pytest.fail("unsafe agent session opened")
     assert (observed.gateway_opens, observed.gateway_closes) == (1, 1)
     assert model.requests == []
+
+
+@pytest.mark.asyncio
+async def test_missing_real_model_dependencies_fail_before_toolkit_or_database(monkeypatch):
+    observed = dependencies(monkeypatch)
+
+    async def missing(self):
+        raise ModelError("MODEL_DEPENDENCIES_REQUIRED")
+
+    monkeypatch.setattr(session.LangChainModel, "prepare", missing, raising=False)
+    config = ChatModelConfig("offline-provider", "offline-model", "FAKE-MODEL-KEY")
+    with pytest.raises(AgentSessionError, match="MODEL_DEPENDENCIES_REQUIRED") as error:
+        async with configured(config):
+            pytest.fail("missing dependencies accepted")
+    assert observed.graph_starts == observed.gateway_opens == 0
+    assert "FAKE-MODEL-KEY" not in str(error.value)

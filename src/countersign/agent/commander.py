@@ -37,6 +37,13 @@ class Commander:
     @property
     def model_id(self):
         value = getattr(self.model, "model_id", "injected")
+        if (
+            type(value) is not str
+            or not 1 <= len(value) <= 200
+            or value.strip() != value
+            or any(ord(character) < 32 or ord(character) == 127 for character in value)
+        ):
+            raise CommanderError("INVALID_MODEL_ID")
         return sanitize(value, self._secrets)
 
     async def step(self, incident: Mapping, context: Mapping | None = None) -> StructuredProposal:
