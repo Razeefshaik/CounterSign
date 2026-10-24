@@ -1,4 +1,5 @@
 """Refunds always need the owner and cannot exceed dispute or aggregate policy."""
+
 from countersign.shield.engine import RuleName, blocked, needs_owner
 from countersign.shield.rules.facts import dispute, has_link, policy_money
 from countersign.shield.snapshot import Action
@@ -20,16 +21,22 @@ def check(proposal, snap):
         if key in proposal.params:
             requested = policy_money(proposal.params[key], currency)
             if requested is None or requested <= 0:
-                return blocked(NAME, ["refund amount must be positive integer minor units in dispute currency"])
+                return blocked(
+                    NAME, ["refund amount must be positive integer minor units in dispute currency"]
+                )
             if requested > row.amount.minor:
                 return blocked(NAME, ["refund amount exceeds the dispute amount"])
     # ACCEPT_CLAIM refunds the full claim: smaller untrusted amounts cannot lower its budget.
     if amount <= 0:
         return blocked(NAME, ["refund amount exceeds the dispute amount or is invalid"])
-    limits = [policy_money(snap.policies.get(key), currency)
-              for key in ("refund_limit_per_order", "refund_limit_per_day")]
+    limits = [
+        policy_money(snap.policies.get(key), currency)
+        for key in ("refund_limit_per_order", "refund_limit_per_day")
+    ]
     if any(limit is None for limit in limits):
         return blocked(NAME, ["refund policy limits are missing or invalid for this currency"])
+    if snap.refund_totals.get("complete") is False:
+        return blocked(NAME, ["aggregate refund history has an unknown currency"])
     orders, days = snap.refund_totals.get("orders"), snap.refund_totals.get("day")
     if not isinstance(orders, dict) or not isinstance(days, dict):
         return blocked(NAME, ["aggregate refund history is unavailable"])

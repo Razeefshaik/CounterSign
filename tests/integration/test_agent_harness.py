@@ -178,16 +178,19 @@ async def mirrored_dispute_incident(world, message):
     async with world.database.tx() as conn:
         disputes = await Repositories(conn).disputes.find()
         [dispute] = disputes
-        # Normal dispute incident creation belongs to C24; C15 currently mirrors
-        # the dispute/reserve and opens incidents for reconciliation exceptions.
-        opened = await Repositories(conn).incidents.insert(
-            kind="DISPUTE",
-            subject={
-                "dispute_id": str(dispute["id"]),
-                "paypal_dispute_id": dispute["paypal_dispute_id"],
-            },
-            state="OPEN",
-        )
+        # C24 discovers normal dispute incidents; this fixture supplies explicit
+        # refund policy for tests of approval binding, rather than missing-data refusal.
+        for key, value in {
+            "refund_limit_per_order": {"minor": 100000, "currency": "USD"},
+            "refund_limit_per_day": {"minor": 100000, "currency": "USD"},
+            "deadline_close_seconds": 3600,
+        }.items():
+            existing = await Repositories(conn).policies.get(key)
+            if existing:
+                await Repositories(conn).policies.update(key, value=value)
+            else:
+                await Repositories(conn).policies.insert(key=key, value=value)
+        [opened] = await Repositories(conn).incidents.find({"kind": "DISPUTE"})
     return dispute, opened
 
 

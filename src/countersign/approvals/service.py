@@ -83,7 +83,9 @@ async def load_rule_facts(conn, snap, *, data, proposal_row):
             ) if isinstance(transactions, list) else (),
         ))
         currency = row["currency"].strip() if row["currency"] else None
-        if currency is None or row["order_id"] is None:
+        if currency is None:
+            if row["amount_refunded_minor"]:
+                totals["complete"] = False
             continue
         observed = row["amount_refunded_minor"] or 0
         committed = 0
@@ -96,10 +98,12 @@ async def load_rule_facts(conn, snap, *, data, proposal_row):
                 continue
             committed += row["amount_minor"] or 0
             at = op["submitted_at"] or op["created_at"]
-            today |= at is None or at.astimezone(UTC).date() == snap.now.astimezone(UTC).date()
+            today |= (op["state"] in {"PENDING", "IN_FLIGHT", "UNKNOWN"} or at is None
+                      or at.astimezone(UTC).date() == snap.now.astimezone(UTC).date())
         amount = max(observed, committed)
         key = f"{row['order_id']}:{currency}"
-        totals["orders"][key] = totals["orders"].get(key, 0) + amount
+        if row["order_id"] is not None:
+            totals["orders"][key] = totals["orders"].get(key, 0) + amount
         try:
             at = datetime.fromisoformat(raw["update_time"])
             if at.utcoffset() is None:

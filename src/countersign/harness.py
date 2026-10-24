@@ -32,6 +32,7 @@ from countersign.fsm.incident import INCIDENT, IncidentEvent
 from countersign.fsm.obligation import OBLIGATION, ObligationEvent
 from countersign.fsm.proposal import PROPOSAL, VERDICT_EVENT, ProposalEvent
 from countersign.inbox import Inbox, InboxError
+from countersign.incidents import IncidentService, LifecycleReconciler
 from countersign.ledger import journal
 from countersign.ledger.reservations import create_reservation
 from countersign.money import Money
@@ -44,6 +45,7 @@ from countersign.reconcile.balances import reconcile_balances
 from countersign.reconcile.disputes import ingest_dispute
 from countersign.shield.engine import Verdict, evaluate
 from countersign.shield.snapshot import NON_FINANCIAL, PAYING, Action
+from countersign.simulator import RunSimulator
 from countersign.worker import worker_once
 
 __all__ = ["ChatModelConfig", "Engine", "EngineError", "EngineSettings"]
@@ -206,9 +208,13 @@ class Engine:
                         raise EngineError("EXECUTOR_FACTORY_UNAVAILABLE")
                     self._executor = factory(self._database, self._http, clock=self.settings.clock)
                 self._inbox = Inbox(self._database, self._reader, self._verifier)
-                self._reconciler = Reconciler(
-                    self._database, self._reader, clock=self.settings.clock
+                self._incidents = IncidentService(self._database, clock=self.settings.clock)
+                self._reconciler = LifecycleReconciler(
+                    Reconciler(self._database, self._reader, clock=self.settings.clock),
+                    self._incidents,
                 )
+                if self._simulator is None:
+                    self._simulator = RunSimulator(self._database)
                 self._approvals = ApprovalService(self._database, clock=self.settings.clock,
                                                   behavior=self.settings.paypal_behavior)
                 if self.settings.llm is not None:

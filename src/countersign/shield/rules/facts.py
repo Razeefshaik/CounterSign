@@ -1,4 +1,5 @@
 """Shared pure readers of C24 snapshot facts; no untrusted fact is authoritative."""
+
 from collections.abc import Mapping
 
 
@@ -16,15 +17,23 @@ def dispute(proposal, snap):
 
 
 def has_link(row, rel):
-    return any(isinstance(link, Mapping) and link.get("rel") == rel
-               and link.get("method", "POST").upper() == "POST"
-               and isinstance(link.get("href"), str) and link["href"]
-               for link in row.links)
+    return any(
+        isinstance(link, Mapping)
+        and link.get("rel") == rel
+        and link.get("method", "POST").upper() == "POST"
+        and isinstance(link.get("href"), str)
+        and link["href"]
+        for link in row.links
+    )
 
 
 def policy_money(value, currency):
-    if (not isinstance(value, Mapping) or set(value) != {"minor", "currency"}
-            or type(value["minor"]) is not int or value["minor"] < 0
-            or value["currency"] != currency):
+    if (
+        not isinstance(value, Mapping)
+        or set(value) != {"minor", "currency"}
+        or type(value["minor"]) is not int
+        or value["minor"] < 0
+        or value["currency"] != currency
+    ):
         return None
     return value["minor"]
