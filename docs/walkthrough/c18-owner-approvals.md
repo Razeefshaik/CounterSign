@@ -77,6 +77,8 @@ owner can review what is being approved. Audit kinds are `OWNER_APPROVED` and
 so free text cannot copy an email or credential into the audit log.
 Storage errors return a fixed `OWNER_STORAGE_UNAVAILABLE` response with status
 503; private database exception values never become HTTP error details.
+All owner errors use the CONTRACTS `error.code` and `error.message` envelope;
+validation errors do not echo the submitted request values.
 
 ## 5. How correctness is decided
 

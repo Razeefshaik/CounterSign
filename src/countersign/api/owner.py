@@ -5,6 +5,9 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
 from psycopg import Error as DatabaseError
 from psycopg_pool import PoolTimeout
 from pydantic import BaseModel, ConfigDict, Field
@@ -30,6 +33,35 @@ class RejectBody(OwnerBody):
 class PayeeBody(OwnerBody):
     payout_email: str = Field(min_length=3, max_length=254)
     confirm: Literal[True]
+
+
+class OwnerRoute(APIRoute):
+    """Keep contract errors stable without exposing validation inputs or driver text."""
+
+    def get_route_handler(self):
+        handler = super().get_route_handler()
+
+        async def contract_handler(request):
+            try:
+                return await handler(request)
+            except HTTPException as exc:
+                code = exc.detail["code"] if isinstance(exc.detail, dict) else "REQUEST_FAILED"
+                return JSONResponse(
+                    {"error": {"code": code, "message": code.replace("_", " ").lower()}},
+                    status_code=exc.status_code,
+                )
+            except RequestValidationError:
+                return JSONResponse(
+                    {
+                        "error": {
+                            "code": "INVALID_REQUEST",
+                            "message": "Invalid request body or identifier",
+                        }
+                    },
+                    status_code=422,
+                )
+
+        return contract_handler
 
 
 def owner_guard(settings: Settings):
@@ -75,7 +107,7 @@ async def owner_document(database: Database, resource: str, row_id: UUID) -> dic
 
 
 def build_router(database: Database, settings: Settings) -> APIRouter:
-    router = APIRouter(dependencies=[Depends(owner_guard(settings))])
+    router = APIRouter(route_class=OwnerRoute, dependencies=[Depends(owner_guard(settings))])
     service = ApprovalService(database)
 
     @router.post("/proposals/{id}/approve", status_code=201)

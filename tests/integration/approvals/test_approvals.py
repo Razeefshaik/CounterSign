@@ -295,6 +295,8 @@ async def test_owner_routes_auth_and_validation_then_approve(world):
             json={"payout_email": "changed@example.test", "confirm": False},
         )
         assert bad.status_code == 422
+        assert bad.json()["error"]["code"] == "INVALID_REQUEST"
+        assert "changed@example.test" not in bad.text
         good = await client.post(
             f"/api/v1/makers/{maker['id']}/payout-email",
             json={"payout_email": "changed@example.test", "confirm": True},
@@ -348,7 +350,7 @@ async def test_demo_owner_reject_returns_public_proposal_and_stale_http_code(wor
             json={"payload_hash": "sha256:" + "0" * 64},
         )
         assert stale.status_code == 409
-        assert stale.json()["detail"]["code"] == "STALE_PROPOSAL"
+        assert stale.json()["error"]["code"] == "STALE_PROPOSAL"
         response = await client.post(
             f"/api/v1/proposals/{proposal['id']}/reject", json={"reason": "Owner defers"}
         )
@@ -377,5 +379,5 @@ async def test_owner_http_storage_errors_do_not_expose_driver_values(world, monk
     ) as client:
         response = await client.post("/api/v1/payout-runs", json={"week_start": WEEK.isoformat()})
     assert response.status_code == 503
-    assert response.json()["detail"]["code"] == "OWNER_STORAGE_UNAVAILABLE"
+    assert response.json()["error"]["code"] == "OWNER_STORAGE_UNAVAILABLE"
     assert "fake-private" not in response.text

@@ -5,7 +5,7 @@ from datetime import date
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, ConfigDict
 
-from countersign.api.owner import owner_document, owner_guard, public_result
+from countersign.api.owner import OwnerRoute, owner_document, owner_guard, public_result
 from countersign.approvals import ApprovalService
 from countersign.config import Settings
 from countersign.db import Database
@@ -17,7 +17,7 @@ class PlanRunBody(BaseModel):
 
 
 def build_router(database: Database, settings: Settings) -> APIRouter:
-    router = APIRouter(dependencies=[Depends(owner_guard(settings))])
+    router = APIRouter(route_class=OwnerRoute, dependencies=[Depends(owner_guard(settings))])
     service = ApprovalService(database)
 
     @router.post("/payout-runs", status_code=201)
