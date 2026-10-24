@@ -1,6 +1,6 @@
 # Step 2: dispute evidence is never sent twice
 
-**Commit:** `6983de3`. **Files:** the dispute checks D8, D9 and D10, plus their tests.
+**Commit:** `e524df1`. **Files:** the dispute checks D8, D9 and D10, plus their tests.
 
 ## The problem
 
