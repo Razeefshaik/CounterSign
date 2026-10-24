@@ -11,11 +11,13 @@ from starlette.exceptions import HTTPException
 from countersign.api import dashboard, owner, runs, webhooks
 from countersign.config import Settings, load_settings
 from countersign.db import Database
+from countersign.executor import Executor
 from countersign.inbox import Inbox
 from countersign.paypal.http import PayPalHTTP
 from countersign.paypal.read import PayPalRead
 from countersign.paypal.webhook_verify import WebhookVerifier
-from countersign.worker import run_inbox
+from countersign.reconcile import Reconciler
+from countersign.worker import load_worker_settings, run_workers
 
 
 class _DashboardFixtures:
@@ -50,6 +52,9 @@ def create_app(
     http=None,
     reader=None,
     verifier=None,
+    executor=None,
+    reconciler=None,
+    worker_settings=None,
     start_worker: bool = True,
 ) -> FastAPI:
     """Injected dependencies belong to the caller; only internally opened ones close.
@@ -66,17 +71,31 @@ def create_app(
             if db is None:
                 db = await stack.enter_async_context(Database(runtime))
             transport = http
-            if transport is None and (reader is None or verifier is None):
+            if transport is None and (
+                reader is None or verifier is None or (start_worker and executor is None)
+            ):
                 transport = await stack.enter_async_context(PayPalHTTP(runtime.paypal))
+            resource_reader = reader if reader is not None else PayPalRead(transport)
             inbox = Inbox(
                 db,
-                reader if reader is not None else PayPalRead(transport),
+                resource_reader,
                 verifier if verifier is not None else WebhookVerifier(transport),
             )
             app.state.settings = runtime
             app.state.database = db
             app.state.inbox = inbox
             app.state.dashboard_source = "fixtures"
+            configured = execution = reconciliation = None
+            if start_worker:
+                configured = (
+                    worker_settings if worker_settings is not None else load_worker_settings()
+                )
+                execution = executor if executor is not None else Executor.from_http(db, transport)
+                reconciliation = (
+                    reconciler if reconciler is not None else Reconciler(db, resource_reader)
+                )
+                app.state.executor = execution
+                app.state.reconciler = reconciliation
             original_routes = list(app.router.routes)
             app.include_router(webhooks.build_router(inbox))
             app.include_router(owner.build_router(db, runtime), prefix="/api/v1")
@@ -86,7 +105,11 @@ def create_app(
             )
             app.openapi_schema = None
             stop = asyncio.Event()
-            task = asyncio.create_task(run_inbox(inbox, stop)) if start_worker else None
+            task = None
+            if start_worker:
+                task = asyncio.create_task(
+                    run_workers(db, inbox, reconciliation, execution, stop, settings=configured)
+                )
             try:
                 yield
             finally:

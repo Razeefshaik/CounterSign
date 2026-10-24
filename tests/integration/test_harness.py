@@ -21,10 +21,11 @@ from psycopg import sql
 from psycopg.conninfo import make_conninfo
 from sqlalchemy import create_engine
 
-from countersign.config import PayPalSettings
+from countersign.config import PayPalSettings, Settings
 from countersign.db import Database, Repositories
 from countersign.executor import Executor, ExecutorError
 from countersign.harness import Engine, EngineError, EngineSettings
+from countersign.main import create_app
 from countersign.paypal.http import PayPalHTTP
 from countersign.worker import (
     WorkerSettings,
@@ -396,6 +397,41 @@ async def test_worker_shutdown_cancels_pending_io_without_closing_dependencies(m
     stop.set()
     await asyncio.wait_for(task, 1)
     assert cancelled.is_set()
+
+
+@pytest.mark.asyncio
+async def test_main_starts_reconciliation_and_executor_sweep_using_the_factory(world, monkeypatch):
+    swept, reconciled = asyncio.Event(), asyncio.Event()
+    original = Executor.sweep
+
+    async def sweep(self):
+        swept.set()
+        return await original(self)
+
+    class Poller:
+        async def poll_once(self):
+            reconciled.set()
+
+    class Verifier:
+        async def verify(self, raw, headers):
+            raise AssertionError("Empty inbox must not verify anything")
+
+    monkeypatch.setattr(Executor, "sweep", sweep)
+    app = create_app(
+        settings=Settings("postgresql://fake:fake@localhost/fake"),
+        database=world.database,
+        http=world.http,
+        verifier=Verifier(),
+        reconciler=Poller(),
+        worker_settings=WorkerSettings(
+            inbox_interval=0.01, reconcile_interval=0.01, executor_interval=0.01
+        ),
+    )
+    async with app.router.lifespan_context(app):
+        await asyncio.wait_for(asyncio.gather(swept.wait(), reconciled.wait()), timeout=5)
+        assert isinstance(app.state.executor, Executor)
+    assert not world.database.pool.closed
+    assert not world.http._client.is_closed
 
 
 @pytest.mark.parametrize("action", ["CANCEL_UNCLAIMED_PAYOUT", "PROVIDE_EVIDENCE", "ACCEPT_CLAIM"])
