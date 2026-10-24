@@ -388,10 +388,21 @@ async def test_public_dispute_id_binds_the_internal_dispute_version(world, chang
     database, service, _, _ = world
     async with database.tx() as conn:
         repos = Repositories(conn)
+        maker = (await repos.makers.find())[0]
+        order = await repos.orders.insert(maker_id=maker["id"], buyer_ref="fake-buyer",
+                                         amount_minor=100, currency="USD")
+        for key, value in {
+            "refund_limit_per_order": {"minor": 10000, "currency": "USD"},
+            "refund_limit_per_day": {"minor": 20000, "currency": "USD"},
+            "deadline_close_seconds": 3600,
+        }.items():
+            await repos.policies.insert(key=key, value=value)
         dispute = await repos.disputes.insert(
             paypal_dispute_id="PP-D-OWNER",
-            links=[{"rel": "accept_claim"}],
-            status="OPEN",
+            order_id=order["id"],
+            status="WAITING_FOR_SELLER_RESPONSE",
+            seller_response_due_date=NOW+timedelta(days=2),
+            links=[{"rel": "accept_claim", "href": "/accept-claim", "method": "POST"}],
             phase="ACTIVE",
             amount_minor=100,
             currency="USD",

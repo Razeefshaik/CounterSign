@@ -76,6 +76,12 @@ async def target(world, *, cancel=False):
                     conn, draft, operation_id=original["id"], occurred_at=NOW
                 )
             return attempt
+        for key, value in {
+            "deadline_close_seconds": 172800,
+            "refund_limit_per_order": {"minor": 10000, "currency": "USD"},
+            "refund_limit_per_day": {"minor": 20000, "currency": "USD"},
+        }.items():
+            await repos.policies.insert(key=key, value=value)
         order = await repos.orders.insert(
             maker_id=maker["id"],
             buyer_ref="BUYER",
@@ -92,8 +98,12 @@ async def target(world, *, cancel=False):
             amount_minor=1000,
             currency="USD",
             phase="ACTIVE",
-            links=[{"rel": "provide_evidence"}, {"rel": "accept_claim"}],
-            raw={},
+            seller_response_due_date=NOW + timedelta(days=3),
+            links=[
+                {"rel": "provide_evidence", "href": "/provide-evidence", "method": "POST"},
+                {"rel": "accept_claim", "href": "/accept-claim", "method": "POST"},
+            ],
+            raw={"disputed_transactions": [{"seller_transaction_id": "CAPTURE"}]},
         )
 
 
@@ -110,7 +120,7 @@ async def proposed(world, action, record, *, behavior=None, approve=True, flags=
         row = await repos.proposals.insert(
             action=action,
             params=params,
-            evidence_refs=[],
+            evidence_refs=["tracking:TRACK-123"] if action == "PROVIDE_EVIDENCE" else [],
             model="fake",
             raw_output={"flags": list(flags)},
             state="CREATED",
