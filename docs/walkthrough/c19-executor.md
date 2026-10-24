@@ -63,6 +63,10 @@ Evidence and acceptance POSTs are never replayed automatically. After a lost ans
 
 The stored request includes its internal target, PayPal target, stable request ID, exact body and format. Dispute requests also bind the prior status and action links; acceptance binds the refund amount. The owner's SHA-256 hash covers the canonical JSON envelope containing action, params and this request. Execution rebuilds it from locked records and checks the saved request and approval before consuming permission or sending HTTP. Model-supplied notes, tracking and bodies are never forwarded.
 
+An available-funded refund reserves cash before the call and keeps that reservation while UNKNOWN. Confirmation replaces it atomically with the refund journal; a definite rejection releases it. Other payouts cannot spend this uncertain outflow.
+
+Worker dispatch and the executor share the EXECUTABLE action set. PAYING still means only maker payouts, so the funding rules retain their original scope. A previously deferred evidence proposal can now run without being recreated or losing its existing audit history.
+
 ## The D6 duplicate link
 
 PayPal's real duplicate response places the original batch in details[].link, even when top-level links is empty. Its host is api.sandbox.paypal.com, while our configured origin is api-m.sandbox.paypal.com. The adapter reads both link locations, permits that one HTTPS alias with no port or port 443, keeps only a valid batch path, and sends the GET to the configured origin. Queries, other hosts and non-batch paths are refused. A linked batch with different keys, payee or amount stays UNKNOWN.

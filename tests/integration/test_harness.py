@@ -434,7 +434,7 @@ async def test_main_starts_reconciliation_and_executor_sweep_using_the_factory(w
     assert not world.http._client.is_closed
 
 
-@pytest.mark.parametrize("action", ["CANCEL_UNCLAIMED_PAYOUT", "PROVIDE_EVIDENCE", "ACCEPT_CLAIM"])
+@pytest.mark.parametrize("action", ["RESERVE_EARNINGS", "RELEASE_RESERVE", "DEFER_SCHEDULED_PAYOUT"])
 @pytest.mark.asyncio
 async def test_nonpaying_actions_are_deferred_without_reimplementation(world, action):
     class Unsupported:

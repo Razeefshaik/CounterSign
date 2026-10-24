@@ -6,9 +6,10 @@
 2. Call PayPal outside any transaction, once per operation, never retried automatically.
 3. Transaction B per operation: SUBMITTED, REJECTED or UNKNOWN, plus the ledger journal.
 
-UNKNOWN is resolved only by an identical replay inside UNKNOWN_REPLAY_WINDOW, or by a
+Payout-create UNKNOWN uses an identical replay inside UNKNOWN_REPLAY_WINDOW, or a
 duplicate-key answer whose original batch GETs to the same payee, amount and keys. Past the
 window the owner gets an incident of its own (DECISIONS, C17 handoff); nothing is resent.
+Cancel, evidence and accept-claim uncertainty is resolved through GET only, never POST replay.
 """
 
 import dataclasses
@@ -84,7 +85,7 @@ class Executor(Actions):
     # -- execution ---------------------------------------------------------------------
 
     async def execute(self, proposal_id: UUID) -> dict:
-        """Run one ALLOWED or APPROVED paying proposal; a second caller finds it taken."""
+        """Run one ready PayPal-write proposal; a second caller finds it taken."""
         for operation in await self._prepare(proposal_id):
             await self._record(operation["id"], await self._call(operation))
         return await self.status(proposal_id)
@@ -114,7 +115,7 @@ class Executor(Actions):
                 action = model.Action(row["action"])
             except ValueError:
                 raise ExecutorError("UNSUPPORTED_ACTION") from None
-            if action not in model.PAYPAL_WRITES:
+            if action not in model.EXECUTABLE:
                 raise ExecutorError("UNSUPPORTED_ACTION")
             await cas_transition(
                 conn,

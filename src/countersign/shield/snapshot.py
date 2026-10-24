@@ -59,6 +59,7 @@ TIER: Mapping[Action, Tier] = MappingProxyType(
 
 # Actions that send a payout item to a maker.
 PAYING = frozenset({A.SCHEDULE_PAYOUT_RUN, A.CREATE_REPLACEMENT_PAYOUT})
+EXECUTABLE = PAYING | frozenset({A.CANCEL_UNCLAIMED_PAYOUT, A.PROVIDE_EVIDENCE, A.ACCEPT_CLAIM})
 
 # Actions the executor turns into a PayPal write, and the operations.kind each one records.
 OPERATION_KIND: Mapping[Action, str] = MappingProxyType(

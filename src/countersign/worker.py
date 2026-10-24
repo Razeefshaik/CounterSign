@@ -10,7 +10,7 @@ import math
 import os
 from dataclasses import dataclass
 
-from countersign.shield.snapshot import PAYING
+from countersign.shield.snapshot import EXECUTABLE
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +71,7 @@ async def execute_pending(database, executor, *, limit: int = 100) -> dict:
     """Route ready proposals, counting only newly created operation records.
 
     Selecting a proposal does not grant permission: execute() locks, rechecks and
-    owns all financial state changes. PAYING is the same capability set checked
+    owns all financial state changes. EXECUTABLE is the same capability set checked
     by the current executor. Other actions retain their state and approval;
     their one-time deferral audit never consumes a supported proposal's slot.
     """
@@ -83,7 +83,7 @@ async def execute_pending(database, executor, *, limit: int = 100) -> dict:
         await conn.execute(
             "SELECT pg_advisory_xact_lock(hashtextextended('countersign:worker-deferrals',0))"
         )
-        actions = sorted(str(action) for action in PAYING)
+        actions = sorted(str(action) for action in EXECUTABLE)
         await conn.execute(
             "INSERT INTO audit_log(actor,kind,proposal_id,details) "
             "SELECT 'system','STATE_TRANSITION',p.id,"
