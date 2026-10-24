@@ -102,6 +102,9 @@ that an advisory lock constrains unrelated SQL clients.
 Payout runs have no C10 machine. Their owner transitions use locked state checks
 plus version-guarded repository updates. Obligation, line and proposal transitions
 use their C10 machines through database CAS.
+Public PayPal dispute and payout-item IDs resolve to locked internal rows before
+building the snapshot. The approval therefore binds the internal dispute or
+attempt version, and conflicting or missing identities fail closed.
 
 **C19 integration decision still required:** one owner approval binds the complete
 run manifest, while each PayPal call has one line's payload. Existing shield

@@ -86,7 +86,34 @@ async def load_context(conn, row: dict, *, now: datetime | None = None):
     links = await cursor.fetchall()
     allocated = {str(r["obligation_id"]): str(r["line_id"]) for r in links}
     params = row["params"]
-    action = model.Action(row["action"])
+    if not isinstance(params, dict):
+        raise ApprovalError("STALE_PROPOSAL")
+    try:
+        action = model.Action(row["action"])
+    except (ValueError, TypeError):
+        raise ApprovalError("STALE_PROPOSAL") from None
+    direct_targets = {
+        key: params.get(key) for key in ("line_id", "obligation_id", "attempt_id", "dispute_id")
+    }
+    # Public proposals use PayPal ids; the shield binds internal row ids and versions.
+    # Resolve both forms against locked records, refusing conflicting identities.
+    for external, table, column, target in (
+        ("paypal_dispute_id", "disputes", "paypal_dispute_id", "dispute_id"),
+        ("payout_item_id", "payout_attempts", "paypal_item_id", "attempt_id"),
+    ):
+        if params.get(external) is not None:
+            matches = [item for item in data[table] if item[column] == params[external]]
+            if len(matches) != 1 or (
+                direct_targets[target] is not None
+                and str(direct_targets[target]) != str(matches[0]["id"])
+            ):
+                raise ApprovalError("STALE_PROPOSAL")
+            direct_targets[target] = str(matches[0]["id"])
+    if (
+        action in {model.Action.ACCEPT_CLAIM, model.Action.PROVIDE_EVIDENCE}
+        and not direct_targets["dispute_id"]
+    ):
+        raise ApprovalError("STALE_PROPOSAL")
     run_id = params.get("run_id")
     lines = [
         r
@@ -181,7 +208,7 @@ async def load_context(conn, row: dict, *, now: datetime | None = None):
     )
 
     def targets(key):
-        value = params.get(key)
+        value = direct_targets.get(key)
         return (str(value),) if value else ()
 
     snap = model.Snapshot(

@@ -381,3 +381,65 @@ async def test_owner_http_storage_errors_do_not_expose_driver_values(world, monk
     assert response.status_code == 503
     assert response.json()["error"]["code"] == "OWNER_STORAGE_UNAVAILABLE"
     assert "fake-private" not in response.text
+
+
+@pytest.mark.parametrize("changed", [False, True])
+async def test_public_dispute_id_binds_the_internal_dispute_version(world, changed):
+    database, service, _, _ = world
+    async with database.tx() as conn:
+        repos = Repositories(conn)
+        dispute = await repos.disputes.insert(
+            paypal_dispute_id="PP-D-OWNER",
+            status="OPEN",
+            phase="ACTIVE",
+            amount_minor=100,
+            currency="USD",
+        )
+        row = await repos.proposals.insert(
+            action="ACCEPT_CLAIM",
+            params={"paypal_dispute_id": "PP-D-OWNER"},
+            evidence_refs=[],
+            model="test",
+            raw_output={},
+            state="NEEDS_OWNER",
+        )
+        proposal, snapshot, _ = await load_context(conn, row, now=NOW)
+        assert snapshot.record_versions() == {f"dispute:{dispute['id']}": 1}
+        pending = {
+            "payload_hash": proposal.payload_hash,
+            "record_versions": snapshot.record_versions(),
+            "expires_at": (NOW + timedelta(minutes=30)).isoformat(),
+        }
+        await repos.proposals.update(
+            row["id"],
+            verdict_details={"approval_request": pending},
+            raw_output={"approval_request": pending},
+        )
+        if changed:
+            await repos.disputes.update(dispute["id"], status="UNDER_REVIEW")
+    if changed:
+        with pytest.raises(ApprovalError, match="STALE_PROPOSAL"):
+            await service.approve(row["id"], proposal.payload_hash)
+    else:
+        result = await service.approve(row["id"], proposal.payload_hash)
+        async with database.tx() as conn:
+            stored = await Repositories(conn).approvals.get(result["id"])
+            assert stored["record_versions"] == pending["record_versions"]
+            assert stored["used_at"] is None
+
+
+@pytest.mark.parametrize("params", [{}, {"paypal_dispute_id": "PP-D-MISSING"}, []])
+async def test_claim_approval_refuses_missing_or_malformed_targets(world, params):
+    database, _, _, _ = world
+    async with database.tx() as conn:
+        row = await Repositories(conn).proposals.insert(
+            action="ACCEPT_CLAIM",
+            params=params,
+            evidence_refs=[],
+            model="test",
+            raw_output={},
+            state="NEEDS_OWNER",
+        )
+        with pytest.raises(ApprovalError, match="STALE_PROPOSAL"):
+            await load_context(conn, row, now=NOW)
+        assert await Repositories(conn).approvals.find() == []
