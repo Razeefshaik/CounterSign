@@ -6,6 +6,7 @@ from test_actions import endpoint, proposed, target
 from test_executor import rows
 
 from countersign import worker
+from countersign.db import Repositories
 from countersign.shield.snapshot import PAYING
 
 world = actions_tests.world
@@ -14,7 +15,17 @@ pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
 
 async def test_previously_deferred_evidence_runs_unchanged(world, monkeypatch):
     record = await target(world)
-    proposal_id, _ = await proposed(world, "PROVIDE_EVIDENCE", record)
+    proposal_id, payload = await proposed(world, "PROVIDE_EVIDENCE", record)
+    # C23 stored only action/params for these autonomous proposals. No owner
+    # permission is being upgraded: the executor builds a fresh trusted request.
+    async with world[0].tx() as conn:
+        await Repositories(conn).proposals.update(
+            proposal_id,
+            raw_output={},
+            verdict_details={
+                "operation_payload": {"action": payload["action"], "params": payload["params"]}
+            },
+        )
     async with endpoint(world) as (executor, control):
         with monkeypatch.context() as previous_capabilities:
             previous_capabilities.setattr(worker, "EXECUTABLE", PAYING)

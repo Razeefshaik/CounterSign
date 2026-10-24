@@ -67,6 +67,8 @@ An available-funded refund reserves cash before the call and keeps that reservat
 
 Worker dispatch and the executor share the EXECUTABLE action set. PAYING still means only maker payouts, so the funding rules retain their original scope. A previously deferred evidence proposal can now run without being recreated or losing its existing audit history.
 
+Legacy autonomous evidence proposals that stored only action and params get a fresh trusted request at execution. Legacy owner approvals covering only those fields cannot authorize the newly explicit request: their hash check fails closed and a new fully bound proposal needs review.
+
 ## The D6 duplicate link
 
 PayPal's real duplicate response places the original batch in details[].link, even when top-level links is empty. Its host is api.sandbox.paypal.com, while our configured origin is api-m.sandbox.paypal.com. The adapter reads both link locations, permits that one HTTPS alias with no port or port 443, keeps only a valid batch path, and sends the GET to the configured origin. Queries, other hosts and non-batch paths are refused. A linked batch with different keys, payee or amount stays UNKNOWN.
