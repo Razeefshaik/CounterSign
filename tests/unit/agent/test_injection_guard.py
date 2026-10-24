@@ -73,6 +73,11 @@ async def test_reloaded_approval_context_preserves_injection_flags_for_execution
                     "paypal_dispute_id": "PP-D-27811",
                     "order_id": None,
                     "phase": "ACTIVE",
+                    "status": "WAITING_FOR_SELLER_RESPONSE",
+                    "links": [{"rel": "accept_claim"}],
+                    "amount_minor": 6000,
+                    "currency": "USD",
+                    "amount_refunded_minor": None,
                     "version": 1,
                 }
             ]
