@@ -76,7 +76,7 @@ class Reconciler:
                 async def on_resource(kind, resource_id, detail):
                     if kind == "dispute":
                         return await ingest_dispute(
-                            conn, detail, now=now, outcome_map=self.settings.outcome_map
+                            conn, detail, now=self.clock(), outcome_map=self.settings.outcome_map
                         )
                     # Normal attempt polling performs its own identity checks and GET.
                     return StageResult(skipped=1)
@@ -97,14 +97,20 @@ class Reconciler:
                     conn,
                     "disputes",
                     lambda: reconcile_disputes(
-                        conn, self.reader, now=now, outcome_map=self.settings.outcome_map
+                        conn,
+                        self.reader,
+                        now=now,
+                        outcome_map=self.settings.outcome_map,
+                        clock=self.clock,
                     ),
                 )
                 result.attempts = await self._stage(
                     conn, "attempts", lambda: reconcile_attempts(conn, self.reader, now=now)
                 )
                 result.balances = await self._stage(
-                    conn, "balances", lambda: reconcile_balances(conn, self.reader, now=now)
+                    conn,
+                    "balances",
+                    lambda: reconcile_balances(conn, self.reader, now=now, clock=self.clock),
                 )
             return result
         except Exception:  # noqa: BLE001 - configuration/connection/commit errors may contain secrets.

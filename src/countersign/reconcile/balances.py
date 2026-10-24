@@ -70,7 +70,7 @@ def _observations(body, now):
     return rows
 
 
-async def reconcile_balances(conn, reader, *, now: datetime) -> StageResult:
+async def reconcile_balances(conn, reader, *, now: datetime, clock=None) -> StageResult:
     """Append an atomic observation in the caller's locked transaction.
 
     Parse *every* currency before inserting anything. Identical refreshes reuse the
@@ -80,7 +80,7 @@ async def reconcile_balances(conn, reader, *, now: datetime) -> StageResult:
         response = await reader.get_balances()
         if not 200 <= response.status_code < 300:
             raise ValueError
-        rows = _observations(response.body, now)
+        rows = _observations(response.body, clock() if clock else now)
     except (ValueError, TypeError, AttributeError, PayPalError):
         raise ReconcileError("Invalid balance observation") from None
     result = StageResult(seen=len(rows))

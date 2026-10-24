@@ -217,7 +217,7 @@ async def _resolve(conn, repos, result, dispute, order, obligations):
     await repos.audit_log.insert(actor="system", kind="STATE_TRANSITION", details=identity)
 
 
-async def _one(conn, reader, original, result, now, outcome_map, *, detail=None):
+async def _one(conn, reader, original, result, now, outcome_map, *, detail=None, clock=None):
     repos = Repositories(conn)
     order = await repos.orders.get(original["order_id"], for_update=True)
     if order is None:
@@ -227,6 +227,8 @@ async def _one(conn, reader, original, result, now, outcome_map, *, detail=None)
         if not 200 <= response.status_code < 300:
             raise ReconcileError("Dispute confirmation unavailable")
         detail = response.body
+        if clock is not None:
+            now = clock()  # Record when GET confirmed the refund, not cycle start.
     if not isinstance(detail, dict) or detail.get("dispute_id") != original["paypal_dispute_id"]:
         raise ReconcileError("Dispute identity mismatch")
     transactions = detail.get("disputed_transactions", [])
@@ -369,7 +371,7 @@ def _merge(result, item):
         setattr(result, key, getattr(result, key) + getattr(item, key))
 
 
-async def _discover(conn, reader, result, now, outcome_map):
+async def _discover(conn, reader, result, now, outcome_map, clock=None):
     """List to discover identities, then GET details; follow every distinct next page."""
     if not callable(getattr(reader, "list_disputes", None)):
         return  # Small injected test readers can deliberately disable discovery.
@@ -403,7 +405,10 @@ async def _discover(conn, reader, result, now, outcome_map):
                         ):
                             raise ReconcileError("Dispute discovery identity mismatch")
                         item = await ingest_dispute(
-                            conn, detail.body, now=now, outcome_map=outcome_map
+                            conn,
+                            detail.body,
+                            now=clock() if clock else now,
+                            outcome_map=outcome_map,
                         )
                 except Exception:  # noqa: BLE001 - isolate a failed newly discovered resource.
                     result.errors += 1
@@ -430,7 +435,9 @@ async def _discover(conn, reader, result, now, outcome_map):
         result.errors += 1
 
 
-async def reconcile_disputes(conn, reader, *, now: datetime, outcome_map=None) -> StageResult:
+async def reconcile_disputes(
+    conn, reader, *, now: datetime, outcome_map=None, clock=None
+) -> StageResult:
     """Run inside the caller's READ COMMITTED transaction and owner-decision lock.
 
     Include terminal mirrors with a surviving earmark: C14 may have observed their
@@ -447,12 +454,12 @@ async def reconcile_disputes(conn, reader, *, now: datetime, outcome_map=None) -
         item = StageResult()
         try:
             async with conn.transaction():
-                await _one(conn, reader, original, item, now, outcome_map)
+                await _one(conn, reader, original, item, now, outcome_map, clock=clock)
         except Exception:  # noqa: BLE001 - savepoint rollback before a safe investigation.
             result.errors += 1
             await _incident(conn, result, original, "DISPUTE_CONFIRMATION_FAILED")
         else:
             for key in ("updated", "incidents", "unknown"):
                 setattr(result, key, getattr(result, key) + getattr(item, key))
-    await _discover(conn, reader, result, now, outcome_map)
+    await _discover(conn, reader, result, now, outcome_map, clock=clock)
     return result

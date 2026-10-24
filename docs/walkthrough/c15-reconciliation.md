@@ -87,7 +87,10 @@ Production `OUTCOME_MAP` remains empty until D10 recordings verify the codes.
 Tests inject explicitly synthetic mappings. D4/D5 payout behavior and D10 refund
 funding remain pending. No buyer-refund cash journal is guessed. Instead an
 observed refund makes available cash unknown until both `as_of_time` and
-`last_refresh_time` cover its first observation. Old balance responses cannot
+`last_refresh_time` cover its first observation after the confirming GET completes.
+Cycle start is too early: a balance may refresh before a refund happens later in
+that same cycle. Tests cover this race for known disputes, discovery and backfill.
+Old balance responses cannot
 restore pre-refund spending capacity. Reporting failures leave that protection in
 place. Original reported observations are preserved, with safe guard metadata.
 

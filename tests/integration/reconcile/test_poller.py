@@ -73,7 +73,7 @@ async def test_racing_cycles_skip_work_and_identical_snapshot_is_deduplicated(
 
 
 async def test_failed_stage_rolls_back_its_writes_and_keeps_other_stages(test_db_url, monkeypatch):
-    async def failed(conn, reader, *, now):
+    async def failed(conn, reader, *, now, clock=None):
         await Repositories(conn).policies.insert(key="failed_stage", value=True)
         raise ValueError("fake-private-token private@example.test")
 
