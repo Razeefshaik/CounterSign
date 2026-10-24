@@ -137,7 +137,10 @@
                     "type": "string"
                   },
                   "incident_id": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "action": {
                     "type": "string"
@@ -376,9 +379,10 @@
                       },
                       "record_versions": {
                         "type": "object",
-                        "properties": {},
-                        "required": [],
-                        "additionalProperties": false
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
                       },
                       "expires_at": {
                         "type": "string"
@@ -408,10 +412,33 @@
                   "model",
                   "approval",
                   "operation",
-                  "created_at",
-                  "approval_request"
+                  "created_at"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "if": {
+                  "properties": {
+                    "state": {
+                      "enum": [
+                        "NEEDS_OWNER"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "approval_request"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "required": [
+                      "approval_request"
+                    ]
+                  }
+                }
               }
             ]
           }
@@ -563,7 +590,10 @@
                     "type": "string"
                   },
                   "incident_id": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "action": {
                     "type": "string"
@@ -707,6 +737,30 @@
                   },
                   "created_at": {
                     "type": "string"
+                  },
+                  "approval_request": {
+                    "type": "object",
+                    "properties": {
+                      "payload_hash": {
+                        "type": "string"
+                      },
+                      "record_versions": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      },
+                      "expires_at": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "payload_hash",
+                      "record_versions",
+                      "expires_at"
+                    ],
+                    "additionalProperties": false
                   }
                 },
                 "required": [
@@ -727,7 +781,31 @@
                   "operation",
                   "created_at"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "if": {
+                  "properties": {
+                    "state": {
+                      "enum": [
+                        "NEEDS_OWNER"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "approval_request"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "required": [
+                      "approval_request"
+                    ]
+                  }
+                }
               }
             ]
           }
@@ -891,7 +969,10 @@
                     "type": "string"
                   },
                   "incident_id": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "action": {
                     "type": "string"
@@ -1038,6 +1119,30 @@
                   },
                   "created_at": {
                     "type": "string"
+                  },
+                  "approval_request": {
+                    "type": "object",
+                    "properties": {
+                      "payload_hash": {
+                        "type": "string"
+                      },
+                      "record_versions": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      },
+                      "expires_at": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "payload_hash",
+                      "record_versions",
+                      "expires_at"
+                    ],
+                    "additionalProperties": false
                   }
                 },
                 "required": [
@@ -1058,7 +1163,31 @@
                   "operation",
                   "created_at"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "if": {
+                  "properties": {
+                    "state": {
+                      "enum": [
+                        "NEEDS_OWNER"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "approval_request"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "required": [
+                      "approval_request"
+                    ]
+                  }
+                }
               }
             ]
           }
@@ -1274,7 +1403,10 @@
                     "type": "string"
                   },
                   "incident_id": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "action": {
                     "type": "string"
@@ -1391,6 +1523,30 @@
                   },
                   "created_at": {
                     "type": "string"
+                  },
+                  "approval_request": {
+                    "type": "object",
+                    "properties": {
+                      "payload_hash": {
+                        "type": "string"
+                      },
+                      "record_versions": {
+                        "type": "object",
+                        "additionalProperties": {
+                          "type": "integer",
+                          "minimum": 1
+                        }
+                      },
+                      "expires_at": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "payload_hash",
+                      "record_versions",
+                      "expires_at"
+                    ],
+                    "additionalProperties": false
                   }
                 },
                 "required": [
@@ -1411,7 +1567,31 @@
                   "operation",
                   "created_at"
                 ],
-                "additionalProperties": false
+                "additionalProperties": false,
+                "if": {
+                  "properties": {
+                    "state": {
+                      "enum": [
+                        "NEEDS_OWNER"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "state"
+                  ]
+                },
+                "then": {
+                  "required": [
+                    "approval_request"
+                  ]
+                },
+                "else": {
+                  "not": {
+                    "required": [
+                      "approval_request"
+                    ]
+                  }
+                }
               }
             ]
           }

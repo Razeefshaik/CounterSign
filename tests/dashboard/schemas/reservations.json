@@ -40,23 +40,27 @@
                 }
               },
               "obligation_id": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "dispute_id": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "proposal_id": {
                 "type": [
-                  "null",
                   "string",
-                  "object"
+                  "null"
                 ]
               },
               "run_id": {
                 "type": [
-                  "null",
                   "string",
-                  "object"
+                  "null"
                 ]
               },
               "reason": {
