@@ -323,7 +323,7 @@ class ApprovalService:
                 raise ApprovalError("RUN_ALREADY_EXISTS")
             # Row locks plus the unique active-allocation index protect rival planners.
             cursor = await conn.execute(
-                "SELECT o.* FROM obligations o WHERE o.state='OPEN' AND o.amount_minor>0 "
+                "SELECT o.* FROM obligations o WHERE o.state='OPEN' AND o.amount_minor<>0 "
                 "AND o.due_date<=%s AND NOT EXISTS (SELECT 1 FROM payout_line_obligations p "
                 "WHERE p.obligation_id=o.id AND p.active) AND NOT EXISTS "
                 "(SELECT 1 FROM reservations r WHERE r.obligation_id=o.id "
@@ -337,11 +337,21 @@ class ApprovalService:
                 raise ApprovalError("NO_PAYABLE_OBLIGATIONS")
             if len({r["currency"].strip() for r in obligations}) != 1:
                 raise ApprovalError("MIXED_CURRENCY_RUN")
-            run = await repos.payout_runs.insert(week_start=week_start, state="AWAITING_OWNER")
             grouped = defaultdict(list)
             planned_lines = []
             for obligation in obligations:
                 grouped[obligation["maker_id"]].append(obligation)
+            # F16 adjustments reduce what we owe; pay only a strictly positive net.
+            # Keep nonpositive maker balances OPEN so future earnings can offset them.
+            grouped = {
+                maker: shares
+                for maker, shares in grouped.items()
+                if sum(share["amount_minor"] for share in shares) > 0
+            }
+            obligations = [share for shares in grouped.values() for share in shares]
+            if not obligations:
+                raise ApprovalError("NO_PAYABLE_OBLIGATIONS")
+            run = await repos.payout_runs.insert(week_start=week_start, state="AWAITING_OWNER")
             for maker_id, shares in sorted(grouped.items()):
                 line = await repos.payout_lines.insert(
                     run_id=run["id"],

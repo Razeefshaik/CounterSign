@@ -443,3 +443,37 @@ async def test_claim_approval_refuses_missing_or_malformed_targets(world, params
         with pytest.raises(ApprovalError, match="STALE_PROPOSAL"):
             await load_context(conn, row, now=NOW)
         assert await Repositories(conn).approvals.find() == []
+
+
+@pytest.mark.parametrize("deduction", [300, 900, 1000])
+async def test_run_nets_negative_adjustments_and_never_pays_nonpositive_balances(world, deduction):
+    database, service, maker, obligation = world
+    async with database.tx() as conn:
+        adjustment = await Repositories(conn).obligations.insert(
+            maker_id=maker["id"],
+            kind="ADJUSTMENT",
+            amount_minor=-deduction,
+            currency="USD",
+            due_date=WEEK,
+            state="OPEN",
+        )
+    if deduction >= 900:
+        with pytest.raises(ApprovalError, match="NO_PAYABLE_OBLIGATIONS"):
+            await service.plan_run(WEEK)
+    else:
+        run = await service.plan_run(WEEK)
+    async with database.tx() as conn:
+        repos = Repositories(conn)
+        if deduction >= 900:
+            assert not await repos.payout_runs.find()
+            assert not await repos.payout_line_obligations.find()
+            assert (await repos.obligations.get(obligation["id"]))["state"] == "OPEN"
+            assert (await repos.obligations.get(adjustment["id"]))["state"] == "OPEN"
+        else:
+            line = (await repos.payout_lines.find({"run_id": run["id"]}))[0]
+            assert line["amount_minor"] == 600
+            links = await repos.payout_line_obligations.find({"line_id": line["id"]})
+            assert sorted(link["amount_minor"] for link in links) == [-300, 900]
+            assert (await repos.obligations.get(adjustment["id"]))["state"] == "SCHEDULED"
+            proposal = await repos.proposals.get(run["proposal_id"])
+            assert proposal["expected_effect"]["available_change"]["minor"] == -600

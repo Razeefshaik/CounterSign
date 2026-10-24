@@ -147,3 +147,4 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | An IN_FLIGHT payout with no recorded answer after 10 minutes becomes UNKNOWN and goes to replay | C19 | Accept | Covers an executor that died between the call and its record; identical keys make the replay safe |
 | An UNKNOWN past 25 days opens one PAYOUT_ITEM incident AWAITING_OWNER and sends nothing | C19 | Accept | Implements the C17 handoff; PayPal's key memory is only 30 days |
 | The C19 executor handles paying actions only; cancel, evidence and accept-claim execution move to a follow-up card before C21 | C19 | Accept | Their approved payload has no persisted request body yet; keeps the slice's money path reviewed first |
+| Run planning nets OPEN positive shares and negative F16 adjustments per maker; nonpositive totals stay OPEN | C15, owner approved | Accept | Ignoring a partial-loss adjustment would overpay the maker when the original share reopens |
