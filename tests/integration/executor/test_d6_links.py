@@ -26,15 +26,30 @@ async def test_unknown_uses_nested_alias_link_only_for_identical_batch(world, mi
         if request.method == "POST" and request.url.path == "/v1/payments/payouts":
             key = json.loads(request.content)["sender_batch_header"]["sender_batch_id"]
             if key in batches:
-                return httpx.Response(400, json={
-                    "name": "USER_BUSINESS_ERROR", "message": "User business error.",
-                    "details": [{"field": "SENDER_BATCH_ID", "location": "body",
-                                 "issue": "Batch with given sender_batch_id already exists",
-                                 "link": [{"href": "https://api.sandbox.paypal.com"
-                                           + "/v1/payments/payouts/" + batches[key],
-                                           "rel": "self", "method": "GET"}]}],
-                    "links": [],
-                })
+                return httpx.Response(
+                    400,
+                    json={
+                        "name": "USER_BUSINESS_ERROR",
+                        "message": "User business error.",
+                        "details": [
+                            {
+                                "field": "SENDER_BATCH_ID",
+                                "location": "body",
+                                "issue": "Batch with given sender_batch_id already exists",
+                                "link": [
+                                    {
+                                        "href": "https://api.sandbox.paypal.com"
+                                        + "/v1/payments/payouts/"
+                                        + batches[key],
+                                        "rel": "self",
+                                        "method": "GET",
+                                    }
+                                ],
+                            }
+                        ],
+                        "links": [],
+                    },
+                )
             response = await controls.counting.inner.handle_async_request(request)
             await response.aread()
             batches[key] = response.json()["batch_header"]["payout_batch_id"]
@@ -55,8 +70,9 @@ async def test_unknown_uses_nested_alias_link_only_for_identical_batch(world, mi
                 return httpx.Response(200, json=body)
         return response
 
-    async with PayPalHTTP(PayPalSettings(base_url=BASE),
-                          transport=httpx.MockTransport(respond)) as http:
+    async with PayPalHTTP(
+        PayPalSettings(base_url=BASE), transport=httpx.MockTransport(respond)
+    ) as http:
         executor = Executor.from_http(database, http, clock=clock)
         _, proposal_id = await approved(world)
         first = await executor.execute(proposal_id)
@@ -66,7 +82,6 @@ async def test_unknown_uses_nested_alias_link_only_for_identical_batch(world, mi
         assert set(swept["resolved"].values()) == {expected}
     assert len(await items(controls)) == 2
     assert {a["state"] for a in await rows(database, "payout_attempts")} == {
-        "UNKNOWN" if mismatch else "SUBMITTED"}
+        "UNKNOWN" if mismatch else "SUBMITTED"
+    }
     assert set(hosts) == {"api-m.sandbox.paypal.com"}
-
-

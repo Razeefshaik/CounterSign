@@ -212,7 +212,7 @@ async def test_normal_financial_proposal_waits_for_an_exact_unused_owner_approva
 
         binding = pending["approval_request"]
         assert binding["payload_hash"] == canonical_payload_hash(
-            {"action": "ACCEPT_CLAIM", "params": params}
+            saved["verdict_details"]["operation_payload"]
         )
         assert saved["raw_output"]["approval_request"] == binding
         assert saved["verdict_details"]["approval_request"] == binding

@@ -118,3 +118,23 @@ def test_runtime_live_requires_owner_token(monkeypatch):
         load_settings()
     monkeypatch.setenv("OWNER_TOKEN", "unit-owner-token")
     assert load_settings().paypal.base_url == SANDBOX_URL
+
+
+def test_refund_source_and_formats_load_at_runtime(monkeypatch):
+    monkeypatch.setenv("DATABASE_URL", DATABASE)
+    monkeypatch.setenv("COUNTERSIGN_MODE", "demo")
+    monkeypatch.delenv("PAYPAL_BASE_URL", raising=False)
+    monkeypatch.delenv("PAYPAL_REFUND_SOURCE", raising=False)
+    assert load_settings().paypal.behavior.refund_source is None
+    monkeypatch.setenv("PAYPAL_REFUND_SOURCE", "paypal:withheld")
+    monkeypatch.setenv("PAYPAL_EVIDENCE_FORMAT", "json")
+    monkeypatch.setenv("PAYPAL_ACCEPT_CLAIM_FORMAT", "multipart")
+    settings = load_settings()
+    assert settings.paypal.behavior.refund_source == "paypal:withheld"
+    assert settings.paypal.behavior.evidence_format == "json"
+    assert settings.paypal.behavior.accept_claim_format == "multipart"
+    assert "withheld" not in repr(settings) + repr(settings.paypal)
+    monkeypatch.setenv("PAYPAL_REFUND_SOURCE", "private-invalid-value")
+    with pytest.raises(SettingsError) as exc:
+        load_settings()
+    assert "private-invalid-value" not in str(exc.value)

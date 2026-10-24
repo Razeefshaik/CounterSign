@@ -390,6 +390,7 @@ async def test_public_dispute_id_binds_the_internal_dispute_version(world, chang
         repos = Repositories(conn)
         dispute = await repos.disputes.insert(
             paypal_dispute_id="PP-D-OWNER",
+            links=[{"rel": "accept_claim"}],
             status="OPEN",
             phase="ACTIVE",
             amount_minor=100,

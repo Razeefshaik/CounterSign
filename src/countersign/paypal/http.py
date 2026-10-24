@@ -231,8 +231,8 @@ class PayPalHTTP:
                         and origin.hostname == "api-m.sandbox.paypal.com"
                         and parsed.hostname == "api.sandbox.paypal.com"
                     ))
-                    and (parsed.port or (443 if parsed.scheme == "https" else 80))
-                    == (origin.port or (443 if origin.scheme == "https" else 80))
+                    and (parsed.port if parsed.port is not None else (443 if parsed.scheme == "https" else 80))
+                    == (origin.port if origin.port is not None else (443 if origin.scheme == "https" else 80))
                 )
             else:
                 valid = valid and path.startswith("/") and not path.startswith("//")

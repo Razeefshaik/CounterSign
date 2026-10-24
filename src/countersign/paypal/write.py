@@ -112,6 +112,10 @@ class PayPalWrite:
         kwargs = {"json": body}
         if body_format == "multipart":
             kwargs = {"files": {"input": (None, canonical_payload(body), "application/json")}}
+        elif body_format == "none":
+            kwargs = {}
+        elif body_format != "json":
+            raise InvalidOperation("Unsupported persisted body format")
         try:
             response = await self.http.request("POST", path, request_id=request_id, **kwargs)
         except (PayPalTransportError, PayPalAuthError) as exc:
@@ -122,6 +126,14 @@ class PayPalWrite:
                 return Ambiguous("Malformed successful response", response, request_id)
             return Ok(response)
         names = _names(response.body)
+        # A recognized duplicate remains uncertain even if its URL is unusable.
+        # Refusing a hostile link must not turn an existing payment into REJECTED.
+        details = response.body.get("details", []) if isinstance(response.body, Mapping) else []
+        duplicate = isinstance(details, list) and any(
+            isinstance(detail, Mapping) and detail.get("field") == "SENDER_BATCH_ID"
+            and detail.get("issue") == "Batch with given sender_batch_id already exists"
+            for detail in details
+        )
         original = self._original_batch_link(response.body)
         behavior = self.http.settings.behavior
         if (
@@ -129,6 +141,7 @@ class PayPalWrite:
             or response.status_code >= 500
             or not 400 <= response.status_code < 500
             or names & behavior.ambiguous_error_names
+            or ("USER_BUSINESS_ERROR" in names and duplicate)
             or (
                 behavior.reconcile_original_batch_links
                 and original
@@ -164,11 +177,12 @@ class PayPalWrite:
 
     async def cancel_item(self, operation: Mapping, *, replay_unknown=False):
         payload, _ = _persisted(operation, "PAYOUT_CANCEL")
-        target = resource_id(payload.get("payout_item_id"))
+        target = resource_id(payload.get("paypal_item_id", payload.get("payout_item_id")))
         return await self._write(
             operation,
             "PAYOUT_CANCEL",
             f"/v1/payments/payouts-item/{target}/cancel",
+            body_format="none",
             replay_unknown=replay_unknown,
         )
 
@@ -179,7 +193,7 @@ class PayPalWrite:
             operation,
             "DISPUTE_EVIDENCE",
             f"/v1/customer/disputes/{target}/provide-evidence",
-            body_format=self.http.settings.behavior.evidence_format,
+            body_format=payload.get("body_format", self.http.settings.behavior.evidence_format),
             replay_unknown=replay_unknown,
         )
 
@@ -190,6 +204,6 @@ class PayPalWrite:
             operation,
             "DISPUTE_ACCEPT_CLAIM",
             f"/v1/customer/disputes/{target}/accept-claim",
-            body_format=self.http.settings.behavior.accept_claim_format,
+            body_format=payload.get("body_format", self.http.settings.behavior.accept_claim_format),
             replay_unknown=replay_unknown,
         )

@@ -22,7 +22,7 @@ from countersign.agent.models import ChatModel, ChatModelConfig, ModelError, cre
 from countersign.agent.session import AgentSession, AgentSessionError
 from countersign.approvals import ApprovalError, ApprovalService
 from countersign.approvals.service import load_context
-from countersign.config import PayPalSettings
+from countersign.config import PayPalBehavior, PayPalSettings
 from countersign.db import Database, Repositories, cas_transition
 from countersign.db.ids import uuid7
 from countersign.db.repositories import TABLES
@@ -62,6 +62,7 @@ class EngineSettings:
     webhook_id: str = field(repr=False)
     clock: Callable[[], datetime] = field(repr=False)
     llm: ChatModelConfig | ChatModel | None = field(default=None, repr=False)
+    paypal_behavior: PayPalBehavior = field(default_factory=PayPalBehavior, repr=False)
 
     def __post_init__(self):
         try:
@@ -188,7 +189,7 @@ class Engine:
                         self.settings.paypal_base_url,
                         self.settings.paypal_client_id,
                         self.settings.paypal_client_secret,
-                        self.settings.webhook_id,
+                        self.settings.webhook_id, behavior=self.settings.paypal_behavior,
                     )
                     self._http = await self._stack.enter_async_context(
                         PayPalHTTP(paypal, transport=self._transport)
@@ -208,7 +209,8 @@ class Engine:
                 self._reconciler = Reconciler(
                     self._database, self._reader, clock=self.settings.clock
                 )
-                self._approvals = ApprovalService(self._database, clock=self.settings.clock)
+                self._approvals = ApprovalService(self._database, clock=self.settings.clock,
+                                                  behavior=self.settings.paypal_behavior)
                 if self.settings.llm is not None:
                     async with self._database.tx() as conn:
                         cursor = await conn.execute("SELECT current_schema() AS schema")
@@ -219,7 +221,7 @@ class Engine:
                                 self.settings.paypal_base_url,
                                 self.settings.paypal_client_id,
                                 self.settings.paypal_client_secret,
-                                self.settings.webhook_id,
+                                self.settings.webhook_id, behavior=self.settings.paypal_behavior,
                             ), reader=self._reader, database_url=self.settings.database_url,
                             schema=schema, tools=self._agent_tools, simulator=self._simulator,
                         )
@@ -386,7 +388,8 @@ class Engine:
                 expected_effect=document["expected_effect"], model=self._agent.model_id,
                 raw_output=raw, state="CREATED", created_at=_time(self.settings.clock()),
             )
-            proposal, snap, payload = await load_context(conn, row, now=_time(self.settings.clock()))
+            proposal, snap, payload = await load_context(conn, row, now=_time(self.settings.clock()),
+                                                        behavior=self.settings.paypal_behavior)
             decision = evaluate(proposal, snap)
             details = {"rule_results": decision.rule_results(), "operation_payload": payload}
             if decision.verdict is Verdict.NEEDS_OWNER:

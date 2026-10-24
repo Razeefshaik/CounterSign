@@ -352,7 +352,7 @@ async def test_malformed_money_fails_without_echoing_value():
 @pytest.mark.parametrize(
     ("method", "kind", "suffix", "format"),
     [
-        ("cancel_item", "PAYOUT_CANCEL", "/cancel", "json"),
+        ("cancel_item", "PAYOUT_CANCEL", "/cancel", "none"),
         ("provide_evidence", "DISPUTE_EVIDENCE", "/provide-evidence", "multipart"),
         ("accept_claim", "DISPUTE_ACCEPT_CLAIM", "/accept-claim", "json"),
     ],
@@ -370,7 +370,9 @@ async def test_other_writes_use_persisted_target_and_configured_format_once(
         result = await getattr(PayPalWrite(http), method)(operation(kind, body={"note": "test"}))
     assert isinstance(result, Ok)
     assert len(calls) == 1 and calls[0].url.path.endswith(suffix)
-    if format == "multipart":
+    if format == "none":
+        assert calls[0].content == b""
+    elif format == "multipart":
         assert calls[0].headers["content-type"].startswith("multipart/form-data;")
         assert b'name="input"' in calls[0].content
     else:

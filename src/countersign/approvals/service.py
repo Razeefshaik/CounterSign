@@ -11,6 +11,8 @@ from uuid import UUID
 
 from psycopg import sql
 
+from countersign.approvals.requests import build_request
+from countersign.config import PayPalBehavior
 from countersign.db import Database, Repositories, cas_transition
 from countersign.fsm.line import LINE, LineEvent
 from countersign.fsm.obligation import OBLIGATION, ObligationEvent
@@ -19,7 +21,7 @@ from countersign.ledger.cash import BalanceView, Outflow, Reservation, cash_posi
 from countersign.ledger.journal import serialize_on
 from countersign.ledger.reservations import create_reservation, release_reservation
 from countersign.money import Money
-from countersign.paypal.http import canonical_payload_hash
+from countersign.paypal.http import PayPalDataError, canonical_payload_hash
 from countersign.shield import snapshot as model
 from countersign.shield.engine import Verdict, evaluate
 from countersign.shield.rules.idempotency import derive_keys
@@ -55,7 +57,7 @@ async def _rows(conn, table):
     return await cursor.fetchall()
 
 
-async def load_context(conn, row: dict, *, now: datetime | None = None):
+async def load_context(conn, row: dict, *, now: datetime | None = None, behavior=None):
     """Return (shield Proposal, Snapshot, canonical payload) within a caller's tx.
 
     Lock order is makers, orders, obligations, payout_runs, payout_lines, payout_attempts,
@@ -164,6 +166,13 @@ async def load_context(conn, row: dict, *, now: datetime | None = None):
     payload = {"action": str(action), "params": params}
     if action in model.PAYING:
         payload["payouts"] = bodies
+    elif action in {model.Action.CANCEL_UNCLAIMED_PAYOUT, model.Action.PROVIDE_EVIDENCE,
+                    model.Action.ACCEPT_CLAIM}:
+        try:
+            payload["request"] = build_request(
+                row, action, data, direct_targets, behavior or PayPalBehavior())
+        except (ValueError, TypeError, AttributeError, PayPalDataError):
+            raise ApprovalError("ACTION_PRECONDITION_FAILED") from None
     currency = payouts[0].amount.currency if payouts else "USD"
     balances = sorted(
         (r for r in data["balance_snapshots"] if r["currency"].strip() == currency),
@@ -308,7 +317,9 @@ async def load_context(conn, row: dict, *, now: datetime | None = None):
 
 
 class ApprovalService:
-    def __init__(self, database: Database, *, clock=None, lifetime=timedelta(minutes=30)):
+    def __init__(self, database: Database, *, clock=None, lifetime=timedelta(minutes=30),
+                 behavior=None):
+        self.behavior = behavior or PayPalBehavior()
         self.database, self.clock, self.lifetime = (
             database,
             clock or (lambda: datetime.now(UTC)),
@@ -403,7 +414,7 @@ class ApprovalService:
                 },
                 state="CREATED",
             )
-            proposal, snap, payload = await load_context(conn, row, now=self.clock())
+            proposal, snap, payload = await load_context(conn, row, now=self.clock(), behavior=self.behavior)
             decision = evaluate(proposal, snap)
             if decision.verdict is Verdict.BLOCK:
                 raise ApprovalError("SHIELD_BLOCKED")
@@ -473,7 +484,7 @@ class ApprovalService:
                 raise ApprovalError("STALE_PROPOSAL") from None
             if self.clock() >= expires:
                 raise ApprovalError("APPROVAL_EXPIRED")
-            proposal, snap, _ = await load_context(conn, row, now=self.clock())
+            proposal, snap, _ = await load_context(conn, row, now=self.clock(), behavior=self.behavior)
             if (
                 payload_hash != pending.get("payload_hash")
                 or proposal.payload_hash != payload_hash
@@ -506,7 +517,7 @@ class ApprovalService:
                 ProposalEvent.OWNER_APPROVED,
             )
             # Re-load after every approval-time state/version bump, using shield's same function.
-            proposal, snap, _ = await load_context(conn, row, now=self.clock())
+            proposal, snap, _ = await load_context(conn, row, now=self.clock(), behavior=self.behavior)
             approval = await repos.approvals.insert(
                 proposal_id=proposal_id,
                 payload_hash=hash_bytes(payload_hash),

@@ -188,9 +188,16 @@ async def _financial(conn, attempt, line, obligations, new_state, now, result):
 
 
 async def _one(conn, reader, attempt, now):
+    item_id, detail = await _confirmed_item(reader, attempt)
+    return await apply_confirmed_item(conn, attempt, item_id, detail, now)
+
+
+async def apply_confirmed_item(conn, attempt, item_id, detail, now):
+    """Apply a matching GET already fetched outside the caller's transaction."""
     result = StageResult(seen=1)
     repos = Repositories(conn)
-    item_id, detail = await _confirmed_item(reader, attempt)
+    if not _matches(attempt, detail, item_id=item_id):
+        raise ReconcileError("Payout item identity mismatch")
     status = detail.get("transaction_status")
     if status not in PAYPAL_STATUSES:
         await repos.payout_attempts.update(

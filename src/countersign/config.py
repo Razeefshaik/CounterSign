@@ -51,6 +51,7 @@ class PayPalBehavior:
     format_rejections: tuple[int, ...] = (400, 415, 422)
     evidence_format: str = "multipart"
     accept_claim_format: str = "json"
+    refund_source: str | None = None
     ambiguous_error_names: frozenset[str] = frozenset(
         {
             "DUPLICATE_SENDER_BATCH_ID",
@@ -64,6 +65,8 @@ class PayPalBehavior:
     reconcile_original_batch_links: bool = True
 
     def __post_init__(self):
+        if self.refund_source not in {None, "paypal:available", "paypal:withheld"}:
+            raise SettingsError("Refund source must be available or withheld")
         if self.evidence_format not in {"multipart", "json"} or self.accept_claim_format not in {
             "multipart",
             "json",
@@ -140,6 +143,11 @@ def load_settings() -> Settings:
         if mock
         else os.environ.get("PAYPAL_CLIENT_SECRET", ""),
         webhook_id=os.environ.get("PAYPAL_WEBHOOK_ID", ""),
+        behavior=PayPalBehavior(
+            evidence_format=os.environ.get("PAYPAL_EVIDENCE_FORMAT", "multipart"),
+            accept_claim_format=os.environ.get("PAYPAL_ACCEPT_CLAIM_FORMAT", "json"),
+            refund_source=os.environ.get("PAYPAL_REFUND_SOURCE") or None,
+        ),
     )
     return Settings(
         database, mode=mode, paypal=paypal, owner_token=os.environ.get("OWNER_TOKEN", "")
