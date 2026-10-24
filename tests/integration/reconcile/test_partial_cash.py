@@ -111,7 +111,9 @@ async def test_partial_refund_blocks_stale_cash_then_plans_only_net_share(test_d
 
 
 @pytest.mark.parametrize("source", ["known", "discovery", "backfill"])
-async def test_refund_after_cycle_start_requires_a_post_get_balance_snapshot(test_db_url, source):
+async def test_refund_after_cycle_start_requires_a_post_get_balance_snapshot(
+    test_db_url, source, poll_until_ready
+):
     moment = {"now": NOW}
     detail = {
         "dispute_id": "PP-D-RACE",
@@ -186,12 +188,14 @@ async def test_refund_after_cycle_start_requires_a_post_get_balance_snapshot(tes
                     status="OPEN",
                     phase="ACTIVE",
                 )
-        result = await Reconciler(
-            database,
-            Reader(),
-            clock=lambda: moment["now"],
-            settings=ReconcileSettings(backfill_enabled=source == "backfill"),
-        ).poll_once()
+        result = await poll_until_ready(
+            Reconciler(
+                database,
+                Reader(),
+                clock=lambda: moment["now"],
+                settings=ReconcileSettings(backfill_enabled=source == "backfill"),
+            )
+        )
         assert result.disputes.errors == 0 and result.balances.errors == 0
         assert result.backfill.errors == 0
         async with database.tx() as conn:

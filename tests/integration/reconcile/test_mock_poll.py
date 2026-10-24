@@ -18,7 +18,9 @@ from mock_paypal.app import create_app
 pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
 
 
-async def test_real_mock_and_read_adapter_settle_once_without_webhook_delivery(test_db_url):
+async def test_real_mock_and_read_adapter_settle_once_without_webhook_delivery(
+    test_db_url, poll_until_ready
+):
     mock = create_app(control_enabled=True)
     transport = httpx.ASGITransport(app=mock)
     base = "http://localhost:8099"
@@ -120,7 +122,7 @@ async def test_real_mock_and_read_adapter_settle_once_without_webhook_delivery(t
                 occurred_at=now(),
             )
         service = Reconciler(database, PayPalRead(http), clock=now)
-        first = await service.poll_once()
+        first = await poll_until_ready(service)
         assert first.attempts.errors == 0 and first.attempts.updated == 1
         async with database.tx() as conn:
             mirrored = await Repositories(conn).payout_attempts.get(attempt["id"])
@@ -128,8 +130,8 @@ async def test_real_mock_and_read_adapter_settle_once_without_webhook_delivery(t
         assert (
             await controls.post("/_mock/clock/advance", json={"seconds": 31})
         ).status_code == 200
-        assert (await service.poll_once()).attempts.errors == 0
-        await service.poll_once()
+        assert (await poll_until_ready(service)).attempts.errors == 0
+        await poll_until_ready(service)
         async with database.tx() as conn:
             repos = Repositories(conn)
             assert (await repos.obligations.get(obligation["id"]))["state"] == "SETTLED"

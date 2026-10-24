@@ -129,6 +129,9 @@ settles once and posts exactly one success journal. Other tests cover UNCLAIMED
 accounting, returns, unexpected moves, rollback, old replacement attempts, missing
 submission journals, unknown outcomes, partial losses, discovery, pagination,
 balance NULLs, stale refund cash, backfill checkpoints and concurrent cycles.
+Schemas isolate test data, but advisory locks are database-wide. Tests that need
+completed work wait for an eligible cycle; the competing-cycle test still checks
+the immediate busy response. Two simultaneous poller test processes pass.
 
 ```powershell
 $env:COUNTERSIGN_TEST_DATABASE_URL = 'postgresql://countersign:countersign-dev@127.0.0.1:55432/countersign'

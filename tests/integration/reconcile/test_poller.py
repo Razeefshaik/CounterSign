@@ -43,7 +43,7 @@ class EmptyMarketplace:
 
 
 async def test_racing_cycles_skip_work_and_identical_snapshot_is_deduplicated(
-    test_db_url, monkeypatch
+    test_db_url, monkeypatch, poll_until_ready
 ):
     entered, release = asyncio.Event(), asyncio.Event()
     real = poller.reconcile_balances
@@ -57,9 +57,9 @@ async def test_racing_cycles_skip_work_and_identical_snapshot_is_deduplicated(
     reader = EmptyMarketplace()
     async with Database(test_db_url, max_size=4) as database:
         service = Reconciler(database, reader, clock=lambda: NOW)
-        first = asyncio.create_task(service.poll_once())
+        first = asyncio.create_task(poll_until_ready(service))
         try:
-            await asyncio.wait_for(entered.wait(), timeout=10)
+            await asyncio.wait_for(entered.wait(), timeout=65)
             calls = list(reader.calls)
             competing = await service.poll_once()
             assert competing.busy and reader.calls == calls
@@ -67,12 +67,14 @@ async def test_racing_cycles_skip_work_and_identical_snapshot_is_deduplicated(
             release.set()
         result = await first
         assert not result.busy and result.balances.updated == 1
-        assert (await service.poll_once()).balances.updated == 0
+        assert (await poll_until_ready(service)).balances.updated == 0
         async with database.tx() as conn:
             assert len(await Repositories(conn).balance_snapshots.find()) == 1
 
 
-async def test_failed_stage_rolls_back_its_writes_and_keeps_other_stages(test_db_url, monkeypatch):
+async def test_failed_stage_rolls_back_its_writes_and_keeps_other_stages(
+    test_db_url, monkeypatch, poll_until_ready
+):
     async def failed(conn, reader, *, now, clock=None):
         await Repositories(conn).policies.insert(key="failed_stage", value=True)
         raise ValueError("fake-private-token private@example.test")
@@ -84,7 +86,7 @@ async def test_failed_stage_rolls_back_its_writes_and_keeps_other_stages(test_db
     monkeypatch.setattr(poller, "reconcile_balances", failed)
     monkeypatch.setattr(poller, "reconcile_attempts", successful)
     async with Database(test_db_url) as database:
-        result = await Reconciler(database, EmptyMarketplace(), clock=lambda: NOW).poll_once()
+        result = await poll_until_ready(Reconciler(database, EmptyMarketplace(), clock=lambda: NOW))
         assert result.balances.errors == 1 and result.balances.incidents == 1
         assert result.attempts.updated == 1
         assert "private" not in str(asdict(result))
