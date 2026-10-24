@@ -51,6 +51,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | 22 | [c18-owner-approvals.md](c18-owner-approvals.md) | **Owner approvals**: the weekly run plan, and an approval that is tied to the exact records it saw and expires after 30 minutes | Codex | `aaa8a98`, `4b4c6a1` |
 | 23 | [c14-webhook-inbox.md](c14-webhook-inbox.md) | **Webhook inbox**: every PayPal message saved once with its exact bytes; acted on only after PayPal confirms the signature, and a dispute reserves money only after a GET confirms it | Codex | `022b199` |
 | 24 | [c19-executor.md](c19-executor.md) | **The executor**: the only code that sends money; saves before sending, re-checks every rule, uses each approval once, and settles unclear answers only by repeating the identical request | Claude | `de708b1` |
+| 25 | [c15-reconciliation.md](c15-reconciliation.md) | **Reconciliation poller**: regularly asks PayPal for the truth about every payout, dispute and balance, corrects our records, and opens an incident when something moves unexpectedly | Codex | `37747c9`, `13c93d8` |
 
 ## Words used everywhere
 
