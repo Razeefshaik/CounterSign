@@ -434,9 +434,9 @@ async def test_main_starts_reconciliation_and_executor_sweep_using_the_factory(w
     assert not world.http._client.is_closed
 
 
-@pytest.mark.parametrize("action", ["CANCEL_UNCLAIMED_PAYOUT", "PROVIDE_EVIDENCE", "ACCEPT_CLAIM"])
+@pytest.mark.parametrize("action", ["RESERVE_EARNINGS", "RELEASE_RESERVE", "DEFER_SCHEDULED_PAYOUT"])
 @pytest.mark.asyncio
-async def test_nonpaying_actions_are_routed_without_reimplementation(world, action):
+async def test_nonpaying_actions_are_deferred_without_reimplementation(world, action):
     class Unsupported:
         def __init__(self):
             self.called = []
@@ -462,8 +462,8 @@ async def test_nonpaying_actions_are_routed_without_reimplementation(world, acti
         world.settings, database=world.database, http=world.http, executor=fake
     ) as engine:
         result = await engine.tick()
-    assert fake.called == [proposal["id"]] and fake.swept == 1
-    assert result["errors"] == 1 and result["operations"] == 0
+    assert fake.called == [] and fake.swept == 1
+    assert result["errors"] == 0 and result["operations"] == 0
     async with world.database.tx() as conn:
         assert not await Repositories(conn).operations.find()
         assert (await Repositories(conn).proposals.get(proposal["id"]))["state"] == "ALLOWED"
@@ -487,11 +487,11 @@ async def test_snapshot_never_returns_an_older_complete_balance_after_cash_guard
     assert (await world.engine.snapshot())["cash"] is None
 
 
-def test_engine_settings_mask_values_and_refuse_unimplemented_agent():
+def test_engine_settings_mask_values_and_require_explicit_agent_configuration():
     configured = settings("postgresql://private-id:private-secret@localhost/demo_eval", lambda: NOW)
     assert "private" not in repr(configured)
     assert "mock-client" not in repr(configured)
-    with pytest.raises(EngineError, match="AGENT_NOT_IMPLEMENTED"):
+    with pytest.raises(EngineError, match="MODEL_CONFIGURATION_REQUIRED"):
         replace(configured, llm=object())
     with pytest.raises(EngineError, match="INVALID_ENGINE_SETTINGS"):
         replace(configured, paypal_base_url="https://api-m.paypal.com")

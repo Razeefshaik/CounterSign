@@ -93,7 +93,7 @@ async def seed_marketplace(database, scenario: dict) -> dict:
                 due_date=due,
                 state="OPEN",
             )
-        for key, value in initial["policy"].items():
+        for key, value in {"deadline_close_seconds": 172800, **initial["policy"]}.items():
             await repos.policies.insert(key=key, value=value)
         counts = {
             "makers": len(makers),

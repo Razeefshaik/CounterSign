@@ -6,11 +6,14 @@ are rebuilt from locked authoritative rows, never from an agent-supplied recipie
 
 import re
 from collections import defaultdict
+from dataclasses import replace
 from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
 from psycopg import sql
 
+from countersign.approvals.requests import build_request
+from countersign.config import PayPalBehavior
 from countersign.db import Database, Repositories, cas_transition
 from countersign.fsm.line import LINE, LineEvent
 from countersign.fsm.obligation import OBLIGATION, ObligationEvent
@@ -19,7 +22,7 @@ from countersign.ledger.cash import BalanceView, Outflow, Reservation, cash_posi
 from countersign.ledger.journal import serialize_on
 from countersign.ledger.reservations import create_reservation, release_reservation
 from countersign.money import Money
-from countersign.paypal.http import canonical_payload_hash
+from countersign.paypal.http import PayPalDataError, canonical_payload_hash
 from countersign.shield import snapshot as model
 from countersign.shield.engine import Verdict, evaluate
 from countersign.shield.rules.idempotency import derive_keys
@@ -55,7 +58,69 @@ async def _rows(conn, table):
     return await cursor.fetchall()
 
 
-async def load_context(conn, row: dict, *, now: datetime | None = None):
+async def load_rule_facts(conn, snap, *, data, proposal_row):
+    """Enrich a snapshot with locked, authoritative C24 facts; never alter payloads.
+
+    Unknown refund dates count against today's budget conservatively. Committed
+    and ambiguous accept-claims reserve their full dispute amount; observed refunds
+    on the same dispute are counted once using the larger amount.
+    """
+    cursor = await conn.execute("SELECT key,value FROM policies ORDER BY key FOR SHARE")
+    policies = {r["key"]: r["value"] for r in await cursor.fetchall()}
+    enriched = []
+    totals = {"orders": {}, "day": {}}
+    for row in data["disputes"]:
+        raw = row["raw"] if isinstance(row["raw"], dict) else {}
+        transactions = raw.get("disputed_transactions", [])
+        enriched.append(model.Dispute(
+            str(row["id"]), _id(row["order_id"]), row["phase"], row["version"],
+            status=row["status"], amount=_money(row) if row["amount_minor"] is not None else None,
+            seller_response_due_date=row["seller_response_due_date"],
+            links=tuple(row["links"] or ()), paypal_dispute_id=row["paypal_dispute_id"],
+            seller_transaction_ids=tuple(
+                t["seller_transaction_id"] for t in transactions
+                if isinstance(t, dict) and isinstance(t.get("seller_transaction_id"), str)
+            ) if isinstance(transactions, list) else (),
+        ))
+        currency = row["currency"].strip() if row["currency"] else None
+        if currency is None:
+            if row["amount_refunded_minor"]:
+                totals["complete"] = False
+            continue
+        observed = row["amount_refunded_minor"] or 0
+        committed = 0
+        today = False
+        for op in data["operations"]:
+            if (op["kind"] != "DISPUTE_ACCEPT_CLAIM"
+                    or op["state"] not in {"PENDING", "IN_FLIGHT", "UNKNOWN", "SUCCEEDED"}
+                    or op["proposal_id"] == proposal_row["id"]
+                    or op["target_id"] != row["id"]):
+                continue
+            committed += row["amount_minor"] or 0
+            at = op["submitted_at"] or op["created_at"]
+            today |= (op["state"] in {"PENDING", "IN_FLIGHT", "UNKNOWN"} or at is None
+                      or at.astimezone(UTC).date() == snap.now.astimezone(UTC).date())
+        amount = max(observed, committed)
+        key = f"{row['order_id']}:{currency}"
+        if row["order_id"] is not None:
+            totals["orders"][key] = totals["orders"].get(key, 0) + amount
+        try:
+            at = datetime.fromisoformat(raw["update_time"])
+            if at.utcoffset() is None:
+                raise ValueError
+            today |= observed > 0 and at.astimezone(UTC).date() == snap.now.astimezone(UTC).date()
+        except (KeyError, TypeError, ValueError):
+            today |= observed > 0
+        if today:
+            totals["day"][currency] = totals["day"].get(currency, 0) + amount
+    return replace(
+        snap, disputes=tuple(enriched), policies=policies,
+        orders=tuple(data["orders"]),
+        evidence_refs=tuple(proposal_row.get("evidence_refs") or ()), refund_totals=totals,
+    )
+
+
+async def load_context(conn, row: dict, *, now: datetime | None = None, behavior=None):
     """Return (shield Proposal, Snapshot, canonical payload) within a caller's tx.
 
     Lock order is makers, orders, obligations, payout_runs, payout_lines, payout_attempts,
@@ -164,6 +229,13 @@ async def load_context(conn, row: dict, *, now: datetime | None = None):
     payload = {"action": str(action), "params": params}
     if action in model.PAYING:
         payload["payouts"] = bodies
+    elif action in {model.Action.CANCEL_UNCLAIMED_PAYOUT, model.Action.PROVIDE_EVIDENCE,
+                    model.Action.ACCEPT_CLAIM}:
+        try:
+            payload["request"] = build_request(
+                row, action, data, direct_targets, behavior or PayPalBehavior())
+        except (ValueError, TypeError, AttributeError, PayPalDataError):
+            raise ApprovalError("ACTION_PRECONDITION_FAILED") from None
     currency = payouts[0].amount.currency if payouts else "USD"
     balances = sorted(
         (r for r in data["balance_snapshots"] if r["currency"].strip() == currency),
@@ -297,15 +369,21 @@ async def load_context(conn, row: dict, *, now: datetime | None = None):
             for r in data["reservations"]
         ),
     )
+    snap = await load_rule_facts(conn, snap, data=data, proposal_row=row)
     return (
-        model.Proposal(str(row["id"]), action, params, canonical_payload_hash(payload)),
+        model.Proposal(
+            str(row["id"]), action, params, canonical_payload_hash(payload),
+            flags=tuple((row.get("raw_output") or {}).get("flags", ())),
+        ),
         snap,
         payload,
     )
 
 
 class ApprovalService:
-    def __init__(self, database: Database, *, clock=None, lifetime=timedelta(minutes=30)):
+    def __init__(self, database: Database, *, clock=None, lifetime=timedelta(minutes=30),
+                 behavior=None):
+        self.behavior = behavior or PayPalBehavior()
         self.database, self.clock, self.lifetime = (
             database,
             clock or (lambda: datetime.now(UTC)),
@@ -400,7 +478,7 @@ class ApprovalService:
                 },
                 state="CREATED",
             )
-            proposal, snap, payload = await load_context(conn, row, now=self.clock())
+            proposal, snap, payload = await load_context(conn, row, now=self.clock(), behavior=self.behavior)
             decision = evaluate(proposal, snap)
             if decision.verdict is Verdict.BLOCK:
                 raise ApprovalError("SHIELD_BLOCKED")
@@ -470,7 +548,7 @@ class ApprovalService:
                 raise ApprovalError("STALE_PROPOSAL") from None
             if self.clock() >= expires:
                 raise ApprovalError("APPROVAL_EXPIRED")
-            proposal, snap, _ = await load_context(conn, row, now=self.clock())
+            proposal, snap, _ = await load_context(conn, row, now=self.clock(), behavior=self.behavior)
             if (
                 payload_hash != pending.get("payload_hash")
                 or proposal.payload_hash != payload_hash
@@ -503,7 +581,7 @@ class ApprovalService:
                 ProposalEvent.OWNER_APPROVED,
             )
             # Re-load after every approval-time state/version bump, using shield's same function.
-            proposal, snap, _ = await load_context(conn, row, now=self.clock())
+            proposal, snap, _ = await load_context(conn, row, now=self.clock(), behavior=self.behavior)
             approval = await repos.approvals.insert(
                 proposal_id=proposal_id,
                 payload_hash=hash_bytes(payload_hash),

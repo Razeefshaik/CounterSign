@@ -171,13 +171,31 @@ def batch_id(body):
 
 def batch_link(body):
     """Only follow a payout-batch GET link within the sandbox API host."""
-    for link in body.get("links") or []:
+    if not isinstance(body, dict):
+        return None
+    links = list(body["links"]) if isinstance(body.get("links"), list) else []
+    for detail in body.get("details", []) if isinstance(body.get("details"), list) else []:
+        if isinstance(detail, dict) and isinstance(detail.get("link"), list):
+            links.extend(detail["link"])
+    for link in links:
         if not isinstance(link, dict) or link.get("method", "GET") != "GET":
             continue
-        parsed = urlsplit(link.get("href", ""))
-        if parsed.netloc and (
-            parsed.scheme != "https" or parsed.netloc != "api-m.sandbox.paypal.com"
-        ):
+        try:
+            href = link.get("href", "")
+            parsed = urlsplit(href)
+            valid = (isinstance(href, str) and not parsed.query and not parsed.fragment
+                     and not parsed.username and not parsed.password
+                     and not any(ord(char) < 32 for char in href)
+                     and not href.startswith("//") and "\\" not in href)
+            if parsed.netloc or parsed.scheme:
+                valid = valid and parsed.scheme == "https" and parsed.hostname in {
+                    "api-m.sandbox.paypal.com", "api.sandbox.paypal.com"
+                } and parsed.port in {None, 443}
+            else:
+                valid = valid and href.startswith("/")
+        except (ValueError, TypeError, AttributeError):
+            valid = False
+        if not valid:
             continue
         if re.fullmatch(r"/v1/payments/payouts/[A-Za-z0-9_-]+", parsed.path):
             return parsed.path.rsplit("/", 1)[-1]

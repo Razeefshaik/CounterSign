@@ -59,6 +59,7 @@ TIER: Mapping[Action, Tier] = MappingProxyType(
 
 # Actions that send a payout item to a maker.
 PAYING = frozenset({A.SCHEDULE_PAYOUT_RUN, A.CREATE_REPLACEMENT_PAYOUT})
+EXECUTABLE = PAYING | frozenset({A.CANCEL_UNCLAIMED_PAYOUT, A.PROVIDE_EVIDENCE, A.ACCEPT_CLAIM})
 
 # Actions the executor turns into a PayPal write, and the operations.kind each one records.
 OPERATION_KIND: Mapping[Action, str] = MappingProxyType(
@@ -97,6 +98,7 @@ class Proposal:
     action: Action
     params: Mapping[str, Any]
     payload_hash: str
+    flags: tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self):
         object.__setattr__(self, "action", Action(self.action))
@@ -205,6 +207,12 @@ class Dispute:
     order_id: str | None
     phase: Phase
     version: int
+    status: str | None = None
+    amount: Money | None = None
+    seller_response_due_date: datetime | None = None
+    links: tuple[Mapping[str, Any], ...] = ()
+    paypal_dispute_id: str | None = None
+    seller_transaction_ids: tuple[str, ...] = ()
 
     def __post_init__(self):
         _coerce(self, "phase", Phase)
@@ -267,6 +275,10 @@ class Snapshot:
     reservations: tuple[ReservationRecord, ...] = ()
     operation: Operation | None = None  # this proposal's write-ahead record (at execution)
     approval: Approval | None = None
+    policies: Mapping[str, Any] = field(default_factory=dict)
+    orders: tuple[Mapping[str, Any], ...] = ()
+    evidence_refs: tuple[str, ...] = ()
+    refund_totals: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         _aware(self.now, "now")

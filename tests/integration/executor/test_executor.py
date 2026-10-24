@@ -269,11 +269,11 @@ async def test_from_http_builds_its_own_adapters_on_the_given_client(world):
     assert built.clock is clock and built.stale_after == executor.stale_after
 
 
-async def test_non_paying_actions_are_refused_before_any_change(world):
+async def test_unsupported_actions_are_refused_before_any_change(world):
     database, _, executor, _, _ = world
     async with database.tx() as conn:
         proposal = await Repositories(conn).proposals.insert(
-            action="PROVIDE_EVIDENCE",
+            action="RESERVE_EARNINGS",
             params={},
             evidence_refs=[],
             model="test",
