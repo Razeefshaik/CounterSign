@@ -58,6 +58,20 @@
             "last_checked_at": "2026-11-06T09:02:10Z"
           }
         ]
+      },
+      {
+        "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000702",
+        "maker": {
+          "id": "0192f1c4-7a10-7c3e-9b1a-5d2f00000303",
+          "display_name": "Maker C"
+        },
+        "amount": {
+          "minor": 30000,
+          "currency": "USD"
+        },
+        "state": "APPROVED",
+        "obligations": [],
+        "attempts": []
       }
     ],
     "replacements": [
