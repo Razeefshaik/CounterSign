@@ -8,6 +8,7 @@ import httpx
 import pytest
 import pytest_asyncio
 from fastapi import FastAPI
+from psycopg import IntegrityError
 
 from countersign.api import owner, runs
 from countersign.approvals import (
@@ -357,3 +358,24 @@ async def test_demo_owner_reject_returns_public_proposal_and_stale_http_code(wor
     assert public["rule_results"]
     assert "raw_output" not in public and "verdict_details" not in public
     assert "maker@example.test" not in response.text
+
+
+async def test_owner_http_storage_errors_do_not_expose_driver_values(world, monkeypatch):
+    database, _, _, _ = world
+
+    async def unavailable(*args, **kwargs):
+        raise IntegrityError("fake-private-owner@example.test fake-private-value")
+
+    monkeypatch.setattr(ApprovalService, "plan_run", unavailable)
+    app = FastAPI()
+    app.include_router(
+        runs.build_router(database, Settings("postgresql://fake:fake@localhost/fake")),
+        prefix="/api/v1",
+    )
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://local"
+    ) as client:
+        response = await client.post("/api/v1/payout-runs", json={"week_start": WEEK.isoformat()})
+    assert response.status_code == 503
+    assert response.json()["detail"]["code"] == "OWNER_STORAGE_UNAVAILABLE"
+    assert "fake-private" not in response.text

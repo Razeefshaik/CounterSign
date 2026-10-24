@@ -75,6 +75,8 @@ storage rows. Run params include line amounts and the expected cash change, so t
 owner can review what is being approved. Audit kinds are `OWNER_APPROVED` and
 `OWNER_REJECTED`; rejection audit details record only whether a reason was supplied,
 so free text cannot copy an email or credential into the audit log.
+Storage errors return a fixed `OWNER_STORAGE_UNAVAILABLE` response with status
+503; private database exception values never become HTTP error details.
 
 ## 5. How correctness is decided
 

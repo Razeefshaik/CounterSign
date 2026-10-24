@@ -5,6 +5,8 @@ from typing import Annotated, Literal
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Header, HTTPException
+from psycopg import Error as DatabaseError
+from psycopg_pool import PoolTimeout
 from pydantic import BaseModel, ConfigDict, Field
 
 from countersign.approvals import ApprovalError, ApprovalService
@@ -50,6 +52,8 @@ async def public_result(awaitable):
         return await awaitable
     except ApprovalError as exc:
         raise HTTPException(status_code=exc.status, detail={"code": exc.code}) from None
+    except (DatabaseError, PoolTimeout):
+        raise HTTPException(status_code=503, detail={"code": "OWNER_STORAGE_UNAVAILABLE"}) from None
 
 
 async def owner_document(database: Database, resource: str, row_id: UUID) -> dict:
@@ -59,9 +63,12 @@ async def owner_document(database: Database, resource: str, row_id: UUID) -> dic
         "maker": "SELECT doc FROM v_dash_makers WHERE id=%s",
         "run": "SELECT doc FROM v_dash_runs WHERE id=%s",
     }
-    async with database.tx() as conn:
-        cursor = await conn.execute(queries[resource], (row_id,))
-        row = await cursor.fetchone()
+    try:
+        async with database.tx() as conn:
+            cursor = await conn.execute(queries[resource], (row_id,))
+            row = await cursor.fetchone()
+    except (DatabaseError, PoolTimeout):
+        raise HTTPException(status_code=503, detail={"code": "OWNER_STORAGE_UNAVAILABLE"}) from None
     if row is None:
         raise HTTPException(status_code=404, detail={"code": "RESOURCE_NOT_FOUND"})
     return row["doc"]
