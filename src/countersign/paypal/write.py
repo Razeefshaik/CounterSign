@@ -8,6 +8,7 @@ database commit: that is the executor's write-ahead responsibility.
 import hashlib
 import hmac
 import json
+import re
 from collections.abc import Mapping
 from urllib.parse import urlsplit
 from uuid import UUID
@@ -71,16 +72,18 @@ class PayPalWrite:
     def _original_batch_link(self, body):
         if not isinstance(body, Mapping):
             return None
-        links = body.get("links", [])
-        if not isinstance(links, list):
-            return None
+        links = list(body["links"]) if isinstance(body.get("links"), list) else []
+        for detail in body.get("details", []) if isinstance(body.get("details"), list) else []:
+            if isinstance(detail, Mapping) and isinstance(detail.get("link"), list):
+                links.extend(detail["link"])
         for link in links:
-            if not isinstance(link, Mapping) or link.get("rel") not in {
+            if (not isinstance(link, Mapping) or link.get("method", "GET") != "GET"
+                    or link.get("rel") not in {
                 "original_batch",
                 "original-batch",
                 "original",
                 "self",
-            }:
+            }):
                 continue
             href = link.get("href")
             try:
@@ -88,17 +91,16 @@ class PayPalWrite:
             except UnsafePayPalURL:
                 continue
             # Only a batch-resource GET is reconciliation evidence, never an action URL.
-            path = urlsplit(validated).path
-            prefix = "/v1/payments/payouts/"
+            parsed = urlsplit(validated)
+            path = parsed.path
             if (
-                path.startswith(prefix)
-                and "/" not in path[len(prefix) :]
-                and path[len(prefix) :]
+                re.fullmatch(r"/v1/payments/payouts/[A-Za-z0-9_-]+", path)
+                and not parsed.query
                 and self.http.redactor.text(validated) == validated
             ):
                 # Original-batch identity is the path. Do not carry arbitrary query data
                 # from a server response into logs or a subsequent authenticated GET.
-                return validated.partition("?")[0]
+                return validated
         return None
 
     async def _write(self, operation, kind, path, *, body_format="json", replay_unknown=False):

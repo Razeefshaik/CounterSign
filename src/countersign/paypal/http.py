@@ -205,7 +205,7 @@ class PayPalHTTP:
         await self._client.aclose()
 
     def url(self, path: str) -> str:
-        """Resolve only relative API paths or same-origin HATEOAS URLs."""
+        """Resolve API paths, normalizing the one sandbox HATEOAS host alias."""
         try:
             parsed = urlsplit(path)
             origin = urlsplit(self.base_url)
@@ -226,7 +226,11 @@ class PayPalHTTP:
             if parsed.scheme or parsed.netloc:
                 valid = valid and (
                     parsed.scheme == origin.scheme
-                    and parsed.hostname == origin.hostname
+                    and (parsed.hostname == origin.hostname or (
+                        origin.scheme == parsed.scheme == "https"
+                        and origin.hostname == "api-m.sandbox.paypal.com"
+                        and parsed.hostname == "api.sandbox.paypal.com"
+                    ))
                     and (parsed.port or (443 if parsed.scheme == "https" else 80))
                     == (origin.port or (443 if origin.scheme == "https" else 80))
                 )
@@ -237,7 +241,9 @@ class PayPalHTTP:
             valid = False
         if not valid:
             raise UnsafePayPalURL("Only same-origin PayPal API paths are allowed") from None
-        return path if parsed.scheme else self.base_url + path
+        # Never send credentials to the alias: retain only the checked API path
+        # and query and always use the explicitly configured base origin.
+        return self.base_url + parsed.path + ("?" + parsed.query if parsed.query else "")
 
     async def _send(self, method, url, **kwargs):
         try:
