@@ -340,3 +340,21 @@ async def test_seed_refuses_unmarked_financial_state(test_db_url, table, values)
             await seed_module.seed_marketplace(db, scenario())
         async with db.tx() as conn:
             assert not await Repositories(conn).makers.find()
+
+
+@pytest.mark.parametrize("threshold", [None, 3600])
+async def test_demo_script_deadline_default_and_owner_override_survive_reseed(test_db_url, threshold):
+    data = scenario()
+    if threshold is None:
+        data["initial_state"]["policy"].pop("deadline_close_seconds", None)
+    else:
+        data["initial_state"]["policy"]["deadline_close_seconds"] = threshold
+    async with Database(test_db_url) as db:
+        await seed_module.seed_marketplace(db, data)
+        async with db.tx() as conn:
+            repos = Repositories(conn)
+            assert (await repos.policies.get("deadline_close_seconds"))["value"] == (172800 if threshold is None else threshold)
+            await repos.policies.update("deadline_close_seconds", value=7200)
+        await seed_module.seed_marketplace(db, data)
+        async with db.tx() as conn:
+            assert (await Repositories(conn).policies.get("deadline_close_seconds"))["value"] == 7200

@@ -84,12 +84,7 @@ async def test_reloaded_approval_context_preserves_injection_flags_for_execution
                     "currency": "USD",
                     "amount_refunded_minor": None,
                     "version": 1,
-                    "status": "WAITING_FOR_SELLER_RESPONSE",
-                    "amount_minor": 6000,
-                    "amount_refunded_minor": None,
-                    "currency": "USD",
                     "seller_response_due_date": None,
-                    "links": [],
                     "raw": {},
                 }
             ]

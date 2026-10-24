@@ -621,7 +621,7 @@ class Engine:
         share = policy.get("maker_share_pct", 90)
         if type(share) is not int or not 0 < share <= 100:
             raise EngineError("INVALID_SEED_POLICY")
-        for key, value in {"maker_share_pct": share, **policy}.items():
+        for key, value in {"maker_share_pct": share, "deadline_close_seconds": 172800, **policy}.items():
             await repos.policies.insert(key=key, value=value)
         due = now.date() + timedelta(days=(4 - now.weekday()) % 7)
         makers, obligations = {}, {}

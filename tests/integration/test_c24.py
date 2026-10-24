@@ -8,7 +8,7 @@ import pytest
 from test_harness import WEEK, ready_poll
 from test_harness import world as shared_world
 
-from countersign.approvals.service import load_context
+from countersign.approvals.service import ApprovalError, load_context
 from countersign.db import Repositories, StaleRow
 from countersign.fsm.incident import IncidentEvent
 from countersign.incidents import IncidentService
@@ -86,7 +86,9 @@ async def test_rule_fact_loader_preserves_hash_and_blocks_missing_policy(world):
             state="CREATED",
         )
         proposal, snap, payload = await load_context(conn, row, now=now)
-        assert payload == {"action": "ACCEPT_CLAIM", "params": params}
+        assert payload["action"] == "ACCEPT_CLAIM" and payload["params"] == params
+        assert payload["request"]["target_id"] == str(dispute["id"])
+        assert payload["request"]["refund_amount"] == {"minor": 54000, "currency": "USD"}
         assert proposal.payload_hash == canonical_payload_hash(payload)
         assert snap.disputes[0].seller_response_due_date == dispute["seller_response_due_date"]
         assert (
@@ -368,10 +370,44 @@ async def test_commander_evidence_verdict_uses_stored_records_and_action_link(wo
     assert world.engine._simulator.database is world.database
     results = saved["verdict_details"]["rule_results"]
     assert next(r for r in results if r["rule"] == "EVIDENCE_INTEGRITY")["outcome"] == "PASS"
-    assert rows["operations"] == []  # C19b owns evidence sending; this branch verifies the verdict.
+    [operation] = rows["operations"]
+    assert saved["state"] == "EXECUTED"
+    assert operation["kind"] == "DISPUTE_EVIDENCE" and operation["state"] == "SUCCEEDED"
+    assert operation["payload"]["body"]["evidences"][0]["evidence_info"]["tracking_info"] == [
+        {"carrier_name": "USPS", "tracking_number": "TRACK-STORED"}
+    ]
+    truth = (await world.controls.get("/_mock/ground-truth")).json()
+    assert (
+        sum(
+            r["method"] == "POST" and r["path"].endswith("/provide-evidence")
+            for r in truth["requests"]
+        )
+        == 1
+    )
     async with world.database.tx() as conn:
         repos = Repositories(conn)
         current = await repos.disputes.get(dispute["id"])
         await repos.disputes.update(current["id"], links=[])
-        proposal, snap, _ = await load_context(conn, saved, now=world.settings.clock())
-        assert evaluate(proposal, snap).verdict is Verdict.BLOCK
+        with pytest.raises(ApprovalError, match="ACTION_PRECONDITION_FAILED"):
+            await load_context(conn, saved, now=world.settings.clock())
+
+
+@pytest.mark.parametrize("threshold", [None, 3600])
+async def test_core_seed_deadline_default_and_owner_override_survive_reseed(world, threshold):
+    from copy import deepcopy
+
+    state = deepcopy(world.state)
+    if threshold is None:
+        state["policy"].pop("deadline_close_seconds", None)
+    else:
+        state["policy"]["deadline_close_seconds"] = threshold
+    await world.engine.seed(state)
+    async with world.database.tx() as conn:
+        repos = Repositories(conn)
+        assert (await repos.policies.get("deadline_close_seconds"))["value"] == (
+            172800 if threshold is None else threshold
+        )
+        await repos.policies.update("deadline_close_seconds", value=7200)
+    await world.engine.seed(state)
+    async with world.database.tx() as conn:
+        assert (await Repositories(conn).policies.get("deadline_close_seconds"))["value"] == 7200
