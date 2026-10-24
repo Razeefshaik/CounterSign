@@ -105,7 +105,7 @@ def test_executor_can_import_write_adapter(contract_project, importer):
     result = run_import_linter(contract_project)
 
     assert result.returncode == 0, result.stdout + result.stderr
-    assert "Contracts: 2 kept, 0 broken." in result.stdout
+    assert "Contracts: 3 kept, 0 broken." in result.stdout
 
 
 def test_agent_can_import_read_adapter(contract_project):
