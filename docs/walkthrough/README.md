@@ -47,6 +47,9 @@ The first working version of the product itself, built step by step. Hashes belo
 | 18 | [05-state-guards.md](05-state-guards.md) | **Closing a gap**: version numbers on every row a state machine moves, and a test that keeps database and code in step | Claude | `da027ac` |
 | 19 | [c16-ledger.md](c16-ledger.md) | **Bookkeeping and cash**: every money move balanced and booked once; dispute earmarks never reduce free cash; demo Thursday gives exactly $254 free | Claude (+ helper) | `c5a67e5`, `2930804` |
 | 20 | [c17-shield.md](c17-shield.md) | **The shield**: 10 safety rules every AI proposal must pass (no double pay, only verified emails, enough free cash, approvals bound to exact records) | Claude (helper) | `e6f2218` |
+| 21 | [c13-paypal-adapter.md](c13-paypal-adapter.md) | **Talking to PayPal**: reads anyone may use; writes only from a saved operation, never retried automatically, and any unclear answer counts as "unknown", never "failed" | Codex | `65b47db` |
+| 22 | [c18-owner-approvals.md](c18-owner-approvals.md) | **Owner approvals**: the weekly run plan, and an approval that is tied to the exact records it saw and expires after 30 minutes | Codex | `aaa8a98`, `4b4c6a1` |
+| 23 | [c14-webhook-inbox.md](c14-webhook-inbox.md) | **Webhook inbox**: every PayPal message saved once with its exact bytes; acted on only after PayPal confirms the signature, and a dispute reserves money only after a GET confirms it | Codex | `022b199` |
 
 ## Words used everywhere
 
