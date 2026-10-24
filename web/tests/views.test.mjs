@@ -11,6 +11,17 @@ const owner = proposals.find(p => p.state === "NEEDS_OWNER");
 const meta = await fixture("meta");
 const response = (body, status = 200) => ({ok: status >= 200 && status < 300, status, json: async () => body});
 
+test("contract 1.0.2 injection guard renders as a blocked rule without renaming the flag", () => {
+  assert.equal(meta.contract_version, "1.0.2");
+  const blocked = proposals.find(p => p.flags.some(f => f.type === "PROMPT_INJECTION"));
+  const guard = blocked.rule_results.find(r => r.rule === "INJECTION_GUARD");
+  assert.equal(guard.outcome, "BLOCK");
+  const html = decisionView(blocked, meta);
+  assert.match(html, /INJECTION_GUARD/);
+  assert.match(html, /PROMPT_INJECTION/);
+  assert.match(html, /id="approve"[^>]*disabled/);
+});
+
 test("decision renders every supplied rule and flags, including blocked owner-tier proposals", () => {
   const blocked = proposals.find(p => p.verdict === "BLOCK");
   const html = decisionView(blocked, meta, true);

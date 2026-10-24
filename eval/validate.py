@@ -1,4 +1,4 @@
-"""Validate CONTRACTS v1.0.1 scenario files, including cross references.
+"""Validate CONTRACTS v1.0.2 scenario files, including cross references.
 
 Run: python -m eval.validate [paths ...]
 Regenerate schema: python -m eval.validate --write-schema
@@ -13,7 +13,7 @@ import argparse
 import json
 import re
 from pathlib import Path
-from typing import Annotated, Literal
+from typing import Annotated, Literal, NotRequired, TypedDict
 
 from pydantic import (
     BaseModel,
@@ -61,9 +61,7 @@ FAULT_CLASSES = Literal[
     "KEY_WINDOW_EXPIRED",
 ]
 Offset = Annotated[str, Field(pattern=r"^\+[0-9]+[mhd]$")]
-UTCString = Annotated[
-    str, Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")
-]
+UTCString = Annotated[str, Field(pattern=r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$")]
 DecimalString = Annotated[str, Field(pattern=r"^[0-9]+\.[0-9]{2}$")]
 Nonnegative = Annotated[int, Field(ge=0)]
 Positive = Annotated[int, Field(ge=1)]
@@ -87,6 +85,7 @@ class Money(Doc):
 
 class Policy(Doc):
     maker_share_pct: Annotated[int, Field(ge=0, le=100)] = 90
+    deadline_close_seconds: Positive = 172800
     refund_limit_per_order: Money
     refund_limit_per_day: Money
 
@@ -112,9 +111,7 @@ class MockConfig(Doc):
     key_retention_days: Positive = 30
     unclaimed_counts_in_available: bool = False
     dispute_hold: bool = True
-    evidence_allowed_stages: list[str] = Field(
-        default_factory=lambda: ["INQUIRY", "CHARGEBACK"]
-    )
+    evidence_allowed_stages: list[str] = Field(default_factory=lambda: ["INQUIRY", "CHARGEBACK"])
     balance_refresh_seconds: Positive = 10800
     transactions_lag_seconds: Nonnegative = 10800
     webhook_delay_seconds: Nonnegative = 5
@@ -143,12 +140,8 @@ class PayPalSeed(Doc):
         for entry in self.captures + self.payout_items:
             value = entry.get("amount")
             value = value.get("value") if isinstance(value, dict) else value
-            if not isinstance(value, str) or not re.fullmatch(
-                r"[0-9]+\.[0-9]{2}", value
-            ):
-                raise ValueError(
-                    "PayPal seed amounts must be two-place decimal strings"
-                )
+            if not isinstance(value, str) or not re.fullmatch(r"[0-9]+\.[0-9]{2}", value):
+                raise ValueError("PayPal seed amounts must be two-place decimal strings")
         if any(not isinstance(entry.get("id"), str) for entry in self.captures):
             raise ValueError("Capture IDs are required")
         ids = [entry["id"] for entry in self.captures]
@@ -157,11 +150,18 @@ class PayPalSeed(Doc):
         return self
 
 
+class PriorPayout(TypedDict):
+    # Preserve the existing historical payload; only its order links are typed here.
+    __pydantic_config__ = ConfigDict(strict=True, extra="allow")
+    maker: str
+    order_keys: NotRequired[list[str]]
+
+
 class InitialState(Doc):
     policy: Policy
     makers: list[Maker]
     orders: list[Order]
-    prior_payouts: list[dict] = Field(default_factory=list)
+    prior_payouts: list[PriorPayout] = Field(default_factory=list)
     disputes: list[dict] = Field(default_factory=list)
     paypal: PayPalSeed
 
@@ -303,14 +303,7 @@ class BuyerMessage(Step):
 
 
 TimelineStep = Annotated[
-    Tick
-    | Advance
-    | FaultStep
-    | WebhookStep
-    | MockStep
-    | PlanRun
-    | Owner
-    | BuyerMessage,
+    Tick | Advance | FaultStep | WebhookStep | MockStep | PlanRun | Owner | BuyerMessage,
     Field(discriminator="do"),
 ]
 
@@ -375,6 +368,17 @@ class Scenario(Doc):
         for payout in self.initial_state.prior_payouts:
             if payout.get("maker") not in makers:
                 raise ValueError("Unknown prior payout maker")
+            linked = payout.get("order_keys", [])
+            if len(linked) != len(set(linked)):
+                raise ValueError("Duplicate prior payout order keys")
+            if set(linked) - orders:
+                raise ValueError("Unknown prior payout order")
+            if any(
+                order.maker != payout["maker"]
+                for order in self.initial_state.orders
+                if order.key in linked
+            ):
+                raise ValueError("Prior payout order belongs to another maker")
         for dispute in self.initial_state.disputes:
             if "order" in dispute and dispute["order"] not in orders:
                 raise ValueError("Unknown disputed order")
@@ -399,15 +403,10 @@ class Scenario(Doc):
             o.capture_id not in captures for o in self.initial_state.orders
         ):
             raise ValueError("Order capture is not seeded")
-        disputes = {
-            d.get("key", d.get("paypal_dispute_id"))
-            for d in self.initial_state.disputes
-        }
+        disputes = {d.get("key", d.get("paypal_dispute_id")) for d in self.initial_state.disputes}
         disputes |= {d.get("dispute_id") for d in self.initial_state.paypal.disputes}
         if any(
-            step.dispute not in disputes
-            for step in self.timeline
-            if isinstance(step, BuyerMessage)
+            step.dispute not in disputes for step in self.timeline if isinstance(step, BuyerMessage)
         ):
             raise ValueError("Unknown buyer-message dispute")
         return self
@@ -426,7 +425,7 @@ def main(argv=None):
     if args.write_schema:
         schema = Scenario.model_json_schema()
         schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
-        schema["title"] = "CounterSign scenario · CONTRACTS v1.0.1"
+        schema["title"] = "CounterSign scenario · CONTRACTS v1.0.2"
         (folder / "scenario.schema.json").write_text(
             json.dumps(schema, indent=2) + "\n", encoding="utf-8"
         )
