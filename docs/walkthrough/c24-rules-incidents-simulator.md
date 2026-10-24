@@ -96,3 +96,18 @@ This branch is not pushed or merged. Rebase onto main after C19b lands, preservi
 | `docs/DECISIONS.md`, this page and `docs/walkthrough/README.md` | Design reasons, usage and walkthrough index |
 
 The policy keys are `refund_limit_per_order`, `refund_limit_per_day` (both already named in CONTRACTS), and the new `deadline_close_seconds`. For example, trusted setup may choose `3600` for an hour; this is an example, not an installed default. Missing refund policies block; a missing deadline threshold requires owner attention.
+
+
+## Final verification on Oct 24
+
+- Full `python -m pytest -q --tb=short -rs`: **2,009 passed, 6 skipped, 0 failed**, with one existing Starlette/httpx deprecation warning; 281.91 seconds.
+- The six skips are one C09 recording/index test and five checks requiring the optional PayPal Agent Toolkit/LangChain installation. No dependencies were added to bypass those skips.
+- `ruff check .`: **0 issues**.
+- `lint-imports`: **3 contracts kept, 0 broken**; 84 files and 269 dependencies analyzed.
+- `git diff --check`: clean.
+
+The full run used a temporary PostgreSQL 16 container with memory-backed storage and default durability settings. All application calls used the local mock or stubbed HTTP. The earlier disk-backed run was superseded because repeated database-drop checkpoints were slow. No live PayPal or model call was made.
+
+At verification, main remains `0c16564`; C19b has not merged. No rebase has been attempted, so there are no encountered rebase conflicts. Likely overlap points after C19b lands are `approvals/service.py`, `harness.py`, `shield/snapshot.py`, the approval and agent integration fixtures, and `docs/DECISIONS.md`. Preserve C19b's request/hash construction, behavior wiring and executable-action set when rebasing, then rerun the combined suite.
+
+C19b fixtures for evidence must supply stored tracking references, a response deadline and an explicit `deadline_close_seconds` policy. Claim fixtures must also supply the refund limits. Actual evidence submission remains C19b's responsibility and needs the combined end-to-end check after the C19b-first merge. Aman needs no interface change.
