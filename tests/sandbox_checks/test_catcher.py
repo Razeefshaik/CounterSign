@@ -1,4 +1,5 @@
 import asyncio
+import dataclasses
 import json
 import time
 from datetime import UTC, datetime
@@ -194,6 +195,40 @@ def test_register_error_reports_paypal_error_name_only(tmp_path, settings):
             )
         )
     assert "fake detail" not in str(error.value)
+
+
+def test_update_patches_only_the_url_of_the_existing_webhook(tmp_path, settings):
+    seen = []
+    settings = dataclasses.replace(settings, webhook_id="WH-FAKE-OLD")
+    recorder = Recorder("D11", root=tmp_path, redactor=Redactor.from_settings(settings))
+    url = "https://new.tunnel.example/webhooks/paypal"
+    transport = stub_transport(200, {"id": "WH-FAKE-OLD", "url": url}, seen)
+
+    webhook_id = asyncio.run(
+        register_webhook.update_url(url, settings, recorder, transport=transport)
+    )
+
+    assert webhook_id == "WH-FAKE-OLD"
+    [request] = seen
+    assert request.method == "PATCH"
+    assert request.url.path == "/v1/notifications/webhooks/WH-FAKE-OLD"
+    assert json.loads(request.content) == [{"op": "replace", "path": "/url", "value": url}]
+
+
+def test_update_without_a_webhook_id_sends_nothing(tmp_path, settings):
+    seen = []
+    recorder = Recorder("D11", root=tmp_path, redactor=Redactor.from_settings(settings))
+
+    with pytest.raises(RuntimeError, match="PAYPAL_WEBHOOK_ID"):
+        asyncio.run(
+            register_webhook.update_url(
+                "https://new.tunnel.example/webhooks/paypal",
+                settings,
+                recorder,
+                transport=stub_transport(200, {}, seen),
+            )
+        )
+    assert seen == []
 
 
 def test_dry_run_prints_body_without_loading_settings(monkeypatch, capsys):
