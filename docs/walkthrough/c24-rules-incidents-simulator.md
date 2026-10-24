@@ -89,6 +89,7 @@ This branch is not pushed or merged. Rebase onto main after C19b lands, preservi
 | `src/countersign/simulator/{__init__,service}.py` | Read-only integer cash comparisons |
 | `src/countersign/harness.py` | Lifecycle and simulator dependency wiring only |
 | `tests/unit/shield/{test_c24_rules,test_shield_engine}.py` | New rule cases and updated registry expectations |
+| `tests/unit/agent/test_injection_guard.py` | Keep injection assertions while supplying the added authoritative-fact query and fields |
 | `tests/integration/{test_c24,test_c24_simulator}.py` | Database/mock checks for facts, cash simulation, commander verdicts and incident closure |
 | `tests/integration/test_agent_harness.py` | Reuse discovered incidents and supply explicit policy in approval fixtures |
 | `tests/integration/approvals/test_approvals.py` | Supply the linked order, deadline, link and policy required by claim approval |

@@ -51,7 +51,12 @@ async def test_original_injected_refund_has_distinct_payee_and_injection_blocks(
     )
     result = evaluate(shield_proposal, snap())
     assert result.verdict is Verdict.BLOCK
-    assert result.rules == (RuleName.PAYEE_INTEGRITY, RuleName.INJECTION_GUARD)
+    assert result.rules == (
+        RuleName.PAYEE_INTEGRITY,
+        RuleName.REFUND_POLICY,  # missing authoritative dispute facts fail closed
+        RuleName.DEADLINE_GUARD,
+        RuleName.INJECTION_GUARD,
+    )
     assert result.outcome_of(RuleName.APPROVAL_BINDING) is Outcome.NEEDS_OWNER
 
 
@@ -79,6 +84,13 @@ async def test_reloaded_approval_context_preserves_injection_flags_for_execution
                     "currency": "USD",
                     "amount_refunded_minor": None,
                     "version": 1,
+                    "status": "WAITING_FOR_SELLER_RESPONSE",
+                    "amount_minor": 6000,
+                    "amount_refunded_minor": None,
+                    "currency": "USD",
+                    "seller_response_due_date": None,
+                    "links": [],
+                    "raw": {},
                 }
             ]
         return []
@@ -90,7 +102,11 @@ async def test_reloaded_approval_context_preserves_injection_flags_for_execution
     class Connection:
         async def execute(self, query, params=None):
             assert str(query).startswith(
-                ("SELECT * FROM payout_line_obligations", "SELECT p.amount_minor")
+                (
+                    "SELECT * FROM payout_line_obligations",
+                    "SELECT p.amount_minor",
+                    "SELECT key,value FROM policies",
+                )
             )
             return Cursor()
 
