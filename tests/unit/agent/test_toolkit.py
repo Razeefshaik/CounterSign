@@ -5,12 +5,15 @@ import contextlib
 import importlib.metadata
 import io
 import json
+import os
 import socket
 import sys
+import threading
 import types
 
 import pytest
 
+from countersign.agent import toolkit as gateway_module
 from countersign.agent import toolkit_child as child
 from countersign.agent.toolkit import MAX_MESSAGE_BYTES, ToolkitGateway, child_environment
 from countersign.agent.tools import TOOLKIT_TOOLS, ToolError
@@ -420,3 +423,178 @@ def test_optional_installed_toolkit_lists_exactly_five_without_network(monkeypat
     monkeypatch.setattr(requests.sessions.Session, "request", original)
     runtime = child.Runtime(SETTINGS)
     assert {item["name"] for item in runtime.listing()} == TOOLKIT_TOOLS
+
+
+@pytest.fixture
+def local_child(tmp_path):
+    """Tiny protocol peer: no SDK, network, credentials or environment-file reads."""
+    path = tmp_path / "read_tool_peer.py"
+    path.write_text(
+        '''import json, sys, time
+names = ["list_disputes", "get_dispute", "get_shipment_tracking", "get_order_details", "list_transactions"]
+definitions = [{"name": name, "description": "local read", "schema": {"type": "object", "properties": {}}} for name in names]
+source, destination = sys.stdin.buffer, sys.stdout.buffer
+json.loads(source.readline())
+destination.write(json.dumps({"ok": True, "tools": definitions}).encode() + b"\\n")
+destination.flush()
+if sys.argv[1] == "blocked_input":
+    time.sleep(60)
+for line in source:
+    message = json.loads(line)
+    mode = message["arguments"].get("mode", "echo")
+    if mode == "hang":
+        time.sleep(60)
+    elif mode == "oversize":
+        destination.write(b"x" * 1048576)
+        destination.flush()
+        time.sleep(60)
+    elif mode == "stderr_flood":
+        sys.stderr.write("diagnostic" * 131072)
+        sys.stderr.flush()
+    destination.write(json.dumps({"ok": True, "output": {"mode": mode}}).encode() + b"\\n")
+    destination.flush()
+''',
+        encoding="utf-8",
+    )
+    return path
+
+
+def local_gateway(path, processes, *, mode="normal"):
+    async def spawn(*argv, **options):
+        process = await gateway_module._create_subprocess(*argv[:-1], str(path), mode, **options)
+        processes.append(process)
+        return process
+
+    return ToolkitGateway(PayPalSettings(**SETTINGS), process_factory=spawn, timeout=5)
+
+
+def run_selector(coroutine):
+    with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:
+        return runner.run(asyncio.wait_for(coroutine, timeout=8))
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows SelectorEventLoop subprocess compatibility")
+def test_actual_child_works_on_selector_loop_and_stderr_cannot_fill_a_pipe(local_child):
+    processes = []
+
+    async def scenario():
+        async with local_gateway(local_child, processes) as instance:
+            read = next(tool for tool in instance.read_tools() if tool.name == "get_dispute")
+            assert await read.handler({"mode": "echo"}) == {"mode": "echo"}
+            assert await read.handler({"mode": "stderr_flood"}) == {"mode": "stderr_flood"}
+        assert processes[0].returncode == 0
+        assert processes[0]._process.stdin.closed
+        assert processes[0].stdout._stream.closed
+
+    run_selector(scenario())
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows SelectorEventLoop subprocess compatibility")
+def test_actual_child_oversized_line_without_newline_is_bounded_and_killed(local_child):
+    processes = []
+
+    async def scenario():
+        instance = local_gateway(local_child, processes)
+        await instance.open()
+        read = next(tool for tool in instance.read_tools() if tool.name == "get_dispute")
+        with pytest.raises(ToolError, match="^TOOLKIT_MESSAGE_INVALID$"):
+            await read.handler({"mode": "oversize"})
+        assert processes[0].returncode is not None
+        assert processes[0]._process.stdin.closed
+        assert processes[0].stdout._stream.closed
+
+    run_selector(scenario())
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows SelectorEventLoop subprocess compatibility")
+@pytest.mark.parametrize("cancel", [False, True], ids=["timeout", "cancelled"])
+def test_actual_child_interrupted_read_is_reaped_and_gateway_stays_closed(local_child, cancel):
+    processes = []
+
+    async def scenario():
+        instance = local_gateway(local_child, processes)
+        await instance.open()
+        instance._timeout = 0.1 if not cancel else 5
+        read = next(tool for tool in instance.read_tools() if tool.name == "get_dispute")
+        pending = asyncio.create_task(read.handler({"mode": "hang"}))
+        if cancel:
+            await asyncio.sleep(0.05)
+            pending.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await pending
+        else:
+            with pytest.raises(ToolError, match="^TOOLKIT_CALL_FAILED$"):
+                await pending
+        assert processes[0].returncode is not None
+        assert processes[0]._process.stdin.closed
+        assert processes[0].stdout._stream.closed
+        with pytest.raises(ToolError, match="^TOOLKIT_CLOSED$"):
+            await read.handler({"mode": "echo"})
+
+    run_selector(scenario())
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows SelectorEventLoop subprocess compatibility")
+def test_actual_child_blocked_stdin_times_out_without_blocking_event_loop(local_child):
+    processes = []
+
+    async def scenario():
+        instance = local_gateway(local_child, processes, mode="blocked_input")
+        await instance.open()
+        instance._timeout = 0.1
+        read = next(tool for tool in instance.read_tools() if tool.name == "get_dispute")
+        advanced = asyncio.Event()
+
+        async def heartbeat():
+            await asyncio.sleep(0.02)
+            advanced.set()
+
+        pulse = asyncio.create_task(heartbeat())
+        with pytest.raises(ToolError, match="^TOOLKIT_CALL_FAILED$"):
+            await read.handler({"data": "x" * 200000})
+        await pulse
+        assert advanced.is_set()
+        assert processes[0].returncode is not None
+        assert processes[0]._process.stdin.closed
+        assert processes[0].stdout._stream.closed
+
+    run_selector(scenario())
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Windows SelectorEventLoop subprocess compatibility")
+def test_cancel_during_actual_process_creation_reaps_child_even_before_gateway_has_handle(
+    local_child, monkeypatch
+):
+    original = gateway_module.subprocess.Popen
+    created, release = threading.Event(), threading.Event()
+    processes = []
+
+    def delayed_launch(*args, **kwargs):
+        process = original(*args, **kwargs)
+        processes.append(process)
+        created.set()
+        release.wait(timeout=5)
+        return process
+
+    monkeypatch.setattr(gateway_module.subprocess, "Popen", delayed_launch)
+
+    async def scenario():
+        pending = asyncio.create_task(
+            gateway_module._create_subprocess(
+                sys.executable, "-I", str(local_child), "normal",
+                stdin=asyncio.subprocess.PIPE, stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.DEVNULL, env=child_environment(),
+                limit=MAX_MESSAGE_BYTES + 1,
+            )
+        )
+        try:
+            assert await asyncio.to_thread(created.wait, 3)
+            pending.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await pending
+        finally:
+            release.set()
+        while processes[0].poll() is None or not processes[0].stdin.closed or not processes[0].stdout.closed:
+            await asyncio.sleep(0.01)
+
+    run_selector(scenario())

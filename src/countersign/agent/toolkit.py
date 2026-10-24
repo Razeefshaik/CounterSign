@@ -2,10 +2,13 @@
 
 import asyncio
 import contextlib
+import io
 import json
 import math
 import os
+import subprocess
 import sys
+import threading
 from pathlib import Path
 
 from countersign.agent.safety import sanitize
@@ -34,6 +37,136 @@ def child_environment(environment=None) -> dict[str, str]:
     return {key: value for key, value in source.items() if key.upper() in _OS_ENVIRONMENT}
 
 
+class _ThreadWriter:
+    """Match asyncio's writer surface without writing a pipe on the event loop."""
+
+    def __init__(self, stream, limit):
+        self._stream = stream
+        self._limit = limit
+        self._pending = bytearray()
+
+    def write(self, data):
+        if self._stream.closed:
+            raise BrokenPipeError
+        if len(self._pending) + len(data) > self._limit:
+            raise ToolError("TOOLKIT_MESSAGE_INVALID")
+        self._pending.extend(data)
+
+    async def drain(self):
+        data = bytes(self._pending)
+        self._pending.clear()
+
+        def write():
+            remaining = memoryview(data)
+            while remaining:
+                written = self._stream.write(remaining)
+                if not written:
+                    raise BrokenPipeError
+                remaining = remaining[written:]
+            self._stream.flush()
+
+        await asyncio.to_thread(write)
+
+    def close(self):
+        self._pending.clear()
+        # stdin is unbuffered. Normal shutdown holds the gateway lock after its
+        # last drain; a failed exchange kills the child before closing this pipe.
+        self._stream.close()
+
+
+class _ThreadReader:
+    def __init__(self, stream, limit):
+        self._stream = stream
+        self._limit = limit
+
+    async def readline(self):
+        # A missing newline cannot grow memory or wait for arbitrary output.
+        return await asyncio.to_thread(self._stream.readline, self._limit)
+
+
+class _ThreadProcess:
+    """Popen adapter for psycopg's Windows SelectorEventLoop.
+
+    Windows selector loops cannot create asyncio subprocess transports. The
+    persistent IPC stays unchanged, but blocking pipe and wait calls run in
+    threads. Killing the child unblocks those calls after a cancelled exchange.
+    """
+
+    def __init__(self, process, limit):
+        self._process = process
+        self.stdin = _ThreadWriter(process.stdin, limit)
+        self.stdout = _ThreadReader(io.BufferedReader(process.stdout), limit)
+        self._wait_task = None
+
+    @property
+    def returncode(self):
+        return self._process.poll()
+
+    def kill(self):
+        self._process.kill()
+
+    async def wait(self):
+        if self._wait_task is None:
+            def wait_and_close():
+                try:
+                    return self._process.wait()
+                finally:
+                    # A reader may still be unwinding after cancellation. Close
+                    # its pipe in this thread, never while holding the loop.
+                    for stream in (self._process.stdin, self.stdout._stream):
+                        with contextlib.suppress(OSError):
+                            stream.close()
+
+            self._wait_task = asyncio.create_task(asyncio.to_thread(wait_and_close))
+        # A gateway timeout can cancel wait() before kill() and another wait().
+        # Retain one reaper instead of accumulating blocked pool threads.
+        return await asyncio.shield(self._wait_task)
+
+
+async def _create_subprocess(*argv, **options):
+    if os.name != "nt":
+        return await asyncio.create_subprocess_exec(*argv, **options)
+    limit = options.pop("limit", MAX_MESSAGE_BYTES + 1)
+    # Popen does not understand asyncio's stream limit. Use unbuffered stdin so
+    # an event-loop close cannot wait for a background writer's buffer lock.
+    state = {"cancelled": False, "process": None}
+    state_lock = threading.Lock()
+
+    def launch():
+        process = subprocess.Popen(
+            argv, **options, bufsize=0, creationflags=subprocess.CREATE_NO_WINDOW, shell=False
+        )
+        with state_lock:
+            state["process"] = process
+            cancelled = state["cancelled"]
+        if cancelled:
+            # The async caller may already be gone. This worker still owns the
+            # newly created process and reaps it even during loop shutdown.
+            with contextlib.suppress(OSError):
+                process.kill()
+            process.wait()
+            for stream in (process.stdin, process.stdout):
+                with contextlib.suppress(OSError):
+                    stream.close()
+        return process
+
+    try:
+        process = await asyncio.to_thread(launch)
+    except asyncio.CancelledError:
+        # Cancellation during process creation must not abandon a newly started
+        # child whose handle has not yet been handed to the gateway.
+        with state_lock:
+            state["cancelled"] = True
+            process = state["process"]
+        if process is not None:
+            adapter = _ThreadProcess(process, limit)
+            with contextlib.suppress(OSError):
+                adapter.kill()
+            await adapter.wait()
+        raise
+    return _ThreadProcess(process, limit)
+
+
 class ToolkitGateway:
     """One child, serialized bounded requests, and no automatic call retries.
 
@@ -56,7 +189,7 @@ class ToolkitGateway:
         self._settings = settings
         self._python = str(python_executable or sys.executable)
         self._timeout = timeout
-        self._spawn = process_factory or asyncio.create_subprocess_exec
+        self._spawn = process_factory or _create_subprocess
         self._process = None
         self._definitions = ()
         self._lock = asyncio.Lock()
