@@ -108,7 +108,7 @@ async def owner_document(database: Database, resource: str, row_id: UUID) -> dic
 
 def build_router(database: Database, settings: Settings) -> APIRouter:
     router = APIRouter(route_class=OwnerRoute, dependencies=[Depends(owner_guard(settings))])
-    service = ApprovalService(database)
+    service = ApprovalService(database, behavior=settings.paypal.behavior)
 
     @router.post("/proposals/{id}/approve", status_code=201)
     async def approve(id: UUID, body: ApproveBody):

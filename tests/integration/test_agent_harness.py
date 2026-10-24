@@ -17,7 +17,7 @@ from countersign.agent.tools import ALLOWED_TOOLS, ReadTool, ToolRegistry
 from countersign.db import Repositories
 from countersign.harness import Engine
 from countersign.paypal.http import canonical_payload_hash
-from countersign.shield.snapshot import PAYING
+from countersign.shield.snapshot import EXECUTABLE
 from countersign.worker import execute_pending
 
 pytestmark = pytest.mark.integration
@@ -212,7 +212,7 @@ async def test_normal_financial_proposal_waits_for_an_exact_unused_owner_approva
 
         binding = pending["approval_request"]
         assert binding["payload_hash"] == canonical_payload_hash(
-            {"action": "ACCEPT_CLAIM", "params": params}
+            saved["verdict_details"]["operation_payload"]
         )
         assert saved["raw_output"]["approval_request"] == binding
         assert saved["verdict_details"]["approval_request"] == binding
@@ -374,7 +374,7 @@ async def test_deferred_actions_do_not_starve_supported_work_or_change_approvals
     async with world.database.tx() as conn:
         repos = Repositories(conn)
         deferred = []
-        for action, state in (("RESERVE_EARNINGS", "ALLOWED"), ("ACCEPT_CLAIM", "APPROVED")):
+        for action, state in (("RESERVE_EARNINGS", "ALLOWED"), ("DEFER_SCHEDULED_PAYOUT", "APPROVED")):
             deferred.append(await repos.proposals.insert(
                 action=action, params={}, evidence_refs=[], model="fixture", raw_output={}, state=state,
                 created_at=world.settings.clock() - timedelta(days=1),
@@ -402,7 +402,7 @@ async def test_deferred_actions_do_not_starve_supported_work_or_change_approvals
         result = await execute_pending(world.database, executor, limit=1)
         assert result == {"proposals": 1, "operations": 0, "errors": 0}
     assert called == [supported["id"], supported["id"]]
-    assert supported["action"] in PAYING
+    assert supported["action"] in EXECUTABLE
     async with world.database.tx() as conn:
         repos = Repositories(conn)
         for before in deferred:
@@ -417,7 +417,7 @@ async def test_deferred_actions_do_not_starve_supported_work_or_change_approvals
     assert len(audits) == len(deferred)
     # A later executor capability set makes the exact same proposal/approval
     # executable. Deferral itself never requires rewriting either record.
-    monkeypatch.setattr(worker, "PAYING", PAYING | {row["action"] for row in deferred})
+    monkeypatch.setattr(worker, "EXECUTABLE", EXECUTABLE | {row["action"] for row in deferred})
     result = await execute_pending(world.database, executor, limit=3)
     assert result == {"proposals": 3, "operations": 0, "errors": 0}
     assert set(called[-3:]) == {supported["id"], *(row["id"] for row in deferred)}

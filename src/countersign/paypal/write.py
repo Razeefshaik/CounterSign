@@ -8,6 +8,7 @@ database commit: that is the executor's write-ahead responsibility.
 import hashlib
 import hmac
 import json
+import re
 from collections.abc import Mapping
 from urllib.parse import urlsplit
 from uuid import UUID
@@ -71,16 +72,18 @@ class PayPalWrite:
     def _original_batch_link(self, body):
         if not isinstance(body, Mapping):
             return None
-        links = body.get("links", [])
-        if not isinstance(links, list):
-            return None
+        links = list(body["links"]) if isinstance(body.get("links"), list) else []
+        for detail in body.get("details", []) if isinstance(body.get("details"), list) else []:
+            if isinstance(detail, Mapping) and isinstance(detail.get("link"), list):
+                links.extend(detail["link"])
         for link in links:
-            if not isinstance(link, Mapping) or link.get("rel") not in {
+            if (not isinstance(link, Mapping) or link.get("method", "GET") != "GET"
+                    or link.get("rel") not in {
                 "original_batch",
                 "original-batch",
                 "original",
                 "self",
-            }:
+            }):
                 continue
             href = link.get("href")
             try:
@@ -88,17 +91,16 @@ class PayPalWrite:
             except UnsafePayPalURL:
                 continue
             # Only a batch-resource GET is reconciliation evidence, never an action URL.
-            path = urlsplit(validated).path
-            prefix = "/v1/payments/payouts/"
+            parsed = urlsplit(validated)
+            path = parsed.path
             if (
-                path.startswith(prefix)
-                and "/" not in path[len(prefix) :]
-                and path[len(prefix) :]
+                re.fullmatch(r"/v1/payments/payouts/[A-Za-z0-9_-]+", path)
+                and not parsed.query
                 and self.http.redactor.text(validated) == validated
             ):
                 # Original-batch identity is the path. Do not carry arbitrary query data
                 # from a server response into logs or a subsequent authenticated GET.
-                return validated.partition("?")[0]
+                return validated
         return None
 
     async def _write(self, operation, kind, path, *, body_format="json", replay_unknown=False):
@@ -110,6 +112,10 @@ class PayPalWrite:
         kwargs = {"json": body}
         if body_format == "multipart":
             kwargs = {"files": {"input": (None, canonical_payload(body), "application/json")}}
+        elif body_format == "none":
+            kwargs = {}
+        elif body_format != "json":
+            raise InvalidOperation("Unsupported persisted body format")
         try:
             response = await self.http.request("POST", path, request_id=request_id, **kwargs)
         except (PayPalTransportError, PayPalAuthError) as exc:
@@ -120,6 +126,14 @@ class PayPalWrite:
                 return Ambiguous("Malformed successful response", response, request_id)
             return Ok(response)
         names = _names(response.body)
+        # A recognized duplicate remains uncertain even if its URL is unusable.
+        # Refusing a hostile link must not turn an existing payment into REJECTED.
+        details = response.body.get("details", []) if isinstance(response.body, Mapping) else []
+        duplicate = isinstance(details, list) and any(
+            isinstance(detail, Mapping) and detail.get("field") == "SENDER_BATCH_ID"
+            and detail.get("issue") == "Batch with given sender_batch_id already exists"
+            for detail in details
+        )
         original = self._original_batch_link(response.body)
         behavior = self.http.settings.behavior
         if (
@@ -127,6 +141,7 @@ class PayPalWrite:
             or response.status_code >= 500
             or not 400 <= response.status_code < 500
             or names & behavior.ambiguous_error_names
+            or ("USER_BUSINESS_ERROR" in names and duplicate)
             or (
                 behavior.reconcile_original_batch_links
                 and original
@@ -162,11 +177,12 @@ class PayPalWrite:
 
     async def cancel_item(self, operation: Mapping, *, replay_unknown=False):
         payload, _ = _persisted(operation, "PAYOUT_CANCEL")
-        target = resource_id(payload.get("payout_item_id"))
+        target = resource_id(payload.get("paypal_item_id", payload.get("payout_item_id")))
         return await self._write(
             operation,
             "PAYOUT_CANCEL",
             f"/v1/payments/payouts-item/{target}/cancel",
+            body_format="none",
             replay_unknown=replay_unknown,
         )
 
@@ -177,7 +193,7 @@ class PayPalWrite:
             operation,
             "DISPUTE_EVIDENCE",
             f"/v1/customer/disputes/{target}/provide-evidence",
-            body_format=self.http.settings.behavior.evidence_format,
+            body_format=payload.get("body_format", self.http.settings.behavior.evidence_format),
             replay_unknown=replay_unknown,
         )
 
@@ -188,6 +204,6 @@ class PayPalWrite:
             operation,
             "DISPUTE_ACCEPT_CLAIM",
             f"/v1/customer/disputes/{target}/accept-claim",
-            body_format=self.http.settings.behavior.accept_claim_format,
+            body_format=payload.get("body_format", self.http.settings.behavior.accept_claim_format),
             replay_unknown=replay_unknown,
         )

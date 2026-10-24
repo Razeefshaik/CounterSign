@@ -6,9 +6,10 @@
 2. Call PayPal outside any transaction, once per operation, never retried automatically.
 3. Transaction B per operation: SUBMITTED, REJECTED or UNKNOWN, plus the ledger journal.
 
-UNKNOWN is resolved only by an identical replay inside UNKNOWN_REPLAY_WINDOW, or by a
+Payout-create UNKNOWN uses an identical replay inside UNKNOWN_REPLAY_WINDOW, or a
 duplicate-key answer whose original batch GETs to the same payee, amount and keys. Past the
 window the owner gets an incident of its own (DECISIONS, C17 handoff); nothing is resent.
+Cancel, evidence and accept-claim uncertainty is resolved through GET only, never POST replay.
 """
 
 import dataclasses
@@ -37,8 +38,10 @@ from countersign.paypal.write import PayPalWrite
 from countersign.shield import snapshot as model
 from countersign.shield.engine import Verdict, evaluate
 
+from .actions import Actions
+
 LOCK = "countersign:owner-decisions"  # shared with C18, so no owner decision interleaves
-EXECUTABLE = ("ALLOWED", "APPROVED")
+READY = ("ALLOWED", "APPROVED")
 OPEN = ("PENDING", "IN_FLIGHT", "UNKNOWN")
 
 
@@ -60,7 +63,7 @@ def _money(row) -> Money:
     return Money(row["amount_minor"], row["currency"].strip())
 
 
-class Executor:
+class Executor(Actions):
     def __init__(
         self,
         database: Database,
@@ -82,7 +85,7 @@ class Executor:
     # -- execution ---------------------------------------------------------------------
 
     async def execute(self, proposal_id: UUID) -> dict:
-        """Run one ALLOWED or APPROVED paying proposal; a second caller finds it taken."""
+        """Run one ready PayPal-write proposal; a second caller finds it taken."""
         for operation in await self._prepare(proposal_id):
             await self._record(operation["id"], await self._call(operation))
         return await self.status(proposal_id)
@@ -98,20 +101,21 @@ class Executor:
         }
 
     async def _prepare(self, proposal_id: UUID) -> list[dict]:
+        if await self._defer_unconfigured(proposal_id):
+            return []
         async with self.database.tx() as conn:
             await serialize_on(conn, LOCK)
             repos = Repositories(conn)
             row = await repos.proposals.get(proposal_id, for_update=True)
             if row is None:
                 raise ExecutorError("PROPOSAL_NOT_FOUND")
-            if row["state"] not in EXECUTABLE:
+            if row["state"] not in READY:
                 return []  # already taken by another executor, or never executable
             try:
                 action = model.Action(row["action"])
             except ValueError:
                 raise ExecutorError("UNSUPPORTED_ACTION") from None
-            if action not in model.PAYING:
-                # Cancel, evidence and accept-claim follow in their own card.
+            if action not in model.EXECUTABLE:
                 raise ExecutorError("UNSUPPORTED_ACTION")
             await cas_transition(
                 conn,
@@ -129,31 +133,46 @@ class Executor:
             approvals = await cursor.fetchall()
             now = self.clock()
             try:
-                proposal, snap, payload = await load_context(conn, row, now=now)
+                proposal, snap, payload = await load_context(
+                    conn, row, now=now, behavior=self.writer.http.settings.behavior)
             except ApprovalError as exc:
                 await self._block(conn, row, [], [f"context: {exc.code}"])
                 return []
             kind = model.OPERATION_KIND[action]
             approval = approvals[0] if len(approvals) == 1 else None
+            requests = payload["payouts"] if action in model.PAYING else [payload["request"]]
+            if action not in model.PAYING:
+                target = UUID(payload["request"]["target_id"])
+                conflicts = [o for o in snap.operations if o.target_id == str(target)
+                             and o.state in {"PENDING", "IN_FLIGHT"}]
+                if conflicts:
+                    await self._block(conn, row, [], ["target already has a write in flight"])
+                    return []
             operations = [
                 await repos.operations.insert(
                     kind=kind,
-                    target_type="payout_line",
-                    target_id=UUID(body["line_id"]),
+                    target_type="payout_line" if action in model.PAYING else body["target_type"],
+                    target_id=UUID(body["line_id"] if action in model.PAYING else body["target_id"]),
                     payload=body,
                     payload_hash=_hash_bytes(body),
                     proposal_id=proposal_id,
                     approval_id=approval["id"] if approval else None,
                     state="PENDING",
                 )
-                for body in payload["payouts"]
+                for body in requests
             ]
             if not operations:
                 await self._block(conn, row, [], ["no payout to send"])
                 return []
             # The rows as stored must rebuild the approved payload byte for byte: that is
             # what WRITE_AHEAD and APPROVAL_BINDING then compare (DECISIONS, C19).
-            stored = {**payload, "payouts": [o["payload"] for o in operations]}
+            stored = ({**payload, "payouts": [o["payload"] for o in operations]}
+                      if action in model.PAYING else {**payload, "request": operations[0]["payload"]})
+            previous = (row.get("verdict_details") or {}).get("operation_payload", {})
+            if (action not in model.PAYING and "request" in previous
+                    and canonical_payload_hash(previous) != canonical_payload_hash(stored)):
+                await self._block(conn, row, operations, ["request changed since proposal"])
+                return []
             states = {o["state"] for o in operations}
             decision = evaluate(
                 proposal,
@@ -201,6 +220,9 @@ class Executor:
                 if await cursor.fetchone() is None:
                     raise ExecutorError("APPROVAL_ALREADY_USED")  # rolls everything back
             run_id = row["params"].get("run_id")
+            if action not in model.PAYING:
+                await self._prepare_action(conn, operations[0], now)
+                return [await repos.operations.get(operations[0]["id"])]
             if action is model.Action.SCHEDULE_PAYOUT_RUN:
                 run = await repos.payout_runs.get(UUID(run_id), for_update=True)
                 if run is None or run["state"] != "APPROVED":
@@ -360,11 +382,21 @@ class Executor:
 
     async def _call(self, operation, *, replay=False):
         try:
-            return await self.writer.create_payout_single_item(operation, replay_unknown=replay)
+            method = {
+                "PAYOUT_CREATE": self.writer.create_payout_single_item,
+                "PAYOUT_CANCEL": self.writer.cancel_item,
+                "DISPUTE_EVIDENCE": self.writer.provide_evidence,
+                "DISPUTE_ACCEPT_CLAIM": self.writer.accept_claim,
+            }[operation["kind"]]
+            return await method(operation, replay_unknown=replay)
         except Exception as exc:  # noqa: BLE001 - unsure whether it was sent: fail closed
             return Ambiguous(type(exc).__name__)
 
     async def _record(self, operation_id: UUID, result) -> str:
+        async with self.database.tx() as conn:
+            operation = await Repositories(conn).operations.get(operation_id)
+        if operation["kind"] != "PAYOUT_CREATE":
+            return await self._record_action(operation, result)
         async with self.database.tx() as conn:
             repos = Repositories(conn)
             operation = await repos.operations.get(operation_id, for_update=True)
@@ -486,7 +518,7 @@ class Executor:
         recovered = await self.recover_stale()
         async with self.database.tx() as conn:
             cursor = await conn.execute(
-                "SELECT id FROM operations WHERE state='UNKNOWN' AND kind='PAYOUT_CREATE' "
+                "SELECT id FROM operations WHERE state='UNKNOWN' "
                 "ORDER BY id"
             )
             unknown = [r["id"] for r in await cursor.fetchall()]
@@ -498,15 +530,16 @@ class Executor:
         cutoff = self.clock() - self.stale_after
         async with self.database.tx() as conn:
             cursor = await conn.execute(
-                "SELECT * FROM operations WHERE state='IN_FLIGHT' AND kind='PAYOUT_CREATE' "
+                "SELECT * FROM operations WHERE state='IN_FLIGHT' "
                 "AND submitted_at < %s ORDER BY id FOR UPDATE SKIP LOCKED",
                 (cutoff,),
             )
             stale = await cursor.fetchall()
             repos = Repositories(conn)
             for operation in stale:
-                [attempt] = await repos.payout_attempts.find({"operation_id": operation["id"]})
-                await self._move(conn, ATTEMPT, "payout_attempts", attempt, "AMBIGUOUS")
+                if operation["kind"] == "PAYOUT_CREATE":
+                    [attempt] = await repos.payout_attempts.find({"operation_id": operation["id"]})
+                    await self._move(conn, ATTEMPT, "payout_attempts", attempt, "AMBIGUOUS")
                 await self._move(conn, OPERATION, "operations", operation, "AMBIGUOUS")
                 await repos.operations.update(
                     operation["id"], error="no recorded answer before the stale cutoff"
@@ -521,6 +554,10 @@ class Executor:
             return len(stale)
 
     async def resolve_unknown(self, operation_id: UUID) -> str:
+        async with self.database.tx() as conn:
+            operation = await Repositories(conn).operations.get(operation_id)
+        if operation and operation["kind"] != "PAYOUT_CREATE":
+            return await self._resolve_action(operation)
         async with self.database.tx() as conn:
             repos = Repositories(conn)
             operation = await repos.operations.get(operation_id, for_update=True)
