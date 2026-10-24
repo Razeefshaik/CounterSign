@@ -52,6 +52,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | 23 | [c14-webhook-inbox.md](c14-webhook-inbox.md) | **Webhook inbox**: every PayPal message saved once with its exact bytes; acted on only after PayPal confirms the signature, and a dispute reserves money only after a GET confirms it | Codex | `022b199` |
 | 24 | [c19-executor.md](c19-executor.md) | **The executor**: the only code that sends money; saves before sending, re-checks every rule, uses each approval once, and settles unclear answers only by repeating the identical request | Claude | `de708b1` |
 | 25 | [c15-reconciliation.md](c15-reconciliation.md) | **Reconciliation poller**: regularly asks PayPal for the truth about every payout, dispute and balance, corrects our records, and opens an incident when something moves unexpectedly | Codex | `37747c9`, `13c93d8` |
+| 26 | [c20-engine-facade.md](c20-engine-facade.md) | **Engine facade**: the one stable door the evaluation, the demo bar and Aman's code use; it can wipe only a database named `_test` or `_eval`, and the worker now runs the poller and the unknown-payout sweep | Codex | `3872557`, `18613fb` |
 
 ## Words used everywhere
 
