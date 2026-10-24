@@ -6,7 +6,7 @@ from pathlib import Path
 import psycopg
 import pytest
 from hardening_world import TABLES, seed, state, update
-from hypothesis import HealthCheck, given, settings
+from hypothesis import HealthCheck, example, given, settings
 from hypothesis import strategies as st
 from psycopg import sql
 
@@ -60,6 +60,12 @@ def test_installed_rows_and_trigger_attachments_match_generated_fsm(db_schema):
     max_examples=120, deadline=None, suppress_health_check=[HealthCheck.function_scoped_fixture]
 )
 @given(move=st.sampled_from(ILLEGAL))
+@example(move=("obligation", "OPEN", "SETTLED"))
+@example(move=("line", "APPROVED", "PAID"))
+@example(move=("attempt", "PREPARED", "SUCCESS"))
+@example(move=("operation", "PENDING", "SUCCEEDED"))
+@example(move=("proposal", "CREATED", "EXECUTED"))
+@example(move=("incident", "OPEN", "RESOLVED"))
 def test_illegal_raw_sql_state_moves_are_rejected_without_changing_rows(db_schema, move):
     entity, source, target = move
     with db_schema.connect() as conn, conn.transaction(force_rollback=True):
