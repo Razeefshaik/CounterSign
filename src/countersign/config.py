@@ -55,6 +55,7 @@ class PayPalBehavior:
         {
             "DUPLICATE_SENDER_BATCH_ID",
             "DUPLICATE_BATCH_ID",
+            "DUPLICATE_REQUEST_ID",
             "PREVIOUS_REQUEST_IN_PROGRESS",
             "REQUEST_TIMEOUT_EXCEEDED",
             "INTERNAL_ERROR",
