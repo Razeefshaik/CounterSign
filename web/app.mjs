@@ -1,10 +1,15 @@
 import {filterIncidents, summary, money, label, isStaged, modeLabel, loadWorkspace} from "./data.mjs";
+import {createWorkspaceViews} from "./workspace.mjs";
 const $ = id => document.getElementById(id);
+const views = createWorkspaceViews(document, window.location);
+window.addEventListener("hashchange", () => views.render());
 let workspace, api;
 function badge(text, kind = "") {
   const span = document.createElement("span"); span.className = "badge " + kind; span.textContent = text; return span;
 }
 function inspect(row) {
+  $("open-decision").hidden = !row.latest_proposal;
+  $("open-decision").href = row.latest_proposal ? "#decision/" + row.latest_proposal.id : "#decision";
   $("detail-title").textContent = row.title;
   $("detail-text").textContent = row.latest_proposal ? label(row.latest_proposal.action) + " · " + label(row.latest_proposal.state) + ". Payments and refunds require owner approval." : "Investigation is in progress.";
   const verdict = $("detail-verdict"); verdict.hidden = !row.latest_proposal;
@@ -18,7 +23,7 @@ function update() {
   $("result-count").textContent = rows.length;
   $("table-note").textContent = rows.length + " of " + workspace.incidents.length + " incidents";
   if (rows.length) inspect(rows[0]);
-  else {$("detail-title").textContent = "No incidents match these filters"; $("detail-text").textContent = "Clear a filter or try another search."; $("detail-verdict").hidden = true;}
+  else {$("detail-title").textContent = "No incidents match these filters"; $("detail-text").textContent = "Clear a filter or try another search."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
 }
 function setupGrid() {
   api = agGrid.createGrid($("grid"), {
@@ -59,6 +64,7 @@ async function refresh() {
     $("nav-count").textContent = workspace.incidents.length;
     if (!api) setupGrid();
     update();
+    await views.setWorkspace(workspace);
   } catch (error) {$("error").textContent = "The incident source could not be loaded. Try Refresh."; $("error").hidden = false; console.error(error);}
   finally {$("refresh").disabled = false;}
 }
