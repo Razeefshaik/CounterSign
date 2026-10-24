@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.1 (Oct 23, 2026).** 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.2 (Oct 24, 2026).** 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -31,7 +31,7 @@ Sections:
   - **Actions:** `WAIT`, `DRAFT_MESSAGE`, `PROVIDE_EVIDENCE`, `CANCEL_UNCLAIMED_PAYOUT`, `RESERVE_EARNINGS`, `RELEASE_RESERVE`, `SCHEDULE_PAYOUT_RUN`, `CREATE_REPLACEMENT_PAYOUT`, `DEFER_SCHEDULED_PAYOUT`, `ACCEPT_CLAIM`, `REQUEST_OWNER`.
   - **Tiers:** `AUTONOMOUS`, `OWNER`.
   - **Verdicts:** `ALLOW`, `BLOCK`, `NEEDS_OWNER`. **Rule outcomes:** `PASS`, `BLOCK`, `NEEDS_OWNER`.
-  - **Rules:** `SETTLEMENT`, `PAYOUT_STATE_MACHINE`, `CANCEL_BEFORE_REPLACE`, `IDEMPOTENCY`, `WRITE_AHEAD`, `DISPUTE_RESERVE`, `FUNDING`, `PAYEE_INTEGRITY`, `REFUND_POLICY`, `EVIDENCE_INTEGRITY`, `DEADLINE_GUARD`, `UNKNOWN_SCOPED`, `APPROVAL_BINDING`, `RECHECK_AT_EXECUTION`, `WEBHOOK_AUTHENTICITY`.
+  - **Rules:** `SETTLEMENT`, `PAYOUT_STATE_MACHINE`, `CANCEL_BEFORE_REPLACE`, `IDEMPOTENCY`, `WRITE_AHEAD`, `DISPUTE_RESERVE`, `FUNDING`, `PAYEE_INTEGRITY`, `REFUND_POLICY`, `EVIDENCE_INTEGRITY`, `DEADLINE_GUARD`, `UNKNOWN_SCOPED`, `APPROVAL_BINDING`, `RECHECK_AT_EXECUTION`, `WEBHOOK_AUTHENTICITY`, `INJECTION_GUARD`.
   - **Proposal states:** `CREATED`, `ALLOWED`, `BLOCKED`, `NEEDS_OWNER`, `APPROVED`, `REJECTED`, `EXPIRED`, `EXECUTING`, `EXECUTED`, `BLOCKED_AT_EXECUTION`, `FAILED`.
   - **Obligation states:** `OPEN`, `RESERVED`, `SCHEDULED`, `IN_FLIGHT`, `SETTLED`, `VOID`.
   - **Line states:** `APPROVED`, `PAYING`, `PAID`, `UNPAID`, `RELEASED`.
@@ -78,7 +78,7 @@ All examples below use the demo week from HANDOFF section 10.
 
 ```json
 {"mode": "demo", "paypal_env": "mock", "simulated": true, "simulation_label": "Simulated: mock PayPal",
- "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.1"}
+ "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.2"}
 ```
 
 - `mode` is `demo` (runs against the local mock) or `live` (runs against the sandbox).

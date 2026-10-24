@@ -97,6 +97,7 @@ class Proposal:
     action: Action
     params: Mapping[str, Any]
     payload_hash: str
+    flags: tuple[Mapping[str, Any], ...] = ()
 
     def __post_init__(self):
         object.__setattr__(self, "action", Action(self.action))
