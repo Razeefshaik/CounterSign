@@ -12,9 +12,10 @@ same saved operation, body and keys. The final proof requires one payout item,
 B's share settled once, A's share still reserved, and the **payout incident**
 resolved by reconciliation. A's dispute and its incident remain open.
 
-The automated tests use the local mock, fake credentials and isolated PostgreSQL
-schemas. The sandbox script is implemented and tested with stubbed HTTP; the
-owner and Claude must still run it against PayPal. These are separate results.
+The automated tests use the actual local mock, fake credentials and isolated
+PostgreSQL schemas with C22's migration 0004 transition guards enabled. Sandbox
+order setup and the lost-response transport have separate stubbed HTTP checks;
+the owner and Claude must still run the complete script against PayPal.
 
 ## 2. What you do in the browser
 
@@ -79,7 +80,9 @@ The mock uses its `drop_response` fault with `after_commit: true`. Sandbox uses 
 transport that forwards the first payout POST, closes its response without
 reading it, then raises a read timeout. C19b owns all financial recovery. The
 real D6 duplicate shape is a 400 `USER_BUSINESS_ERROR` with the original batch
-link in `details[].link`; a 400 replay does not prove the first payment failed.
+link in `details[].link`. M09a now gives the mock that same response on every
+duplicate, using its own base URL for the batch link. A 400 replay does not prove
+the first payment failed.
 
 ## 4. What gets saved and how resume works
 
@@ -115,9 +118,10 @@ the evidence intended for the video. Review redacted evidence before publishing.
 The positive test checks the real owner endpoint, one accepted payout item in
 mock ground truth, one settled obligation and one success journal. It also checks
 that A remains reserved and that the payout incident gets one reconciliation
-closure audit. A second replay variant uses `MockTransport` to supply the real
-D6 nested-link error because the current mock returns 201 for an identical
-replay. Aman can align that mock behavior separately.
+closure audit. Recovery receives the actual mock's 400 `USER_BUSINESS_ERROR`,
+follows its original-batch link and confirms the item by GET. The test checks
+that the replay preserves the original request ID, sender batch ID and payload.
+No synthetic duplicate response substitutes for the mock's behavior.
 
 The negative test delivers a genuine signed SUCCESS webhook while the payout
 item GET still says PENDING. The payout incident must stay open, B must stay
@@ -136,10 +140,10 @@ lost-response fault, order/capture reuse and exact webhook registration. Tests
 make no real PayPal calls. The dashboard's HTTP financial pages remain fixtures
 until M15; the script's Engine snapshot and inbox evidence establish this result.
 
-The focused C21 file passed all 25 tests against the local PostgreSQL 16 service:
-four integration scenarios and 21 script checks. Inbox regression tests also
-check item and batch identity mismatches, unknown events, and that processing a
-confirmed payout webhook changes no financial rows or ledger postings.
+Inbox regression tests also check item and batch identity mismatches, unknown
+events, and that processing a confirmed payout webhook changes no financial rows
+or ledger postings. The database transition guards stay enabled throughout the
+slice tests; setup and recovery must use legal state-machine transitions.
 
 ## 6. How the owner runs it
 
