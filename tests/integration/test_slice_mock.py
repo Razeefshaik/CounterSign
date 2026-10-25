@@ -196,8 +196,11 @@ async def test_sandbox_order_helper_creates_and_captures_two_orders_once(tmp_pat
 
 
 @asynccontextmanager
-async def slice_world(db_schema, tmp_path, *, recorded_duplicate=False, driver_stages=False):
+async def slice_world(
+    db_schema, tmp_path, *, base_url="http://localhost:8099", driver_stages=False
+):
     holder, delivered, replays, read_faults = {}, [], [], {}
+    payout_posts, exchanges = [], []
 
     async def delivery(url, headers, body):
         status = await holder["engine"].deliver_webhook(headers, body)
@@ -207,52 +210,25 @@ async def slice_world(db_schema, tmp_path, *, recorded_duplicate=False, driver_s
     mock = create_app(control_enabled=True, webhook_delivery=delivery)
     inner = httpx.ASGITransport(app=mock)
     store = checkpoint(tmp_path)
-    base = "http://localhost:8099"
+    base = base_url
 
     async def respond(request):
-        if (
-            recorded_duplicate
-            and request.method == "POST"
-            and request.url.path == "/v1/payments/payouts"
-        ):
-            body = json.loads(request.content)
-            response = await inner.handle_async_request(
-                httpx.Request("GET", base + "/_mock/ground-truth")
-            )
-            await response.aread()
-            matches = [
-                item
-                for item in response.json()["payout_items"]
-                if item["sender_batch_id"] == body["sender_batch_header"]["sender_batch_id"]
-            ]
-            if matches:
-                # The mock still returns 201 on replay. Bridge only this gap using
-                # the recorded D6 envelope; localhost link stays valid for a mock origin.
-                replays.append(request)
-                return httpx.Response(
-                    400,
-                    json={
-                        "name": "USER_BUSINESS_ERROR",
-                        "links": [],
-                        "details": [
-                            {
-                                "field": "SENDER_BATCH_ID",
-                                "location": "body",
-                                "issue": "Batch with given sender_batch_id already exists",
-                                "link": [
-                                    {
-                                        "href": base
-                                        + "/v1/payments/payouts/"
-                                        + matches[0]["payout_batch_id"],
-                                        "rel": "self",
-                                        "method": "GET",
-                                    }
-                                ],
-                            }
-                        ],
-                    },
-                )
+        payout_post = request.method == "POST" and request.url.path == "/v1/payments/payouts"
+        if payout_post:
+            payout_posts.append((request.headers["PayPal-Request-Id"], request.content))
+        if request.method == "GET":
+            exchanges.append(("GET", str(request.url)))
         response = await inner.handle_async_request(request)
+        if payout_post and response.status_code == 400:
+            # Observe M09a's actual response. Never synthesize a duplicate or
+            # short-circuit the payout route that must enforce idempotency.
+            await response.aread()
+            body = response.json()
+            assert body["name"] == "USER_BUSINESS_ERROR" and body["links"] == []
+            href = body["details"][0]["link"][0]["href"]
+            assert href.startswith(base + "/v1/payments/payouts/")
+            replays.append(request)
+            exchanges.append(("DUPLICATE_400", href))
         if (
             request.method == "GET"
             and request.url.path.startswith("/v1/payments/payouts-item/")
@@ -319,6 +295,36 @@ async def slice_world(db_schema, tmp_path, *, recorded_duplicate=False, driver_s
             Engine(config, database=database, http=http) as engine,
         ):
             holder["engine"] = engine
+            async with database.tx() as conn:
+                assert (
+                    await (await conn.execute("SELECT version_num FROM alembic_version")).fetchone()
+                )["version_num"] == "0004"
+                guards = await conn.execute(
+                    "SELECT c.relname,t.tgenabled FROM pg_trigger t "
+                    "JOIN pg_class c ON c.oid=t.tgrelid "
+                    "WHERE c.relnamespace=current_schema()::regnamespace "
+                    "AND t.tgname='guard_state_transition'"
+                )
+                installed = {row["relname"]: row["tgenabled"] for row in await guards.fetchall()}
+                assert installed == dict.fromkeys(
+                    (
+                        "obligations",
+                        "payout_lines",
+                        "payout_attempts",
+                        "operations",
+                        "proposals",
+                        "incidents",
+                    ),
+                    "O",
+                )
+            tick = engine.tick
+
+            async def checked_tick():
+                result = await tick()
+                assert result["errors"] == 0, "slice tick must not hide a rejected transition"
+                return result
+
+            engine.tick = checked_tick
             await engine.seed(seed_state(emails, orders, NOW))
             store.checkpoint(week_start="2026-11-02", orders=orders)
             owner = FastAPI()
@@ -360,6 +366,8 @@ async def slice_world(db_schema, tmp_path, *, recorded_duplicate=False, driver_s
                     advance=advance,
                     delivered=delivered,
                     replays=replays,
+                    payout_posts=payout_posts,
+                    exchanges=exchanges,
                     read_faults=read_faults,
                     mock=mock,
                     api=api,
@@ -399,11 +407,9 @@ async def stage_dispute_and_fault(control, advance, engine):
 
 @pytest.mark.integration
 @pytest.mark.asyncio
-@pytest.mark.parametrize("recorded_duplicate", [False, True])
-async def test_vertical_slice_reserves_a_pays_b_once_and_reconciles(
-    db_schema, tmp_path, recorded_duplicate
-):
-    async with slice_world(db_schema, tmp_path, recorded_duplicate=recorded_duplicate) as world:
+@pytest.mark.parametrize("base_url", ["http://localhost:8099", "http://127.0.0.1:8099"])
+async def test_vertical_slice_reserves_a_pays_b_once_and_reconciles(db_schema, tmp_path, base_url):
+    async with slice_world(db_schema, tmp_path, base_url=base_url) as world:
         final = await settled_slice(
             world.engine, world.checkpoint, world.gate, world.approve, world.advance
         )
@@ -415,8 +421,11 @@ async def test_vertical_slice_reserves_a_pays_b_once_and_reconciles(
         [item] = truth["payout_items"]
         assert item["receiver"] == "maker-b@example.test" and item["status"] == "SUCCESS"
         assert item["amount"] == {"value": "1.80", "currency": "USD"}
-        if recorded_duplicate:
-            assert len(world.replays) == 1
+        assert len(world.replays) == 1
+        assert len(world.payout_posts) == 2 and world.payout_posts[0] == world.payout_posts[1]
+        href = base_url + "/v1/payments/payouts/" + item["payout_batch_id"]
+        duplicate = world.exchanges.index(("DUPLICATE_400", href))
+        assert ("GET", href) in world.exchanges[duplicate + 1 :]
         assert world.delivered and all(status == 200 for _, _, status in world.delivered)
         async with world.database.tx() as conn:
             repos = Repositories(conn)
@@ -458,7 +467,7 @@ async def test_vertical_slice_reserves_a_pays_b_once_and_reconciles(
 async def test_payout_incident_stays_open_until_get_agrees_then_resume_pays_nobody_twice(
     db_schema, tmp_path
 ):
-    async with slice_world(db_schema, tmp_path, recorded_duplicate=True) as world:
+    async with slice_world(db_schema, tmp_path) as world:
         # A signed SUCCESS webhook arrives, while the item GET still says PENDING.
         world.read_faults["status"] = "PENDING"
         with pytest.raises(SliceError, match="SLICE_PENDING_RECONCILIATION"):
@@ -505,9 +514,7 @@ async def test_payout_incident_stays_open_until_get_agrees_then_resume_pays_nobo
 async def test_mock_script_driver_stages_dispute_approval_and_fault_then_resumes(
     db_schema, tmp_path
 ):
-    async with slice_world(
-        db_schema, tmp_path, recorded_duplicate=True, driver_stages=True
-    ) as world:
+    async with slice_world(db_schema, tmp_path, driver_stages=True) as world:
         manual = ManualSteps(
             world.checkpoint.redactor, input_fn=lambda _: pytest.fail("mock is automatic")
         )
