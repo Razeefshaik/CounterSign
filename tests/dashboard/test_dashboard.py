@@ -155,7 +155,7 @@ def test_meta_and_run_consistency(client):
         meta["simulated"] is True
         and meta["simulation_label"] == "Simulated: mock PayPal"
     )
-    assert meta["contract_version"] == "1.0.2"
+    assert meta["contract_version"] == "1.0.3"
     run = client.get("/api/v1/payout-runs").json()["items"][0]
     detail = client.get("/api/v1/payout-runs/" + run["id"]).json()
     assert len(detail["lines"]) == run["line_count"]
