@@ -60,9 +60,11 @@ async def test_mock_payout_read_cancel_replay_and_balances():
             assert "items" not in result.resp.body
             replay = copy.deepcopy(row)
             replay["state"] = "UNKNOWN"
+            # Contract 1.0.3 (D6): every duplicate is a 400 that links the original batch.
             repeated = await writer.create_payout_single_item(replay)
-            assert isinstance(repeated, Ok)
-            assert repeated.resp.body["batch_header"]["payout_batch_id"] == batch_id
+            assert isinstance(repeated, Ambiguous) and repeated.resp.status_code == 400
+            assert repeated.resp.body["name"] == "USER_BUSINESS_ERROR"
+            assert repeated.original_batch_link == f"{BASE}/v1/payments/payouts/{batch_id}"
             batch = await reader.get_payout_batch(batch_id)
             assert batch.amounts["/batch_header/amount"] == Money(100, "USD")
             item_id = batch.body["items"][0]["payout_item_id"]
@@ -214,7 +216,16 @@ async def test_mock_lost_response_after_commit_identical_replay_one_item():
             assert len((await controls.get("/_mock/ground-truth")).json()["payout_items"]) == 1
             row["state"] = "UNKNOWN"
             recovered = await writer.create_payout_single_item(row)
-            assert isinstance(recovered, Ok)
+            assert isinstance(recovered, Ambiguous) and recovered.resp.status_code == 400
+            assert recovered.original_batch_link is not None
+            original = await PayPalRead(http).follow(recovered.original_batch_link)
+            assert original.status_code == 200
+            header = original.body["batch_header"]
+            assert header["sender_batch_header"]["sender_batch_id"] == KEY
+            [item] = original.body["items"]
+            sent = row["payload"]["body"]["items"][0]
+            assert item["payout_item"]["receiver"] == sent["receiver"]
+            assert item["payout_item"]["amount"] == sent["amount"]
         truth = (await controls.get("/_mock/ground-truth")).json()
     assert len(truth["payout_items"]) == 1
     assert truth["balances"]["available"]["value"] == "1499.00"
