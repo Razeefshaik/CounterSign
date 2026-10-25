@@ -210,3 +210,14 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Contract 1.0.3: the mock answers every duplicate payout POST (same or new PayPal-Request-Id, changed body, concurrent loser) with 400 USER_BUSINESS_ERROR and the original batch in details[].link; no 201 replay and no 409 | Owner (D6) | Accept | D6a to D6d recorded exactly this on the sandbox, and the mock must not be kinder than PayPal |
 | The mock duplicate link uses its own base URL by default; duplicate_link_host="sandbox" reproduces the recorded api.sandbox.paypal.com host | Owner (D6) | Accept | core follows links only to its configured host or the one sandbox alias, so the default keeps local recovery testable |
 | M09a fixes the confirmed D5 cancel response to RETURNED and accepts JSON or multipart input for both dispute writes pending D10 | Owner prompt | Accept | Cancellation must match the observed response, while local dispute tests must support both formats until the sandbox format is confirmed |
+
+## Oct 25 C22 deferred hardening
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| C22 generates unique state pairs from the six Python FSM tables into a frozen 0004 JSON snapshot; unit and database tests reject drift | C22 | Accept | Historical migrations remain reproducible while a changed FSM cannot silently diverge from the database |
+| C22 checks attempt transitions only when OLD.state is PREPARED or UNKNOWN; same-state updates and later PayPal mirrors pass | C22, owner prompt | Accept | Unexpected GET-confirmed statuses must be retained and investigated rather than rejected by the database |
+| C22 resolves allowed_transitions through TG_TABLE_SCHEMA in the shared trigger function | C22 | Accept | A caller search path must not select a different transition table |
+| C22 repairs test-only state shortcuts: cancel fixtures schedule before flight, unapproved claims start from CREATED, and reconciliation fault injection changes an amount rather than violating SETTLED | C22 validation | Accept | The database guard stays enabled and no production transition is added for a fixture |
+| C22 executor-race examples each use a fresh migrated schema and never call Engine.reset on the shared fixture | C22 review | Accept | Property-test isolation must also work with the standard countersign database name without weakening the reset guard |
+| C22 executor races await observed settlement through bounded ticks rather than assuming one error-free tick made progress | C22 standard-environment validation | Accept | The reconciliation advisory lock spans schemas and a busy cycle legitimately returns without polling |

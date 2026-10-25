@@ -40,6 +40,7 @@ async def target(world, *, cancel=False):
                 state="PAYING",
             )
             obligation = (await repos.obligations.find({"maker_id": maker["id"]}))[0]
+            await repos.obligations.update(obligation["id"], state="SCHEDULED")
             await repos.obligations.update(obligation["id"], state="IN_FLIGHT")
             await repos.payout_line_obligations.insert(
                 line_id=line["id"], obligation_id=obligation["id"], amount_minor=900
@@ -134,7 +135,7 @@ async def proposed(world, action, record, *, behavior=None, approve=True, flags=
         }
         await repos.proposals.update(
             row["id"],
-            state="NEEDS_OWNER" if action == "ACCEPT_CLAIM" else "ALLOWED",
+            state="NEEDS_OWNER" if action == "ACCEPT_CLAIM" and approve else "ALLOWED",
             verdict_details={"operation_payload": payload, "approval_request": binding},
             raw_output={"flags": list(flags), "approval_request": binding},
         )
@@ -360,8 +361,8 @@ async def test_unapproved_accept_claim_is_blocked(world):
     behavior = PayPalBehavior(refund_source=journal.AVAILABLE)
     record = await target(world)
     proposal_id, _ = await proposed(world, "ACCEPT_CLAIM", record, behavior=behavior, approve=False)
-    async with world[0].tx() as conn:
-        await Repositories(conn).proposals.update(proposal_id, state="ALLOWED")
+    # The unapproved fixture starts with a CREATED -> ALLOWED verdict; it never
+    # rewrites an existing NEEDS_OWNER decision into an autonomous approval.
     async with endpoint(world, behavior=behavior) as (executor, control):
         assert (await executor.execute(proposal_id))["proposal_state"] == "BLOCKED_AT_EXECUTION"
         assert not control["posts"] and not await rows(world[0], "ledger_journals")

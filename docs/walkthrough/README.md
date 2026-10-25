@@ -58,6 +58,7 @@ The first working version of the product itself, built step by step. Hashes belo
 
 | Page | What it explains |
 | --- | --- |
+| [c22-hardening.md](c22-hardening.md) | Database transition guards, frozen FSM rows and generated safety tests |
 | [c24-rules-incidents-simulator.md](c24-rules-incidents-simulator.md) | Dispute rules, reconciliation-only incident closure and read-only payout cash comparisons |
 | [m09a-mock-sandbox-facts.md](m09a-mock-sandbox-facts.md) | Duplicate payout recovery, confirmed cancellation responses and both dispute request formats in the local mock |
 

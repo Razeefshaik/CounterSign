@@ -314,7 +314,9 @@ async def test_payout_resolution_requires_matching_get_ledger_and_obligations(wo
         [obligation] = await repos.obligations.find()
         assert attempt["state"] == "SUCCESS" and obligation["state"] == "SETTLED"
         # Fault injection corrupts the local record after a successful external payout.
-        await repos.obligations.update(obligation["id"], state="IN_FLIGHT")
+        await repos.obligations.update(
+            obligation["id"], amount_minor=obligation["amount_minor"] + 1
+        )
     service = world.engine._incidents
     incident = await service.open("PAYOUT_ITEM", {"attempt_id": str(attempt["id"])})
     await service.sweep(since=now)
@@ -322,7 +324,7 @@ async def test_payout_resolution_requires_matching_get_ledger_and_obligations(wo
         repos = Repositories(conn)
         saved = await repos.incidents.get(incident["id"])
         assert saved["state"] != "RESOLVED" and saved["closed_at"] is None
-        await repos.obligations.update(obligation["id"], state="SETTLED")
+        await repos.obligations.update(obligation["id"], amount_minor=obligation["amount_minor"])
     await service.sweep(since=world.settings.clock() + timedelta(seconds=1))
     async with world.database.tx() as conn:
         assert (await Repositories(conn).incidents.get(incident["id"]))["state"] != "RESOLVED"
