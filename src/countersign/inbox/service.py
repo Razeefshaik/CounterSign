@@ -192,8 +192,18 @@ class Inbox:
             return False
         if not 200 <= response.status_code < 300:
             raise InboxError("Payout confirmation unavailable")
+        detail = response.body
+        if not isinstance(detail, dict):
+            raise InboxError("Payout identity mismatch")
+        if event_type.startswith("PAYMENT.PAYOUTS-ITEM."):
+            confirmed_id = detail.get("payout_item_id")
+        else:
+            header = detail.get("batch_header")
+            confirmed_id = header.get("payout_batch_id") if isinstance(header, dict) else None
+        if confirmed_id != resource_id:
+            raise InboxError("Payout identity mismatch")
         # C15 owns payout reconciliation and posting. Delivery itself changes no payout state.
-        return False
+        return True
 
     async def _dispute(self, conn, detail):
         repos = Repositories(conn)

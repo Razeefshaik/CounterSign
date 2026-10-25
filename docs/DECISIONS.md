@@ -221,3 +221,14 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | C22 repairs test-only state shortcuts: cancel fixtures schedule before flight, unapproved claims start from CREATED, and reconciliation fault injection changes an amount rather than violating SETTLED | C22 validation | Accept | The database guard stays enabled and no production transition is added for a fixture |
 | C22 executor-race examples each use a fresh migrated schema and never call Engine.reset on the shared fixture | C22 review | Accept | Property-test isolation must also work with the standard countersign database name without weakening the reset guard |
 | C22 executor races await observed settlement through bounded ticks rather than assuming one error-free tick made progress | C22 standard-environment validation | Accept | The reconciliation advisory lock spans schemas and a busy cycle legitimately returns without polling |
+
+## Oct 25 C21 vertical slice
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| C21 keeps fault injection in a script-only transport and uses fsynced atomic checkpoints plus a per-run file lock; sandbox order setup reuses the bound harness writes | C21 | Accept | The demo must survive interruption without changing production HTTP behavior, replaying completed writes or exposing credentials |
+| C21 closes the payout incident while Maker A's dispute and reserved share remain active; a script-only replay pause lets the real lifecycle observe UNKNOWN before recovery | C21, owner approved | Accept | Releasing A's reserve would contradict the slice, and an immediate same-tick recovery would leave no pending payout incident to demonstrate |
+| C21 receiver runs the existing app without background workers while only the script ticks its dedicated empty database | C21 | Accept | Another executor process would bypass the staged transport and could send the payout before the intended lost-response fault |
+| C21 may read webhook_inbox by exact event_type and run resource_id, requiring signature SUCCESS and status PROCESSED, with no inbox writes or facade/contract changes | C21, owner approved | Accept | Public snapshots cannot prove which delivery was verified and processed; an unrelated processed event must never satisfy the slice |
+| Inbox marks a signature-verified, GET-confirmed payout event PROCESSED; it still moves no payout state (C15 owns posting). | C21, owner approved | Accept | The slice needs exact processing evidence while payout reconciliation and ledger posting remain with C15 |
+| C21 tests M09a's actual duplicate 400 and original-batch link with identical saved keys and payload, with C22 migration 0004 guards enabled and no synthetic duplicate bridge | C21 integration | Accept | Recovery must prove the current mock and guarded database work together rather than substitute the behavior being tested |

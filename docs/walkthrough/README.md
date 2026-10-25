@@ -53,6 +53,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | 24 | [c19-executor.md](c19-executor.md) | **The executor**: the only code that sends money; saves before sending, re-checks every rule, uses each approval once, and settles unclear answers only by repeating the identical request | Claude | `de708b1` |
 | 25 | [c15-reconciliation.md](c15-reconciliation.md) | **Reconciliation poller**: regularly asks PayPal for the truth about every payout, dispute and balance, corrects our records, and opens an incident when something moves unexpectedly | Codex | `37747c9`, `13c93d8` |
 | 26 | [c20-engine-facade.md](c20-engine-facade.md) | **Engine facade**: the one stable door the evaluation, the demo bar and Aman's code use; it can wipe only a database named `_test` or `_eval`, and the worker now runs the poller and the unknown-payout sweep | Codex | `3872557`, `18613fb` |
+| 27 | [c21-slice.md](c21-slice.md) | **Vertical slice**: reserve A's disputed share, approve and pay B once through a lost response, and close the payout incident only after reconciliation; sandbox run remains owner-operated | Codex | `5138be6`, `b13f068`, `d3ffd8e` |
 
 ## After the slice
 
