@@ -114,6 +114,11 @@
           "rule": "REFUND_POLICY",
           "outcome": "NEEDS_OWNER",
           "detail": "Refunds always need owner approval"
+        },
+        {
+          "rule": "INJECTION_GUARD",
+          "outcome": "BLOCK",
+          "detail": "Untrusted buyer instructions must not authorize financial actions."
         }
       ],
       "flags": [

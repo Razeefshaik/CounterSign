@@ -5,5 +5,5 @@
   "simulation_label": "Simulated: mock PayPal",
   "clock": "2026-11-06T09:00:00Z",
   "version": "0.1.0",
-  "contract_version": "1.0.1"
+  "contract_version": "1.0.2"
 }

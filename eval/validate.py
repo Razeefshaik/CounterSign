@@ -1,4 +1,4 @@
-"""Validate CONTRACTS v1.0.1 scenario files, including cross references.
+"""Validate CONTRACTS v1.0.2 scenario files, including cross references.
 
 Run: python -m eval.validate [paths ...]
 Regenerate schema: python -m eval.validate --write-schema
@@ -85,6 +85,7 @@ class Money(Doc):
 
 class Policy(Doc):
     maker_share_pct: Annotated[int, Field(ge=0, le=100)] = 90
+    deadline_close_seconds: Positive = 172800
     refund_limit_per_order: Money
     refund_limit_per_day: Money
 
@@ -424,7 +425,7 @@ def main(argv=None):
     if args.write_schema:
         schema = Scenario.model_json_schema()
         schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
-        schema["title"] = "CounterSign scenario · CONTRACTS v1.0.1"
+        schema["title"] = "CounterSign scenario · CONTRACTS v1.0.2"
         (folder / "scenario.schema.json").write_text(
             json.dumps(schema, indent=2) + "\n", encoding="utf-8"
         )

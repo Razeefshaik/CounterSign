@@ -27,6 +27,15 @@ def proposal_document(client, location):
 
 
 @pytest.mark.parametrize("location", LOCATIONS)
+def test_contract_102_accepts_injection_guard_rule_results(client, location):
+    document, target, schema = proposal_document(client, location)
+    target["rule_results"].append(
+        {"rule": "INJECTION_GUARD", "outcome": "BLOCK", "detail": "Untrusted financial instruction"}
+    )
+    validate(document, schema)
+
+
+@pytest.mark.parametrize("location", LOCATIONS)
 def test_proposal_incident_link_can_be_null_but_not_wrong_type(client, location):
     document, target, schema = proposal_document(client, location)
     target["incident_id"] = None
