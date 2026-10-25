@@ -12,6 +12,7 @@ from mock_paypal.store import MockStore
 DEFAULTS = {
     "payout_processing_seconds": 30,
     "key_retention_days": 30,
+    "duplicate_link_host": "mock",
     "unclaimed_counts_in_available": False,
     "dispute_hold": True,
     "evidence_allowed_stages": ["INQUIRY", "CHARGEBACK"],
@@ -125,6 +126,8 @@ def test_config_defaults_and_partial_updates(client):
             changed = not value
         elif isinstance(value, int):
             changed = value + 1
+        elif key == "duplicate_link_host":
+            changed = "sandbox"
         else:
             changed = ["CUSTOM"]
         response = client.post("/_mock/config", json={key: changed})

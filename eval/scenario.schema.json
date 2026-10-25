@@ -1149,7 +1149,7 @@
     "task",
     "expected"
   ],
-  "title": "CounterSign scenario \u00b7 CONTRACTS v1.0.2",
+  "title": "CounterSign scenario \u00b7 CONTRACTS v1.0.3",
   "type": "object",
   "$schema": "https://json-schema.org/draft/2020-12/schema"
 }

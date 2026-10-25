@@ -1,6 +1,6 @@
-# Mock PayPal - M01 and M02
+# Mock PayPal - M01 through M09a
 
-Local, in-memory test server implementing CONTRACTS v1.0.1. It does not
+Local, in-memory test server implementing CONTRACTS v1.0.3. It does not
 connect to PayPal, load .env, or need sandbox credentials.
 
 From the repository root, with FastAPI and Uvicorn installed:
@@ -29,7 +29,7 @@ events scheduled by callbacks. Equal-time events keep insertion order.
 Callbacks may be synchronous or async. All timer deadlines use mock time.
 Clock controls are serialized; backward moves and naive times are rejected.
 
-All nine config flags match CONTRACTS section 5.7. Pending D4, D5, D8c,
+Config flags follow CONTRACTS section 5.7, plus duplicate_link_host. Pending D4, D8c,
 D9, D11 and D12 behaviors remain flags. The pending D1 OAuth scope may be
 overridden with create_app(oauth_scope=...). No sandbox claims are made.
 
@@ -65,47 +65,28 @@ The unclaimed_counts_in_available flag defaults to false. Switching it
 reprices existing UNCLAIMED items immediately; a later claim or return
 accounts for the amount once.
 
-Request-ID replay takes precedence over new body validation and sender keys.
-Completed replays return 201 with the current batch header; changed bodies
-are ignored by default. Concurrent overlapping duplicates return 409
-DUPLICATE_REQUEST_ID. A new or absent request ID with a retained sender key
-returns 400 USER_BUSINESS_ERROR and a link to the original batch.
+D6 duplicate detection uses sender_batch_id only. Every duplicate within the
+retention window returns 400 USER_BUSINESS_ERROR, including identical retries,
+changed bodies, new request IDs and concurrent losers. The original batch link
+is in details[].link; top-level links is empty. A request ID with a new sender
+batch ID creates a new payout. Sender keys expire exactly key_retention_days
+after creation (30 by default); retries do not extend expiry. Historical batches
+remain readable. Clock/reset/config mutations and payout writes share a lock.
 
-Both keys expire exactly key_retention_days after creation (30 by default).
-Replays do not extend expiry. Historical resources remain readable afterward.
-An asyncio zero-duration checkpoint allows overlapping requests to observe
-the in-progress response; it introduces no mock delay or wall-clock timer.
-Clock/reset/config mutations and payout writes share a lock.
+Duplicate links use the request's local base URL by default. Set
+`POST /_mock/config` to `{"duplicate_link_host": "sandbox"}` to reproduce the
+recorded `https://api.sandbox.paypal.com` host, or `"mock"` to restore local
+links. The sandbox option changes response text only; the mock makes no
+outbound PayPal calls. Tests should follow the default local links.
 
 GET batch defaults to page 1, page_size 1000; pages accept up to 15000 items.
 total_required=true includes total_items/total_pages. HATEOAS links use
 the local request base URL. No outbound API request is made.
 
-Pending D3/D5/D6/D7 response defaults can be overridden without changing the
-nine contract config flags:
-
-    from mock_paypal.app import create_app
-    from mock_paypal.payouts import PayoutBehavior
-
-    app = create_app(
-        control_enabled=True,
-        payout_behavior=PayoutBehavior(
-            create_includes_items=False,
-            cancel_item_status="RETURNED",
-            insufficient_funds_status=422,
-            concurrent_duplicate_status=409,
-            concurrent_duplicate_name="DUPLICATE_REQUEST_ID",
-            duplicate_batch_status=400,
-            duplicate_batch_name="USER_BUSINESS_ERROR",
-            duplicate_batch_issue="DUPLICATE_SENDER_BATCH_ID",
-            replay_current_header=True,
-            replay_original_body_wins=True,
-        ),
-    )
-
-These defaults are contract fixtures, not sandbox-verified findings.
-No dependencies beyond M01/C01's approved libraries were added.
-
+Pending D3 and D7 response defaults remain configurable through
+`create_app(payout_behavior=PayoutBehavior(create_includes_items=False,
+insufficient_funds_status=422))`. Confirmed D5 cancellation always returns
+RETURNED, and D6 duplicates always return 400. No dependencies were added.
 
 ## M03 faults and ground truth
 
@@ -113,7 +94,8 @@ Request faults match method, regex path, nth and count. Delay/timeout waits
 resolve only when the mock clock advances. A dropped response sends an
 incomplete HTTP body and closes the connection; a real TCP acceptance test
 checks that the client receives a protocol error while the committed payout
-survives and replays once. Fault logs retain keys and statuses, never auth headers.
+survives; an identical replay returns 400 with a link to that single batch.
+Fault logs retain keys and statuses, never auth headers.
 Transition/claim controls include the claim-during-next-cancel race.
 
 D7 names follow the project fixture codes and the official reference:
@@ -133,8 +115,11 @@ remain in memory. No deduplication uses transaction ID alone.
 
 Balance snapshots refresh on the mock clock; actual funds change immediately.
 Reporting transactions remain hidden until transactions_lag_seconds elapses.
-Evidence defaults to multipart with an application/json input part, parsed
-with Python's standard email parser. No multipart dependency is required.
+Evidence and accept-claim accept JSON or multipart with one input part holding
+JSON, parsed with Python's standard email parser. Malformed or duplicate input
+parts are rejected before mutation. The real sandbox format remains pending
+D10; accepting both locally makes no claim that both work there. No multipart
+dependency is required.
 Only status/stage-allowed actions receive HATEOAS links. Held refunds consume
 withheld funds by default, and seller wins/buyer-close release holds once.
 ResourceBehavior exposes pending D8/D9/D10 choices through create_app.

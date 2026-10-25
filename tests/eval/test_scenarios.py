@@ -38,7 +38,7 @@ def test_schema_is_generated_from_validator():
     schema = json.loads(path.read_text())
     expected = Scenario.model_json_schema()
     expected["$schema"] = "https://json-schema.org/draft/2020-12/schema"
-    expected["title"] = "CounterSign scenario · CONTRACTS v1.0.2"
+    expected["title"] = "CounterSign scenario · CONTRACTS v1.0.3"
     assert schema == expected
     assert len(schema["$defs"]["FaultStep"]["properties"]) == 3
     assert len(schema["properties"]["fault_class"]["enum"]) == 21

@@ -191,6 +191,68 @@ def test_accept_claim_refund_with_or_without_hold(client, hold):
     assert actual["balances"]["withheld"]["value"] == "0.00"
 
 
+@pytest.mark.parametrize("action", ["provide-evidence", "accept-claim"])
+@pytest.mark.parametrize("wire_format", ["json", "multipart-field", "multipart-file"])
+def test_dispute_writes_accept_both_formats(client, action, wire_format):
+    d = staged(client)
+    path = "/v1/customer/disputes/" + d["dispute_id"]
+    payload = (
+        {
+            "evidences": [
+                {"evidence_type": "PROOF_OF_FULFILLMENT", "notes": "Stored tracking"}
+            ]
+        }
+        if action == "provide-evidence"
+        else {"accept_claim_type": "REFUND", "note": "Owner approved"}
+    )
+    kwargs = (
+        {"json": payload}
+        if wire_format == "json"
+        else {
+            "files": {
+                "input": (
+                    "input.json" if wire_format == "multipart-file" else None,
+                    json.dumps(payload),
+                    "application/json",
+                )
+            }
+        }
+    )
+    response = client.post(path + "/" + action, **kwargs)
+    assert response.status_code == 200
+    observed = client.get(path).json()
+    if action == "provide-evidence":
+        assert observed["status"] == "UNDER_REVIEW"
+        assert observed["evidences"] == payload["evidences"]
+        assert truth(client)["refunds"] == []
+    else:
+        assert observed["status"] == "RESOLVED"
+        assert observed["dispute_outcome"]["amount_refunded"]["value"] == "400.00"
+        assert len(truth(client)["refunds"]) == 1
+
+
+@pytest.mark.parametrize("action", ["provide-evidence", "accept-claim"])
+@pytest.mark.parametrize(
+    "parts",
+    [
+        [("other", (None, "{}", "application/json"))],
+        [("input", (None, "{", "application/json"))],
+        [("input", (None, "[]", "application/json"))],
+        [("input", (None, "{}", "application/json"))] * 2,
+    ],
+)
+def test_invalid_multipart_never_changes_dispute_or_money(client, action, parts):
+    d = staged(client)
+    path = "/v1/customer/disputes/" + d["dispute_id"]
+    before = truth(client)
+    response = client.post(path + "/" + action, files=parts)
+    assert response.status_code == 422
+    assert client.get(path).json() == d
+    after = truth(client)
+    assert after["balances"] == before["balances"]
+    assert after["refunds"] == before["refunds"]
+
+
 def test_escalate_require_evidence_buyer_win(client):
     d = staged(client)
     path = "/v1/customer/disputes/" + d["dispute_id"]
@@ -286,7 +348,6 @@ def test_pending_behavior_switches():
         control_enabled=True,
         resource_behavior=ResourceBehavior(
             initial_stage="CHARGEBACK",
-            evidence_format="json",
             capture_transaction_field="capture_id",
         ),
     )

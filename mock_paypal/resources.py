@@ -36,7 +36,6 @@ class ResourceBehavior:
     capture_transaction_field: str = "seller_transaction_id"  # pending D8b
     initial_status: str = "WAITING_FOR_SELLER_RESPONSE"
     initial_stage: str = "INQUIRY"
-    evidence_format: str = "multipart"  # pending D9
     evidence_result_status: str = "UNDER_REVIEW"
     escalation_status: str = "UNDER_REVIEW"  # pending D10
     seller_win_code: str = "RESOLVED_SELLER_FAVOUR"
@@ -461,13 +460,12 @@ class ResourceService:
                 "Action not allowed",
                 details=[{"issue": "ACTION_NOT_ALLOWED"}],
             )
+        ct = request.headers.get("content-type", "")
+        media_type = ct.split(";", 1)[0].strip().lower()
         if (
-            action == "provide-evidence"
-            and self.behavior.evidence_format == "multipart"
+            action in {"provide-evidence", "accept-claim"}
+            and media_type == "multipart/form-data"
         ):
-            ct = request.headers.get("content-type", "")
-            if not ct.startswith("multipart/form-data"):
-                raise ValueError("Use multipart evidence")
             raw = (
                 "Content-Type: " + ct + "\r\nMIME-Version: 1.0\r\n\r\n"
             ).encode() + await request.body()
@@ -477,10 +475,12 @@ class ResourceService:
                 for p in message.iter_parts()
                 if p.get_param("name", header="content-disposition") == "input"
             ]
-            if not parts:
-                raise ValueError("Missing input")
+            if not message.is_multipart() or len(parts) != 1:
+                raise ValueError("Exactly one input part required")
             body = json.loads(parts[0].get_payload(decode=True))
         else:
+            if media_type != "application/json":
+                raise ValueError("Use JSON or multipart input")
             body = await request.json()
         if not isinstance(body, dict):
             raise TypeError("Expected object")

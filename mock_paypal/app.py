@@ -44,7 +44,14 @@ class SetBody(ControlBody):
 
 
 def error(
-    request: Request, status: int, name: str, message: str, *, details=None, links=None
+    request: Request,
+    status: int,
+    name: str,
+    message: str,
+    *,
+    details=None,
+    links=None,
+    information_link: str = "https://developer.paypal.com/api/rest/responses/",
 ) -> JSONResponse:
     return JSONResponse(
         status_code=status,
@@ -52,7 +59,7 @@ def error(
             "name": name,
             "message": message,
             "debug_id": request.state.debug_id,
-            "information_link": "https://developer.paypal.com/api/rest/responses/",
+            "information_link": information_link,
             "details": details or [],
             "links": links or [],
         },
@@ -131,6 +138,7 @@ def create_app(
             exc.message,
             details=exc.details,
             links=exc.links,
+            information_link=exc.information_link,
         )
 
     @app.exception_handler(HTTPException)

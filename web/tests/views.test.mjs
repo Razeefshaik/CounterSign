@@ -11,8 +11,8 @@ const owner = proposals.find(p => p.state === "NEEDS_OWNER");
 const meta = await fixture("meta");
 const response = (body, status = 200) => ({ok: status >= 200 && status < 300, status, json: async () => body});
 
-test("contract 1.0.2 injection guard renders as a blocked rule without renaming the flag", () => {
-  assert.equal(meta.contract_version, "1.0.2");
+test("contract 1.0.3 injection guard renders as a blocked rule without renaming the flag", () => {
+  assert.equal(meta.contract_version, "1.0.3");
   const blocked = proposals.find(p => p.flags.some(f => f.type === "PROMPT_INJECTION"));
   const guard = blocked.rule_results.find(r => r.rule === "INJECTION_GUARD");
   assert.equal(guard.outcome, "BLOCK");
