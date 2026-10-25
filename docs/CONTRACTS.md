@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.2 (Oct 24, 2026).** 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.3 (Oct 25, 2026).** 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -78,7 +78,7 @@ All examples below use the demo week from HANDOFF section 10.
 
 ```json
 {"mode": "demo", "paypal_env": "mock", "simulated": true, "simulation_label": "Simulated: mock PayPal",
- "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.2"}
+ "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.3"}
 ```
 
 - `mode` is `demo` (runs against the local mock) or `live` (runs against the sandbox).
@@ -458,17 +458,21 @@ Validation:
 
 **Idempotency.** The mock applies these rules in order. Keys are remembered for `key_retention_days` (default 30) of mock time.
 
-1. **Seen `PayPal-Request-Id`, request still in progress** (a concurrent duplicate): return 409 with `name: "DUPLICATE_REQUEST_ID"`. The first request completes normally **[pending D6d]** (the real code and name).
-2. **Seen `PayPal-Request-Id`, request completed:** return the original status (201) with the **current** batch header, so `batch_status` may have moved on. A different body with the same key is ignored and the original wins **[pending D6a, D6c]**.
-3. **No or new `PayPal-Request-Id`, but the `sender_batch_id` was used within the window:** return 400 with this body **[pending D6b]** (the exact name and issue):
+1. **The `sender_batch_id` was used within the window:** return **400** with the body below. This applies to **every** duplicate, whatever the `PayPal-Request-Id`: an exact replay with the same key and body (D6a), a new key (D6b), the same key with a changed body (D6c), and the loser of two concurrent POSTs (D6d). The mock never returns the original 201 again, and never 409. The first request completes normally.
 
 ```json
-{"name": "USER_BUSINESS_ERROR", "message": "Batch with given sender_batch_id already exists",
- "details": [{"field": "sender_batch_id", "value": "cs-0192...0701-a1", "location": "body", "issue": "DUPLICATE_SENDER_BATCH_ID"}],
- "links": [{"href": "http://localhost:8099/v1/payments/payouts/MOCKB5UXD2E8A7", "rel": "self", "method": "GET"}]}
+{"name": "USER_BUSINESS_ERROR", "message": "User business error.", "debug_id": "<random>",
+ "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+ "details": [{"field": "SENDER_BATCH_ID", "location": "body",
+   "issue": "Batch with given sender_batch_id already exists",
+   "link": [{"href": "http://localhost:8099/v1/payments/payouts/MOCKB5UXD2E8A7",
+             "rel": "self", "method": "GET", "encType": "application/json"}]}],
+ "links": []}
 ```
 
-4. **Otherwise:** create the batch.
+   The link sits inside `details[].link` (a singular key holding a list), and top-level `links` is empty, exactly as recorded in D6. By default the href uses the **mock's own base URL**, so core follows it locally. The config flag `duplicate_link_host: "sandbox"` switches the host to `https://api.sandbox.paypal.com` to replay the recorded shape. Core accepts that host only as an alias of `api-m.sandbox.paypal.com`, so against the mock that link is deliberately unusable and the attempt stays UNKNOWN.
+
+2. **Otherwise:** create the batch. A `PayPal-Request-Id` on its own decides nothing: the sandbox showed that duplicates are recognised by `sender_batch_id`.
 
 After the window, keys are forgotten. Reusing a key then creates a **new** payout, and eval scenarios test exactly this.
 
@@ -499,7 +503,7 @@ After the window, keys are forgotten. Reusing a key then creates a **new** payou
 - `transaction_status` is one of `SUCCESS`, `FAILED`, `PENDING`, `UNCLAIMED`, `RETURNED`, `ONHOLD`, `BLOCKED`, `REFUNDED`, `REVERSED`. There is **no** `CANCELED` status.
 
 **`POST /v1/payments/payouts-item/{payout_item_id}/cancel`**
-- If the item is `UNCLAIMED`: return 200 with the PayoutItem, now `RETURNED` **[pending D5]**.
+- If the item is `UNCLAIMED`: return 200 with the PayoutItem, already `RETURNED` in this response (confirmed in D5; a later GET agrees).
 - If it was already cancelled: 400 `ITEM_ALREADY_CANCELLED`.
 - Any other status: 400 `ITEM_INCORRECT_STATUS`.
 
