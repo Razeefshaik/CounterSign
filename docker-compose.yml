@@ -15,5 +15,30 @@ services:
       timeout: 5s
       retries: 12
 
+  postgres-test:
+    image: postgres:16
+    profiles: [test]
+    environment:
+      POSTGRES_DB: countersign
+      POSTGRES_USER: countersign
+      POSTGRES_PASSWORD: countersign-dev
+    ports:
+      - "127.0.0.1:55433:5432"
+    tmpfs:
+      - /var/lib/postgresql/data:rw,size=512m
+    command:
+      - postgres
+      - -c
+      - fsync=off
+      - -c
+      - synchronous_commit=off
+      - -c
+      - full_page_writes=off
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U countersign -d countersign"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
 volumes:
   countersign_postgres:
