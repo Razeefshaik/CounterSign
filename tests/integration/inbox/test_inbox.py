@@ -4,6 +4,7 @@ import asyncio
 import importlib.util
 import json
 from copy import deepcopy
+from datetime import date
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -296,33 +297,130 @@ async def test_naive_or_non_string_event_timestamp_rejected(timestamp):
         await inbox.receive(raw, {})
 
 
-async def test_nested_batch_header_is_get_confirmed_without_changing_payouts(test_db_url):
-    class BatchReader:
+@pytest.mark.parametrize("resource_type", ["item", "batch"])
+@pytest.mark.parametrize("identity_matches", [False, True])
+async def test_payout_get_confirmation_checks_identity_without_changing_state_or_ledger(
+    test_db_url, resource_type, identity_matches
+):
+    expected_id = "ITEM-1" if resource_type == "item" else "BATCH-1"
+
+    class PayoutReader:
         def __init__(self):
             self.calls = []
+
+        async def get_payout_item(self, item_id):
+            self.calls.append(item_id)
+            return SimpleNamespace(
+                status_code=200,
+                body={
+                    "payout_item_id": item_id if identity_matches else "OTHER-ITEM",
+                    "transaction_status": "SUCCESS",
+                },
+            )
 
         async def get_payout_batch(self, batch_id):
             self.calls.append(batch_id)
             return SimpleNamespace(
-                status_code=200, body={"batch_header": {"payout_batch_id": batch_id}}
+                status_code=200,
+                body={
+                    "batch_header": {
+                        "payout_batch_id": batch_id if identity_matches else "OTHER-BATCH",
+                        "batch_status": "SUCCESS",
+                    }
+                },
             )
 
     async with Database(test_db_url) as db:
-        reader = BatchReader()
+        async with db.tx() as conn:
+            repos = Repositories(conn)
+            maker = await repos.makers.insert(display_name="Maker")
+            obligation = await repos.obligations.insert(
+                maker_id=maker["id"],
+                kind="ORDER_SHARE",
+                amount_minor=180,
+                currency="USD",
+                due_date=date(2026, 11, 6),
+                state="IN_FLIGHT",
+            )
+            run = await repos.payout_runs.insert(week_start=date(2026, 11, 2), state="EXECUTING")
+            line = await repos.payout_lines.insert(
+                run_id=run["id"],
+                maker_id=maker["id"],
+                amount_minor=180,
+                currency="USD",
+                state="PAYING",
+            )
+            await repos.payout_line_obligations.insert(
+                line_id=line["id"], obligation_id=obligation["id"], amount_minor=180
+            )
+            operation = await repos.operations.insert(
+                kind="PAYOUT_CREATE",
+                target_type="payout_line",
+                target_id=line["id"],
+                payload={},
+                payload_hash=b"x" * 32,
+                state="SUCCEEDED",
+            )
+            await repos.payout_attempts.insert(
+                line_id=line["id"],
+                attempt_no=1,
+                operation_id=operation["id"],
+                sender_batch_id="sender-batch",
+                request_id="request",
+                sender_item_id="sender-item",
+                payee_email="maker@example.test",
+                amount_minor=180,
+                currency="USD",
+                state="PENDING",
+                paypal_batch_id="BATCH-1",
+                paypal_item_id="ITEM-1",
+            )
+            financial_tables = (
+                "obligations",
+                "payout_runs",
+                "payout_lines",
+                "payout_attempts",
+                "operations",
+                "reservations",
+                "ledger_journals",
+                "ledger_postings",
+            )
+            before = {table: await repos[table].find() for table in financial_tables}
+        reader = PayoutReader()
         inbox = Inbox(db, reader, Verifier())
         raw = json.dumps(
             {
-                "id": "WH-BATCH",
-                "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
-                "resource": {"batch_header": {"payout_batch_id": "BATCH-1"}},
+                "id": "WH-PAYOUT",
+                "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+                if resource_type == "item"
+                else "PAYMENT.PAYOUTSBATCH.SUCCESS",
+                "resource": {"payout_item_id": expected_id}
+                if resource_type == "item"
+                else {"batch_header": {"payout_batch_id": expected_id}},
             }
         ).encode()
         await inbox.receive(raw, {})
         await inbox.process_one()
-        assert reader.calls == ["BATCH-1"]
-        assert (await stored(db, "WH-BATCH"))["status"] == "IGNORED"
+        assert reader.calls == [expected_id]
+        event = await stored(db, "WH-PAYOUT")
+        assert event["status"] == ("PROCESSED" if identity_matches else "ERROR")
+        if identity_matches:
+            assert event["signature"] == "SUCCESS"
         async with db.tx() as conn:
-            assert not await Repositories(conn).payout_attempts.find()
+            repos = Repositories(conn)
+            after = {table: await repos[table].find() for table in financial_tables}
+            assert after == before
+
+
+async def test_unknown_signature_verified_event_remains_ignored(test_db_url):
+    async with Database(test_db_url) as db:
+        reader = Reader()
+        inbox = Inbox(db, reader, Verifier())
+        await inbox.receive(raw_event(event_type="UNSUPPORTED.EVENT"), {})
+        await inbox.process_one()
+        event = await stored(db)
+        assert event["signature"] == "SUCCESS" and event["status"] == "IGNORED"
+        assert not reader.calls
 
 
 @pytest.mark.parametrize(
@@ -343,7 +441,9 @@ async def test_seed_refuses_unmarked_financial_state(test_db_url, table, values)
 
 
 @pytest.mark.parametrize("threshold", [None, 3600])
-async def test_demo_script_deadline_default_and_owner_override_survive_reseed(test_db_url, threshold):
+async def test_demo_script_deadline_default_and_owner_override_survive_reseed(
+    test_db_url, threshold
+):
     data = scenario()
     if threshold is None:
         data["initial_state"]["policy"].pop("deadline_close_seconds", None)
@@ -353,8 +453,12 @@ async def test_demo_script_deadline_default_and_owner_override_survive_reseed(te
         await seed_module.seed_marketplace(db, data)
         async with db.tx() as conn:
             repos = Repositories(conn)
-            assert (await repos.policies.get("deadline_close_seconds"))["value"] == (172800 if threshold is None else threshold)
+            assert (await repos.policies.get("deadline_close_seconds"))["value"] == (
+                172800 if threshold is None else threshold
+            )
             await repos.policies.update("deadline_close_seconds", value=7200)
         await seed_module.seed_marketplace(db, data)
         async with db.tx() as conn:
-            assert (await Repositories(conn).policies.get("deadline_close_seconds"))["value"] == 7200
+            assert (await Repositories(conn).policies.get("deadline_close_seconds"))[
+                "value"
+            ] == 7200
