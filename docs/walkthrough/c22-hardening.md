@@ -33,12 +33,12 @@ The one-live-attempt index remains separate and unchanged. It still prevents two
 
 ## What the generated tests exercise
 
-The Hypothesis dependency is added only to the dev extras. Example counts are bounded, and database examples use rollback isolation inside the existing randomly named test schemas.
+The Hypothesis dependency is added only to the dev extras. Example counts are bounded. Database histories use rollback isolation, while executor races use a fresh migrated schema for each example through the existing schema fixture.
 
 - **Settlement:** up to 200 random event sequences call the real obligation machine. Illegal events are rejected. Each interval between successful `PAYOUT_CLAWED_BACK` events contains at most one entry into SETTLED. An explicit sequence covers settlement, clawback and another settlement. The pure FSM receives the clawback event; existing application integration tests remain responsible for requiring GET confirmation before emitting it.
 - **One live attempt:** up to 60 random prepare, submit, ambiguous, replay and GET-observation histories run through the actual attempt functions and PostgreSQL index. Repeated prepare attempts must raise the named unique violation while another attempt is live.
 - **External mirrors:** up to 100 source/status combinations call the real `mirror` function and persist the result. Explicit surprising cases include SUCCESS to PENDING and a first SUBMITTED to REFUNDED observation.
-- **Executor races:** eight bounded generated cases race two separate executor objects on the same approved line through the real mock transport. They check one attempt, one actual payout POST and one settled obligation, including repeated execute calls. Each example resets the mock and uses a fresh HTTP client because resetting the mock invalidates OAuth tokens.
+- **Executor races:** eight bounded generated cases race two separate executor objects on the same approved line through the real mock transport. They check one attempt, one actual payout POST and one settled obligation, including repeated execute calls. Each example gets its own migrated `cs_test_<uuid>` schema and database pool, which closes before fixture cleanup drops the schema. It never calls `Engine.reset()`, so the test also works when the database is named `countersign`. Each example resets the mock and uses a fresh HTTP client because resetting the mock invalidates OAuth tokens. After advancing mock time, it waits up to 60 seconds for observed settlement through repeated ticks: the database-wide reconciliation lock can make a tick skip polling with zero errors while another schema is active. Unexpected obligation states and tick errors still fail immediately.
 - **Cash:** up to 200 random integer-money cases vary currencies, outflows, refresh boundaries and reservation lists. Earmarks change only the displayed earmarked total. RUN_CASH and PROPOSAL_CASH reduce free cash by exactly their sum. No inflow is invented and no hold is subtracted twice.
 - **SQL bypass:** up to 120 illegal state pairs must fail at the database boundary without changing the row. All 50 generated legal pairs and same-state updates are tested separately. A temporary shadow allowlist cannot bypass the guard.
 
@@ -62,7 +62,7 @@ No real PayPal or model call is made. Hypothesis examples are not separate pytes
 | `tests/integration/executor/test_actions.py`, `tests/integration/test_c24.py` | Constraint-valid fixture setup and reconciliation mismatch injection |
 | `docs/DECISIONS.md`, walkthrough index and this page | Design reasons and verification handoff |
 
-Use the existing CounterSign-db `.venv`, set `PYTHONPATH=src` and point `COUNTERSIGN_TEST_DATABASE_URL` at a dedicated PostgreSQL 16 test database. The existing fixtures create `cs_test_<uuid>` schemas. Run `python -m pytest -q --tb=short -rs`, `ruff check .`, `lint-imports`, and the generator's `--check` command.
+Use the existing CounterSign-db `.venv`, set `PYTHONPATH=src` and point `COUNTERSIGN_TEST_DATABASE_URL` at the standard local PostgreSQL 16 database (`127.0.0.1:55432/countersign`). The existing fixtures create `cs_test_<uuid>` schemas; the race test does not require a database name ending in `_test`. The harness reset tests separately create randomly named disposable `_test` databases to exercise the unchanged reset guard. Run `python -m pytest -q --tb=short -rs`, `ruff check .`, `lint-imports`, and the generator's `--check` command.
 
 ## Fixture repairs exposed by the guard
 
@@ -74,20 +74,40 @@ The first full run found three test-only shortcuts:
 
 The harness reset test also expects migration revision 0004. The guard and generated pairs were not changed to accommodate these fixtures.
 
+Review then caught an isolation error in the race property: it called `Engine.reset()` on the shared world fixture. The initial run used a database ending in `_test`, which hid the failure on the standard database named `countersign`. Each generated race now creates a fresh migrated schema instead of resetting the shared database. The production reset guard is unchanged.
+
+Validation on the shared server also exposed the race test's one-tick assumption. A busy reconciliation cycle is legitimate, so the test now waits for actual settlement within a timeout rather than treating zero errors as proof that a GET happened. It retains the one-attempt, one-POST and final-settlement assertions.
+
 C21's worktree and owned slice files are untouched. No application state machine has been edited. The full suite exposed no illegal application transition; the three shortcuts above were confined to tests.
 
-## Verified results (October 25, 2026)
+## Standard-environment review and rebase (October 25, 2026)
 
-The final full suite ran against a dedicated, temporary PostgreSQL 16 database and the existing mock transport:
+The review correction uses the standard PostgreSQL connection at `127.0.0.1:55432/countersign`, without renaming the database or weakening `Engine.reset()`. The original temporary-database result did not expose the reset-name dependency and is superseded by this validation.
 
-- `pytest -q --tb=short -rs`: **2,128 passed, 6 skipped, 0 failed**, with one existing Starlette/httpx deprecation warning, in **352.11 seconds (5 minutes 52 seconds)**.
+The branch was first rebased onto `eee26ab` (PRs #4 and #5 and contract 1.0.3). Main then advanced during verification, so it was rebased again onto **`36b8dbe3ea6e70f351a944a6575f79a2031027ac`**, including PR #6 and the updated duplicate-link contract test. **DECISIONS.md was the only conflict in each rebase. Both sides' rows were retained**, including the contract 1.0.3 and M09a decisions. Application code, the reset guard, contract text and mate-owned files have no C22 edits relative to that main base.
+
+Observed review runs before the final rebase:
+
+- The first full standard-URL run reported **2 failed, 2,215 passed, 6 skipped, 1 warning** in **2,345.88 seconds (39 minutes 5 seconds)**. The race property asserted settlement after a busy tick; C24's existing `add_dispute` helper indexed an empty list after its polling helper returned. The C24 test passed an isolated standard-URL rerun in **7.24 seconds**. No illegal application transition was reported.
+- After adding the bounded settlement wait, the race property passed on the standard URL in **65.28 seconds**. Its one-attempt, one-POST and final-settlement assertions remain intact.
+- The next run used fail-fast and stopped at Aman's `tests/mock_paypal/test_fault_transport.py::test_after_commit_connection_loss_over_tcp`: the local server readiness GET raised `httpx.ReadTimeout`. It reported **1 failed, 428 passed, 1 skipped, 1 warning** in **1,659.52 seconds (27 minutes 39 seconds)**. C24 passed in that run. The mate-owned transport test was not edited.
+
+Concurrent test sessions and PostgreSQL checkpoint/disk-sync waits were observed during these runs. The standard database settings were not changed.
+
+The latest-base run also encountered severe host file-read delays. A 30-second process-local watchdog captured `importlib.get_data` reading AnyIO package files while importing FastAPI, before the diagnostic test body began. A separate invocation of the first contract test passed once imports finished. PostgreSQL later showed one active writer spending more than 85 seconds in `DataFileImmediateSync`, with no lock blockers. These observations explain why verification remains slow; they are not a passing full-suite result.
+
+The earlier `36b8dbe` attempt ended without a final result, and the standard PostgreSQL container was subsequently found stopped. The existing `countersign-db-postgres-1` container was started again; its image, port, database name and durability settings were not changed. A fresh full run used the exact standard URL, with a detached runner saving its exit status, log and JUnit report.
+
+Final verification on `36b8dbe`:
+
+- `pytest -q --tb=short -rs --junitxml=...`: **2,235 passed, 6 skipped, 0 failed**, with one existing Starlette/httpx deprecation warning, in **1,508.91 seconds (25 minutes 8 seconds)**. The runner exited with status **0**. This is the full run, including the corrected executor-race property and the previously flaky C24 and mock TCP tests.
 - `ruff check .`: **0 issues**.
 - `lint-imports`: **3 contracts kept, 0 broken**, analyzing 86 files and 284 dependencies.
-- `python migrations/generate_transitions.py --check`: passed; the frozen snapshot contains **50 distinct pairs**.
+- Generator `--check`: passed for **50 distinct pairs**.
 - `git diff --check`: passed.
 
-One skipped test requires C09's unpublished redacted sandbox recordings and index. The other five require the optional PayPal Agent Toolkit/LangChain packages. Those skips do not exercise live services. No real PayPal or model call was made.
+The six skips are one unpublished C09 sandbox-recording check and five optional PayPal Agent Toolkit/LangChain checks. No database integration test was skipped because of the standard database name. The standard-server suite exceeded the original approximate 15-minute target; the measured runtime above includes its database and host I/O delays.
 
-The temporary test container, `countersign-c22-test-postgres`, was started with `--rm`. After verification, its stop command could not reach Docker Desktop's Linux-engine pipe, so container removal could not be confirmed. If it remains after Docker restarts, stop that named container; the shared development database was not touched.
+The final log, JUnit XML and runner status are saved under the system temporary directory with the stem `countersign-c22-standard-36b8dbe-resumed`. No illegal application transition was found. There are no open implementation questions for this correction; the earlier concurrent-run fixture failures remain recorded above rather than being hidden by changing production guards.
 
-There are no open implementation questions or known illegal application moves from this run. The branch starts at `4a057a4`; it has not been pushed or merged into main.
+No real PayPal or model call was made. The branch has not been pushed or merged into main.
