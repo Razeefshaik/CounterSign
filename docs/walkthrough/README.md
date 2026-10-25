@@ -62,6 +62,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | [c22-hardening.md](c22-hardening.md) | Database transition guards, frozen FSM rows and generated safety tests |
 | [test-database.md](test-database.md) | Disposable PostgreSQL for faster local tests and deterministic simulator setup |
 | [c24-rules-incidents-simulator.md](c24-rules-incidents-simulator.md) | Dispute rules, reconciliation-only incident closure and read-only payout cash comparisons |
+| [c25-demo-week.md](c25-demo-week.md) | The staged marketplace week, three safety moments, exact Friday approval and owner-operated sandbox runbook |
 | [m09a-mock-sandbox-facts.md](m09a-mock-sandbox-facts.md) | Duplicate payout recovery, confirmed cancellation responses and both dispute request formats in the local mock |
 
 ## Words used everywhere

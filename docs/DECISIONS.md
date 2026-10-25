@@ -238,3 +238,11 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | C20 adds an opt-in postgres-test service on localhost:55433 with tmpfs data and fsync, synchronous_commit and full_page_writes disabled; the existing postgres service and volume are unchanged | Owner test-infrastructure prompt | Accept | Disposable test databases can trade crash durability for faster Windows test runs; sandbox working state must retain crash-safe storage |
+
+## Oct 25 C25 demo week
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| C25 requires an explicit adjudicate or buyer_close settlement setting and a configured terminal outcome mapping; sandbox execution remains owner-operated pending D10 | C25 | Accept | Neither a mock outcome nor a staged seller win establishes real sandbox behavior |
+| C25 submits evidence only when fresh status and provide_evidence links permit it; otherwise the real shield blocks the proposal and the week continues | C25 | Accept | D8 and D9 showed that dispute stage alone cannot determine evidence availability |
+| C25 CLI parses the database name and refuses names not ending in _demo or _test before opening connections | C25 | Accept | A resumable staged money workflow must never operate on the owner's working database |
