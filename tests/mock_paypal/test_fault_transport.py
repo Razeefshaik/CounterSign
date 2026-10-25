@@ -72,13 +72,22 @@ def test_after_commit_connection_loss_over_tcp():
                     headers={"PayPal-Request-Id": "tcp"},
                 )
             assert len(client.get("/_mock/ground-truth").json()["payout_items"]) == 1
+            replay = client.post(
+                "/v1/payments/payouts",
+                json=payload,
+                headers={"PayPal-Request-Id": "tcp"},
+            )
+            assert replay.status_code == 400
+            assert replay.json()["name"] == "USER_BUSINESS_ERROR"
+            assert replay.json()["links"] == []
+            linked = client.get(replay.json()["details"][0]["link"][0]["href"])
+            assert linked.status_code == 200
+            assert len(linked.json()["items"]) == 1
             assert (
-                client.post(
-                    "/v1/payments/payouts",
-                    json=payload,
-                    headers={"PayPal-Request-Id": "tcp"},
-                ).status_code
-                == 201
+                linked.json()["batch_header"]["payout_batch_id"]
+                == client.get("/_mock/ground-truth").json()["payout_items"][0][
+                    "payout_batch_id"
+                ]
             )
             assert len(client.get("/_mock/ground-truth").json()["payout_items"]) == 1
     finally:

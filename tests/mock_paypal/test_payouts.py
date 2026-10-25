@@ -113,6 +113,12 @@ def test_unregistered_cancel_and_no_double_credit(client):
     response = client.post(path)
     assert response.status_code == 200
     assert response.json()["transaction_status"] == "RETURNED"
+    assert (
+        client.get(f"/v1/payments/payouts-item/{payout['payout_item_id']}").json()[
+            "transaction_status"
+        ]
+        == "RETURNED"
+    )
     assert "errors" not in response.json()
     assert client.app.state.store.payouts.available_minor == 150000
     check_error(client.post(path), 400, "ITEM_ALREADY_CANCELLED")

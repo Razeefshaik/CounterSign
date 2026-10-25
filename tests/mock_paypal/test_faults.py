@@ -38,7 +38,18 @@ def test_connection_loss_and_same_key_retry(client, kind, after):
         client.post(PATH, json=body(), headers={"PayPal-Request-Id": "stable"})
     truth = client.get("/_mock/ground-truth").json()
     assert len(truth["payout_items"]) == int(after)
-    create(client, headers={"PayPal-Request-Id": "stable"})
+    replay = client.post(PATH, json=body(), headers={"PayPal-Request-Id": "stable"})
+    assert replay.status_code == (400 if after else 201)
+    if after:
+        doc = replay.json()
+        assert doc["name"] == "USER_BUSINESS_ERROR"
+        assert doc["links"] == []
+        linked = client.get(doc["details"][0]["link"][0]["href"])
+        assert linked.status_code == 200
+        assert (
+            linked.json()["batch_header"]["payout_batch_id"]
+            == truth["payout_items"][0]["payout_batch_id"]
+        )
     truth = client.get("/_mock/ground-truth").json()
     assert len(truth["payout_items"]) == 1
     assert truth["payout_items"][0]["money_left_account"]

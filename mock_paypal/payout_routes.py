@@ -1,7 +1,5 @@
 """HTTP payout routes; money mutations serialize with clock and reset controls."""
 
-import asyncio
-
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
@@ -21,18 +19,6 @@ async def create(request: Request):
     base = str(request.base_url)
     async with lock:
         state = store.payouts
-        record = state.request_keys.get(request_id) if request_id else None
-        if record and record.in_progress:
-            raise PayoutError(
-                service.behavior.concurrent_duplicate_status,
-                service.behavior.concurrent_duplicate_name,
-                "Request with this ID is still in progress",
-            )
-        # Completed request IDs win before sender_batch_id or new body validation.
-        if record and service.behavior.replay_original_body_wins:
-            return JSONResponse(
-                status_code=201, content=service.replay_doc(record, base)
-            )
         try:
             if (
                 request.headers.get("content-type", "").split(";")[0].strip().lower()
@@ -42,46 +28,41 @@ async def create(request: Request):
             body = CreatePayout.model_validate(await request.json())
         except (ValueError, UnicodeError, ValidationError):
             raise PayoutError(422, "INVALID_REQUEST", "Invalid payout body") from None
-        if record:
-            if body.model_dump(exclude_none=True) != record.original_body:
-                raise PayoutError(400, "INVALID_REQUEST", "Request ID body changed")
-            return JSONResponse(
-                status_code=201, content=service.replay_doc(record, base)
-            )
         sender_id = body.sender_batch_header.sender_batch_id
         previous_id = state.sender_keys.get(sender_id)
         if previous_id:
+            link_base = (
+                "https://api.sandbox.paypal.com"
+                if store.config.duplicate_link_host == "sandbox"
+                else base
+            )
             raise PayoutError(
-                service.behavior.duplicate_batch_status,
-                service.behavior.duplicate_batch_name,
-                "Batch with given sender_batch_id already exists",
+                400,
+                "USER_BUSINESS_ERROR",
+                "User business error.",
+                information_link="https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
                 details=[
                     {
-                        "field": "sender_batch_id",
-                        "value": sender_id,
+                        "field": "SENDER_BATCH_ID",
                         "location": "body",
-                        "issue": service.behavior.duplicate_batch_issue,
+                        "issue": "Batch with given sender_batch_id already exists",
+                        "link": [
+                            {
+                                **service.link(
+                                    link_base,
+                                    f"/v1/payments/payouts/{previous_id}",
+                                    "self",
+                                ),
+                                "encType": "application/json",
+                            }
+                        ],
                     }
-                ],
-                links=[
-                    service.link(base, f"/v1/payments/payouts/{previous_id}", "self")
                 ],
             )
         batch = service.create(body)
         batch.request_id = request_id
-        record = service.remember_keys(batch, request_id, body)
-
-    try:
-        # Scheduling checkpoint only: zero mock time passes. Allow overlapping requests
-        # to observe the committed operation while its response is still in progress.
-        await asyncio.sleep(0)
-        async with lock:
-            if store.payouts is not state:
-                raise PayoutError(409, "MOCK_RESET", "Mock was reset during request")
-            result = service.create_doc(batch, base)
-    finally:
-        # Commit already happened: retries must adopt this batch even if delivery fails.
-        record.in_progress = False
+        service.remember_keys(batch)
+        result = service.create_doc(batch, base)
     return JSONResponse(status_code=201, content=result)
 
 
