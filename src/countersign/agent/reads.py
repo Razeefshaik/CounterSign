@@ -16,7 +16,7 @@ from psycopg import sql
 from psycopg.rows import dict_row
 
 from countersign.agent.safety import sanitize
-from countersign.agent.tools import ReadTool
+from countersign.agent.tools import ReadTool, ReadToolError
 
 AGENT_ROLE = "countersign_agent_ro"
 _SCHEMA = re.compile(r"[a-z_][a-z0-9_]{0,62}\Z")
@@ -67,10 +67,6 @@ SELECT r.rolname AS role,
        ) AS view_select_only
 FROM pg_roles r WHERE r.rolname = current_user
 """
-
-
-class ReadToolError(ValueError):
-    """A fixed public code, never a driver, URL, credential or buyer message."""
 
 
 def _arguments(value, allowed, required=()):
