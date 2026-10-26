@@ -408,7 +408,11 @@ def test_sandbox_missing_outcome_mapping_stops_before_connections(monkeypatch, c
     assert expected in output and "FAKE-SECRET" not in output
 
 
-def test_buyer_close_cannot_use_the_seller_win_mapping():
+def test_buyer_close_needs_its_own_d10_mapping_not_the_seller_win(monkeypatch):
+    # D10 confirmed CANCELED_BY_BUYER, so the real map allows buyer-close...
+    demo.settlement_mapping_guard(demo.DemoOptions(settlement="buyer_close"))
+    # ...but the seller-win code alone must never stand in for it.
+    monkeypatch.delitem(OUTCOME_MAP, "CANCELED_BY_BUYER")
     with pytest.raises(SliceError, match="D10_BUYER_CLOSE_OUTCOME_MAPPING_REQUIRED"):
         demo.settlement_mapping_guard(demo.DemoOptions(settlement="buyer_close"))
 

@@ -63,12 +63,19 @@ def test_outcome_map_contains_only_d10_confirmed_codes():
     assert OUTCOME_MAP == {
         "RESOLVED_SELLER_FAVOUR": Phase.WON,
         "RESOLVED_BUYER_FAVOUR": Phase.LOST_FULL,
+        "CANCELED_BY_BUYER": Phase.CANCELLED,
     }
 
 
-@pytest.mark.parametrize("code", ["CANCELED_BY_BUYER", "RESOLVED_SELLER_FAVOR", "NEW_CODE"])
+@pytest.mark.parametrize("code", ["RESOLVED_SELLER_FAVOR", "CANCELLED_BY_BUYER", "NEW_CODE"])
 def test_unconfirmed_codes_still_fail_closed(code):
     assert phase("RESOLVED", code, 0, AMOUNT) is Phase.UNKNOWN_OUTCOME
+
+
+def test_d10_buyer_close_cancels_only_without_a_refund():
+    assert phase("RESOLVED", "CANCELED_BY_BUYER", 0, AMOUNT) is Phase.CANCELLED
+    assert phase("RESOLVED", "CANCELED_BY_BUYER", None, AMOUNT) is Phase.CANCELLED
+    assert phase("RESOLVED", "CANCELED_BY_BUYER", 1, AMOUNT) is Phase.UNKNOWN_OUTCOME
 
 
 def test_d10_seller_win_releases_only_without_a_contradictory_refund():
