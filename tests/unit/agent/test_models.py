@@ -222,3 +222,37 @@ async def test_prepare_refuses_a_factory_result_without_chat_methods(monkeypatch
     )
     with pytest.raises(ModelError, match="MODEL_CONFIGURATION_INVALID"):
         await model.prepare()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("fails", [False, True])
+async def test_provider_cleanup_is_once_and_keeps_failures_private(monkeypatch, fails):
+    @contextmanager
+    def disabled(**_):
+        yield
+
+    monkeypatch.setitem(sys.modules, "langsmith", SimpleNamespace(tracing_context=disabled))
+    closed = []
+
+    class Client:
+        def bind_tools(self, _):
+            return self
+
+        async def ainvoke(self, *_, **__):
+            pytest.fail("resource cleanup must not make a model request")
+
+        async def aclose(self):
+            closed.append(True)
+            if fails:
+                raise RuntimeError("FAKE-KEY private cleanup failure")
+
+    model = LangChainModel(ChatModelConfig("fake", "model", "FAKE-KEY"), factory=lambda _: Client())
+    await model.prepare()
+    if fails:
+        with pytest.raises(ModelError, match="^MODEL_CLOSE_FAILED$") as error:
+            await model.aclose()
+        assert "FAKE-KEY" not in str(error.value)
+    else:
+        await model.aclose()
+    await model.aclose()
+    assert closed == [True] and model._conversation is None

@@ -18,15 +18,32 @@ from countersign.config import PayPalSettings
 MAX_MESSAGE_BYTES = 262144
 _OS_ENVIRONMENT = frozenset(
     {
-        "SYSTEMROOT", "WINDIR", "PATH", "PATHEXT", "COMSPEC", "TEMP", "TMP",
-        "USERPROFILE", "APPDATA", "LOCALAPPDATA", "PROGRAMDATA", "HOME", "LANG", "LC_ALL",
+        "SYSTEMROOT",
+        "WINDIR",
+        "PATH",
+        "PATHEXT",
+        "COMSPEC",
+        "TEMP",
+        "TMP",
+        "USERPROFILE",
+        "APPDATA",
+        "LOCALAPPDATA",
+        "PROGRAMDATA",
+        "HOME",
+        "LANG",
+        "LC_ALL",
     }
 )
 _CHILD_ERRORS = frozenset(
     {
-        "TOOLKIT_DEPENDENCIES_MISSING", "TOOLKIT_VERSION_UNSUPPORTED", "TOOLKIT_SET_MISMATCH",
-        "TOOLKIT_CONFIG_INVALID", "TOOLKIT_CALL_FAILED", "TOOLKIT_REQUEST_BLOCKED",
-        "INVALID_TOOL_ARGUMENTS", "TOOLKIT_MESSAGE_INVALID",
+        "TOOLKIT_DEPENDENCIES_MISSING",
+        "TOOLKIT_VERSION_UNSUPPORTED",
+        "TOOLKIT_SET_MISMATCH",
+        "TOOLKIT_CONFIG_INVALID",
+        "TOOLKIT_CALL_FAILED",
+        "TOOLKIT_REQUEST_BLOCKED",
+        "INVALID_TOOL_ARGUMENTS",
+        "TOOLKIT_MESSAGE_INVALID",
     }
 )
 
@@ -107,6 +124,7 @@ class _ThreadProcess:
 
     async def wait(self):
         if self._wait_task is None:
+
             def wait_and_close():
                 try:
                     return self._process.wait()
@@ -187,7 +205,9 @@ class ToolkitGateway:
         if type(timeout) not in (int, float) or not math.isfinite(timeout) or timeout <= 0:
             raise ToolError("TOOLKIT_CONFIG_INVALID")
         self._settings = settings
-        self._python = str(python_executable or sys.executable)
+        self._python = str(
+            python_executable or os.environ.get("COUNTERSIGN_TOOLKIT_PYTHON") or sys.executable
+        )
         self._timeout = timeout
         self._spawn = process_factory or _create_subprocess
         self._process = None
@@ -263,9 +283,7 @@ class ToolkitGateway:
             async def handler(arguments, *, selected=name):
                 return await self._invoke(selected, arguments)
 
-            result.append(
-                ReadTool(name, definition["description"], definition["schema"], handler)
-            )
+            result.append(ReadTool(name, definition["description"], definition["schema"], handler))
         return tuple(result)
 
     async def _invoke(self, name, arguments):
