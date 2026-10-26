@@ -1,0 +1,472 @@
+[
+  {
+    "value": "ERRPYOB002",
+    "method": "GET",
+    "path": "/v1/payments/payouts/ERRPYOB002",
+    "status": 200,
+    "body": {
+      "batch_header": {
+        "payout_batch_id": "2HQND3EJEWMLW",
+        "batch_status": "PENDING",
+        "time_created": "2017-08-22T15:15:07Z",
+        "sender_batch_header": {
+          "sender_batch_id": "API-155",
+          "email_subject": "Test batch status"
+        },
+        "amount": {
+          "currency": "USD",
+          "value": "2580.00"
+        }
+      },
+      "items": [
+        {
+          "payout_item_id": "3VFK6ZWG47BLU",
+          "transaction_status": "PENDING",
+          "payout_batch_id": "2HQND3EJEWMLW",
+          "payout_item": {
+            "recipient_type": "EMAIL",
+            "amount": {
+              "currency": "USD",
+              "value": "2580.00"
+            },
+            "note": "payout to receiver test1",
+            "receiver": "email@redacted",
+            "sender_item_id": "ID-30"
+          },
+          "links": [
+            {
+              "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/3VFK6ZWG47BLU",
+              "rel": "item",
+              "method": "GET",
+              "encType": "application/json"
+            }
+          ]
+        }
+      ],
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/2HQND3EJEWMLW",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/03_get_batch_errpyob002.json"
+  },
+  {
+    "value": "ERRPYOB003",
+    "method": "GET",
+    "path": "/v1/payments/payouts/ERRPYOB003",
+    "status": 200,
+    "body": {
+      "batch_header": {
+        "payout_batch_id": "MQ5DXH23LZAM4",
+        "batch_status": "PROCESSING",
+        "time_created": "2017-08-22T15:00:45Z",
+        "sender_batch_header": {
+          "sender_batch_id": "API-15",
+          "email_subject": "Test batch status"
+        },
+        "amount": {
+          "currency": "USD",
+          "value": "25.80"
+        },
+        "fees": {
+          "currency": "USD",
+          "value": "0.25"
+        }
+      },
+      "items": [
+        {
+          "payout_item_id": "YL3JDBJ65GDGA",
+          "transaction_status": "PENDING",
+          "payout_item_fee": {
+            "currency": "USD",
+            "value": "0.25"
+          },
+          "payout_batch_id": "MQ5DXH23LZAM4",
+          "payout_item": {
+            "recipient_type": "EMAIL",
+            "amount": {
+              "currency": "USD",
+              "value": "25.80"
+            },
+            "note": "payout to  receiver test1",
+            "receiver": "email@redacted",
+            "sender_item_id": "ID-30"
+          },
+          "links": [
+            {
+              "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/YL3JDBJ65GDGA",
+              "rel": "item",
+              "method": "GET",
+              "encType": "application/json"
+            }
+          ]
+        }
+      ],
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/MQ5DXH23LZAM4",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/04_get_batch_errpyob003.json"
+  },
+  {
+    "value": "ERRPYOB004",
+    "method": "GET",
+    "path": "/v1/payments/payouts/ERRPYOB004",
+    "status": 200,
+    "body": {
+      "batch_header": {
+        "payout_batch_id": "87FVC3NPD6Y8J",
+        "batch_status": "DENIED",
+        "time_created": "2017-08-22T15:18:48Z",
+        "sender_batch_header": {
+          "sender_batch_id": "API-1556",
+          "email_subject": "Test batch status"
+        },
+        "amount": {
+          "currency": "SGD",
+          "value": "2580.00"
+        },
+        "fees": {
+          "currency": "SGD",
+          "value": "0.00"
+        }
+      },
+      "items": [
+        {
+          "payout_item_id": "FYXYDFKV795Z2",
+          "transaction_status": "FAILED",
+          "payout_item_fee": {
+            "currency": "SGD",
+            "value": "0.00"
+          },
+          "payout_batch_id": "87FVC3NPD6Y8J",
+          "payout_item": {
+            "recipient_type": "EMAIL",
+            "amount": {
+              "currency": "SGD",
+              "value": "2580.00"
+            },
+            "note": "payout to receiver test1",
+            "receiver": "email@redacted",
+            "sender_item_id": "ID-30"
+          },
+          "errors": {
+            "name": "NON_HOLDING_CURRENCY",
+            "message": "Balance not available in the specified currency",
+            "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+            "details": []
+          },
+          "links": [
+            {
+              "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/FYXYDFKV795Z2",
+              "rel": "item",
+              "method": "GET",
+              "encType": "application/json"
+            }
+          ]
+        }
+      ],
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/87FVC3NPD6Y8J",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/05_get_batch_errpyob004.json"
+  },
+  {
+    "value": "ERRPYO015",
+    "method": "GET",
+    "path": "/v1/payments/payouts/ERRPYO015",
+    "status": 200,
+    "body": {
+      "batch_header": {
+        "payout_batch_id": "DQCP2UAJCBMNY",
+        "batch_status": "DENIED",
+        "time_created": "2017-08-21T11:22:33Z",
+        "time_completed": "2017-08-21T11:22:54Z",
+        "sender_batch_header": {
+          "email_subject": "user test case"
+        },
+        "amount": {
+          "currency": "USD",
+          "value": "190.00"
+        },
+        "fees": {
+          "currency": "USD",
+          "value": "0.00"
+        }
+      },
+      "items": [
+        {
+          "payout_item_id": "RWD4Y3H9VV8BA",
+          "transaction_status": "FAILED",
+          "payout_item_fee": {
+            "currency": "USD",
+            "value": "0.00"
+          },
+          "payout_batch_id": "DQCP2UAJCBMNY",
+          "payout_item": {
+            "recipient_type": "EMAIL",
+            "amount": {
+              "currency": "USD",
+              "value": "190.00"
+            },
+            "note": "payout to receiver",
+            "receiver": "email@redacted",
+            "sender_item_id": "MSI-2727"
+          },
+          "time_processed": "2017-08-21T11:22:44Z",
+          "errors": {
+            "name": "CLOSED_MARKET",
+            "message": "Market closed and transaction is between 2 different countries",
+            "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+            "details": []
+          },
+          "links": [
+            {
+              "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/RWD4Y3H9VV8BA",
+              "rel": "item",
+              "method": "GET",
+              "encType": "application/json"
+            }
+          ]
+        }
+      ],
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/DQCP2UAJCBMNY",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/06_get_batch_errpyo015.json"
+  },
+  {
+    "value": "ERRPYO015",
+    "method": "GET",
+    "path": "/v1/payments/payouts-item/ERRPYO015",
+    "status": 404,
+    "body": {
+      "name": "INVALID_RESOURCE_ID",
+      "message": "The requested resource ID was not found",
+      "debug_id": "f900981cd9d6f",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+      "details": [],
+      "links": []
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/07_get_item_errpyo015.json"
+  },
+  {
+    "value": "ERRPYO047",
+    "method": "GET",
+    "path": "/v1/payments/payouts-item/ERRPYO047",
+    "status": 200,
+    "body": {
+      "payout_item_id": "JJ5Z53TN2SR5C",
+      "transaction_id": "7EA91403EK812680R",
+      "transaction_status": "UNCLAIMED",
+      "payout_item_fee": {
+        "currency": "USD",
+        "value": "0.25"
+      },
+      "payout_batch_id": "8U28CZSK6JGLU",
+      "payout_item": {
+        "recipient_type": "EMAIL",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "note": "payout to receiver test1",
+        "receiver": "email@redacted",
+        "sender_item_id": "30.30"
+      },
+      "errors": {
+        "name": "RECEIVER_UNREGISTERED",
+        "message": "Receiver is unregistered",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+        "details": []
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/JJ5Z53TN2SR5C",
+          "rel": "item",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/08_get_item_errpyo047.json"
+  },
+  {
+    "value": "ERRPYO052",
+    "method": "GET",
+    "path": "/v1/payments/payouts-item/ERRPYO052",
+    "status": 200,
+    "body": {
+      "payout_item_id": "NL34TAVXXT4ZU",
+      "transaction_status": "FAILED",
+      "payout_item_fee": {
+        "currency": "USD",
+        "value": "0.00"
+      },
+      "payout_batch_id": "PQUQGBBRSKM5Y",
+      "payout_item": {
+        "recipient_type": "EMAIL",
+        "amount": {
+          "currency": "USD",
+          "value": "12.00"
+        },
+        "note": "payout to receiver from TEST merchant",
+        "receiver": "email@redacted",
+        "sender_item_id": "30.30"
+      },
+      "errors": {
+        "name": "RISK_DECLINE",
+        "message": "This transaction was declined due to risk concerns",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+        "details": []
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/NL34TAVXXT4ZU",
+          "rel": "item",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/09_get_item_errpyo052.json"
+  },
+  {
+    "value": "ERRPYO007",
+    "method": "POST",
+    "path": "/v1/payments/payouts-item/ERRPYO007/cancel",
+    "status": 400,
+    "body": {
+      "name": "ITEM_ALREADY_CANCELLED",
+      "message": "Requested item is already cancelled.",
+      "debug_id": "99246ee451ec5",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/10_cancel_errpyo007.json"
+  },
+  {
+    "value": "ERRPYO008",
+    "method": "POST",
+    "path": "/v1/payments/payouts-item/ERRPYO008/cancel",
+    "status": 400,
+    "body": {
+      "name": "ITEM_CANCELLATION_FAILED",
+      "message": "Cancel request for the item failed due to an internal error.",
+      "debug_id": "56236ee451ef4",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/11_cancel_errpyo008.json"
+  },
+  {
+    "value": "ERRPYO009",
+    "method": "POST",
+    "path": "/v1/payments/payouts-item/ERRPYO009/cancel",
+    "status": 400,
+    "body": {
+      "name": "ITEM_INCORRECT_STATUS",
+      "message": "Only items in Unclaimed status can be cancelled.",
+      "debug_id": "53505ea6f6957",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/12_cancel_errpyo009.json"
+  },
+  {
+    "value": "ERRPYO005",
+    "method": "POST",
+    "path": "/v1/payments/payouts",
+    "status": 422,
+    "body": {
+      "name": "INSUFFICIENT_FUNDS",
+      "message": "An internal service error has occurred.",
+      "debug_id": "9de0a086d00cd",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/13_create_errpyo005.json"
+  },
+  {
+    "value": "ERRPYO006",
+    "method": "POST",
+    "path": "/v1/payments/payouts",
+    "status": 500,
+    "body": {
+      "name": "INTERNAL_ERROR",
+      "message": "An internal service error has occurred.",
+      "debug_id": "74b46c42107ee",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/14_create_errpyo006.json"
+  },
+  {
+    "value": "ERRPYO014",
+    "method": "POST",
+    "path": "/v1/payments/payouts",
+    "status": 400,
+    "body": {
+      "name": "USER_BUSINESS_ERROR",
+      "message": "User business error.",
+      "debug_id": "9c7324f51c311",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+      "details": [
+        {
+          "field": "SENDER_BATCH_ID",
+          "issue": "Batch with given sender_batch_id already exists",
+          "link": [
+            {
+              "href": "https://api.sandbox.paypal.com/v1/payments/payouts/JGZ2AMH9HTGRA",
+              "rel": "self",
+              "method": "GET"
+            }
+          ]
+        }
+      ]
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/15_create_errpyo014.json"
+  },
+  {
+    "value": "ERRPYO036",
+    "method": "POST",
+    "path": "/v1/payments/payouts",
+    "status": 504,
+    "body": {
+      "name": "REQUEST_TIMEOUT_EXCEEDED",
+      "message": "Server did not receive a timely response from a system it needed to access to process the request. Please retry after some time.",
+      "debug_id": "dc5aba28bb036",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/16_create_errpyo036.json"
+  },
+  {
+    "value": "ERRPYO039",
+    "method": "POST",
+    "path": "/v1/payments/payouts",
+    "status": 400,
+    "body": {
+      "name": "PREVIOUS_REQUEST_IN_PROGRESS",
+      "message": "A previous with the same sender batch id is in progress. Please try after some time.",
+      "debug_id": "dc5aba28bb036",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+    },
+    "source": "recordings/sandbox/2026-10-24/D7/17_create_errpyo039.json"
+  }
+]
