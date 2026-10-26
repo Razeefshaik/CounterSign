@@ -172,12 +172,14 @@ def test_real_commander_and_child_complete_all_five_reads_on_actual_mock(toolkit
                             ]
                         else:
                             assert self.turns == 3
+                            # D12: an empty search omits transaction_details entirely,
+                            # and reporting lag may honestly leave the result empty.
                             assert isinstance(
-                                request["observations"][4]["untrusted_result"][
-                                    "transaction_details"
-                                ],
+                                request["observations"][4]["untrusted_result"].get(
+                                    "transaction_details", []
+                                ),
                                 list,
-                            )  # Reporting lag may honestly leave the result empty.
+                            )
                             assert request["observations"][5]["untrusted_result"]["trackers"]
                             return proposal()
                         return {
