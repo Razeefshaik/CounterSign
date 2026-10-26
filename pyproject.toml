@@ -12,6 +12,12 @@ license = "Apache-2.0"
 license-files = ["LICENSE"]
 
 [project.optional-dependencies]
+llm = [
+    "langchain==1.4.7",
+    "langchain-core==1.7.0",
+    "langchain-google-genai==4.4.2",
+    "google-genai==2.33.0",
+]
 dev = [
     "httpx",
     "fastapi",

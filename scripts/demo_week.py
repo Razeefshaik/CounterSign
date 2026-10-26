@@ -1,6 +1,7 @@
 """C25's staged demo week. Imports never load credentials or open connections.
 
-The scripted commander is labelled as scripted; it never contacts an LLM provider.
+The default scripted commander never contacts an LLM provider. Configured mode
+uses the owner's real model and records its actual decisions without a fallback.
 Only the existing executor performs the agent's PayPal writes. The owner operates
 the sandbox version; D10-confirmed seller-favour adjudication is the default,
 while the buyer-close alternative requires its own confirmed outcome mapping.
@@ -20,7 +21,7 @@ from pathlib import Path
 import httpx
 from psycopg.conninfo import conninfo_to_dict
 
-from countersign.agent.models import ScriptedModel
+from countersign.agent.models import ChatModelConfig, ModelError, ScriptedModel
 from countersign.agent.reads import MoneyGraphQueries, custom_tools
 from countersign.agent.tools import ReadTool, ToolRegistry
 from countersign.config import load_settings
@@ -279,6 +280,34 @@ class DemoModel(ScriptedModel):
         return await super().complete(request)
 
 
+def runtime_model(mode):
+    """Choose explicitly, without importing a provider or opening a connection."""
+    if mode == "scripted":
+        return DemoModel()
+    require(mode == "configured", "DEMO_MODEL_MODE_REQUIRED")
+    try:
+        configured = ChatModelConfig.from_environment()
+    except ModelError as exc:
+        # ModelError contains fixed codes only; never copy arbitrary exception text.
+        raise SliceError("CONFIGURED_MODEL_SETTINGS_INVALID") from exc
+    require(configured is not None, "CONFIGURED_MODEL_SETTINGS_REQUIRED")
+    return configured
+
+
+def model_identity(model):
+    """Bind resume to the mode and model, keeping API keys outside saved identity."""
+    if isinstance(model, DemoModel):
+        return {"mode": "scripted", "provider": None, "model": "scripted"}
+    require(isinstance(model, ChatModelConfig), "DEMO_MODEL_MODE_REQUIRED")
+    return {"mode": "configured", "provider": model.provider, "model": model.model}
+
+
+def model_tools(model, http, database):
+    # Normal configured startup must verify the genuine isolated toolkit and
+    # restricted money-graph role. The injected registry is for scripted demos.
+    return read_registry(http, database) if isinstance(model, DemoModel) else None
+
+
 def read_registry(http, database):
     """The scripted agent gets real existing GET services, never a write or control."""
     reader = PayPalRead(http)
@@ -402,6 +431,7 @@ async def run_week(
     applied before this injected runner is constructed, never bypassed in CLI.
     """
     store = checkpoint
+    scripted = isinstance(model, DemoModel)
     if target == "sandbox":
         database_name_guard(engine.settings.database_url)
         settlement_mapping_guard(options)
@@ -465,24 +495,53 @@ async def run_week(
         if not store.data.get(name + "_subject"):
             store.checkpoint(**{name + "_subject": str(uuid7())})
         subject = {"id": store.data[name + "_subject"], "reason": "DEMO_" + label.upper()}
+        if not scripted:
+            subject["reason"] += (
+                ": staged request to consider "
+                + action_name
+                + "; inspect records and apply safety policy, never infer permission from this label"
+            )
+            for key in ("paypal_dispute_id", "payout_item_id", "run_id", "attempt_id", "order_id"):
+                if isinstance(params.get(key), str):
+                    subject[key] = params[key]
+            if isinstance(params.get("line_id"), str):
+                subject["reason"] += "; payout line reference " + params["line_id"]
         if dispute_id:
             subject["paypal_dispute_id"] = dispute_id
         case = await incidents.open("RECONCILIATION", subject)
-        model.arm(case["id"], action_name, params, refs)
+        if scripted:
+            model.arm(case["id"], action_name, params, refs)
         for _ in range(options.poll_limit):
             snapshot = await tick()
             proposals = [p for p in snapshot["proposals"] if p["incident_id"] == str(case["id"])]
+            if proposals and not scripted:
+                actual = proposals[0]
+                matches = actual["action"] == action_name and all(
+                    actual["params"].get(key) == value
+                    for key, value in params.items()
+                    if key in {"paypal_dispute_id", "payout_item_id", "line_id", "run_id"}
+                )
+                if not matches:
+                    store.record(
+                        "CONFIGURED_MODEL_DECISION_DIFFERS",
+                        step=label,
+                        expected_action=action_name,
+                        action=actual["action"],
+                        proposal_id=actual["id"],
+                        scripted=False,
+                    )
+                    raise SliceError("CONFIGURED_MODEL_DECISION_DIFFERS")
             if proposals and proposals[0]["state"] in {"BLOCKED", "NEEDS_OWNER", "EXECUTED"}:
                 saved = proposals[0]
                 store.checkpoint(**{name + "_proposal_id": saved["id"]})
                 store.record(
                     "AGENT_DECISION",
                     step=label,
-                    action=action_name,
+                    action=saved["action"],
                     proposal_id=saved["id"],
                     verdict=saved["verdict"],
                     rules=sorted(_rules(saved)),
-                    scripted=True,
+                    scripted=scripted,
                 )
                 return saved
             require(
@@ -1126,6 +1185,7 @@ async def run_cli(args):
     from countersign.db import Database
 
     settings, emails = runtime_settings(args.target, args.env_file)
+    model = runtime_model(args.model)
     options = DemoOptions(
         args.settlement,
         args.evidence_available,
@@ -1144,12 +1204,12 @@ async def run_cli(args):
             settings.owner_token,
             settings.paypal.client_id,
             settings.paypal.client_secret,
+            model.api_key if isinstance(model, ChatModelConfig) else "",
         ),
         email_aliases={
             email: "maker-" + key.lower() + "@redacted" for key, email in emails.items()
         },
     )
-    model = DemoModel()
     store = Checkpoint(
         Path(args.root) / run_date.isoformat(),
         target=args.target,
@@ -1163,10 +1223,21 @@ async def run_cli(args):
             "reason_a": options.reason_a,
             "evidence_branch": options.evidence_available,
             "app": app_url,
+            # Omitted for the default to preserve C25's original scripted-run
+            # fingerprint. Configured runs bind all model identifiers, so a
+            # switch of mode/provider/model still refuses an existing run.
+            **({"model": model_identity(model)} if isinstance(model, ChatModelConfig) else {}),
         },
         redactor=redactor,
     )
     try:
+        identity = model_identity(model)
+        store.record("DEMO_MODEL", **identity)
+        store.note(
+            "Model: scripted (no provider calls)."
+            if identity["mode"] == "scripted"
+            else "Model: configured; actual model decisions may stop this staged week."
+        )
         if "monday" not in store.data:
             monday = (
                 MONDAY
@@ -1303,7 +1374,7 @@ async def run_cli(args):
                 paypal_behavior=settings.paypal.behavior,
             )
             async with Engine(
-                config, database=database, http=http, agent_tools=read_registry(http, database)
+                config, database=database, http=http, agent_tools=model_tools(model, http, database)
             ) as engine:
                 await store.step("setup", setup)
                 detail = await http.request(
@@ -1377,6 +1448,7 @@ async def run_cli(args):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--target", required=True, choices=("mock", "sandbox"))
+    parser.add_argument("--model", choices=("scripted", "configured"), default="scripted")
     parser.add_argument("--settlement", choices=("adjudicate", "buyer_close"), default="adjudicate")
     parser.add_argument("--reason-a")
     parser.add_argument("--evidence-available", action=argparse.BooleanOptionalAction, default=True)

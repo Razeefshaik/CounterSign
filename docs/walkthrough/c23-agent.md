@@ -96,38 +96,134 @@ including owner decisions made through the HTTP API.
 
 ## 5. Switching on a real model
 
-The owner must provide:
+The owner chose Google Gemini through AI Studio's free API tier. Model identity
+is configurable, with `gemini-3.5-flash` as the configured default and
+`gemini-3.5-flash-lite` as an explicitly selected eval fallback. Nothing contacts Google merely because a key
+exists: the demo stays scripted unless `--model configured` is selected. A partial
+configuration fails clearly; configured mode never falls back to a fake model.
 
-- A LangChain provider ID and its exact model ID. The model must support tool calls.
-- That provider's API key, supplied through runtime configuration.
-- A provider integration version compatible with the toolkit's LangChain adapter.
+### Why there are two Python environments
 
-Install `paypal-agent-toolkit==1.11.0` with `--no-deps`, then the D13 adapter set
-(`langchain==0.3.23`, `requests>=2.31.0`, `pydantic>=2.10`) and the chosen compatible
-provider package. These optional dependencies are not added to `pyproject.toml`.
-The configured PayPal endpoint must be reachable from the child process: a running
-local mock HTTP service or the sandbox, using the existing explicit PayPal settings.
-The database login must be able to assume `countersign_agent_ro`.
+The optional `llm` extra pins the main process to:
 
-The facade re-exports `ChatModelConfig`, so eval callers still import only
-`countersign.harness`. For an already configured engine settings object:
+| Package | Version |
+| --- | --- |
+| langchain | 1.4.7 |
+| langchain-core | 1.7.0 |
+| langchain-google-genai | 4.4.2 |
+| google-genai | 2.33.0 |
 
-```python
-from dataclasses import replace
-from countersign.harness import ChatModelConfig
+PayPal's toolkit stays at 1.11.0 in the existing isolated child process, with
+LangChain 0.3.23 and core 0.3.76. The parent selects that interpreter with
+`COUNTERSIGN_TOOLKIT_PYTHON`; credentials still travel over the existing bounded
+stdin protocol, and the child never inherits the Google key.
 
-configured = replace(existing_settings, llm=ChatModelConfig(
-    provider=provider_id, model=model_id, api_key=model_api_key,
-))
+This is option (b) from C23b. LangChain documents that Gemini 3 needs Google
+integration 3.1.0 or later and the original assistant messages returned with tool
+responses. The 2.x integration does not meet that requirement. Google now limits
+2.5 access to previously active users, so an older model is not a reliable setup
+for a new project. The separate interpreter reuses the existing subprocess bridge
+without mixing incompatible LangChain versions. Sources:
+[LangChain thought signatures](https://docs.langchain.com/oss/python/integrations/chat/google_generative_ai#thought-signatures),
+[Google model availability](https://ai.google.dev/gemini-api/docs/deprecations).
+
+The adapter retains each original assistant message, including its opaque thought
+signature, during the current bounded investigation. Tool results become proper
+ToolMessages. It clears that private history on a final answer or error and
+refuses a continuation from another incident. Signatures and raw responses are
+never smoke-test output or public recordings.
+
+### Owner setup, from CounterSign-db
+
+1. Open [AI Studio's API key page](https://aistudio.google.com/apikey), select the
+   project with free-tier quota, and create a key. Keep it private. Confirm quota
+   and model access in that project; a Gemini consumer subscription is separate.
+   Google's [API pricing](https://ai.google.dev/gemini-api/docs/pricing) currently
+   lists free input/output for `gemini-3.5-flash`, the example below.
+2. Install the optional main dependencies and the small adapter environment:
+
+```powershell
+$env:PYTHONPATH = 'src'
+.venv\Scripts\python.exe -m pip install -e '.[dev,llm]'
+.venv\Scripts\python.exe -m venv .venv\toolkit
+.venv\toolkit\Scripts\python.exe -m pip install langchain==0.3.23 langchain-core==0.3.76 requests==2.32.5 python-dotenv==1.1.1 pydantic==2.12.5
+.venv\toolkit\Scripts\python.exe -m pip install --no-deps paypal-agent-toolkit==1.11.0
 ```
 
-Those values come from the owner's runtime configuration. Keys never belong in
-chat or Git. Startup checks provider dependencies locally without a model call;
-missing packages report `MODEL_DEPENDENCIES_REQUIRED`.
+The final `--no-deps` follows D13: this child uses only the genuine LangChain
+adapter and its explicitly installed runtime, not the toolkit's unrelated
+CrewAI/OpenAI agent integrations. Do not install both LangChain generations into
+the same environment. The core install remains unchanged without the `llm` extra.
 
-`ChatModelConfig` is the model configuration entry point. `ScriptedModel` is for
-deterministic offline tests. Real model configuration does not silently fall back
-to the scripted model. No real PayPal or LLM request is needed by the C23 tests.
+3. Set these names privately in the owner's runtime environment file:
+
+```dotenv
+COUNTERSIGN_LLM_PROVIDER=google_genai
+COUNTERSIGN_LLM_MODEL=gemini-3.5-flash
+GOOGLE_API_KEY=<paste the private AI Studio key here>
+COUNTERSIGN_TOOLKIT_PYTHON=S:\StudyResource\TechBoooo\Hackathons\PayPalDevPost\CounterSign-db\.venv\toolkit\Scripts\python.exe
+```
+
+Configured Gemini uses `gemini-3.5-flash` when the model ID is omitted. Set
+`COUNTERSIGN_LLM_MODEL=gemini-3.5-flash-lite` explicitly for the eval fallback;
+there is no automatic retry on a different model. Other exact model IDs remain
+configurable. The owner reported tool-call probes for Flash and Flash-Lite;
+those access checks are not a real evaluation or proof of model quality.
+Existing process environment values override an explicitly loaded file. Unset
+settings return no model; a missing provider or key raises a fixed, value-free error.
+The provider and key are required even when the default model is used.
+
+4. Run the one-call smoke test yourself:
+
+```powershell
+$env:PYTHONPATH = 'src'
+.venv\Scripts\python.exe -m scripts.llm_smoke --env-file ..\CounterSign\.env
+```
+
+Without `--env-file`, the command reads only the process environment, never an
+implicit file. With no configuration/key it stops before a client or network
+call. With valid settings it makes exactly one model request, binding one harmless
+read stub through the same LangChain adapter as the commander. It never calls
+PayPal or invokes a returned tool. Output contains only provider, model ID,
+whether a tool call returned, and token counts when available. There are no raw
+responses, thought text or keys. A quota/provider failure is a fixed error; retrying
+is an explicit owner action rather than an automatic loop.
+
+5. Once the owner smoke succeeds, follow the C25 receiver/tunnel/database runbook
+   and add `--model configured` to its demo command. The default remains
+   `--model scripted`. Configured runs use the genuine read toolkit and read-only
+   graph role, and bind provider/model identity into the saved checkpoint. Old
+   scripted checkpoint fingerprints remain compatible; switching model modes for
+   an existing run is refused.
+
+The real model makes its own proposals. The demo records what it actually chose
+and stops if that differs from the staged week's expected action. It may correctly
+refuse to propose an intentionally unsafe red-team action. Such a stop is not a
+successful real-model week, and there is no scripted substitution. No real Google
+or PayPal call was made while implementing this card.
+
+### Hook Aman needs for M13/M16
+
+`eval/runner.py::run_suite` already accepts `llm` and passes it to SystemContext,
+but its CLI currently supports only the dummy system. M13/M16 modules are not yet
+present. Aman should add the CLI `--model` selection, load the configuration once (explicitly choose Flash-Lite when requested),
+and pass the same immutable configuration to both systems, with a fresh model
+adapter per run. Report `config.model` as the result's actual model identity.
+Neither the eval files nor their mock-only safety boundaries were changed here.
+
+The existing facade export supplies configuration without a new Engine method:
+
+```python
+from countersign.harness import ChatModelConfig
+
+config = ChatModelConfig.from_environment()  # None or validated configuration
+# run_suite(..., llm=config, model=config.model) for explicitly configured runs
+# M16: EngineSettings(..., llm=context.llm)
+```
+
+The C21 slice currently builds no commander/model and remains its deterministic
+payout/reconciliation proof. The HTTP receiver also runs without a commander;
+only the selected demo CLI performs model steps.
 
 ## 6. Scope and remaining work
 
@@ -147,6 +243,6 @@ Mate's schemas accept arbitrary string rule names. Its `web/fixtures/meta.json`
 still advertises contract 1.0.1; mate should update that fixture to 1.0.2. This card
 changes only the approved contract header, rule list and meta example.
 
-Actual model quality and cost remain unmeasured until the owner selects a model
-and authorizes a real evaluation. Offline scripted tests validate the boundaries
+Actual model quality and cost remain unmeasured until the owner authorizes a
+real evaluation with the selected model. Offline scripted tests validate the boundaries
 and orchestration; they do not claim that a real model completed the task.

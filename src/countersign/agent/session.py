@@ -4,17 +4,24 @@ import asyncio
 from contextlib import AsyncExitStack
 
 from countersign.agent.commander import Commander
-from countersign.agent.models import LangChainModel, ModelError, create_model
+from countersign.agent.models import ChatModelConfig, LangChainModel, ModelError, create_model
 from countersign.agent.reads import MoneyGraphQueries, ReadToolError, custom_tools
 from countersign.agent.toolkit import ToolkitGateway
 from countersign.agent.tools import ToolError, ToolRegistry
 
-_STARTUP_CODES = frozenset({
-    "MODEL_DEPENDENCIES_REQUIRED", "MODEL_CONFIGURATION_INVALID",
-    "MONEY_GRAPH_ROLE_REFUSED", "MONEY_GRAPH_UNAVAILABLE",
-    "TOOLKIT_DEPENDENCIES_MISSING", "TOOLKIT_VERSION_UNSUPPORTED",
-    "TOOLKIT_SET_MISMATCH", "TOOLKIT_CONFIG_INVALID", "TOOL_SET_MISMATCH",
-})
+_STARTUP_CODES = frozenset(
+    {
+        "MODEL_DEPENDENCIES_REQUIRED",
+        "MODEL_CONFIGURATION_INVALID",
+        "MONEY_GRAPH_ROLE_REFUSED",
+        "MONEY_GRAPH_UNAVAILABLE",
+        "TOOLKIT_DEPENDENCIES_MISSING",
+        "TOOLKIT_VERSION_UNSUPPORTED",
+        "TOOLKIT_SET_MISMATCH",
+        "TOOLKIT_CONFIG_INVALID",
+        "TOOL_SET_MISMATCH",
+    }
+)
 
 
 class AgentSessionError(RuntimeError):
@@ -30,9 +37,11 @@ class AgentSession:
     No provider or PayPal request is made by constructing this object.
     """
 
-    def __init__(self, config, paypal, reader, database_url, schema="public", *,
-                 tools=None, simulator=None):
+    def __init__(
+        self, config, paypal, reader, database_url, schema="public", *, tools=None, simulator=None
+    ):
         self._model = create_model(config)
+        self._owns_model = isinstance(config, ChatModelConfig)
         if tools is not None and not isinstance(tools, ToolRegistry):
             raise AgentSessionError("AGENT_TOOL_REGISTRY_REQUIRED")
         self._paypal, self._reader = paypal, reader
@@ -55,17 +64,24 @@ class AgentSession:
             try:
                 if isinstance(self._model, LangChainModel):
                     await self._model.prepare()
+                    if self._owns_model:
+                        self._stack.push_async_callback(self._model.aclose)
                 tools = self._tools
                 if tools is None:
                     graph = MoneyGraphQueries(self._database_url, self._schema)
                     await graph.start()
                     gateway = await self._stack.enter_async_context(ToolkitGateway(self._paypal))
-                    tools = ToolRegistry((*gateway.read_tools(),
-                                          *custom_tools(self._reader, graph, self._simulator)))
+                    tools = ToolRegistry(
+                        (*gateway.read_tools(), *custom_tools(self._reader, graph, self._simulator))
+                    )
                 self._commander = Commander(
-                    self._model, tools,
-                    secrets=(self._paypal.client_id, self._paypal.client_secret,
-                             self._paypal.webhook_id),
+                    self._model,
+                    tools,
+                    secrets=(
+                        self._paypal.client_id,
+                        self._paypal.client_secret,
+                        self._paypal.webhook_id,
+                    ),
                 )
                 return self
             except Exception as exc:  # noqa: BLE001 - dependency errors can contain private values.
