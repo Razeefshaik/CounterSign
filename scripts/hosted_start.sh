@@ -65,6 +65,8 @@ export COUNTERSIGN_MODE=demo
 export PAYPAL_BASE_URL="http://127.0.0.1:$MOCK_PORT"
 export MOCK_PAYPAL_CLIENT_ID=mock-client
 export MOCK_PAYPAL_CLIENT_SECRET=mock-secret
+# M15: the dashboard reads the engine's own records, not contract fixtures.
+export COUNTERSIGN_DASHBOARD_SOURCE=database
 unset PAYPAL_WEBHOOK_ID COUNTERSIGN_LLM_PROVIDER COUNTERSIGN_LLM_MODEL
 
 cleanup() {
