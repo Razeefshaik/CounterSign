@@ -382,3 +382,24 @@ def test_f01_real_engine_recovers_lost_response_with_zero_invariants(engine_data
         else asyncio.new_event_loop
     ) as runner:
         runner.run(run())
+
+
+@pytest.mark.integration
+def test_f01_real_engine_over_the_loopback_tcp_mock(engine_database):
+    """M13 TCP runner: the same Engine F01 run reaches the mock over real HTTP."""
+
+    async def run():
+        system = CountersignSystem(database_url=engine_database)
+        row = await run_one(
+            scenario(), system, run_id="m13-tcp", k_index=0, model="none", mock_transport="tcp"
+        )
+        assert row["error"] is None
+        assert row["passed"] and not any(row["invariants"].values())
+        assert row["makers_paid_on_time"] == {"paid": 1, "due": 1}
+
+    with asyncio.Runner(
+        loop_factory=asyncio.SelectorEventLoop
+        if sys.platform == "win32"
+        else asyncio.new_event_loop
+    ) as runner:
+        runner.run(run())

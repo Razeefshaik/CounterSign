@@ -64,6 +64,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | [c24-rules-incidents-simulator.md](c24-rules-incidents-simulator.md) | Dispute rules, reconciliation-only incident closure and read-only payout cash comparisons |
 | [c25-demo-week.md](c25-demo-week.md) | The staged marketplace week, three safety moments, exact Friday approval and owner-operated sandbox runbook |
 | [m09a-mock-sandbox-facts.md](m09a-mock-sandbox-facts.md) | Duplicate payout recovery, confirmed cancellation responses and both dispute request formats in the local mock |
+| [m13-baseline-llm.md](m13-baseline-llm.md) | The plain LLM baseline: mock-only tools, PayPal's own idempotency used correctly, quota stop and the TCP mock option |
 | [c27-hosting.md](c27-hosting.md) | Free hosting options compared, the single-container demo image, owner deploy steps and what stays off |
 | [c28-submission-checklist.md](c28-submission-checklist.md) | README placeholders, claims check, video shot list, GitHub About, hosting and the Devpost form |
 
