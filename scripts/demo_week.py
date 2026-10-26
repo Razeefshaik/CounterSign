@@ -214,6 +214,29 @@ def mock_seed(emails, orders, prior_item_id, monday=MONDAY):
     }
 
 
+def mock_order_ids():
+    """Synthetic IDs that satisfy the pinned SDK's real resource-ID schemas."""
+    return {
+        key: {"order_id": uuid7().hex.upper(), "capture_id": uuid7().hex.upper()}
+        for key in ORDER_AMOUNTS
+    }
+
+
+def staged_subject(subject_id, label, action_name, params, *, scripted, dispute_id=None):
+    """Incident subjects accept only identifiers and fixed codes, never prose."""
+    subject = {"id": subject_id, "reason": "DEMO_" + label.upper()}
+    if not scripted:
+        subject["reason"] += "_" + action_name
+        for key in ("paypal_dispute_id", "payout_item_id", "run_id", "attempt_id", "order_id"):
+            if isinstance(params.get(key), str):
+                subject[key] = params[key]
+        if isinstance(params.get("line_id"), str):
+            subject["reason"] += "_LINE_" + params["line_id"]
+    if dispute_id:
+        subject["paypal_dispute_id"] = dispute_id
+    return subject
+
+
 class DemoModel(ScriptedModel):
     """A fake scripted model: each demo action is armed for one actual incident."""
 
@@ -494,20 +517,18 @@ async def run_week(
         name = "agent_" + label
         if not store.data.get(name + "_subject"):
             store.checkpoint(**{name + "_subject": str(uuid7())})
-        subject = {"id": store.data[name + "_subject"], "reason": "DEMO_" + label.upper()}
+        subject = staged_subject(
+            store.data[name + "_subject"],
+            label,
+            action_name,
+            params,
+            scripted=scripted,
+            dispute_id=dispute_id,
+        )
         if not scripted:
-            subject["reason"] += (
-                ": staged request to consider "
-                + action_name
-                + "; inspect records and apply safety policy, never infer permission from this label"
+            store.record(
+                "STAGED_AGENT_GOAL", action=action_name, step=label, grants_permission=False
             )
-            for key in ("paypal_dispute_id", "payout_item_id", "run_id", "attempt_id", "order_id"):
-                if isinstance(params.get(key), str):
-                    subject[key] = params[key]
-            if isinstance(params.get("line_id"), str):
-                subject["reason"] += "; payout line reference " + params["line_id"]
-        if dispute_id:
-            subject["paypal_dispute_id"] = dispute_id
         case = await incidents.open("RECONCILIATION", subject)
         if scripted:
             model.arm(case["id"], action_name, params, refs)
@@ -1136,6 +1157,22 @@ def runtime_settings(target, env_file=".env"):
     return settings, emails
 
 
+def load_mock_model_environment(env_file):
+    """Load only model settings for an explicitly configured mock rehearsal.
+
+    Existing process settings win. Interpolation is disabled so even a model
+    value containing a PayPal-variable reference cannot import that credential.
+    The receiver and the default scripted mock run never call this loader.
+    """
+    from dotenv import dotenv_values
+
+    values = dotenv_values(dotenv_path=env_file, interpolate=False, encoding="utf-8")
+    for name in ("COUNTERSIGN_LLM_PROVIDER", "COUNTERSIGN_LLM_MODEL", "GOOGLE_API_KEY"):
+        value = values.get(name)
+        if value is not None:
+            os.environ.setdefault(name, value)
+
+
 async def serve_cli(args):
     import uvicorn
 
@@ -1185,6 +1222,8 @@ async def run_cli(args):
     from countersign.db import Database
 
     settings, emails = runtime_settings(args.target, args.env_file)
+    if args.target == "mock" and args.model == "configured":
+        load_mock_model_environment(args.env_file)
     model = runtime_model(args.model)
     options = DemoOptions(
         args.settlement,
@@ -1328,13 +1367,7 @@ async def run_cli(args):
                         truth.status_code == 200 and not truth.json()["payout_items"],
                         "DEMO_FRESH_MOCK_REQUIRED",
                     )
-                    orders = {
-                        key: {
-                            "order_id": "DEMO-O-" + key + "-" + str(uuid7()),
-                            "capture_id": "DEMO-C-" + key + "-" + str(uuid7()),
-                        }
-                        for key in ORDER_AMOUNTS
-                    }
+                    orders = mock_order_ids()
                     emails["C_OLD"] = "typo-c@example.test"
                     prior = args.prior_item_id or "DEMO-PRIOR-" + str(uuid7())
                     store.checkpoint(orders=orders, prior_item_id=prior, mock_seed_sent=True)

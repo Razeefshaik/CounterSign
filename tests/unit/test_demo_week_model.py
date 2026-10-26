@@ -1,6 +1,7 @@
 """The real model switch is explicit and fails before connections when absent."""
 
 import json
+import re
 from types import SimpleNamespace
 
 import pytest
@@ -8,6 +9,13 @@ import pytest
 from countersign.agent.models import ChatModelConfig, ModelError
 from countersign.config import Settings
 from scripts import demo_week as demo
+
+
+@pytest.fixture(autouse=True)
+def no_owner_environment_file(monkeypatch):
+    # This file tests model selection, not environment-file loading. Dedicated
+    # C23c tests use generated fake files for the allowlisted loader itself.
+    monkeypatch.setattr(demo, "load_mock_model_environment", lambda *_: None)
 
 
 @pytest.mark.parametrize("mode", [None, "configured"])
@@ -144,3 +152,25 @@ def test_scripted_mode_retains_its_existing_injected_read_registry(monkeypatch):
 
     monkeypatch.setattr(demo, "read_registry", scripted_tools)
     assert demo.model_tools(demo.DemoModel(), http, database) is tools
+
+
+@pytest.mark.parametrize(
+    "label,action,params",
+    [
+        ("evidence", "PROVIDE_EVIDENCE", {"paypal_dispute_id": "PP-D-TEST"}),
+        ("cancel", "CANCEL_UNCLAIMED_PAYOUT", {"payout_item_id": "ITEM-TEST"}),
+        (
+            "settled_retry",
+            "CREATE_REPLACEMENT_PAYOUT",
+            {"line_id": "019ab123-1234-7123-8123-123456789abc"},
+        ),
+    ],
+)
+def test_configured_staged_subjects_contain_only_valid_identifiers_and_fixed_codes(
+    label, action, params
+):
+    subject = demo.staged_subject("case-1", label, action, params, scripted=False)
+    assert all(re.fullmatch(r"[A-Za-z0-9_-]{1,128}", value) for value in subject.values())
+    assert action in subject["reason"]
+    if "line_id" in params:
+        assert subject["reason"].endswith("_LINE_" + params["line_id"])

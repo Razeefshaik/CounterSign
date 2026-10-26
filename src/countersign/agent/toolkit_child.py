@@ -13,13 +13,19 @@ import math
 import os
 import re
 import sys
-from urllib.parse import urlsplit
+from urllib.parse import urlencode, urlsplit
 
 VERSION = "1.11.0"
 SANDBOX = "https://api-m.sandbox.paypal.com"
 MAX_MESSAGE_BYTES = 262144
 TOOL_NAMES = frozenset(
-    {"list_disputes", "get_dispute", "get_shipment_tracking", "get_order_details", "list_transactions"}
+    {
+        "list_disputes",
+        "get_dispute",
+        "get_shipment_tracking",
+        "get_order_details",
+        "list_transactions",
+    }
 )
 ACTIONS = {
     "disputes": {"list": True, "get": True},
@@ -35,8 +41,19 @@ _READ_PATHS = (
 )
 _EMAIL = re.compile(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}")
 _PRIVATE_FIELDS = frozenset(
-    {"authorization", "proxyauthorization", "accesstoken", "refreshtoken", "clientid",
-     "clientsecret", "secret", "password", "apikey", "token", "paypalauthassertion"}
+    {
+        "authorization",
+        "proxyauthorization",
+        "accesstoken",
+        "refreshtoken",
+        "clientid",
+        "clientsecret",
+        "secret",
+        "password",
+        "apikey",
+        "token",
+        "paypalauthassertion",
+    }
 )
 
 
@@ -183,12 +200,17 @@ class Runtime:
 
     def __init__(self, settings):
         if type(settings) is not dict or set(settings) != {
-            "base_url", "client_id", "client_secret"
+            "base_url",
+            "client_id",
+            "client_secret",
         }:
             raise ChildError("TOOLKIT_CONFIG_INVALID")
         self.base_url = validated_origin(settings["base_url"])
         client_id, secret = settings["client_id"], settings["client_secret"]
-        if any(type(value) is not str or not value or len(value) > 4096 for value in (client_id, secret)):
+        if any(
+            type(value) is not str or not value or len(value) > 4096
+            for value in (client_id, secret)
+        ):
             raise ChildError("TOOLKIT_CONFIG_INVALID")
         basic = base64.b64encode(f"{client_id}:{secret}".encode()).decode()
         self.secrets = {client_id, secret, basic}
@@ -224,6 +246,35 @@ class Runtime:
         check_names(tool.name for tool in tools)
         self._tools = {tool.name: tool for tool in tools}
         client.base_url = self.base_url
+        self._client = client
+        # SDK 1.11.0's read handlers expect two helpers its HTTP client lacks:
+        # tracking by order calls get_order_details(), and transaction-ID search
+        # calls get(payload=...) then decodes a JSON string. Keep the genuine
+        # handlers and normalize only those fixed read requests here.
+        original_get = client.get
+
+        def get(uri, payload=None):
+            if payload is None:
+                return original_get(uri)
+            if (
+                uri != "/v1/reporting/transactions"
+                or type(payload) is not dict
+                or not payload.keys()
+                <= {
+                    "transaction_id",
+                    "transaction_status",
+                    "start_date",
+                    "end_date",
+                    "page_size",
+                    "page",
+                }
+            ):
+                raise ChildError("TOOLKIT_REQUEST_BLOCKED")
+            query = {key: value for key, value in payload.items() if value is not None}
+            return json.dumps(original_get(uri + "?" + urlencode(query)))
+
+        client.get = get
+        client.get_order_details = lambda order_id: original_get("/v2/checkout/orders/" + order_id)
         self._definitions = []
         for name, tool in sorted(self._tools.items()):
             schema = tool.args_schema.model_json_schema()
@@ -240,6 +291,11 @@ class Runtime:
 
     def invoke(self, name, arguments):
         check_names(self._tools)
+        # Context(sandbox=True) is required to disable live APIs, but the
+        # selected HTTP origin is independent. Refuse SDK/config drift before
+        # an OAuth request, rather than falling back to a sandbox default.
+        if self._client.base_url != self.base_url:
+            raise ChildError("TOOLKIT_CONFIG_INVALID")
         if type(name) is not str or name not in self._tools or type(arguments) is not dict:
             raise ChildError("INVALID_TOOL_ARGUMENTS")
         schema = next(item["schema"] for item in self._definitions if item["name"] == name)

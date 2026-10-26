@@ -304,7 +304,10 @@ def fake_sdk(monkeypatch):
             if state.noisy:
                 print(CLIENT_ID)
                 print(SECRET, file=sys.stderr)
-            self.client = types.SimpleNamespace(base_url=child.SANDBOX)
+            self.client = types.SimpleNamespace(
+                base_url=child.SANDBOX,
+                get=lambda *_: pytest.fail("the fake SDK fixture cannot make HTTP requests"),
+            )
 
         def get_paypal_api(self):
             return types.SimpleNamespace(_paypal_client=self.client)
@@ -349,6 +352,25 @@ def test_runtime_fails_closed_before_any_tool_when_sdk_set_differs(fake_sdk, nam
     with pytest.raises(child.ChildError, match="^TOOLKIT_SET_MISMATCH$"):
         child.Runtime(SETTINGS)
     assert fake_sdk.calls == []
+
+
+def test_runtime_refuses_sdk_origin_drift_before_any_tool_or_oauth(fake_sdk):
+    runtime = child.Runtime(SETTINGS)
+    runtime._client.base_url = child.SANDBOX
+    with pytest.raises(child.ChildError, match="^TOOLKIT_CONFIG_INVALID$"):
+        runtime.invoke("get_dispute", {"id": "PP-D-1"})
+    assert fake_sdk.calls == []
+
+
+@pytest.mark.parametrize("uri,payload", [
+    ("/v1/payments/payouts", {"transaction_id": "TEST"}),
+    ("/v1/reporting/transactions", {"url": "https://attacker.example"}),
+    ("https://attacker.example/v1/reporting/transactions", {}),
+])
+def test_read_compatibility_helpers_never_accept_other_paths_or_fields(fake_sdk, uri, payload):
+    runtime = child.Runtime(SETTINGS)
+    with pytest.raises(child.ChildError, match="^TOOLKIT_REQUEST_BLOCKED$"):
+        runtime._client.get(uri, payload=payload)
 
 
 def test_runtime_refuses_version_drift_before_constructing_toolkit(fake_sdk, monkeypatch):
