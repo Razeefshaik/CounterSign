@@ -243,6 +243,8 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
-| C25 requires an explicit adjudicate or buyer_close settlement setting and a configured terminal outcome mapping; sandbox execution remains owner-operated pending D10 | C25 | Accept | Neither a mock outcome nor a staged seller win establishes real sandbox behavior |
+| C25 defaults settlement to adjudicate after D10 confirmed SELLER_FAVOR returned 200; buyer_close remains an explicit alternative pending a confirmed outcome code | C25, D10 owner findings | Accept | Use verified settlement behavior while unmapped buyer-close outcomes keep the reserve |
 | C25 submits evidence only when fresh status and provide_evidence links permit it; otherwise the real shield blocks the proposal and the week continues | C25 | Accept | D8 and D9 showed that dispute stage alone cannot determine evidence availability |
 | C25 CLI parses the database name and refuses names not ending in _demo or _test before opening connections | C25 | Accept | A resumable staged money workflow must never operate on the owner's working database |
+| D10 maps RESOLVED_SELLER_FAVOUR to WON and sizes RESOLVED_BUYER_FAVOUR as LOST_FULL or LOST_PARTIAL from amount_refunded; CANCELED_BY_BUYER stays mock-only | D10, owner confirmed Oct 26 | Accept | Sandbox adjudication recorded INELIGIBLE_BUYER_PROTECTION_POLICY and accept-claim recorded SELLER_ISSUED_REFUND; unrecognized outcomes retain reserves |
+| D10 confirms multipart input JSON evidence at WAITING_FOR_SELLER_RESPONSE / CHARGEBACK and JSON accept-claim, both returning 200; evidence submission then moved the case to UNDER_REVIEW | D10, owner confirmed Oct 26 | Accept | Existing adapter defaults match the observed formats and action links still determine evidence permission |

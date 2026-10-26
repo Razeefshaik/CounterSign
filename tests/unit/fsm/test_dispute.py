@@ -59,15 +59,36 @@ def test_any_status_but_resolved_is_active_whatever_the_outcome_fields(status):
     assert phase(status, "TEST_LOSS", AMOUNT, AMOUNT, outcome_map=TEST_MAP) is Phase.ACTIVE
 
 
-def test_outcome_map_is_empty_until_d10():
-    assert OUTCOME_MAP == {}
+def test_outcome_map_contains_only_d10_confirmed_codes():
+    assert OUTCOME_MAP == {
+        "RESOLVED_SELLER_FAVOUR": Phase.WON,
+        "RESOLVED_BUYER_FAVOUR": Phase.LOST_FULL,
+    }
+
+
+@pytest.mark.parametrize("code", ["CANCELED_BY_BUYER", "RESOLVED_SELLER_FAVOR", "NEW_CODE"])
+def test_unconfirmed_codes_still_fail_closed(code):
+    assert phase("RESOLVED", code, 0, AMOUNT) is Phase.UNKNOWN_OUTCOME
+
+
+def test_d10_seller_win_releases_only_without_a_contradictory_refund():
+    assert phase("RESOLVED", "RESOLVED_SELLER_FAVOUR", 0, AMOUNT) is Phase.WON
+    assert phase("RESOLVED", "RESOLVED_SELLER_FAVOUR", None, AMOUNT) is Phase.WON
+    assert phase("RESOLVED", "RESOLVED_SELLER_FAVOUR", 1, AMOUNT) is Phase.UNKNOWN_OUTCOME
 
 
 @pytest.mark.parametrize(
-    "code", ["RESOLVED_SELLER_FAVOUR", "RESOLVED_BUYER_FAVOUR", "CANCELED_BY_BUYER"]
+    ("refunded", "expected"),
+    [
+        (AMOUNT, Phase.LOST_FULL),
+        (15000, Phase.LOST_PARTIAL),
+        (0, Phase.UNKNOWN_OUTCOME),
+        (None, Phase.UNKNOWN_OUTCOME),
+        (AMOUNT + 1, Phase.UNKNOWN_OUTCOME),
+    ],
 )
-def test_until_d10_every_resolved_dispute_fails_closed(code):
-    assert phase("RESOLVED", code, 0, AMOUNT) is Phase.UNKNOWN_OUTCOME
+def test_d10_buyer_win_sizes_loss_from_confirmed_refund(refunded, expected):
+    assert phase("RESOLVED", "RESOLVED_BUYER_FAVOUR", refunded, AMOUNT) is expected
 
 
 @pytest.mark.parametrize("code", [None, "", "NOT_IN_MAP", "test_win"])
