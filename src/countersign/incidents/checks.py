@@ -5,7 +5,7 @@ from uuid import UUID
 from countersign.db import Repositories
 from countersign.money import Money
 from countersign.reconcile.attempts import _matches
-from countersign.simulator.service import rows
+from countersign.simulator.service import rows, run_replacement_entries
 
 
 def identifier(value):
@@ -217,17 +217,26 @@ async def run_agrees(conn, run_id, *, since):
     run = await repos.payout_runs.get(identifier(run_id)) if identifier(run_id) else None
     if not run or run["state"] != "DONE":
         return False, "RUN_NOT_DONE"
-    lines = await repos.payout_lines.find({"run_id": run["id"]})
+    replacements = await run_replacement_entries(conn, run)
+    replacement_ids = list(replacements)
+    lines = await rows(
+        conn, "SELECT * FROM payout_lines WHERE run_id=%s OR id=ANY(%s) ORDER BY id",
+        (run["id"], replacement_ids),
+    )
+    if not set(replacement_ids) <= {line["id"] for line in lines}:
+        return False, "RUN_REPLACEMENT_UNAVAILABLE"
     if not lines:
         return False, "RUN_HAS_NO_LINES"
     for line in lines:
         attempts = await rows(
             conn,
-            "SELECT id FROM payout_attempts WHERE line_id=%s ORDER BY attempt_no DESC LIMIT 1",
+            "SELECT id,attempt_no FROM payout_attempts WHERE line_id=%s ORDER BY attempt_no DESC LIMIT 1",
             (line["id"],),
         )
         if not attempts:
             return False, "RUN_PAYOUT_UNCONFIRMED"
+        if line["id"] in replacements and attempts[0]["attempt_no"] != replacements[line["id"]]:
+            return False, "RUN_REPLACEMENT_UNCONFIRMED"
         agrees, reason = await payout_agrees(conn, attempts[0]["id"], since=since)
         if not agrees:
             return False, reason
