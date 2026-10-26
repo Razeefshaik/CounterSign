@@ -10,7 +10,7 @@ import httpx
 import pytest
 
 from countersign.agent.commander import Commander
-from countersign.agent.models import ChatModelConfig, LangChainModel, ModelError
+from countersign.agent.models import MODEL_ATTEMPTS, ChatModelConfig, LangChainModel, ModelError
 
 
 @pytest.fixture
@@ -44,7 +44,7 @@ def google_stub(monkeypatch):
         return httpx.Response(status, json=body)
 
     def create(*args, **kwargs):
-        assert kwargs["max_retries"] == 0 and kwargs["vertexai"] is False
+        assert kwargs["max_retries"] == MODEL_ATTEMPTS and kwargs["vertexai"] is False
         model = real_chat(
             *args,
             **kwargs,
@@ -161,18 +161,19 @@ async def test_commander_preserves_gemini_signature_through_a_real_tool_round(go
 
 
 @pytest.mark.asyncio
-async def test_google_rate_limit_is_one_attempt_and_never_exposes_private_error(
+async def test_google_rate_limit_retries_boundedly_and_never_exposes_private_error(
     google_stub, caplog
 ):
     requests, clients, replies = google_stub
-    replies.append(
-        (429, {"error": {"code": 429, "message": "FAKE-KEY", "status": "RESOURCE_EXHAUSTED"}})
+    replies.extend(
+        [(429, {"error": {"code": 429, "message": "FAKE-KEY", "status": "RESOURCE_EXHAUSTED"}})]
+        * MODEL_ATTEMPTS
     )
     model = LangChainModel(ChatModelConfig("google_genai", "gemini-3.5-flash", "FAKE-KEY"))
     try:
         with pytest.raises(ModelError, match="^MODEL_CALL_FAILED$") as caught:
             await model.complete({"system": "trusted", "data": {}, "observations": [], "tools": []})
-        assert len(requests) == 1 and "FAKE-KEY" not in str(caught.value)
+        assert len(requests) == MODEL_ATTEMPTS and "FAKE-KEY" not in str(caught.value)
         assert "FAKE-KEY" not in caplog.text
         assert model._conversation is None
     finally:

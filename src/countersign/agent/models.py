@@ -11,6 +11,8 @@ from typing import Protocol
 
 from countersign.agent.safety import sanitize
 
+MODEL_ATTEMPTS = 3  # langchain-google-genai treats max_retries as total attempts
+
 
 class ModelError(RuntimeError):
     """Fixed model configuration/call errors, never provider exception text."""
@@ -89,8 +91,10 @@ def _langchain_factory(config):
         model_provider=config.provider,
         api_key=config.api_key,
         configurable_fields=None,
-        max_retries=0,
-        timeout=30,
+        # Model calls only read and propose, so retrying a transient 429/5xx is safe;
+        # the first live Gemini 3.5 Flash call took over 30 s and overloads return 503.
+        max_retries=MODEL_ATTEMPTS,
+        timeout=90,
         **({"vertexai": False} if config.provider == "google_genai" else {}),
     )
 
