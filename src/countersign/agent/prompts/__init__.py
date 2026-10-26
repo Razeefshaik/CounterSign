@@ -1,6 +1,6 @@
 """Trusted instructions are static; all incident and tool content stays data."""
 
-from countersign.agent.params import ACTION_PARAMS, REFERENCE_PREFIXES
+from countersign.agent.params import ACTION_PARAMS, EVIDENCE_PREFIXES, REFERENCE_PREFIXES
 
 SYSTEM_PROMPT = """You are CounterSign's Incident Commander. Investigate one incident
 with the supplied read-only tools, then return exactly one JSON proposal. Never
@@ -46,6 +46,9 @@ Do not include verdicts, approvals, operation ids, markdown or multiple proposal
 
 SYSTEM_PROMPT += "\nAction params contract (shape only; the shield still decides permission):\n"
 SYSTEM_PROMPT += "\n".join(spec.prompt_line(action) for action, spec in ACTION_PARAMS.items())
+SYSTEM_PROMPT += ("\nPROVIDE_EVIDENCE evidence_refs prefixes only: "
+                  + ", ".join(prefix + ":" for prefix in sorted(EVIDENCE_PREFIXES))
+                  + "; at least one tracking: reference is required.\n")
 SYSTEM_PROMPT += ("\nOther evidence_refs are '<prefix>:<observed identifier>[:<fact>]', with prefixes "
                   + ", ".join(sorted(REFERENCE_PREFIXES))
                   + ". Use [] when there is no evidence; never invent references.\n"

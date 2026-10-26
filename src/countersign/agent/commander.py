@@ -3,7 +3,7 @@
 import asyncio
 from collections.abc import Mapping
 
-from countersign.agent.models import create_model
+from countersign.agent.models import ModelError, create_model
 from countersign.agent.params import ProposalParamsError
 from countersign.agent.prompts import SYSTEM_PROMPT
 from countersign.agent.proposal import ProposalError, StructuredProposal, parse_proposal
@@ -67,6 +67,10 @@ class Commander:
             raise
         except TimeoutError:
             raise CommanderError("COMMANDER_TIMEOUT") from None
+        except ModelError as error:
+            if error.args == ("MODEL_QUOTA_EXHAUSTED",):
+                raise CommanderError("MODEL_QUOTA_EXHAUSTED") from None
+            raise CommanderError("COMMANDER_STEP_FAILED") from None
         except Exception:  # noqa: BLE001 - discard private provider/tool exception text.
             raise CommanderError("COMMANDER_STEP_FAILED") from None
 

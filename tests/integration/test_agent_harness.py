@@ -12,7 +12,7 @@ from test_harness import ready_poll
 from test_harness import world as shared_world
 
 from countersign import worker
-from countersign.agent.models import ScriptedModel
+from countersign.agent.models import ModelError, ScriptedModel
 from countersign.agent.tools import ALLOWED_TOOLS, ReadTool, ToolRegistry
 from countersign.approvals.service import ApprovalError, load_context
 from countersign.db import Repositories
@@ -233,6 +233,40 @@ async def test_repeated_agent_failures_skip_that_incident_version_without_starvi
         ("AGENT_PROPOSAL_UNBOUND", None),
         ("AGENT_STEP_FAILED", "COMMANDER_PROPOSAL_INVALID"),
     ]
+    await assert_no_money_write(world, rows)
+
+
+@pytest.mark.asyncio
+async def test_model_quota_does_not_exhaust_incident_failure_cap_and_resumes_same_version(world):
+    row = await incident(world)
+
+    class QuotaModel(ScriptedModel):
+        failures = 2
+
+        async def complete(self, request):
+            if self.failures:
+                self.failures -= 1
+                raise ModelError("MODEL_QUOTA_EXHAUSTED")
+            return await super().complete(request)
+
+    model = QuotaModel([proposal(row["id"], "WAIT")])
+    async with agent_engine(world, model) as engine:
+        for _ in range(2):
+            assert (await engine.tick())["errors"] == 1
+        rows = await stored(world)
+        assert rows["proposals"] == []
+        assert rows["incidents"][0]["state"] == "OPEN"
+        assert rows["incidents"][0]["version"] == row["version"]
+        quota_audits = [a for a in rows["audit_log"] if a["actor"] == "agent"]
+        assert len(quota_audits) == 2
+        assert all(a["details"] == {
+            "reason": "MODEL_QUOTA_EXHAUSTED", "code": "MODEL_QUOTA_EXHAUSTED", "count": 1,
+            "incident_id": str(row["id"]), "incident_version": row["version"],
+        } for a in quota_audits)
+        assert (await engine.tick())["errors"] == 0
+    rows = await stored(world)
+    [saved] = rows["proposals"]
+    assert saved["action"] == "WAIT" and saved["state"] == "EXECUTED"
     await assert_no_money_write(world, rows)
 
 
