@@ -65,6 +65,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | [c25-demo-week.md](c25-demo-week.md) | The staged marketplace week, three safety moments, exact Friday approval and owner-operated sandbox runbook |
 | [m09a-mock-sandbox-facts.md](m09a-mock-sandbox-facts.md) | Duplicate payout recovery, confirmed cancellation responses and both dispute request formats in the local mock |
 | [c27-hosting.md](c27-hosting.md) | Free hosting options compared, the single-container demo image, owner deploy steps and what stays off |
+| [c28-submission-checklist.md](c28-submission-checklist.md) | README placeholders, claims check, video shot list, GitHub About, hosting and the Devpost form |
 
 ## Words used everywhere
 
