@@ -47,8 +47,9 @@ def local_mock(app):
 
 @pytest.mark.integration
 @pytest.mark.asyncio
+@pytest.mark.parametrize("recover", [True, False], ids=["recovered", "budget-exceeded"])
 async def test_configured_engine_reads_order_and_dispute_then_executes_stored_evidence(
-    db_schema, monkeypatch, caplog
+    db_schema, monkeypatch, caplog, recover
 ):
     executable = os.environ.get("COUNTERSIGN_TEST_TOOLKIT_PYTHON")
     if not executable:
@@ -111,6 +112,9 @@ async def test_configured_engine_reads_order_and_dispute_then_executes_stored_ev
                         break
                     await asyncio.sleep(0.01)
                 assert len(incidents) == 1
+                async with database.tx() as conn:
+                    [internal_order] = await Repositories(conn).orders.find()
+                internal_order_id = str(internal_order["id"])
 
             class FakeConfiguredChat:
                 def __init__(self):
@@ -124,6 +128,27 @@ async def test_configured_engine_reads_order_and_dispute_then_executes_stored_ev
                     self.turns += 1
                     assert config == {"callbacks": []}
                     if self.turns == 1:
+                        data = json.loads(turns[1][1])["untrusted_data"]
+                        assert data["incident"]["subject"]["countersign_order_id"] == internal_order_id
+                        assert "order_id" not in data["incident"]["subject"]
+                        assert data["context"]["orders"] == [{
+                            "countersign_order_id": internal_order_id,
+                            "paypal_order_id": order_id, "paypal_capture_id": capture,
+                        }]
+                        assert data["context"]["disputes"][0]["paypal_dispute_id"] == dispute_id
+                    if self.turns == 1 or not recover:
+                        if self.turns > 1:
+                            assert json.loads(turns[-1].content)["untrusted_result"] == {
+                                "error": "TOOLKIT_CALL_FAILED", "tool": "get_order_details"
+                            }
+                        return messages.AIMessage(content="", tool_calls=[{
+                            "id": "wrong-order-" + str(self.turns),
+                            "name": "get_order_details", "args": {"order_id": internal_order_id},
+                        }])
+                    if self.turns == 2:
+                        assert json.loads(turns[-1].content)["untrusted_result"] == {
+                            "error": "TOOLKIT_CALL_FAILED", "tool": "get_order_details"
+                        }
                         return messages.AIMessage(
                             content="",
                             tool_calls=[
@@ -139,7 +164,7 @@ async def test_configured_engine_reads_order_and_dispute_then_executes_stored_ev
                                 },
                             ],
                         )
-                    assert self.turns == 2
+                    assert self.turns == 3
                     assert isinstance(turns[-1], messages.ToolMessage)
                     assert isinstance(turns[-2], messages.ToolMessage)
                     observed_order = json.loads(turns[-2].content)["untrusted_result"]
@@ -178,10 +203,16 @@ async def test_configured_engine_reads_order_and_dispute_then_executes_stored_ev
             # database role and starts the actual isolated toolkit child.
             async with Engine(configured, database=database, http=http) as engine:
                 result = await engine.tick()
-                assert result["errors"] == 0 and result["operations"] == 1
-            assert fake_chat.turns == 2
+                assert result["errors"] == (0 if recover else 1)
+                assert result["operations"] == (1 if recover else 0)
+            assert fake_chat.turns == (3 if recover else 4)
             async with database.tx() as conn:
                 repos = Repositories(conn)
+                if not recover:
+                    assert await repos.proposals.find() == []
+                    assert await repos.operations.find() == []
+                    assert await repos.approvals.find() == []
+                    return
                 [proposal] = await repos.proposals.find()
                 assert proposal["model"] == "offline-configured-rehearsal"
                 assert proposal["action"] == "PROVIDE_EVIDENCE"
