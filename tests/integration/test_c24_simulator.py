@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta
 from uuid import uuid4
 
@@ -7,6 +8,7 @@ from test_harness import world as shared_world
 
 from countersign.agent.reads import CustomReads
 from countersign.db import Repositories
+from countersign.reconcile import PollResult
 from countersign.simulator import RunSimulator, SimulationError
 
 world = shared_world
@@ -15,8 +17,21 @@ pytestmark = [pytest.mark.integration, pytest.mark.asyncio]
 
 async def seeded(world):
     await world.engine.seed(world.state)
-    await ready_poll(world.engine)
+    await mirrored_rows(world, "balance_snapshots")
     return world.settings.clock()
+
+
+async def mirrored_rows(world, table, filters=None):
+    # A busy reconciliation cycle can report zero errors without reading PayPal.
+    # Wait for the required observation, not merely an error-free tick.
+    async with asyncio.timeout(60):
+        while True:
+            await ready_poll(world.engine)
+            async with world.database.tx() as conn:
+                rows = await getattr(Repositories(conn), table).find(filters)
+            if rows:
+                return rows
+            await asyncio.sleep(0.02)
 
 
 async def snapshot_rows(world):
@@ -46,12 +61,28 @@ async def add_dispute(world):
         },
     )
     assert response.status_code == 200
-    await ready_poll(world.engine)
-    async with world.database.tx() as conn:
-        return (await Repositories(conn).disputes.find())[0]
+    rows = await mirrored_rows(
+        world, "disputes", {"paypal_dispute_id": response.json()["dispute_id"]}
+    )
+    return rows[0]
 
 
-async def test_simulator_with_and_without_dispute_reserve_never_writes(world):
+@pytest.mark.parametrize("busy_cycles", [0, 2])
+async def test_simulator_with_and_without_dispute_reserve_never_writes(
+    world, monkeypatch, busy_cycles
+):
+    poller = world.engine._reconciler.reconciler
+    original = poller.poll_once
+    remaining = busy_cycles
+
+    async def sometimes_busy():
+        nonlocal remaining
+        if remaining:
+            remaining -= 1
+            return PollResult(busy=True)
+        return await original()
+
+    monkeypatch.setattr(poller, "poll_once", sometimes_busy)
     now = await seeded(world)
     async with world.database.tx() as conn:
         repos = Repositories(conn)
@@ -65,12 +96,15 @@ async def test_simulator_with_and_without_dispute_reserve_never_writes(world):
             due_date=WEEK,
             state="OPEN",
         )
+    remaining = busy_cycles
     await add_dispute(world)
     run_id = await world.engine.plan_payout_run(WEEK)
     before = await snapshot_rows(world)
     simulator = RunSimulator(world.database)
     protected = await simulator.simulate({"run_id": run_id})
     exposed = await simulator.simulate({"run_id": run_id, "respect_reserves": False})
+    assert await simulator.simulate({"run_id": run_id}) == protected
+    assert await simulator.simulate({"run_id": run_id, "respect_reserves": False}) == exposed
     assert protected["payout"] == {"minor": 10000, "currency": "USD"}
     assert exposed["payout"] == {"minor": 58600, "currency": "USD"}
     assert protected["effective_available"] == exposed["effective_available"]
@@ -79,10 +113,10 @@ async def test_simulator_with_and_without_dispute_reserve_never_writes(world):
     assert not protected["pays_disputed_shares"] and exposed["pays_disputed_shares"]
     assert not exposed["executable"]
     assert protected["own_cash_reservation_replaced"]["minor"] == 10000
-    assert before == await snapshot_rows(world)
     reads = CustomReads(None, None, simulator)
     result = await reads.simulate({"run_id": run_id})
     assert result["available"] and result["simulation"] == protected
+    assert before == await snapshot_rows(world)
     assert now == world.settings.clock()
 
 

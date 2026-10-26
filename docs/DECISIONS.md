@@ -232,3 +232,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | C21 may read webhook_inbox by exact event_type and run resource_id, requiring signature SUCCESS and status PROCESSED, with no inbox writes or facade/contract changes | C21, owner approved | Accept | Public snapshots cannot prove which delivery was verified and processed; an unrelated processed event must never satisfy the slice |
 | Inbox marks a signature-verified, GET-confirmed payout event PROCESSED; it still moves no payout state (C15 owns posting). | C21, owner approved | Accept | The slice needs exact processing evidence while payout reconciliation and ledger posting remain with C15 |
 | C21 tests M09a's actual duplicate 400 and original-batch link with identical saved keys and payload, with C22 migration 0004 guards enabled and no synthetic duplicate bridge | C21 integration | Accept | Recovery must prove the current mock and guarded database work together rather than substitute the behavior being tested |
+
+## Oct 25 local test infrastructure
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| C20 adds an opt-in postgres-test service on localhost:55433 with tmpfs data and fsync, synchronous_commit and full_page_writes disabled; the existing postgres service and volume are unchanged | Owner test-infrastructure prompt | Accept | Disposable test databases can trade crash durability for faster Windows test runs; sandbox working state must retain crash-safe storage |
