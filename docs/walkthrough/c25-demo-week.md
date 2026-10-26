@@ -9,7 +9,7 @@ It makes no LLM provider calls. The model proposes; only the executor's adapter
 can send a financial write after the shield allows it.
 
 The target Friday result is one owner approval for B's $486, C's current $300
-and C's old $300 resend: **$1,086**, leaving **$254 unreserved** from $1,340
+and C's old $300 resend: **$1,086**, leaving **$714 unreserved** from $1,800
 available. A's $360 and B's disputed $54 remain reserved. A's $360 is paid only
 in the following week, after the reconciler confirms the dispute release.
 
@@ -27,23 +27,41 @@ timeline
     Monday start : 1500 dollars available
                  : Old C payout of 300 is already UNCLAIMED and excluded
     Monday : Buyer disputes A's 400 order
-           : 1100 available and A's 360 reserved
+           : Capture A is PENDING, 1500 available and A's 360 reserved
     Wednesday : Buyer disputes B's 60 order
-              : 1040 available and B's 54 reserved
+              : Capture B is PENDING, 1500 available and B's 54 reserved
     Thursday : Agent cancels old C payout
-             : GET confirms RETURNED and 1340 becomes available
+             : GET confirms RETURNED and 1800 becomes available
              : Owner verifies C's corrected payee
     Friday : Owner approves 1086 once
            : B receives 486 and C receives 300 plus 300 resend
-           : A's 360 and B's 54 stay reserved and 254 stays unreserved
+           : A's 360 and B's 54 stay reserved and 714 stays unreserved
     Following week : Owner stages A's seller win or buyer close
-                   : Reconciler confirms release before owner approves A's 360
+                   : Reserve release leaves available at 714
+                   : Owner approves A's 360, leaving 354 available
 ```
 
 The opening $1,500 already excludes C's unclaimed $300. Do not subtract that
-$300 again. The holds on A's $400 and B's $60 reduce available to $1,040;
-cancelling C's old payout returns $300 and restores $1,340. The dispute earmarks
-protect maker shares; they do not subtract those holds from available again.
+$300 again. D8 and D12 found that disputed captures become `PENDING` without
+moving available into withheld. Both disputes therefore leave $1,500 available;
+cancelling C's old payout returns $300, giving $1,800. CounterSign's non-cash
+`DISPUTE_EARMARK` reserves protect the $360 and $54 maker shares even though the
+balance looks sufficient. The demo confirms each frozen capture through a GET.
+
+| Checkpoint | Previous hold-based expectation | No-hold available | Cash flow |
+| --- | --- | --- | --- |
+| Monday start | $1,500 | $1,500 | Historical C payout already excluded |
+| Monday A dispute | $1,100 | $1,500 | No cash move; reserve A $360 |
+| Wednesday B dispute | $1,040 | $1,500 | No cash move; reserve B $54 |
+| Thursday C return | $1,340 | $1,800 | Add the confirmed $300 return |
+| Friday payout | $254 | $714 | Subtract B $486 and C $600 |
+| Following-week A resolution | $654 | $714 | Release A's reserve; no cash inflow |
+| Following-week A payout | $294 | $354 | Subtract A $360 |
+
+B's $60 ACCEPT_CLAIM remains unapproved, so the week contains no buyer refund.
+An executed accept-claim or buyer-favour refund would reduce `paypal:available`
+by its actual refund amount under D10; it would not spend withheld money. Neither
+A's seller win nor its buyer-close alternative creates an available-balance credit.
 
 Four current orders produce the shares: A $400 gives $360, B $540 gives $486,
 B $60 gives $54, and C $333.33 gives $300 after the Money type's cent rounding.
@@ -51,8 +69,10 @@ C's historical $300 is separate from all four orders. Fees need separate
 funding and verification; the demo arithmetic must not silently absorb them.
 
 The naive comparison is a **read-only C24 simulation**: paying everything would
-request $1,500 against $1,340 available, a $160 shortfall, and would pay A's
-disputed share. The script must never execute that comparison as a payout.
+request $1,500 against $1,800 available, leaving $300 with no cash shortfall.
+It would still pay the **$414 disputed shares** (A $360 plus B $54), exposing the
+marketplace if those buyers are refunded later. Balance sufficiency alone does
+not make those shares payable. The script never executes the comparison.
 
 ## 3. What is autonomous and what waits for a person
 
@@ -136,6 +156,33 @@ Validation runs the full suite against the disposable fast PostgreSQL test
 service on port 55433, including integration, property, contract and C25 tests,
 plus Ruff and the three import contracts. This page
 does not invent pass counts or treat mock results as sandbox evidence.
+
+For C25b validation from `CounterSign-c25b`, use the existing sibling virtual
+environments and explicitly enable both database and real-child tests:
+
+```powershell
+$env:PYTHONPATH = 'src'
+$env:COUNTERSIGN_TEST_DATABASE_URL = 'postgresql://countersign:countersign-dev@127.0.0.1:55433/countersign'
+$env:COUNTERSIGN_TEST_TOOLKIT_PYTHON = (Resolve-Path '..\CounterSign-db\.venv\toolkit\Scripts\python.exe').Path
+& '..\CounterSign-db\.venv\Scripts\python.exe' -m pytest -q
+```
+
+Leaving either test setting unset skips its corresponding integration checks;
+a passing run with those skips does not validate the complete demo integration.
+
+The C25b targeted demo file passed all 16 tests, including all four whole-week
+combinations, in 305.37 seconds. The first full run overlapped another suite on
+the same database: 3,426 passed, five skipped and one unchanged C24 test failed
+in 1,117.60 seconds. Its `add_dispute` helper indexed an empty mirror after an
+error-free busy tick (`tests/integration/test_c24.py:57`). That test passed alone
+in 7.54 seconds. No C24 fixture or production code was changed for C25b.
+
+After the competing suite finished, the complete repeat against the same URL
+passed: **3,427 passed, five skipped, zero failures in 844.86 seconds (14m 04s)**.
+The five skips are optional legacy-toolkit checks in the main environment; the
+separate toolkit-child proof ran with its interpreter set. Ruff passed and all
+three import-linter contracts were kept, with zero broken. These are local mock
+and offline test results from Oct 27, not a sandbox or real-model rehearsal.
 
 D10 findings and the remaining owner choices:
 

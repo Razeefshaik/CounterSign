@@ -285,3 +285,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The isolated child adapts only SDK 1.11.0's missing tracking-by-order helper and transaction-search GET payload/JSON conventions, retaining the genuine five handlers and guarded read paths | C23c real-child tests | Accept | These are SDK client-interface defects, not missing mock endpoints; compatibility must not introduce writes, extra tools or alternate hosts |
 | Mock rehearsal setup starts a loopback mock with a minimal environment, reuses its webhook and preserves existing state unless --reset is explicitly supplied | C23c | Accept | The owner needs reproducible setup without leaking model keys to the mock, duplicating callbacks or silently discarding another rehearsal |
 | Configured demo incident subjects contain fixed action codes and resource identifiers; descriptive staging is recorded separately without granting permission | C23c integration review | Accept | IncidentService rejects prose in subjects, so the previous configured goal string failed before the next model step |
+
+## Oct 27 C25b no-hold demo
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| C25b narrates a dispute freeze confirmed by capture GET PENDING plus our non-cash DISPUTE_EARMARK reserve, never a balance hold; dispute opening and seller-favour resolution leave available unchanged | D8, D12; owner C25b prompt | Accept | The demo must match recorded sandbox behavior rather than invent $400 or $60 withheld cash |
+| C25b compares the protected $1,086 Friday run with a read-only $1,500 naive run against $1,800 available; the naive run pays $414 disputed shares with zero shortfall | C25b | Accept | The real risk is paying disputed obligations from an apparently sufficient balance; funds sufficiency cannot replace the reserve rule |
