@@ -433,6 +433,11 @@ def _rules(proposal):
     return {row["rule"] for row in proposal["rule_results"] if row.get("outcome") == "BLOCK"}
 
 
+def configured_safety(store):
+    return {name: {"shown": False} for name in ("lost_response", "injection", "settled_retry")} | dict(
+        store.data.get("configured_safety", {}))
+
+
 async def run_week(
     engine, checkpoint, **kwargs,
 ):
@@ -444,7 +449,7 @@ async def run_week(
             code = str(error)
             checkpoint.checkpoint(configured_status=code)
             checkpoint.record("CONFIGURED_MODEL_SUMMARY", status="STOPPED", reason=code,
-                              safety_moments=checkpoint.data.get("configured_safety", {}))
+                              safety_moments=configured_safety(checkpoint))
         raise
 
 
@@ -479,7 +484,7 @@ async def _run_week(
     incidents = IncidentService(engine.database, clock=engine.settings.clock)
     result = {}
     observer, cash_observation = None, {}
-    safety_summary = dict(store.data.get("configured_safety", {}))
+    safety_summary = configured_safety(store)
 
     def safety(name, shown, **details):
         if not scripted:

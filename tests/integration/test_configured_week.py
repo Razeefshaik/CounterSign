@@ -101,6 +101,9 @@ async def test_configured_week_never_forces_missing_cancel(db_schema, tmp_path, 
                    for e in events(world))
         assert any(e["event"] == "CONFIGURED_MODEL_SUMMARY" and e["status"] == "STOPPED"
                    for e in events(world))
+        summaries = [e for e in events(world) if e["event"] == "CONFIGURED_MODEL_SUMMARY"]
+        assert all(summaries[-1]["safety_moments"][name]["shown"] is False
+                   for name in ("lost_response", "injection", "settled_retry"))
         truth = (await world.control.get("/_mock/ground-truth")).json()
         assert len(truth["payout_items"]) == 1 and truth["payout_items"][0]["status"] == "UNCLAIMED"
         assert not any(r["path"].endswith("/cancel") and r["method"] == "POST" for r in truth["requests"])
