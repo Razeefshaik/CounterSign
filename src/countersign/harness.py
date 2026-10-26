@@ -395,6 +395,23 @@ class Engine:
         )
 
     async def _store_agent_proposal(self, observed, proposed):
+        try:
+            await self._bind_agent_proposal(observed, proposed)
+        except ApprovalError:
+            # The failed transaction rolls back the proposal and incident move.
+            # Count this recoverable agent error in the audit, not tick.errors:
+            # a bad model reference must not stop the resumable demo/worker.
+            # The same ApprovalError still escapes owner/executor callers.
+            async with self._database.tx() as conn:
+                await Repositories(conn).audit_log.insert(
+                    actor="agent", kind="RECONCILE_MISMATCH",
+                    details={"reason": "AGENT_PROPOSAL_UNBOUND", "count": 1,
+                             "incident_id": str(observed["id"])},
+                )
+            return "AGENT_PROPOSAL_UNBOUND"
+        return None
+
+    async def _bind_agent_proposal(self, observed, proposed):
         async with self._database.tx() as conn:
             await journal.serialize_on(conn, "countersign:owner-decisions")
             repos = Repositories(conn)
