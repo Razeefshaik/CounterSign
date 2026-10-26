@@ -423,8 +423,7 @@ The work is split into two roles by folder; the rules are in [AGENTS.md](AGENTS.
   the web dashboard.
 
 The interfaces between them are fixed in [docs/CONTRACTS.md](docs/CONTRACTS.md)
-(version 1.0.3). Core work was built with AI coding agents (Claude Code and
-Codex), and each finished piece has a plain-English walkthrough in
+(version 1.0.3). Each finished piece has a plain-English walkthrough in
 [docs/walkthrough/](docs/walkthrough/README.md). Every design change is logged
 with a one-line reason in [docs/DECISIONS.md](docs/DECISIONS.md).
 
