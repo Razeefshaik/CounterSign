@@ -477,6 +477,8 @@ DISPUTE_EARMARK never touches cash, because PayPal already withholds that money 
 
 ## 3. Handoff review: wrong, overstated or unverifiable
 
+**Outcome note (Oct 27):** This is the approved day-one plan and historical review. Sandbox findings and check outcomes are in [SANDBOX_FINDINGS.md](SANDBOX_FINDINGS.md); adopted decisions are recorded in [DECISIONS.md](DECISIONS.md).
+
 **High impact** (changes the design or the demo):
 
 - **F1. "UNKNOWN resolved by querying PayPal by item id or by sender_batch_id" (sections 5 and 7).** Payouts has **no lookup by `sender_batch_id`**. The only lookups are GET batch by `payout_batch_id` and GET item by `payout_item_id`, and the create response returns **no item IDs**. After a lost response you hold neither ID.

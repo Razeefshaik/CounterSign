@@ -16,8 +16,8 @@ in the following week, after the reconciler confirms the dispute release.
 These are acceptance targets, not a claim that the sandbox week has run. Mock
 validation, sandbox execution and real-model evaluation are separate results.
 The final implementation report records the actual test counts. The owner and
-Claude run the sandbox later. D10 confirmed adjudication and the seller/buyer
-outcome codes; buyer-close still awaits sandbox confirmation.
+Claude run the sandbox later. D10 confirmed adjudication, accept-claim and buyer
+close, including `CANCELED_BY_BUYER` / `BUYER_CANCELLED_CASE`.
 
 ## 2. The week and its amounts
 
@@ -43,7 +43,7 @@ timeline
 
 The opening $1,500 already excludes C's unclaimed $300. Do not subtract that
 $300 again. D8 and D12 found that disputed captures become `PENDING` without
-moving available into withheld. Both disputes therefore leave $1,500 available;
+moving available into withheld. In C25b's fixed fixture, both disputes leave $1,500 available;
 cancelling C's old payout returns $300, giving $1,800. CounterSign's non-cash
 `DISPUTE_EARMARK` reserves protect the $360 and $54 maker shares even though the
 balance looks sufficient. The demo confirms each frozen capture through a GET.
@@ -60,8 +60,16 @@ balance looks sufficient. The demo confirms each frozen capture through a GET.
 
 B's $60 ACCEPT_CLAIM remains unapproved, so the week contains no buyer refund.
 An executed accept-claim or buyer-favour refund would reduce `paypal:available`
-by its actual refund amount under D10; it would not spend withheld money. Neither
-A's seller win nor its buyer-close alternative creates an available-balance credit.
+by its actual refund amount under D10; it would not spend withheld money. In this
+fixed demo scenario, neither A's seller win nor its buyer-close alternative creates
+an available-balance credit.
+
+These are C25b's fixed acceptance amounts, not a reconstruction of the recorded
+D8/D12 capture cash flows. The Oct 27 findings attributed the actual $383.07 rise
+to A's $385.55 net capture release minus B's $2.48 net refund effect. Those
+captures had been disputed before reaching available; behavior for disputes on
+already-available captures remains untested. Cash always follows the observed
+available balance and counts inflows only once a snapshot reflects them.
 
 Four current orders produce the shares: A $400 gives $360, B $540 gives $486,
 B $60 gives $54, and C $333.33 gives $300 after the Money type's cent rounding.
@@ -191,13 +199,15 @@ D10 findings and the remaining owner choices:
 | Settlement path | `adjudicate` is the D10-confirmed default (200); buyer-close remains an explicit, guarded alternative |
 | Maker A dispute reason | Explicit reason selected from D10 findings; fresh GET links still decide evidence availability |
 | Outcome mapping | RESOLVED_SELLER_FAVOUR maps to WON; RESOLVED_BUYER_FAVOUR becomes full or partial loss according to the refunded amount |
-| Buyer-close | CANCELED_BY_BUYER is synthetic mock-only; sandbox execution refuses it until D10 confirms its outcome mapping |
+| Buyer-close | D10 confirmed CANCELED_BY_BUYER / BUYER_CANCELLED_CASE; OUTCOME_MAP maps CANCELED_BY_BUYER to CANCELLED, with no refund allowed |
 | Request formats | Multipart evidence with an input JSON part and JSON accept-claim both returned 200 in D10 |
 | Release proof | Reconciler observes that outcome and releases A's share before payment |
 
 An empty or unverified OUTCOME_MAP is not permission to release money. Sandbox
-must fail closed until the relevant D10 code is configured. Any mock-only
-synthetic outcome mapping is a labelled test fixture, never a sandbox finding.
+still fails closed for unknown outcomes. The implemented D10 mapping includes
+`RESOLVED_SELLER_FAVOUR`, `RESOLVED_BUYER_FAVOUR` and `CANCELED_BY_BUYER`; buyer
+close is no longer mock-only. Any additional synthetic outcome remains a labelled
+test fixture, never a sandbox finding.
 This demo leaves B's claim pending, so it does not establish the refund-source
 setting for a later ACCEPT_CLAIM execution.
 
@@ -266,7 +276,7 @@ after changing it. The script checks registration before financial setup.
 
 **Terminal 3, demo:** replace the example origin, reason and item ID with the
 owner's actual values. The command uses the D10-confirmed default adjudication path.
-Buyer-close remains unavailable on sandbox until its outcome is confirmed.
+Buyer-close is a D10-confirmed alternative selected explicitly with `--settlement buyer_close`.
 
 ```powershell
 Set-Location 'S:\StudyResource\TechBoooo\Hackathons\PayPalDevPost\CounterSign-db'
