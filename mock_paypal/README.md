@@ -139,6 +139,12 @@ imaginary hold. Synthetic hold experiments can opt in via dispute_hold and
 ResourceBehavior.refund_uses_withheld. Recorded outcome spellings are retained.
 
 
+Balance history is capped at the latest 256 snapshots per mock instance (32 days
+at the default three-hour refresh interval). Older snapshots are evicted; an
+`as_of_time` before the retained history returns `404 RESOURCE_NOT_FOUND`.
+The refresh delay and all timestamps still use the mock clock. Reseeding/reset
+replaces the history, so repeated demo runs do not accumulate snapshots.
+
 ## M05 webhook signing and delivery
 
 Events are signed with the explicitly PUBLIC mock-only RSA fixture in

@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from test_payouts import advance, authenticated, body, create
 
 from mock_paypal.app import create_app
-from mock_paypal.resources import ResourceBehavior
+from mock_paypal.resources import BALANCE_SNAPSHOT_LIMIT, ResourceBehavior
 
 SEED = {
     "balances": {"available": "1500.00", "withheld": "0.00", "currency_code": "USD"},
@@ -95,6 +95,37 @@ def test_hold_and_snapshot_refresh(client):
     assert fresh["last_refresh_time"] == "2026-11-02T12:00:00Z"
     assert client.get("/v1/reporting/balances?as_of_time=2026-11-02T09:00:00Z").json() == first
     assert client.get("/v1/customer/disputes/" + d["dispute_id"]).status_code == 200
+
+
+def test_balance_snapshot_history_is_bounded_during_long_clock_advance(client):
+    first = client.get("/v1/reporting/balances").json()
+    assert client.post("/_mock/config", json={"balance_refresh_seconds": 1}).status_code == 200
+    advance(client, BALANCE_SNAPSHOT_LIMIT * 8)
+    snapshots = client.app.state.store.resources.snapshots
+    assert len(snapshots) == BALANCE_SNAPSHOT_LIMIT
+    assert snapshots.maxlen == BALANCE_SNAPSHOT_LIMIT
+    latest = client.get("/v1/reporting/balances").json()
+    assert latest == snapshots[-1]
+    assert latest["balances"] == first["balances"]
+    oldest_time = snapshots[0]["as_of_time"]
+    assert client.get(
+        "/v1/reporting/balances", params={"as_of_time": oldest_time}
+    ).json() == snapshots[0]
+    assert client.get(
+        "/v1/reporting/balances", params={"as_of_time": first["as_of_time"]}
+    ).status_code == 404
+    advance(client, 10)
+    assert len(snapshots) == BALANCE_SNAPSHOT_LIMIT
+    assert snapshots[0]["as_of_time"] > oldest_time
+
+
+def test_reseed_replaces_bounded_snapshot_history(client):
+    old = client.app.state.store.resources.snapshots
+    assert client.post("/_mock/seed", json=SEED).status_code == 200
+    current = client.app.state.store.resources.snapshots
+    assert current is not old
+    assert len(current) == 1
+    assert current.maxlen == BALANCE_SNAPSHOT_LIMIT
 
 
 def test_default_dispute_freezes_capture_without_a_balance_hold(client):

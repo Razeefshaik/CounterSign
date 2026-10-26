@@ -2,6 +2,7 @@
 
 import base64
 import json
+from collections import deque
 from copy import deepcopy
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
@@ -18,6 +19,10 @@ from mock_paypal.payout_models import amount, minor
 from mock_paypal.payouts import PayoutBatch, PayoutError, PayoutItem, PayoutState
 
 router = APIRouter()
+
+# Bounded per mock instance, including when demos use one-second refreshes.
+# At the default three-hour interval this retains 32 days of balance history.
+BALANCE_SNAPSHOT_LIMIT = 256
 
 
 def instant(value):
@@ -77,7 +82,7 @@ class ResourceState:
     trackers: list = field(default_factory=list)
     disputes: dict = field(default_factory=dict)
     held: dict = field(default_factory=dict)
-    snapshots: list = field(default_factory=list)
+    snapshots: deque = field(default_factory=lambda: deque(maxlen=BALANCE_SNAPSHOT_LIMIT))
     transactions: list = field(default_factory=list)
     repeat_transaction_ids: bool = False
     snapshot_generation: int = 0
