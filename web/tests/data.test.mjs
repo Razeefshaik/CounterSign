@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {filterIncidents, summary, money, modeLabel, isStaged, loadWorkspace} from "../data.mjs";
+import {filterIncidents, summary, money, atRisk, modeLabel, isStaged, loadWorkspace} from "../data.mjs";
 const incidents = JSON.parse(await readFile(new URL("../fixtures/incidents.json", import.meta.url))).items;
 const disputes = JSON.parse(await readFile(new URL("../fixtures/disputes.json", import.meta.url))).items;
 test("state and kind filters combine", () => {
@@ -32,4 +32,10 @@ test("static preview uses visibly simulated contract fixtures", async () => {
   assert.equal(data.fixture,true);
   assert.equal(data.meta.simulation_label,"Simulated: mock PayPal");
   assert.equal(data.incidents.length,4);
+});
+test("an incident without an amount at risk renders a dash, not an error", () => {
+  assert.equal(atRisk(null), "—");
+  assert.equal(atRisk(undefined), "—");
+  assert.equal(atRisk({minor: 6000, currency: "USD"}), "$60.00");
+  assert.throws(() => atRisk({minor: 1.5, currency: "USD"}));
 });
