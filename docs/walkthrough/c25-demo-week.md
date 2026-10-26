@@ -16,7 +16,8 @@ in the following week, after the reconciler confirms the dispute release.
 These are acceptance targets, not a claim that the sandbox week has run. Mock
 validation, sandbox execution and real-model evaluation are separate results.
 The final implementation report records the actual test counts. The owner and
-Claude run the sandbox later, after the D10 choices below are confirmed.
+Claude run the sandbox later. D10 confirmed adjudication and the seller/buyer
+outcome codes; buyer-close still awaits sandbox confirmation.
 
 ## 2. The week and its amounts
 
@@ -85,8 +86,8 @@ The three safety moments have their own output labels and log entries:
    must be blocked by SETTLEMENT.
 
 The following week's outcome is a **staged sandbox action**, never an AI-caused
-win. `adjudicate` requests SELLER_FAVOR through the sandbox-only control from
-UNDER_REVIEW. `buyer_close` asks the buyer to close the existing case in the
+win. The default `adjudicate` requests SELLER_FAVOR through the sandbox-only control from
+UNDER_REVIEW. The alternative `buyer_close` asks the buyer to close the existing case in the
 Resolution Center. Both paths must be followed by reconciler-confirmed reserve
 release before a new owner approval pays A.
 
@@ -131,18 +132,20 @@ reserves held until reconciliation, both evidence branches, both settlement
 choices and the three safety moments. The naive comparison runs only through
 the simulator. Database transition guards remain enabled.
 
-The required validation includes `tests/integration`, `tests/property`,
-`tests/contract`, the new C25 file, Ruff and the three import contracts. The full
-suite is left to Claude on the merge, as the C25 prompt requests. This page
+Validation runs the full suite against the disposable fast PostgreSQL test
+service on port 55433, including integration, property, contract and C25 tests,
+plus Ruff and the three import contracts. This page
 does not invent pass counts or treat mock results as sandbox evidence.
 
-Before sandbox execution, Claude must resolve the D10-dependent choices:
+D10 findings and the remaining owner choices:
 
 | Choice | Required evidence or behavior |
 | --- | --- |
-| Settlement path | Explicit `adjudicate` or `buyer_close`; no guessed default |
+| Settlement path | `adjudicate` is the D10-confirmed default (200); buyer-close remains an explicit, guarded alternative |
 | Maker A dispute reason | Explicit reason selected from D10 findings; fresh GET links still decide evidence availability |
-| Outcome mapping | D10-confirmed terminal code mapped to the correct phase in core |
+| Outcome mapping | RESOLVED_SELLER_FAVOUR maps to WON; RESOLVED_BUYER_FAVOUR becomes full or partial loss according to the refunded amount |
+| Buyer-close | CANCELED_BY_BUYER is synthetic mock-only; sandbox execution refuses it until D10 confirms its outcome mapping |
+| Request formats | Multipart evidence with an input JSON part and JSON accept-claim both returned 200 in D10 |
 | Release proof | Reconciler observes that outcome and releases A's share before payment |
 
 An empty or unverified OUTCOME_MAP is not permission to release money. Sandbox
@@ -153,14 +156,15 @@ setting for a later ACCEPT_CLAIM execution.
 
 ## 6. Owner runbook for the sandbox
 
-Do this only after the implementation is validated and Claude has supplied the
-D10 choices and outcome mapping. No sandbox or real LLM run was performed while
+Do this after implementation validation and owner selection of A's dispute
+reason. Adjudication and the seller/buyer mappings are confirmed by D10. No sandbox or real LLM run was performed while
 writing this page.
 
 Prepare the following:
 
 1. A dedicated empty, migrated PostgreSQL 16 database ending in `_demo` or
-   `_test`, plus the existing local Python environment.
+   `_test`, plus the existing local Python environment. Use durable database
+   storage for sandbox runs; port 55433 is the disposable test service.
 2. The sandbox seller app, buyer-1, three distinct owner-verified maker emails,
    and C's **existing $300 UNCLAIMED item ID** at the old typo address. The script
    reads that old address from PayPal; it does not create another historical
@@ -214,15 +218,15 @@ the week. Set the exact `PAYPAL_WEBHOOK_ID` privately and restart the receiver
 after changing it. The script checks registration before financial setup.
 
 **Terminal 3, demo:** replace the example origin, reason and item ID with the
-owner's actual values. The settlement below is an explicit example, not a
-default recommendation; use Claude's D10-confirmed choice.
+owner's actual values. The command uses the D10-confirmed default adjudication path.
+Buyer-close remains unavailable on sandbox until its outcome is confirmed.
 
 ```powershell
 Set-Location 'S:\StudyResource\TechBoooo\Hackathons\PayPalDevPost\CounterSign-db'
 $env:PYTHONPATH = 'src'
 $demoEnvFile = 'S:\StudyResource\TechBoooo\Hackathons\PayPalDevPost\CounterSign\.env'
 $demoDate = [DateTime]::UtcNow.ToString('yyyy-MM-dd')
-.venv\Scripts\python.exe -m scripts.demo_week --target sandbox --settlement buyer_close --reason-a D10_CHOSEN_REASON --prior-item-id EXISTING_UNCLAIMED_ITEM_ID --app-url http://127.0.0.1:8000 --tunnel-url https://your-current-tunnel.ngrok-free.app --env-file $demoEnvFile --date $demoDate
+.venv\Scripts\python.exe -m scripts.demo_week --target sandbox --settlement adjudicate --reason-a D10_CHOSEN_REASON --prior-item-id EXISTING_UNCLAIMED_ITEM_ID --app-url http://127.0.0.1:8000 --tunnel-url https://your-current-tunnel.ngrok-free.app --env-file $demoEnvFile --date $demoDate
 ```
 
 Follow the pauses in order: buyer-1 approves all four orders, opens the two

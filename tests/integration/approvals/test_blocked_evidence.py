@@ -1,5 +1,6 @@
 """Unavailable evidence is auditable but never becomes an executable request."""
 
+import asyncio
 from dataclasses import replace
 from datetime import UTC, datetime
 from types import SimpleNamespace
@@ -104,7 +105,16 @@ async def unavailable_evidence(db_schema):
                 json={"status": "UNDER_REVIEW", "stage": "CHARGEBACK"},
             )
             assert transitioned.status_code == 200
-            assert (await engine.tick())["errors"] == 0
+            # A sibling isolated schema can hold the reconciler's global lease;
+            # an error-free tick may legitimately skip polling. Await the fact.
+            for _ in range(50):
+                assert (await engine.tick())["errors"] == 0
+                async with database.tx() as conn:
+                    observed = await Repositories(conn).disputes.find()
+                if observed:
+                    break
+                await asyncio.sleep(0.01)
+            assert observed, "the staged dispute must be reconciled before proposal tests"
             async with database.tx() as conn:
                 repos = Repositories(conn)
                 [dispute] = await repos.disputes.find()
