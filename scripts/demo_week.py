@@ -486,6 +486,19 @@ async def run_week(
             await advance()
         raise SliceError(code)
 
+    async def frozen_capture(key):
+        capture_id = store.data["orders"][key]["capture_id"]
+        for _ in range(options.poll_limit):
+            response = await http.request("GET", "/v2/payments/captures/" + capture_id)
+            if (
+                response.status_code == 200
+                and response.body.get("id") == capture_id
+                and response.body.get("status") == "PENDING"
+            ):
+                return capture_id
+            await advance()
+        raise SliceError("DISPUTED_CAPTURE_NOT_PENDING")
+
     async def day(label, offset):
         done = {
             0: "monday_dispute",
@@ -691,14 +704,24 @@ async def run_week(
                     "stage": "CHARGEBACK",
                 },
             )
+        capture_id = await frozen_capture("A400")
         await until(
             lambda s: (
                 maker(s, "A")["reserved"]["minor"] == 36000
-                and s["cash"]["paypal"]["available"]["minor"] == 110000
+                and s["cash"]
+                and s["cash"]["paypal"]["available"]["minor"] == 150000
             ),
             "A_RESERVE_PENDING",
         )
-        store.record("MONDAY_HOLD_CONFIRMED", available_minor=110000, reserved_a_minor=36000)
+        store.record(
+            "MONDAY_DISPUTE_FROZEN",
+            capture_id=capture_id,
+            capture_status="PENDING",
+            available_minor=150000,
+            reserved_a_minor=36000,
+            reserve_kind="DISPUTE_EARMARK",
+            affects_cash=False,
+        )
         proposal = await action(
             "evidence",
             "PROVIDE_EVIDENCE",
@@ -736,14 +759,24 @@ async def run_week(
 
     async def wednesday_dispute():
         await open_dispute("B60", 6000, "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED")
+        capture_id = await frozen_capture("B60")
         await until(
             lambda s: (
                 maker(s, "B")["reserved"]["minor"] == 5400
-                and s["cash"]["paypal"]["available"]["minor"] == 104000
+                and s["cash"]
+                and s["cash"]["paypal"]["available"]["minor"] == 150000
             ),
             "B_RESERVE_PENDING",
         )
-        store.record("WEDNESDAY_HOLD_CONFIRMED", available_minor=104000, reserved_b_minor=5400)
+        store.record(
+            "WEDNESDAY_DISPUTE_FROZEN",
+            capture_id=capture_id,
+            capture_status="PENDING",
+            available_minor=150000,
+            reserved_b_minor=5400,
+            reserve_kind="DISPUTE_EARMARK",
+            affects_cash=False,
+        )
 
     await store.step("wednesday_dispute", wednesday_dispute)
     await day("Thursday: autonomous cancel; GET must confirm RETURNED", 3)
@@ -764,14 +797,14 @@ async def run_week(
         else:
             raise SliceError("C_CANCEL_GET_PENDING")
         await until(
-            lambda s: s["cash"] and s["cash"]["paypal"]["available"]["minor"] == 134000,
+            lambda s: s["cash"] and s["cash"]["paypal"]["available"]["minor"] == 180000,
             "C_RETURN_BALANCE_PENDING",
         )
         store.record(
             "C_CANCEL_CONFIRMED",
             payout_item_id=store.data["prior_item_id"],
             state="RETURNED",
-            available_minor=134000,
+            available_minor=180000,
         )
         snapshot = await engine.snapshot()
         if target == "sandbox":
@@ -807,13 +840,15 @@ async def run_week(
         naive = await simulator.simulate({"run_id": run_id, "respect_reserves": False})
         require(
             protected.get("payout", {}).get("minor") == 108600
-            and protected["unreserved_after"]["minor"] == 25400,
+            and protected["unreserved_after"]["minor"] == 71400,
             "PROTECTED_SIMULATION_MISMATCH",
         )
         require(
             naive.get("payout", {}).get("minor") == 150000
-            and naive["snapshot_available"]["minor"] == 134000
-            and naive["shortfall"]["minor"] == 16000
+            and naive["snapshot_available"]["minor"] == 180000
+            and naive["effective_available"]["minor"] == 180000
+            and naive["shortfall"]["minor"] == 0
+            and naive["disputed_shares"]["minor"] == 41400
             and naive["pays_disputed_shares"],
             "NAIVE_SIMULATION_MISMATCH",
         )
@@ -823,8 +858,10 @@ async def run_week(
         store.record(
             "NAIVE_COMPARISON_READ_ONLY",
             payout_minor=150000,
-            available_minor=134000,
-            shortfall_minor=16000,
+            available_minor=180000,
+            shortfall_minor=0,
+            disputed_shares_minor=41400,
+            unreserved_after_minor=30000,
             pays_disputed_shares=True,
             executed=False,
         )
@@ -859,6 +896,8 @@ async def run_week(
             lambda s: (
                 maker(s, "B")["settled_last_30d"]["minor"] == 48600
                 and maker(s, "C")["settled_last_30d"]["minor"] == 60000
+                and s["cash"]
+                and s["cash"]["paypal"]["available"]["minor"] == 71400
             ),
             "FRIDAY_SETTLEMENT_PENDING",
         )
@@ -869,7 +908,9 @@ async def run_week(
         )
         require(bool(store.data.get("duplicate_links")), "LOST_RESPONSE_LINK_NOT_OBSERVED")
         store.checkpoint(friday_settled=final)
-        store.record("SAFETY_1_RECOVERED", same_keys=True, friday_paid_minor=108600)
+        store.record(
+            "SAFETY_1_RECOVERED", same_keys=True, friday_paid_minor=108600, available_minor=71400
+        )
 
     await store.step("friday_execute", friday_execute)
     result["friday_settled"] = store.data["friday_settled"]
@@ -989,7 +1030,8 @@ async def run_week(
         released = await until(
             lambda s: (
                 maker(s, "A")["reserved"]["minor"] == 0
-                and s["cash"]["paypal"]["available"]["minor"] == 65400
+                and s["cash"]
+                and s["cash"]["paypal"]["available"]["minor"] == 71400
                 and any(
                     d["paypal_dispute_id"] == dispute_a and d["phase"] in {"WON", "CANCELLED"}
                     for d in s["disputes"]
@@ -999,7 +1041,13 @@ async def run_week(
         )
         require(maker(released, "A")["settled_last_30d"]["minor"] == 0, "A_PAID_BEFORE_RELEASE")
         store.checkpoint(following_release=released)
-        store.record("A_RELEASE_RECONCILED", dispute_id=dispute_a, settlement=options.settlement)
+        store.record(
+            "A_RELEASE_RECONCILED",
+            dispute_id=dispute_a,
+            settlement=options.settlement,
+            available_minor=71400,
+            reserved_a_minor=0,
+        )
 
     await store.step("following_week_settle", settle_a)
     result["following_release"] = store.data["following_release"]
@@ -1007,7 +1055,12 @@ async def run_week(
     async def pay_a():
         await approve_run("following_week", week + timedelta(days=7), 36000)
         snapshot = await until(
-            lambda s: maker(s, "A")["settled_last_30d"]["minor"] == 36000, "A_PAYMENT_PENDING"
+            lambda s: (
+                maker(s, "A")["settled_last_30d"]["minor"] == 36000
+                and s["cash"]
+                and s["cash"]["paypal"]["available"]["minor"] == 35400
+            ),
+            "A_PAYMENT_PENDING",
         )
         require(maker(snapshot, "B")["reserved"]["minor"] == 5400, "B_RESERVE_LOST")
 
@@ -1033,6 +1086,7 @@ async def run_week(
         friday_paid_minor=108600,
         following_week_a_paid_minor=36000,
         remaining_b_reserved_minor=5400,
+        available_minor=35400,
         scripted_model=True,
     )
     return result
