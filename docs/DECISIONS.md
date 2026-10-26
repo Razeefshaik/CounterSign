@@ -309,3 +309,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | --- | --- | --- | --- |
 | C25b narrates a dispute freeze confirmed by capture GET PENDING plus our non-cash DISPUTE_EARMARK reserve, never a balance hold; dispute opening and seller-favour resolution leave available unchanged | D8, D12; owner C25b prompt | Accept | The demo must match recorded sandbox behavior rather than invent $400 or $60 withheld cash |
 | C25b compares the protected $1,086 Friday run with a read-only $1,500 naive run against $1,800 available; the naive run pays $414 disputed shares with zero shortfall | C25b | Accept | The real risk is paying disputed obligations from an apparently sufficient balance; funds sufficiency cannot replace the reserve rule |
+
+## Oct 27 C29 documentation sync
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| HANDOFF synced with sandbox findings (owner-approved Oct 27); no design change. | Owner C29 prompt | Accept | Describe the recorded D1–D13 outcomes, implemented recovery and evidence gates, and C25b's fixed demo amounts without treating them as a replay of the recorded capture cash flows |
