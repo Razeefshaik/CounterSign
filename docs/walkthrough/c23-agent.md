@@ -182,12 +182,13 @@ $env:PYTHONPATH = 'src'
 
 Without `--env-file`, the command reads only the process environment, never an
 implicit file. With no configuration/key it stops before a client or network
-call. With valid settings it makes exactly one model request, binding one harmless
+call. With valid settings it makes one logical model invocation, binding one harmless
 read stub through the same LangChain adapter as the commander. It never calls
 PayPal or invokes a returned tool. Output contains only provider, model ID,
 whether a tool call returned, and token counts when available. There are no raw
-responses, thought text or keys. A quota/provider failure is a fixed error; retrying
-is an explicit owner action rather than an automatic loop.
+responses, thought text or keys. The shared model client has up to three total
+attempts with a 90-second timeout per attempt for transient provider failures.
+A final failure is a fixed error; rerunning the smoke is an explicit owner action.
 
 5. Once the owner smoke succeeds, follow the C25 receiver/tunnel/database runbook
    and add `--model configured` to its demo command. The default remains
@@ -224,6 +225,96 @@ config = ChatModelConfig.from_environment()  # None or validated configuration
 The C21 slice currently builds no commander/model and remains its deterministic
 payout/reconciliation proof. The HTTP receiver also runs without a commander;
 only the selected demo CLI performs model steps.
+
+### C23c: rehearse the configured model against the local mock
+
+This is a mock rehearsal, not a PayPal sandbox run. The owner already confirmed a
+Gemini tool call with the smoke test. C23c's tests use a fake model and the genuine
+isolated toolkit child; they make no real Google or PayPal requests.
+
+Complete the two-environment install above first. Keep only the model provider,
+model ID and Google key in the selected runtime file. A configured mock run copies
+only `COUNTERSIGN_LLM_PROVIDER`, `COUNTERSIGN_LLM_MODEL` and `GOOGLE_API_KEY` from it,
+with interpolation disabled and existing process values winning. PayPal credentials,
+DATABASE_URL, owner settings and the toolkit interpreter in that file are ignored.
+Scripted mock runs and the receiver do not read the file at all.
+
+For a fresh rehearsal, stop the previous receiver and preserve its checkpoint.
+Use a new empty database and a fresh scratch root. From `CounterSign-db`:
+
+```powershell
+docker compose --profile test up -d postgres-test
+docker compose --profile test exec -T postgres-test createdb -U countersign countersign_rehearsal_c23c_demo
+$env:PYTHONPATH = 'src'
+$env:DATABASE_URL = 'postgresql://countersign:countersign-dev@127.0.0.1:55433/countersign_rehearsal_c23c_demo'
+.venv\Scripts\python.exe -m alembic -c migrations/alembic.ini upgrade head
+$rehearsalRoot = Join-Path $env:TEMP ('countersign-rehearsal-' + [DateTime]::UtcNow.ToString('yyyyMMdd-HHmmss'))
+.venv\Scripts\python.exe -m scripts.mock_rehearsal --reset --env-file ..\CounterSign\.env --root $rehearsalRoot
+```
+
+If that database already exists, select a new name ending in `_demo`; do not drop
+working data. Port 55433 is the disposable test service and loses state on restart.
+The `--reset` above is deliberate: it discards this local mock's previous state
+for a fresh run. For resume, keep the original database, root, mock and webhook;
+do not reset the mock, create another database or change the saved date.
+
+The helper starts the mock on loopback port 8099 when absent and leaves it running
+in the background. It uses fake mock OAuth credentials, registers or reuses the
+wildcard webhook, and prints the actual public webhook ID plus two commands. It
+never opens the runtime file or prints a database URL, model key or bearer token.
+An existing mock is preserved when `--reset` is omitted. Keep the printed settings
+and commands; the webhook ID is not hard-coded to an assumed seed sequence.
+
+Run the printed shared environment settings in **both** PowerShell terminals,
+including the same DATABASE_URL from above. They select `COUNTERSIGN_MODE=demo`,
+`PAYPAL_BASE_URL=http://127.0.0.1:8099`, fake mock credentials,
+`PAYPAL_WEBHOOK_ID` and the absolute `COUNTERSIGN_TOOLKIT_PYTHON` path. Then:
+
+```powershell
+# Terminal 1: the actual receiver, with background workers disabled
+.venv\Scripts\python.exe -m scripts.demo_week --target mock --model configured --serve --port 8000 --env-file ..\CounterSign\.env
+
+# Terminal 2: use the exact scratch root printed by the helper
+.venv\Scripts\python.exe -m scripts.demo_week --target mock --model configured --env-file ..\CounterSign\.env --root 'PASTE-THE-PRINTED-SCRATCH-ROOT'
+```
+
+Only Terminal 2 invokes the real model. `adjudicate` remains the default. This is
+an owner-operated Google call against a fully local PayPal mock; no sandbox
+PayPal credentials are loaded. Keep this run separate from scripted acceptance
+results. The model may choose WAIT or another action instead of the staged
+expectation; `CONFIGURED_MODEL_DECISION_DIFFERS` records that actual choice and
+stops honestly, without replacing it with DemoModel output.
+
+The bridge reproduction established:
+
+- `get_dispute` and the other reads contact the selected mock, not the sandbox.
+  The guard still permits OAuth plus fixed GET paths only, with exactly five
+  genuine toolkit tools. A changed SDK origin fails before any request.
+- Old `DEMO-O-...` UUID strings did not match the SDK's 17-to-32 uppercase
+  alphanumeric order-ID schema. Fresh mock orders/captures now use valid
+  synthetic IDs. The mock already creates the corresponding order from each
+  seeded capture; no new mock endpoint is required.
+- SDK 1.11.0's tracking-by-order handler calls an absent `get_order_details`
+  client method. Its transaction-ID search calls an unsupported `get(payload=...)`
+  and expects JSON text. The child supplies narrow read-only compatibility
+  helpers while keeping the genuine tool handlers and the existing HTTP guard.
+- The transaction-ID search uses the SDK's real UTC month windows; a future
+  accelerated mock clock can honestly produce `found=false`. Reporting lag can
+  also produce empty lists. Neither is proof of a failed HTTP call or an absent
+  transaction. The SDK order tool's canned ?captured? message is not evidence of
+  capture: inspect its raw status and records.
+
+Configured staging also uses fixed incident reason codes and identifiers; the
+previous descriptive prose violated IncidentService's subject validation and
+blocked later model steps. Human-readable staging is logged separately.
+
+All five tool names, tracking by transaction and by order, transaction-ID search,
+argument validation, mock routing and the financial-write guard have offline
+coverage. A database integration test uses a fake LangChain reply through the
+normal configured Engine and restricted graph/toolkit startup, reads the order
+and dispute, and executes one allowed evidence submission against the local mock. These transport checks do not claim that a real-model week completed.
+Saved runs with the old invalid synthetic IDs are not silently rewritten; start
+fresh as above when validating the corrected setup.
 
 ## 6. Scope and remaining work
 
