@@ -7,7 +7,8 @@ PayPal's balance lags by up to three hours, so the formula stays conservative:
     unreserved          = effective_available - active reservations that affect cash
 
 Inflows count only once a snapshot reflects them, so they never appear here. A dispute
-earmark never affects cash: PayPal already withholds that money [pending D8c, D12].
+earmark protects the maker's share without affecting cash. D8/D12 observed PENDING
+captures with no withheld-balance movement; the formula uses observed available only.
 """
 
 from collections.abc import Iterable

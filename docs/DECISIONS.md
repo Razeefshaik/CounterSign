@@ -330,3 +330,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | A completed matching cancel/evidence action is reused with CONFIGURED_MODEL_ACTED_EARLIER and its recorded action time; optional model differences remain logged and the final configured summary names shown and missing safety moments | C25c | Accept | Real reasoning may act early or refuse an unsafe demonstration; the script must neither force a staged proposal nor claim a safety moment it did not observe |
 | Numeric provider HTTP 429 becomes MODEL_QUOTA_EXHAUSTED, separately audited outside the per-incident failure cap and saved as a resumable script stop; no provider error text or automatic model switch | C25c | Accept | A free-tier daily limit is not an incident failure and must not strand the same incident when the owner resumes after quota resets |
 | The walkthrough recommends explicit gemini-3.5-flash-lite for rehearsals, while evidence-prefix guidance is generated from EVIDENCE_PREFIXES | Owner Oct 27 quota observations; C25c | Accept | The owner's Flash free-tier limit was 20 daily requests, below a full week's observed needs, and fixed shape guidance avoids wasting correction turns |
+
+## Oct 27 C29 documentation sync
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| HANDOFF synced with sandbox findings (owner-approved Oct 27); no design change. | Owner C29 prompt | Accept | Describe the recorded D1–D13 outcomes, implemented recovery and evidence gates, and C25b's fixed demo amounts without treating them as a replay of the recorded capture cash flows |

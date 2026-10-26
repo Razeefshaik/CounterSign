@@ -289,7 +289,7 @@ The same flow passes as an automated test against `mock_paypal`. The sandbox res
 
 **C25: Demo week on the sandbox**
 - **Owner:** core. **Due:** Nov 9.
-- **Files:** `scripts/demo_week_sandbox.py`.
+- **Files:** `scripts/demo_week.py`.
 - **Depends on:** C24. **Needs the human owner:** the staged buyer actions.
 - **Acceptance:**
   - The HANDOFF section 10 week runs on the sandbox, including all three live safety moments.
