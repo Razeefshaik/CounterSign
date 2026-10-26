@@ -7,9 +7,10 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from email import policy
 from email.parser import BytesParser
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlsplit
 
 from fastapi import APIRouter, Query, Request
+from fastapi.responses import JSONResponse
 
 from mock_paypal.clock import timestamp
 from mock_paypal.config import MockConfig
@@ -31,6 +32,23 @@ def money(value):
     return {"value": sign + amount(abs(value))["value"], "currency_code": "USD"}
 
 
+def local_links(value, base):
+    """Only PayPal API hosts in fixtures become local; never trust arbitrary hrefs."""
+    if isinstance(value, list):
+        return [local_links(item, base) for item in value]
+    if isinstance(value, dict):
+        result = {key: local_links(item, base) for key, item in value.items()}
+        href = result.get("href")
+        if isinstance(href, str):
+            parsed = urlsplit(href)
+            if parsed.hostname in {"api.sandbox.paypal.com", "api-m.sandbox.paypal.com"}:
+                result["href"] = (
+                    base.rstrip("/") + parsed.path + ("?" + parsed.query if parsed.query else "")
+                )
+        return result
+    return value
+
+
 @dataclass(frozen=True)
 class ResourceBehavior:
     capture_transaction_field: str = "seller_transaction_id"  # pending D8b
@@ -41,8 +59,8 @@ class ResourceBehavior:
     seller_win_code: str = "RESOLVED_SELLER_FAVOUR"
     buyer_win_code: str = "RESOLVED_BUYER_FAVOUR"
     buyer_close_code: str = "CANCELED_BY_BUYER"
-    refund_uses_withheld: bool = True
-    capture_held_status: str = "COMPLETED"  # pending D8c
+    refund_uses_withheld: bool = False  # D10/D12
+    capture_held_status: str = "PENDING"  # D8
     action_rels: tuple = (
         "provide_evidence",
         "accept_claim",
@@ -94,9 +112,7 @@ class ResourceService:
                     {
                         "currency": "USD",
                         "primary": True,
-                        "total_balance": money(
-                            funds.available_minor + funds.withheld_minor
-                        ),
+                        "total_balance": money(funds.available_minor + funds.withheld_minor),
                         "available_balance": money(funds.available_minor),
                         "withheld_balance": money(funds.withheld_minor),
                     }
@@ -113,15 +129,10 @@ class ResourceService:
         generation = state.snapshot_generation
 
         def refresh():
-            if (
-                state is not self.store.resources
-                or generation != state.snapshot_generation
-            ):
+            if state is not self.store.resources or generation != state.snapshot_generation:
                 return
             self.snapshot()
-            self.store.clock.schedule(
-                self.store.config.balance_refresh_seconds, refresh
-            )
+            self.store.clock.schedule(self.store.config.balance_refresh_seconds, refresh)
 
         self.store.clock.schedule(self.store.config.balance_refresh_seconds, refresh)
 
@@ -148,9 +159,7 @@ class ResourceService:
             state.orders[entry["id"]] = deepcopy(entry)
         for entry in body.get("captures", []):
             value = (
-                entry["amount"]
-                if isinstance(entry["amount"], str)
-                else entry["amount"]["value"]
+                entry["amount"] if isinstance(entry["amount"], str) else entry["amount"]["value"]
             )
             value = minor(value)
             created = entry.get("create_time", timestamp(self.store.clock.now))
@@ -166,6 +175,10 @@ class ResourceService:
                 },
                 "create_time": created,
             }
+            # Full recorded captures retain optional PayPal metadata and fees.
+            capture.update(deepcopy(entry))
+            capture["amount"] = money(value)
+            capture.pop("order_id", None)
             state.captures[entry["id"]] = capture
             oid = entry.get("order_id", entry["id"].replace("CAP", "ORD"))
             state.orders.setdefault(
@@ -203,12 +216,15 @@ class ResourceService:
                     }
                 }
             )
+        for transaction in body.get("transactions", []):
+            info = transaction["transaction_info"]
+            instant(info["transaction_initiation_date"])
+            minor(info["transaction_amount"]["value"])
+            state.transactions.append(deepcopy(transaction))
         state.trackers = deepcopy(body.get("trackers", []))
         for index, entry in enumerate(body.get("payout_items", [])):
             value = (
-                entry["amount"]
-                if isinstance(entry["amount"], str)
-                else entry["amount"]["value"]
+                entry["amount"] if isinstance(entry["amount"], str) else entry["amount"]["value"]
             )
             value = minor(value)
             if value <= 0 or entry.get("status", "PENDING") not in {
@@ -224,16 +240,19 @@ class ResourceService:
             }:
                 raise ValueError("Invalid seeded payout")
             created = (
-                instant(entry["created_at"])
-                if entry.get("created_at")
-                else self.store.clock.now
+                instant(entry["created_at"]) if entry.get("created_at") else self.store.clock.now
             )
             bid = entry.get("payout_batch_id", f"MOCKB-SEED-{index}")
             batch = funds.batches.setdefault(
                 bid,
                 PayoutBatch(
                     bid,
-                    {"sender_batch_id": entry.get("sender_batch_id", bid)},
+                    deepcopy(
+                        entry.get(
+                            "sender_batch_header",
+                            {"sender_batch_id": entry.get("sender_batch_id", bid)},
+                        )
+                    ),
                     [],
                     created,
                     request_id=entry.get("request_id"),
@@ -254,10 +273,27 @@ class ResourceService:
                 status=entry.get("status", "PENDING"),
                 synthesised=entry.get("synthesised", False),
             )
+            item.payload = deepcopy(entry.get("payout_item", item.payload))
+            item.transaction_id = entry.get("transaction_id", item.transaction_id)
+            item.activity_id = entry.get("activity_id", item.activity_id)
+            item.processed_at = (
+                instant(entry["time_processed"])
+                if entry.get("time_processed")
+                else created
+                if item.status != "PENDING"
+                else None
+            )
+            item.errors = deepcopy(entry.get("errors"))
+            item.cancelled = entry.get("cancelled", False)
+            item.fee_minor = minor(entry.get("payout_item_fee", {"value": "0.00"})["value"])
+            batch.status = entry.get(
+                "batch_status", "PENDING" if item.status == "PENDING" else "SUCCESS"
+            )
+            if batch.status != "PENDING":
+                batch.completed_at = item.processed_at or created
             item.debited_minor = (
                 value
-                if item.status
-                in {"PENDING", "SUCCESS", "UNCLAIMED", "ONHOLD", "BLOCKED"}
+                if item.status in {"PENDING", "SUCCESS", "UNCLAIMED", "ONHOLD", "BLOCKED"}
                 else 0
             )
             if item.status == "UNCLAIMED" and config.unclaimed_counts_in_available:
@@ -281,13 +317,16 @@ class ResourceService:
             ):
                 raise ValueError("Invalid dispute fixture")
             state.disputes[doc["dispute_id"]] = deepcopy(doc)
-            if doc.get("hold_observed") and doc["status"] != "RESOLVED":
+            if config.dispute_hold and doc.get("hold_observed") and doc["status"] != "RESOLVED":
                 state.held[doc["dispute_id"]] = minor(doc["dispute_amount"]["value"])
         self.store.config, self.store.resources, self.store.payouts = (
             config,
             state,
             funds,
         )
+        for doc in state.disputes.values():
+            if doc["status"] != "RESOLVED":
+                self.capture_status(doc, self.behavior.capture_held_status)
         for item in funds.items.values():
             if item.status == "UNCLAIMED":
                 due = max(
@@ -321,20 +360,29 @@ class ResourceService:
                     ),
                 )
         for capture in state.captures.values():
-            self.store.emit("PAYMENT.CAPTURE.COMPLETED", capture)
+            if capture["status"] == "COMPLETED":
+                self.store.emit("PAYMENT.CAPTURE.COMPLETED", capture)
         self.snapshot()
         self.schedule_snapshots()
 
     def links(self, doc, base):
         status, stage = doc["status"], doc["dispute_life_cycle_stage"]
+        if "links" in doc:
+            # An observed missing permission is not inferred from a lifecycle stage.
+            links = local_links(doc["links"], base)
+            return [
+                link
+                for link in links
+                if link.get("rel") != "provide_evidence" or status == "WAITING_FOR_SELLER_RESPONSE"
+            ]
         names = []
         if status != "RESOLVED":
             names += ["accept-claim"]
             if stage == "INQUIRY":
                 names += ["escalate"]
-        if (
-            status == "WAITING_FOR_SELLER_RESPONSE"
-            and stage in self.store.config.evidence_allowed_stages
+        if status == "WAITING_FOR_SELLER_RESPONSE" and (
+            self.store.config.evidence_allowed_stages is None
+            or stage in self.store.config.evidence_allowed_stages
         ):
             names += ["provide-evidence"]
         if status == "UNDER_REVIEW":
@@ -353,12 +401,20 @@ class ResourceService:
         )
         path = base.rstrip("/") + "/v1/customer/disputes/" + doc["dispute_id"]
         return [{"href": path, "rel": "self", "method": "GET"}] + [
-            {"href": path + "/" + name, "rel": mapping[name], "method": "POST"}
-            for name in names
+            {"href": path + "/" + name, "rel": mapping[name], "method": "POST"} for name in names
         ]
 
     def doc(self, doc, base):
         return {**deepcopy(doc), "links": self.links(doc, base)}
+
+    def capture_status(self, doc, status):
+        for transaction in doc["disputed_transactions"]:
+            capture = self.store.resources.captures.get(
+                transaction.get(self.behavior.capture_transaction_field)
+            )
+            if capture:
+                capture["status"] = status
+                capture["update_time"] = timestamp(self.store.clock.now)
 
     def new_dispute(self, body):
         capture = self.get("captures", body["capture_id"])
@@ -386,9 +442,7 @@ class ResourceService:
             "reason": body["reason"],
             "status": self.behavior.initial_status,
             "dispute_amount": money(value),
-            "seller_response_due_date": timestamp(
-                self.store.clock.now + timedelta(days=10)
-            ),
+            "seller_response_due_date": timestamp(self.store.clock.now + timedelta(days=10)),
             "dispute_life_cycle_stage": self.behavior.initial_stage,
             "dispute_channel": "INTERNAL",
             "messages": [
@@ -403,18 +457,14 @@ class ResourceService:
             self.store.payouts.available_minor -= value
             self.store.payouts.withheld_minor += value
             self.store.resources.held[id] = value
-            capture["status"] = self.behavior.capture_held_status
-        self.store.emit(
-            "CUSTOMER.DISPUTE.CREATED", self.doc(doc, "http://localhost:8099")
-        )
+        self.capture_status(doc, self.behavior.capture_held_status)
+        self.store.emit("CUSTOMER.DISPUTE.CREATED", self.doc(doc, "http://localhost:8099"))
         return doc
 
     def resolve(self, doc, outcome, refund=False, via="adjudicate"):
         id, value = doc["dispute_id"], minor(doc["dispute_amount"]["value"])
         held = self.store.resources.held.get(id, 0)
-        from_held = (
-            min(held, value) if refund and self.behavior.refund_uses_withheld else 0
-        )
+        from_held = min(held, value) if refund and self.behavior.refund_uses_withheld else 0
         needed = value - from_held if refund else 0
         if needed > 0 and self.store.payouts.available_minor < needed:
             raise PayoutError(422, "INSUFFICIENT_FUNDS", "Insufficient refund funds")
@@ -428,6 +478,23 @@ class ResourceService:
                 "amount_refunded": money(value if refund else 0),
             },
         )
+        doc.pop("links", None)
+        if refund:
+            self.capture_status(doc, "REFUNDED")
+        else:
+            capture_ids = {
+                t.get(self.behavior.capture_transaction_field) for t in doc["disputed_transactions"]
+            }
+            still_active = any(
+                other["status"] != "RESOLVED"
+                and any(
+                    t.get(self.behavior.capture_transaction_field) in capture_ids
+                    for t in other["disputed_transactions"]
+                )
+                for other in self.store.resources.disputes.values()
+            )
+            if not still_active:
+                self.capture_status(doc, "COMPLETED")
         if refund:
             self.store.refunds.append(
                 {
@@ -438,13 +505,17 @@ class ResourceService:
                 }
             )
             self.transaction(-value, id)
+            for transaction in doc["disputed_transactions"]:
+                capture = self.store.resources.captures.get(
+                    transaction.get(self.behavior.capture_transaction_field)
+                )
+                if capture:
+                    self.store.emit("PAYMENT.CAPTURE.REFUNDED", capture)
 
     def updated(self, doc):
         doc["update_time"] = timestamp(self.store.clock.now)
         suffix = "RESOLVED" if doc["status"] == "RESOLVED" else "UPDATED"
-        self.store.emit(
-            "CUSTOMER.DISPUTE." + suffix, self.doc(doc, "http://localhost:8099")
-        )
+        self.store.emit("CUSTOMER.DISPUTE." + suffix, self.doc(doc, "http://localhost:8099"))
 
     async def act(self, id, action, request):
         doc = self.get("disputes", id)
@@ -453,7 +524,8 @@ class ResourceService:
             for link in self.links(doc, str(request.base_url))
             if link["method"] == "POST"
         ]
-        if action not in allowed:
+        control = action in {"adjudicate", "require-evidence"} and doc["status"] == "UNDER_REVIEW"
+        if action not in allowed and not control:
             raise PayoutError(
                 422,
                 "UNPROCESSABLE_ENTITY",
@@ -462,10 +534,7 @@ class ResourceService:
             )
         ct = request.headers.get("content-type", "")
         media_type = ct.split(";", 1)[0].strip().lower()
-        if (
-            action in {"provide-evidence", "accept-claim"}
-            and media_type == "multipart/form-data"
-        ):
+        if action in {"provide-evidence", "accept-claim"} and media_type == "multipart/form-data":
             raw = (
                 "Content-Type: " + ct + "\r\nMIME-Version: 1.0\r\n\r\n"
             ).encode() + await request.body()
@@ -488,17 +557,20 @@ class ResourceService:
             if not isinstance(body.get("evidences"), list) or not body["evidences"]:
                 raise ValueError("Evidence required")
             doc["evidences"].extend(deepcopy(body["evidences"]))
+            doc.pop("links", None)
             doc["status"] = self.behavior.evidence_result_status
         elif action == "accept-claim":
             if body.get("accept_claim_type") != "REFUND":
                 raise ValueError("Use REFUND")
             self.resolve(doc, self.behavior.buyer_win_code, True, "accept_claim")
         elif action == "escalate":
+            doc.pop("links", None)
             doc.update(
                 dispute_life_cycle_stage="CHARGEBACK",
                 status=self.behavior.escalation_status,
             )
         elif action == "require-evidence":
+            doc.pop("links", None)
             target = {
                 "SELLER_EVIDENCE": "WAITING_FOR_SELLER_RESPONSE",
                 "BUYER_EVIDENCE": "WAITING_FOR_BUYER_RESPONSE",
@@ -513,12 +585,19 @@ class ResourceService:
             buyer = result == "BUYER_FAVOR"
             self.resolve(
                 doc,
-                self.behavior.buyer_win_code
-                if buyer
-                else self.behavior.seller_win_code,
+                self.behavior.buyer_win_code if buyer else self.behavior.seller_win_code,
                 buyer,
             )
         self.updated(doc)
+        detail = {
+            "href": str(request.base_url).rstrip("/") + "/v1/customer/disputes/" + id,
+            "rel": "detail",
+            "method": "GET",
+        }
+        if action in {"provide-evidence", "accept-claim"}:
+            return {"links": [detail]}
+        if action == "adjudicate":
+            return {**detail, "rel": "self"}
         return self.doc(doc, str(request.base_url))
 
 
@@ -533,9 +612,7 @@ async def seed(body: dict, request: Request):
 
 
 @router.get("/v1/reporting/balances")
-async def balances(
-    request: Request, currency_code: str = "USD", as_of_time: str | None = None
-):
+async def balances(request: Request, currency_code: str = "USD", as_of_time: str | None = None):
     service = request.app.state.resource_service
     if not service.store.resources.snapshots:
         service.snapshot()
@@ -558,22 +635,25 @@ async def balances(
 
 @router.get("/v2/checkout/orders/{id}")
 async def order(id: str, request: Request):
-    return request.app.state.resource_service.get("orders", id)
+    return local_links(request.app.state.resource_service.get("orders", id), str(request.base_url))
 
 
 @router.get("/v2/payments/captures/{id}")
 async def capture(id: str, request: Request):
-    return request.app.state.resource_service.get("captures", id)
+    return local_links(
+        request.app.state.resource_service.get("captures", id), str(request.base_url)
+    )
 
 
 @router.get("/v1/shipping/trackers")
 async def trackers(request: Request, transaction_id: str):
     return {
+        "links": [],
         "trackers": [
             deepcopy(t)
             for t in request.app.state.store.resources.trackers
             if t["transaction_id"] == transaction_id
-        ]
+        ],
     }
 
 
@@ -595,19 +675,19 @@ async def transactions(
     items = [
         deepcopy(t)
         for t in store.resources.transactions
-        if instant(t["transaction_info"]["transaction_initiation_date"])
-        <= min(end, cutoff)
-        and (
-            not start
-            or instant(t["transaction_info"]["transaction_initiation_date"]) >= start
-        )
-        and (
-            not transaction_id
-            or t["transaction_info"]["transaction_id"] == transaction_id
-        )
+        if instant(t["transaction_info"]["transaction_initiation_date"]) <= min(end, cutoff)
+        and (not start or instant(t["transaction_info"]["transaction_initiation_date"]) >= start)
+        and (not transaction_id or t["transaction_info"]["transaction_id"] == transaction_id)
     ]
-    return {
-        "transaction_details": items,
+    doc = {
+        "links": [
+            {
+                "href": str(request.url),
+                "rel": "self",
+                "method": "GET",
+                "encType": "application/json",
+            }
+        ],
         "account_number": "MOCKACCT01",
         "start_date": start_date,
         "end_date": timestamp(end),
@@ -616,6 +696,9 @@ async def transactions(
         "total_items": len(items),
         "total_pages": 1,
     }
+    if items:
+        doc["transaction_details"] = items
+    return doc
 
 
 @router.get("/v1/customer/disputes")
@@ -630,11 +713,22 @@ async def disputes(
     service = request.app.state.resource_service
     try:
         start = instant(start_time) if start_time else None
-        offset = (
-            int(base64.urlsafe_b64decode(next_page_token).decode())
-            if next_page_token
-            else 0
-        )
+        if start and start > service.store.clock.now:
+            raise PayoutError(
+                400,
+                "INVALID_REQUEST",
+                "Request is not well-formed, syntactically incorrect, or violates schema.",
+                details=[
+                    {
+                        "field": "start_time",
+                        "value": start_time,
+                        "location": "query",
+                        "issue": "DATE_CAN_NOT_BE_IN_FUTURE",
+                    }
+                ],
+                information_link="https://developer.paypal.com/docs/api/customer-disputes/v1/#errors",
+            )
+        offset = int(base64.urlsafe_b64decode(next_page_token).decode()) if next_page_token else 0
         if offset < 0:
             raise ValueError("Invalid token")
     except (ValueError, UnicodeError):
@@ -646,13 +740,10 @@ async def disputes(
         and (not dispute_state or d["status"] == dispute_state)
         and (
             not disputed_transaction_id
-            or any(
-                disputed_transaction_id in t.values()
-                for t in d["disputed_transactions"]
-            )
+            or any(disputed_transaction_id in t.values() for t in d["disputed_transactions"])
         )
     ]
-    docs.sort(key=lambda d: (d["create_time"], d["dispute_id"]))
+    docs.sort(key=lambda d: (d["create_time"], d["dispute_id"]), reverse=True)
     links = []
     if offset + page_size < len(docs):
         params = dict(request.query_params)
@@ -666,11 +757,11 @@ async def disputes(
                 "method": "GET",
             }
         ]
+    links.extend(
+        [{"href": str(request.url), "rel": rel, "method": "GET"} for rel in ["self", "first"]]
+    )
     return {
-        "items": [
-            service.doc(d, str(request.base_url))
-            for d in docs[offset : offset + page_size]
-        ],
+        "items": [service.doc(d, str(request.base_url)) for d in docs[offset : offset + page_size]],
         "links": links,
     }
 
@@ -679,6 +770,15 @@ async def disputes(
 async def dispute(id: str, request: Request):
     service = request.app.state.resource_service
     return service.doc(service.get("disputes", id), str(request.base_url))
+
+
+@router.post("/v1/customer/disputes")
+async def blocked_creation():
+    # D8 API creation was blocked even with disputes/create scope. Use staged controls.
+    return JSONResponse(
+        {"error": "invalid_request", "error_description": "No permissions to set target_client_id"},
+        status_code=400,
+    )
 
 
 @router.post("/v1/customer/disputes/{id}/{action}")
@@ -697,9 +797,7 @@ async def new_dispute(body: dict, request: Request):
             service = request.app.state.resource_service
             return service.doc(service.new_dispute(body), str(request.base_url))
         except (ValueError, KeyError, TypeError):
-            raise PayoutError(
-                422, "INVALID_REQUEST", "Invalid staged dispute"
-            ) from None
+            raise PayoutError(422, "INVALID_REQUEST", "Invalid staged dispute") from None
 
 
 @router.post("/_mock/disputes/{id}/{action}")
@@ -712,7 +810,7 @@ async def control_dispute(id: str, action: str, body: dict, request: Request):
         if action == "buyer-message":
             if not isinstance(body.get("content"), str):
                 raise PayoutError(422, "INVALID_REQUEST", "Content required")
-            doc["messages"].append(
+            doc.setdefault("messages", []).append(
                 {
                     "posted_by": "BUYER",
                     "time_posted": timestamp(service.store.clock.now),
@@ -720,11 +818,10 @@ async def control_dispute(id: str, action: str, body: dict, request: Request):
                 }
             )
         elif action == "transition":
-            if not isinstance(body.get("status"), str) or not isinstance(
-                body.get("stage"), str
-            ):
+            if not isinstance(body.get("status"), str) or not isinstance(body.get("stage"), str):
                 raise PayoutError(422, "INVALID_REQUEST", "Status and stage required")
             doc.update(status=body["status"], dispute_life_cycle_stage=body["stage"])
+            doc.pop("links", None)
         elif action == "buyer-close":
             service.resolve(doc, service.behavior.buyer_close_code)
         else:

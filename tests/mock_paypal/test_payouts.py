@@ -119,7 +119,7 @@ def test_unregistered_cancel_and_no_double_credit(client):
         ]
         == "RETURNED"
     )
-    assert "errors" not in response.json()
+    assert response.json()["errors"]["name"] == "RECEIVER_UNREGISTERED"
     assert client.app.state.store.payouts.available_minor == 150000
     check_error(client.post(path), 400, "ITEM_ALREADY_CANCELLED")
     advance(client, 31 * 86400)
@@ -158,9 +158,7 @@ def test_unclaimed_available_switch_and_claim_accounting(client):
     client.post("/_mock/config", json={"unclaimed_counts_in_available": False})
     assert client.app.state.store.payouts.available_minor == 120000
     client.post("/_mock/config", json={"unclaimed_counts_in_available": True})
-    payout = client.app.state.payout_service.get_item(
-        item(client, batch_id)["payout_item_id"]
-    )
+    payout = client.app.state.payout_service.get_item(item(client, batch_id)["payout_item_id"])
     client.app.state.payout_service.transition(payout, "SUCCESS")
     assert client.app.state.store.payouts.available_minor == 120000
     advance(client, 31 * 86400)
@@ -171,9 +169,7 @@ def test_unclaimed_available_switch_and_claim_accounting(client):
 @pytest.mark.parametrize("target", ["FAILED", "RETURNED", "REFUNDED", "REVERSED"])
 def test_crediting_states_only_return_money_once(client, target):
     batch_id = create(client)
-    payout = client.app.state.payout_service.get_item(
-        item(client, batch_id)["payout_item_id"]
-    )
+    payout = client.app.state.payout_service.get_item(item(client, batch_id)["payout_item_id"])
     service = client.app.state.payout_service
     service.transition(payout, target, synthesised=True)
     assert payout.synthesised
@@ -186,18 +182,14 @@ def test_crediting_states_only_return_money_once(client, target):
 
 
 def test_insufficient_balance_is_atomic(client):
-    check_error(
-        client.post(PATH, json=body(value="1500.01")), 422, "INSUFFICIENT_FUNDS"
-    )
+    check_error(client.post(PATH, json=body(value="1500.01")), 422, "INSUFFICIENT_FUNDS")
     assert client.app.state.store.payouts.available_minor == 150000
     assert not client.app.state.store.payouts.items
     assert not client.app.state.store.payouts.batches
     assert client.app.state.store.payouts.withheld_minor == 0
 
 
-@pytest.mark.parametrize(
-    "value", ["0.00", "-1.00", "1", "1.1", "1.001", "1e2", "NaN", 1.25, True]
-)
+@pytest.mark.parametrize("value", ["0.00", "-1.00", "1", "1.1", "1.001", "1e2", "NaN", 1.25, True])
 def test_invalid_amounts_do_not_mutate_state(client, value):
     check_error(client.post(PATH, json=body(value=value)), 422, "INVALID_REQUEST")
     assert not client.app.state.store.payouts.items
@@ -260,9 +252,7 @@ def test_multi_item_batch_pagination(client):
 
 def test_15000_items_are_allowed(client):
     payload = body(value="0.01")
-    payload["items"] = [
-        {**payload["items"][0], "sender_item_id": f"i-{i}"} for i in range(15000)
-    ]
+    payload["items"] = [{**payload["items"][0], "sender_item_id": f"i-{i}"} for i in range(15000)]
     create(client, payload)
     assert len(client.app.state.store.payouts.items) == 15000
     assert client.app.state.store.payouts.available_minor == 135000
@@ -270,9 +260,7 @@ def test_15000_items_are_allowed(client):
 
 def test_missing_resources_and_auth(client):
     check_error(client.get(PATH + "/missing"), 404, "RESOURCE_NOT_FOUND")
-    check_error(
-        client.get("/v1/payments/payouts-item/missing"), 404, "RESOURCE_NOT_FOUND"
-    )
+    check_error(client.get("/v1/payments/payouts-item/missing"), 404, "RESOURCE_NOT_FOUND")
     check_error(
         client.post("/v1/payments/payouts-item/missing/cancel"),
         404,
@@ -294,9 +282,7 @@ def test_reset_removes_payouts_and_timers(client):
 def test_pending_response_switches():
     app = create_app(
         control_enabled=True,
-        payout_behavior=PayoutBehavior(
-            create_includes_items=True, insufficient_funds_status=400
-        ),
+        payout_behavior=PayoutBehavior(create_includes_items=True, insufficient_funds_status=400),
     )
     with TestClient(app) as client:
         authenticated(client)

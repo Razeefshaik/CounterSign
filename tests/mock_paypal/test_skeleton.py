@@ -14,12 +14,12 @@ DEFAULTS = {
     "key_retention_days": 30,
     "duplicate_link_host": "mock",
     "unclaimed_counts_in_available": False,
-    "dispute_hold": True,
-    "evidence_allowed_stages": ["INQUIRY", "CHARGEBACK"],
+    "dispute_hold": False,
+    "evidence_allowed_stages": None,
     "balance_refresh_seconds": 10800,
     "transactions_lag_seconds": 10800,
     "webhook_delay_seconds": 5,
-    "cancel_emits": ["CANCELED", "RETURNED"],
+    "cancel_emits": ["RETURNED"],
 }
 BASIC = {"Authorization": "Basic " + base64.b64encode(b"mock:dummy").decode()}
 
@@ -72,7 +72,7 @@ def test_oauth_and_bearer_expiry_use_mock_clock(client):
     assert body["expires_in"] == 32400
     assert body["access_token"].startswith("MOCK-")
     assert body["nonce"].startswith(timestamp(START))
-    assert len(body["scope"].split()) == 4
+    assert len(body["scope"].split()) == 5
     headers = bearer(body["access_token"])
     assert client.get("/v1/test-protected", headers=headers).json() == {"ok": True}
     client.post("/_mock/clock/advance", json={"seconds": 32399})
@@ -106,9 +106,7 @@ def test_bad_basic_auth(client, authorization):
 
 
 def test_grant_and_content_type_validation(client):
-    wrong = client.post(
-        "/v1/oauth2/token", headers=BASIC, data={"grant_type": "password"}
-    )
+    wrong = client.post("/v1/oauth2/token", headers=BASIC, data={"grant_type": "password"})
     assert wrong.status_code == 400
     assert wrong.json()["error"] == "unsupported_grant_type"
     assert_error(client.post("/v1/oauth2/token", headers=BASIC, json={}), 400)
@@ -133,10 +131,7 @@ def test_config_defaults_and_partial_updates(client):
         response = client.post("/_mock/config", json={key: changed})
         assert response.status_code == 200
         assert response.json()[key] == changed
-    assert (
-        client.post("/_mock/config", json={}).json()
-        == client.get("/_mock/config").json()
-    )
+    assert client.post("/_mock/config", json={}).json() == client.get("/_mock/config").json()
 
 
 @pytest.mark.parametrize(
@@ -164,9 +159,7 @@ def test_clock_controls_and_errors(client):
     assert client.post("/_mock/clock/advance", json={"seconds": 3600}).json() == {
         "now": "2026-11-02T10:00:00Z"
     }
-    response = client.post(
-        "/_mock/clock/set", json={"now": "2026-11-02T12:00:00+01:00"}
-    )
+    response = client.post("/_mock/clock/set", json={"now": "2026-11-02T12:00:00+01:00"})
     assert response.json() == {"now": "2026-11-02T11:00:00Z"}
     for value in ["2026-11-02T10:00:00Z", "2026-11-02T12:00:00", "bad"]:
         assert_error(client.post("/_mock/clock/set", json={"now": value}), 422)
@@ -248,9 +241,7 @@ def test_validation_errors_do_not_echo_input(client):
     assert_error(response, 422)
     assert "sensitive-input" not in response.text
     assert_error(
-        client.post(
-            "/_mock/reset", content="{", headers={"Content-Type": "application/json"}
-        ),
+        client.post("/_mock/reset", content="{", headers={"Content-Type": "application/json"}),
         422,
     )
     token = issue(client)["access_token"]
@@ -263,7 +254,7 @@ def test_apps_do_not_share_state():
     one.records["item"] = {}
     one.config.cancel_emits.append("CUSTOM")
     assert two.records == {}
-    assert two.config.cancel_emits == ["CANCELED", "RETURNED"]
+    assert two.config.cancel_emits == ["RETURNED"]
 
 
 def test_unexpected_errors_keep_envelope_and_hide_exception():

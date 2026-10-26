@@ -13,15 +13,16 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from mock_paypal.clock import timestamp
 from mock_paypal.payout_models import amount
 from mock_paypal.payouts import PayoutError
+from mock_paypal.recorded import negative_response
 
 router = APIRouter()
-# Contract D7 fixtures, replaced through create_app(negative_values=...) after recordings.
+# Published D7 status/name defaults; explicit injection overrides remain available.
 NEGATIVE_VALUES = {
     "ERRPYO005": (422, "INSUFFICIENT_FUNDS"),
     "ERRPYO006": (500, "INTERNAL_ERROR"),
-    "ERRPYO014": (422, "USER_BUSINESS_ERROR"),
+    "ERRPYO014": (400, "USER_BUSINESS_ERROR"),
     "ERRPYO036": (504, "REQUEST_TIMEOUT_EXCEEDED"),
-    "ERRPYO039": (409, "PREVIOUS_REQUEST_IN_PROGRESS"),
+    "ERRPYO039": (400, "PREVIOUS_REQUEST_IN_PROGRESS"),
     "ERRPYO007": (400, "ITEM_ALREADY_CANCELLED"),
     "ERRPYO008": (400, "ITEM_CANCELLATION_FAILED"),
     "ERRPYO009": (400, "ITEM_INCORRECT_STATUS"),
@@ -158,9 +159,7 @@ async def ground_truth(request: Request):
 
 
 class TransitionBody(Strict):
-    to: Literal[
-        "ONHOLD", "BLOCKED", "FAILED", "SUCCESS", "PENDING", "REFUNDED", "REVERSED"
-    ]
+    to: Literal["ONHOLD", "BLOCKED", "FAILED", "SUCCESS", "PENDING", "REFUNDED", "REVERSED"]
     emit_webhook: bool = True
 
 
@@ -173,9 +172,7 @@ async def transition(id: str, body: TransitionBody, request: Request):
     async with request.app.state.control_lock:
         service = request.app.state.payout_service
         item = service.get_item(id)
-        service.transition(
-            item, body.to, synthesised=True, emit_webhook=body.emit_webhook
-        )
+        service.transition(item, body.to, synthesised=True, emit_webhook=body.emit_webhook)
         return service.item_doc(item, str(request.base_url), standalone=True)
 
 
@@ -185,9 +182,7 @@ async def claim(id: str, body: ClaimBody, request: Request):
         service = request.app.state.payout_service
         item = service.get_item(id)
         if item.status != "UNCLAIMED":
-            raise PayoutError(
-                400, "ITEM_INCORRECT_STATUS", "Only unclaimed items can be claimed"
-            )
+            raise PayoutError(400, "ITEM_INCORRECT_STATUS", "Only unclaimed items can be claimed")
         if body.when == "during_next_cancel":
             item.claim_during_cancel = True
         else:
@@ -199,6 +194,7 @@ class FaultMiddleware:
     def __init__(self, app, store, negative_values=None):
         self.app, self.store = app, store
         self.negative_values = negative_values or NEGATIVE_VALUES
+        self.use_recordings = negative_values is None
 
     async def wait(self, seconds):
         future = asyncio.get_running_loop().create_future()
@@ -230,6 +226,12 @@ class FaultMiddleware:
                         candidate.used += 1
                         fault = candidate
         action = fault.doc["action"] if fault else None
+        if authenticated and action is None:
+            value = next(
+                (part for part in scope["path"].split("/") if part in NEGATIVE_VALUES), None
+            )
+            if value:
+                action = {"type": "test_value", "value": value}
         messages = []
 
         async def capture(message):
@@ -240,9 +242,7 @@ class FaultMiddleware:
             await self.wait(action["seconds"])
         if process:
             await self.app(scope, receive, capture)
-        status = next(
-            (m["status"] for m in messages if m["type"] == "http.response.start"), None
-        )
+        status = next((m["status"] for m in messages if m["type"] == "http.response.start"), None)
         entry = {
             "at": timestamp(self.store.clock.now),
             "method": scope["method"],
@@ -276,7 +276,20 @@ class FaultMiddleware:
         debug = uuid4().hex[:13]
         if kind == "test_value":
             code, name = self.negative_values[action["value"]]
-            body = self.negative_doc(action["value"], name, debug, messages)
+            base = (
+                str(scope.get("scheme", "http"))
+                + "://"
+                + headers.get(b"host", b"localhost:8099").decode()
+            )
+            recorded = (
+                negative_response(action["value"], scope["method"], scope["path"], base, debug)
+                if self.use_recordings
+                else None
+            )
+            if recorded is not None:
+                code, body = recorded
+            else:
+                body = self.negative_doc(action["value"], name, debug, messages)
         else:
             code = action["status"]
             body = action.get("body") or self.envelope("INTERNAL_ERROR", debug)
