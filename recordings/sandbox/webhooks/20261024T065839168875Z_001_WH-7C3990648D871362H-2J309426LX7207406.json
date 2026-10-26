@@ -1,0 +1,76 @@
+{
+  "received_at": "2026-10-24T06:58:39.168875Z",
+  "event_id": "WH-7C3990648D871362H-2J309426LX7207406",
+  "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+  "resource_type": "payouts",
+  "create_time": "2026-10-24T06:58:27.365Z",
+  "sha256": "f743145c6b33e35f6bb921b54c46a313c5dd7bf3d6f7e3ff9195718846b97a29",
+  "size": 1019,
+  "raw_file": "raw/webhooks/20261024T065839168875Z_001_WH-7C3990648D871362H-2J309426LX7207406.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "1019",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "f3605031d99b6",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "53e752e8-cf78-11f1-80f8-dd04ac002c6a",
+    "paypal-transmission-sig": "T8at7NshsBrQoZ7Lw9x28ml5LXT6rAvS4CAyqxxlMy3N2O/WzrurOkBInziv3iCs7koS40eIt8R2xySF+SPnnh7vjoaqNFo9KkWE/tX9s6i5NjimgNECtstzBegsDuPKIWcRb4mOaW59LZ3Iy0n0O5jRUI90gsNvKxt/eV0qmBKYhKKdXnMz54JC0NWROJB1iagkVHknJAETACfl9PREdhJydlp5tpqegnI11Hj18tUo+ltsOlhmH4ACfAGIl3c2L59tOGQjoZzjssRAs/1rpy+v4waarL3Ko9ErhRhSYCX1er2R2B+HDJD+vu0V7MqGqMrQ4g1W7jbg1kUYeu1wXw==",
+    "paypal-transmission-time": "2026-10-24T06:58:33Z",
+    "x-forwarded-for": "173.0.80.116",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-7C3990648D871362H-2J309426LX7207406",
+    "event_version": "1.0",
+    "create_time": "2026-10-24T06:58:27.365Z",
+    "resource_type": "payouts",
+    "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+    "summary": "Payouts batch is getting processed.",
+    "resource": {
+      "batch_header": {
+        "payout_batch_id": "BV5759UA95QU8",
+        "batch_status": "PROCESSING",
+        "time_created": "2026-10-24T06:58:05Z",
+        "sender_batch_header": {
+          "sender_batch_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1"
+        },
+        "funding_source": "BALANCE",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "fees": {
+          "currency": "USD",
+          "value": "0.25"
+        },
+        "payments": 1
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/BV5759UA95QU8",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-7C3990648D871362H-2J309426LX7207406",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-7C3990648D871362H-2J309426LX7207406/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

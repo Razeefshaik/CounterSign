@@ -1,0 +1,122 @@
+{
+  "received_at": "2026-10-23T22:17:07.826153Z",
+  "event_id": "WH-3F865444SY1605603-42W54259FR0589717",
+  "event_type": "CUSTOMER.DISPUTE.CREATED",
+  "resource_type": "dispute",
+  "create_time": "2026-10-23T22:17:03.563Z",
+  "sha256": "e603e0407ff4c360d1f30f84812f2ac06519e4bb71015976743e4445ccf141ba",
+  "size": 2063,
+  "raw_file": "raw/webhooks/20261023T221707826153Z_001_WH-3F865444SY1605603-42W54259FR0589717.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "2063",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "0000000000000000758e3b6e5c7a2553",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "7a6de16c-cf2f-11f1-80f8-d941c78ccd19",
+    "paypal-transmission-sig": "MYF5iBZoovNKIWSNQJCGwlCnquQgOS/BddFw2V2p9MZSOxWJiScoeIlWsqlO6hBCg8aB+xSX+zhNe2SYQZpT8Yq1TXebcwIRLguMqeRrapDBWkeviZKO7LIZGB/eBI4lOJMf4sJAjxvxr/lMNz4d/oHYsg19tY18vozF+TNDjtW0jeIItKxygjoQYxOD9CtHBjkRAUAJFq4PzSmn89gDy6fiJVs07ermo7HFE+V4dTZfjUrQ+EDJOtUoNW2otwqZiKdS7HpVWQNFpa68iiB1w4cHqPQMtqTy4io4thV97oGrGns03pBcgVpgJDtxXondxzIXnusy76KNYPVtdmjRGg==",
+    "paypal-transmission-time": "2026-10-23T22:17:04Z",
+    "x-forwarded-for": "173.0.80.116",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-3F865444SY1605603-42W54259FR0589717",
+    "event_version": "1.0",
+    "create_time": "2026-10-23T22:17:03.563Z",
+    "resource_type": "dispute",
+    "event_type": "CUSTOMER.DISPUTE.CREATED",
+    "summary": "A new dispute opened with case # PP-R-XJK-10194293",
+    "resource": {
+      "dispute_id": "PP-R-XJK-10194293",
+      "create_time": "2026-10-23T22:13:43.725Z",
+      "update_time": "2026-10-23T22:16:53.693Z",
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "1KC99580K1831703T",
+          "seller_transaction_id": "69T54342EE2129538",
+          "transaction_status": "HELD",
+          "seller": {
+            "merchant_id": "B23JM5BDGPAF8",
+            "name": "Test Store"
+          },
+          "items": [
+            {
+              "item_name": "Staged sandbox action: CounterSign check.",
+              "item_description": "Staged sandbox action: CounterSign check.",
+              "item_quantity": "1",
+              "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+              "notes": "fdsfgsdf asljkdha  asdas da asdias udsaidu adj asdljasdlkajsdasd uoiudewoiru ceruoids ds dsdnsd asljkdasdeoidrueoiruoiruere",
+              "item_type": "PRODUCT"
+            }
+          ],
+          "seller_protection_eligible": true,
+          "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+        }
+      ],
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+      "status": "UNDER_REVIEW",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "60.00"
+      },
+      "fund_movements": [
+        {
+          "party": "RECEIVER",
+          "amount": {
+            "currency_code": "USD",
+            "value": "56.52"
+          },
+          "initiated_time": "2026-10-23T22:17:02.000Z",
+          "type": "DEBIT",
+          "reason": "HOLD_PLACED"
+        }
+      ],
+      "dispute_life_cycle_stage": "INQUIRY",
+      "dispute_channel": "INTERNAL",
+      "messages": [
+        {
+          "posted_by": "BUYER",
+          "time_posted": "2026-10-23T22:13:43.725Z",
+          "content": "sdrfwer"
+        }
+      ],
+      "offer": {
+        "buyer_requested_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        }
+      },
+      "refund_details": {
+        "allowed_refund_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        }
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293",
+          "rel": "self",
+          "method": "GET"
+        }
+      ]
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-3F865444SY1605603-42W54259FR0589717",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-3F865444SY1605603-42W54259FR0589717/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

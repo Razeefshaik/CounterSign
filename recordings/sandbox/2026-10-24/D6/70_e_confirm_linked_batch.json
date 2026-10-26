@@ -1,0 +1,100 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts/53YFFR9A9YFEA?page_size=1000&total_required=true",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "date": "Sat, 24 Oct 2026 12:18:22 GMT",
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f8ec7689ce",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f8ec7689ce-7ab4567c4b38c5bb-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-encoding": "gzip",
+    "cf-ray": "a4f8ec7689ced68d-BOM"
+  },
+  "response_body": {
+    "total_items": 1,
+    "total_pages": 1,
+    "batch_header": {
+      "payout_batch_id": "53YFFR9A9YFEA",
+      "batch_status": "SUCCESS",
+      "time_created": "2026-10-24T07:03:07Z",
+      "time_completed": "2026-10-24T07:03:31Z",
+      "time_closed": "2026-10-24T07:03:31Z",
+      "sender_batch_header": {
+        "sender_batch_id": "cs-01a16cb8-6f07-792a-b1a9-94000063fa68-a1",
+        "email_subject": "CounterSign sandbox check"
+      },
+      "funding_source": "BALANCE",
+      "amount": {
+        "currency": "USD",
+        "value": "1.00"
+      },
+      "fees": {
+        "currency": "USD",
+        "value": "0.25"
+      }
+    },
+    "items": [
+      {
+        "payout_item_id": "HR4M4PS8QV4HC",
+        "transaction_id": "3M988679324685311",
+        "activity_id": "6C208379VS5910214",
+        "transaction_status": "SUCCESS",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.25"
+        },
+        "payout_batch_id": "53YFFR9A9YFEA",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "1.00"
+          },
+          "note": "Staged sandbox action: CounterSign check.",
+          "receiver": "maker-b@redacted",
+          "sender_item_id": "cs-01a16cb8-6f07-792a-b1a9-94000063fa68-a1",
+          "recipient_wallet": "PAYPAL",
+          "purpose": "GOODS"
+        },
+        "time_processed": "2026-10-24T07:03:23Z",
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/HR4M4PS8QV4HC",
+            "rel": "item",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/53YFFR9A9YFEA?page_size=1000&page=1",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T12:18:24.193418Z",
+  "t_recv": "2026-10-24T12:18:24.634059Z"
+}

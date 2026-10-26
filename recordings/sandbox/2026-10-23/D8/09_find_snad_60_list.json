@@ -1,0 +1,48 @@
+{
+  "method": "GET",
+  "path": "/v1/customer/disputes?start_time=2026-10-23T22%3A03%3A56.716712Z&page_size=50",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": 400,
+  "response_headers": {
+    "date": "Fri, 23 Oct 2026 22:15:48 GMT",
+    "content-type": "application/json",
+    "content-length": "365",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f41a3d2d2a",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f41a3d2d2a-e83348a0520270f7-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cf-ray": "a4f41a3d2d2a47b1-BOM"
+  },
+  "response_body": {
+    "name": "INVALID_REQUEST",
+    "message": "Request is not well-formed, syntactically incorrect, or violates schema.",
+    "debug_id": "ca4f41a3d2d2a",
+    "information_link": "https://developer.paypal.com/docs/api/customer-disputes/v1/#errors",
+    "details": [
+      {
+        "field": "start_time",
+        "value": "2026-10-23T22:03:56.716712Z",
+        "location": "query",
+        "issue": "DATE_CAN_NOT_BE_IN_FUTURE"
+      }
+    ],
+    "links": []
+  },
+  "t_sent": "2026-10-23T22:15:50.221685Z",
+  "t_recv": "2026-10-23T22:15:50.719661Z"
+}

@@ -1,0 +1,133 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/simulate-event",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "75",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "webhook_id": "33T43630L2343754N",
+    "event_type": "PAYMENT.CAPTURE.COMPLETED"
+  },
+  "response_status": 202,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-length": "1774",
+    "paypal-debug-id": "f6917501b6f02",
+    "content-type": "application/json",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "server": "nginx",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f6917501b6f02-98e2ecc8903071df-01\"",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-language": "",
+    "accept-ranges": "bytes",
+    "via": "1.1 varnish, 1.1 varnish",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:14:27 GMT",
+    "x-served-by": "cache-sin-wsap440073-SIN, cache-sin-wsap440073-SIN, cache-maa10229-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027667.944821,VS0,VE357",
+    "vary": "Accept-Encoding"
+  },
+  "response_body": {
+    "id": "WH-7Y7254563A4550640-11V2185806837105M",
+    "create_time": "2015-02-17T18:51:33Z",
+    "resource_type": "capture",
+    "event_type": "PAYMENT.CAPTURE.COMPLETED",
+    "summary": "Payment completed for $ 57.0 USD",
+    "resource": {
+      "disbursement_mode": "DELAYED",
+      "amount": {
+        "currency_code": "USD",
+        "value": "57.00"
+      },
+      "seller_protection": {
+        "status": "ELIGIBLE",
+        "dispute_categories": [
+          "ITEM_NOT_RECEIVED",
+          "UNAUTHORIZED_TRANSACTION"
+        ]
+      },
+      "create_time": "2022-08-26T18:29:50Z",
+      "custom_id": "d93e4fcb-d3af-137c-82fe-1a8101f1ad11",
+      "supplementary_data": {
+        "related_ids": {
+          "order_id": "8U481631H66031715"
+        }
+      },
+      "update_time": "2022-08-26T18:29:50Z",
+      "final_capture": true,
+      "seller_receivable_breakdown": {
+        "gross_amount": {
+          "currency_code": "USD",
+          "value": "57.00"
+        },
+        "paypal_fee": {
+          "currency_code": "USD",
+          "value": "2.48"
+        },
+        "platform_fees": [
+          {
+            "amount": {
+              "currency_code": "USD",
+              "value": "5.13"
+            },
+            "payee": {
+              "merchant_id": "CDD7K6247RPCC"
+            }
+          }
+        ],
+        "net_amount": {
+          "currency_code": "USD",
+          "value": "49.39"
+        }
+      },
+      "invoice_id": "3942619:fdv09c49-a3g6-4cbf-1358-f6d241dacea2",
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v2/payments/captures/0KG12345VG343800K",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v2/payments/captures/0KG12345VG343880K/refund",
+          "rel": "refund",
+          "method": "POST"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v2/checkout/orders/8U481631H66031715",
+          "rel": "up",
+          "method": "GET"
+        }
+      ],
+      "id": "42311647XV020574X",
+      "status": "COMPLETED"
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-7Y7254563A4550640-11V2185806837105M",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-7Y7254563A4550640-11V2185806837105M/resend",
+        "rel": "resend",
+        "method": "POST",
+        "encType": "application/json"
+      }
+    ],
+    "event_version": "1.0",
+    "resource_version": "2.0"
+  },
+  "t_sent": "2026-10-26T15:14:27.650850Z",
+  "t_recv": "2026-10-26T15:14:28.216876Z"
+}

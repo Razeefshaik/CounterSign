@@ -1,0 +1,291 @@
+{
+  "check_id": "D10",
+  "verdict": "CONFIRMED",
+  "settle_from_under_review": true,
+  "reached_under_review": {
+    "inr_400": true,
+    "snad_60": null,
+    "spare_25": true
+  },
+  "evidence_accepted_stages": [
+    "spare_25:CHARGEBACK"
+  ],
+  "inr_400": {
+    "path": [
+      {
+        "after": "start",
+        "history": [
+          {
+            "at": "2026-10-24T12:17:03.400180Z",
+            "status": "UNDER_REVIEW",
+            "dispute_life_cycle_stage": "CHARGEBACK",
+            "rels": [
+              "accept_claim",
+              "adjudicate",
+              "provide_supporting_info",
+              "require_evidence",
+              "self"
+            ]
+          }
+        ]
+      },
+      {
+        "after": "adjudicate",
+        "history": [
+          {
+            "at": "2026-10-24T12:17:06.722458Z",
+            "status": "UNDER_REVIEW",
+            "dispute_life_cycle_stage": "CHARGEBACK",
+            "rels": [
+              "provide_supporting_info",
+              "self"
+            ]
+          },
+          {
+            "at": "2026-10-24T12:19:10.059505Z",
+            "status": "RESOLVED",
+            "dispute_life_cycle_stage": "CHARGEBACK",
+            "rels": [
+              "self"
+            ]
+          }
+        ]
+      }
+    ],
+    "reached_under_review": true,
+    "adjudicate": {
+      "sent_at": "2026-10-24T12:17:03.400180Z",
+      "status": 200,
+      "error_name": null
+    },
+    "final": {
+      "status": "RESOLVED",
+      "dispute_life_cycle_stage": "CHARGEBACK",
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "400.00"
+      },
+      "seller_response_due_date": null,
+      "dispute_outcome": {
+        "outcome_code": "RESOLVED_SELLER_FAVOUR",
+        "outcome_reason": "INELIGIBLE_BUYER_PROTECTION_POLICY"
+      },
+      "rels": [
+        "self"
+      ]
+    },
+    "resolved": true
+  },
+  "snad_60": {
+    "path": [
+      {
+        "after": "start",
+        "history": [
+          {
+            "at": "2026-10-24T12:19:11.253738Z",
+            "status": "WAITING_FOR_SELLER_RESPONSE",
+            "dispute_life_cycle_stage": "INQUIRY",
+            "rels": [
+              "accept_claim",
+              "escalate",
+              "make_offer",
+              "self",
+              "send_message"
+            ]
+          }
+        ]
+      },
+      {
+        "after": "accept_claim_json",
+        "history": [
+          {
+            "at": "2026-10-24T12:19:17.068016Z",
+            "status": "UNDER_REVIEW",
+            "dispute_life_cycle_stage": "INQUIRY",
+            "rels": [
+              "self"
+            ]
+          },
+          {
+            "at": "2026-10-24T12:21:21.456466Z",
+            "status": "RESOLVED",
+            "dispute_life_cycle_stage": "INQUIRY",
+            "rels": [
+              "self"
+            ]
+          }
+        ]
+      }
+    ],
+    "attempts": [
+      {
+        "format": "json",
+        "sent_at": "2026-10-24T12:19:11.253738Z",
+        "status": 200,
+        "error_name": null,
+        "outcome": "SENT"
+      }
+    ],
+    "accept_claim_outcome": "RESOLVED",
+    "final": {
+      "status": "RESOLVED",
+      "dispute_life_cycle_stage": "INQUIRY",
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "60.00"
+      },
+      "seller_response_due_date": null,
+      "dispute_outcome": {
+        "outcome_code": "RESOLVED_BUYER_FAVOUR",
+        "outcome_reason": "SELLER_ISSUED_REFUND",
+        "amount_refunded": {
+          "currency_code": "USD",
+          "value": "60.00"
+        }
+      },
+      "rels": [
+        "self"
+      ]
+    },
+    "resolved": true
+  },
+  "spare_25": {
+    "path": [
+      {
+        "after": "start",
+        "history": [
+          {
+            "at": "2026-10-24T12:21:22.647753Z",
+            "status": "WAITING_FOR_SELLER_RESPONSE",
+            "dispute_life_cycle_stage": "CHARGEBACK",
+            "rels": [
+              "accept_claim",
+              "provide_evidence",
+              "self"
+            ]
+          }
+        ]
+      },
+      {
+        "after": "evidence",
+        "history": [
+          {
+            "at": "2026-10-24T12:21:26.165198Z",
+            "status": "UNDER_REVIEW",
+            "dispute_life_cycle_stage": "CHARGEBACK",
+            "rels": [
+              "provide_supporting_info",
+              "self"
+            ]
+          }
+        ]
+      }
+    ],
+    "evidence": {
+      "submitted": true,
+      "outcome": "SENT",
+      "format": "multipart",
+      "attempts": [
+        {
+          "format": "multipart",
+          "status": 200,
+          "error_name": null,
+          "outcome": "SENT"
+        }
+      ],
+      "stage": "CHARGEBACK"
+    },
+    "reached_under_review": true,
+    "final": {
+      "status": "UNDER_REVIEW",
+      "dispute_life_cycle_stage": "CHARGEBACK",
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "25.00"
+      },
+      "seller_response_due_date": null,
+      "dispute_outcome": null,
+      "rels": [
+        "provide_supporting_info",
+        "self"
+      ]
+    },
+    "resolved": false
+  },
+  "buyer_close": {
+    "role": "spare_25",
+    "dispute_id": "PP-R-UJV-10194294",
+    "closed_confirmed_at": "2026-10-26T11:53:38.681913Z",
+    "history": [
+      {
+        "at": "2026-10-26T11:53:40.946042Z",
+        "status": "UNDER_REVIEW",
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "rels": [
+          "provide_supporting_info",
+          "self"
+        ]
+      },
+      {
+        "at": "2026-10-26T11:55:44.360248Z",
+        "status": "RESOLVED",
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "rels": [
+          "self"
+        ]
+      }
+    ],
+    "final": {
+      "status": "RESOLVED",
+      "dispute_life_cycle_stage": "CHARGEBACK",
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "25.00"
+      },
+      "seller_response_due_date": null,
+      "dispute_outcome": {
+        "outcome_code": "CANCELED_BY_BUYER",
+        "outcome_reason": "BUYER_CANCELLED_CASE"
+      },
+      "rels": [
+        "self"
+      ]
+    },
+    "resolved": true
+  },
+  "outcome_codes": [
+    "CANCELED_BY_BUYER",
+    "RESOLVED_BUYER_FAVOUR",
+    "RESOLVED_SELLER_FAVOUR"
+  ],
+  "withheld_back_to_baseline_at": "2026-10-26T11:55:45.837342Z",
+  "release_evidence": "RELEASED",
+  "resolved_webhooks": [
+    {
+      "event_id": "WH-9F265567AR690063U-37860160SY5258744",
+      "dispute_id": "PP-R-JQM-10194292",
+      "create_time": "2026-10-24T12:19:33.521Z",
+      "received_at": "2026-10-24T12:19:37.645339Z",
+      "file": "webhooks/20261024T121937645339Z_001_WH-9F265567AR690063U-37860160SY5258744.json",
+      "delay_seconds": 4.124
+    },
+    {
+      "event_id": "WH-7P3563880T306724N-15G659343U8652353",
+      "dispute_id": "PP-R-XJK-10194293",
+      "create_time": "2026-10-24T12:21:12.486Z",
+      "received_at": "2026-10-24T12:21:17.113446Z",
+      "file": "webhooks/20261024T122117113446Z_001_WH-7P3563880T306724N-15G659343U8652353.json",
+      "delay_seconds": 4.627
+    }
+  ],
+  "notes": [
+    "accept-claim was sent by the script standing in for the owner (staged)",
+    "spare_25 evidence reuses the D9 tracking; it tests the stage, not the order"
+  ],
+  "observed_at": "2026-10-24T12:17:00.883843Z",
+  "evidence_files": []
+}

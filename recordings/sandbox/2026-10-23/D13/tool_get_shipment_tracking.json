@@ -1,0 +1,42 @@
+{
+  "tool": "get_shipment_tracking",
+  "ok": true,
+  "output": {
+    "trackers": [
+      {
+        "transaction_id": "1X031539U0011491U",
+        "tracking_number": "9400111899223197428490",
+        "tracking_number_type": "CARRIER_PROVIDED",
+        "status": "SHIPPED",
+        "shipment_date": "2026-10-23",
+        "carrier": "USPS",
+        "notify_buyer": false,
+        "created_time": "2026-10-23T22:02:42.000Z",
+        "last_updated_time": "1792792962000",
+        "shipment_direction": "FORWARD",
+        "shipment_uploader": "MERCHANT",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+            "rel": "replace",
+            "method": "PUT",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+            "rel": "edit",
+            "method": "PATCH",
+            "encType": "application/json"
+          }
+        ]
+      }
+    ],
+    "links": []
+  }
+}

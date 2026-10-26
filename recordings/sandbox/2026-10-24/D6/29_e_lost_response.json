@@ -1,0 +1,38 @@
+{
+  "method": "POST",
+  "path": "/v1/payments/payouts",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "paypal-request-id": "cs-01a16cb8-6f07-792a-b1a9-94000063fa68-a1",
+    "content-length": "367",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "sender_batch_header": {
+      "sender_batch_id": "cs-01a16cb8-6f07-792a-b1a9-94000063fa68-a1",
+      "email_subject": "CounterSign sandbox check"
+    },
+    "items": [
+      {
+        "recipient_type": "EMAIL",
+        "receiver": "maker-b@redacted",
+        "amount": {
+          "value": "1.00",
+          "currency": "USD"
+        },
+        "sender_item_id": "cs-01a16cb8-6f07-792a-b1a9-94000063fa68-a1",
+        "note": "Staged sandbox action: CounterSign check."
+      }
+    ]
+  },
+  "response_status": null,
+  "response_headers": {},
+  "response_body": null,
+  "t_sent": "2026-10-24T07:03:09.311398Z",
+  "t_recv": "2026-10-24T07:03:09.376853Z",
+  "error": "ReadTimeout"
+}

@@ -1,0 +1,100 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "1736",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "e2dff8d2-cf78-11f1-a71f-95c2f60c8c55",
+    "transmission_sig": "QapWacNwZgau+XicF3gqXvM9rZckIiyLdUPin8ijvczaqFN6Opa+xvyeqbTzYFxn3+kI3ZevYkKDRZQFw4aFxJlo4ffvRM9AzHsmBy9kGxIKdGRlz1JV4ZcJqNMdyZqGAsStVJ7KxCHdZ9s9bmprPDmRkArm2unr69CAXLLLGPl5NvEL984rVh8UOXP1OG+IVCIFXsTKQzgqEsV4h5sfYgFDYnA95/URlVbWXFzi6arep3U+ffDeyjme5q6C5JzLdiN+NyiAthHYeOZCedvqe1qu+WhzeA5NEAtPApdCkWFF9OE6heErmGJfkB/2QHb+tdLiqLJKUsDlb4gOGkSssA==",
+    "transmission_time": "2026-10-24T07:02:33Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-6RD99503T3316645A-21D23376S26126250",
+      "event_version": "1.0",
+      "create_time": "2026-10-24T07:02:27.349Z",
+      "resource_type": "payouts",
+      "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+      "summary": "Payouts batch completed successfully.",
+      "resource": {
+        "batch_header": {
+          "payout_batch_id": "5H5397MBCBLM8",
+          "batch_status": "SUCCESS",
+          "time_created": "2026-10-24T07:01:49Z",
+          "time_completed": "2026-10-24T07:02:13Z",
+          "time_closed": "2026-10-24T07:02:13Z",
+          "sender_batch_header": {
+            "sender_batch_id": "cs-01a16cb7-3d82-7609-835f-80ddfb786e58-a1"
+          },
+          "funding_source": "BALANCE",
+          "amount": {
+            "currency": "USD",
+            "value": "1.00"
+          },
+          "fees": {
+            "currency": "USD",
+            "value": "0.25"
+          },
+          "payments": 1
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/5H5397MBCBLM8",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-6RD99503T3316645A-21D23376S26126250",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-6RD99503T3316645A-21D23376S26126250/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "paypal-debug-id": "f439784b90bdf",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "content-language": "",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f439784b90bdf-a40227d66bb5f28c-01\"",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:15:27 GMT",
+    "x-served-by": "cache-sin-wsap440057-SIN, cache-sin-wsap440057-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027727.567848,VS0,VE772",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:15:27.438015Z",
+  "t_recv": "2026-10-26T15:15:28.255353Z"
+}

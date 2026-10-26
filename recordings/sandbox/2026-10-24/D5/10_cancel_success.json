@@ -1,0 +1,43 @@
+{
+  "method": "POST",
+  "path": "/v1/payments/payouts-item/YY5BLYXZR8WHE/cancel",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "paypal-request-id": "cs-01a16dd6-968a-7972-847c-9fc3df2f8886-a1",
+    "cookie": "[REDACTED]",
+    "content-length": "2",
+    "content-type": "application/json"
+  },
+  "request_body": {},
+  "response_status": 400,
+  "response_headers": {
+    "date": "Sat, 24 Oct 2026 12:15:40 GMT",
+    "content-type": "application/json",
+    "content-length": "221",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f8e882e8dd",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f8e882e8dd-49bc613ded641911-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cf-ray": "a4f8e882e8dda6dc-BOM"
+  },
+  "response_body": {
+    "name": "ITEM_INCORRECT_STATUS",
+    "message": "Only items in Unclaimed status can be cancelled.",
+    "debug_id": "ca4f8e882e8dd",
+    "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+    "links": []
+  },
+  "t_sent": "2026-10-24T12:15:42.331598Z",
+  "t_recv": "2026-10-24T12:15:42.801809Z"
+}

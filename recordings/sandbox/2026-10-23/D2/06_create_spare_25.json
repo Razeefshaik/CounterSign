@@ -1,0 +1,94 @@
+{
+  "method": "POST",
+  "path": "/v2/checkout/orders",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "prefer": "return=representation",
+    "paypal-request-id": "cs-01a16aab-afd3-7290-9be9-1f55acf16636-a1",
+    "content-length": "174",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "intent": "CAPTURE",
+    "purchase_units": [
+      {
+        "reference_id": "spare_25",
+        "description": "Staged sandbox action: CounterSign check.",
+        "amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        }
+      }
+    ]
+  },
+  "response_status": 201,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-length": "800",
+    "paypal-debug-id": "f132054de7ed6",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f132054de7ed6-5a38c4361b1dbaa2-01\"",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-type": "application/json",
+    "accept-ranges": "bytes",
+    "via": "1.1 varnish, 1.1 varnish",
+    "edge-control": "max-age=0",
+    "date": "Fri, 23 Oct 2026 21:29:58 GMT",
+    "x-served-by": "cache-sin-wsap440039-SIN, cache-sin-wsap440039-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792790997.914202,VS0,VE1259",
+    "vary": "Accept-Encoding"
+  },
+  "response_body": {
+    "id": "09C47164EN842932R",
+    "intent": "CAPTURE",
+    "status": "CREATED",
+    "purchase_units": [
+      {
+        "reference_id": "spare_25",
+        "amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        },
+        "payee": {
+          "email_address": "email@redacted",
+          "merchant_id": "B23JM5BDGPAF8"
+        },
+        "description": "Staged sandbox action: CounterSign check."
+      }
+    ],
+    "create_time": "2026-10-23T21:29:57Z",
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/09C47164EN842932R",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://www.sandbox.paypal.com/checkoutnow?token=09C47164EN842932R",
+        "rel": "approve",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/09C47164EN842932R",
+        "rel": "update",
+        "method": "PATCH"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/09C47164EN842932R/capture",
+        "rel": "capture",
+        "method": "POST"
+      }
+    ]
+  },
+  "t_sent": "2026-10-23T21:29:59.074654Z",
+  "t_recv": "2026-10-23T21:30:00.384627Z"
+}

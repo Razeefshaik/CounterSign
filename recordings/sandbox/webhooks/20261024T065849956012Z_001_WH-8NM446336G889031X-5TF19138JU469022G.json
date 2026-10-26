@@ -1,0 +1,93 @@
+{
+  "received_at": "2026-10-24T06:58:49.956012Z",
+  "event_id": "WH-8NM446336G889031X-5TF19138JU469022G",
+  "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+  "resource_type": "payouts_item",
+  "create_time": "2026-10-24T06:58:39.493Z",
+  "sha256": "da405af55fc6e69011b30c5cd9039ceb055c402a26779289e1254ee8c7fd86e8",
+  "size": 1819,
+  "raw_file": "raw/webhooks/20261024T065849956012Z_001_WH-8NM446336G889031X-5TF19138JU469022G.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "1819",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "24ac8aeb3174c",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "5a21b6cc-cf78-11f1-9883-fb1feaa9c592",
+    "paypal-transmission-sig": "GGNNwguoyj0yKAGdnD1hv+VOygUQg0pKchvdH6rkBQrmN0eZejQuV0ZuKOZlqpYpSmmkO2y3RN5lL/JVq6rEVvki7HlTdm72YAF3qOXY2A/WxVeTifAQjRQhmgo9WkXM2BAbr0ziRujgPmVBFkwWShEIk4wF6ZkUPcVx4zs3ylhD6ZSMl7+HogEjB+OMyKz5IznLh4xqmPkfl64gefbJDk7IJcS+HL+kkJzvSSaDE+G24aAlWEMHve6Tx6oCQMQTjHGP4mf8lTmFFDdPH5vroybzNBkSdQGjs8L06dvc9nT29m2BjPy3GkkU7vTMfiuirLXmopOtn/HhQYVaWuc0sg==",
+    "paypal-transmission-time": "2026-10-24T06:58:44Z",
+    "x-forwarded-for": "173.0.80.117",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-8NM446336G889031X-5TF19138JU469022G",
+    "event_version": "1.0",
+    "create_time": "2026-10-24T06:58:39.493Z",
+    "resource_type": "payouts_item",
+    "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+    "summary": "A payout item is unclaimed",
+    "resource": {
+      "transaction_id": "72E96294377283213",
+      "payout_item_fee": {
+        "currency": "USD",
+        "value": "0.25"
+      },
+      "transaction_status": "UNCLAIMED",
+      "sender_batch_id": "cs-01a16cb3-d7da-756b-878b-97c7e0123522-a1",
+      "time_processed": "2026-10-24T06:58:21Z",
+      "activity_id": "0B0794250U629102C",
+      "payout_item": {
+        "recipient_type": "EMAIL",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "note": "Staged sandbox action: CounterSign check.",
+        "receiver": "unreg-2@redacted",
+        "sender_item_id": "cs-01a16cb3-d7da-756b-878b-97c7e0123522-a1",
+        "recipient_wallet": "PAYPAL"
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/27K3KYVCVZZV6",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/66T9EUC3HR2JY",
+          "rel": "batch",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ],
+      "payout_item_id": "27K3KYVCVZZV6",
+      "payout_batch_id": "66T9EUC3HR2JY",
+      "errors": {
+        "name": "RECEIVER_UNREGISTERED",
+        "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+        "details": [],
+        "links": []
+      }
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-8NM446336G889031X-5TF19138JU469022G",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-8NM446336G889031X-5TF19138JU469022G/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

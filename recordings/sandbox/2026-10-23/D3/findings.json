@@ -1,0 +1,208 @@
+{
+  "check_id": "D3",
+  "verdict": "CONFIRMED",
+  "payout": {
+    "batch_id": "MZ6LMVL8FZDYG",
+    "create_status": 201,
+    "create_body": {
+      "batch_header": {
+        "payout_batch_id": "MZ6LMVL8FZDYG",
+        "batch_status": "PENDING",
+        "sender_batch_header": {
+          "sender_batch_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+          "email_subject": "CounterSign sandbox check"
+        }
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/MZ6LMVL8FZDYG",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "amount_minor": 100,
+    "write_name": "maker_a",
+    "item": {
+      "payout_item_id": "YY5BLYXZR8WHE",
+      "transaction_id": "45716010RL1846810",
+      "activity_id": "5NL64487259093922",
+      "transaction_status": "SUCCESS",
+      "payout_item_fee": {
+        "currency": "USD",
+        "value": "0.25"
+      },
+      "payout_batch_id": "MZ6LMVL8FZDYG",
+      "sender_batch_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+      "payout_item": {
+        "recipient_type": "EMAIL",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "note": "Staged sandbox action: CounterSign check.",
+        "receiver": "maker-a@redacted",
+        "sender_item_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+        "recipient_wallet": "PAYPAL",
+        "purpose": "GOODS"
+      },
+      "time_processed": "2026-10-23T22:16:27Z",
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/YY5BLYXZR8WHE",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/MZ6LMVL8FZDYG",
+          "rel": "batch",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "history": [
+      {
+        "at": "2026-10-23T22:16:14.125214Z",
+        "batch_http_status": 200,
+        "batch_status": "PENDING",
+        "item_count": 1,
+        "total_items": 1,
+        "item_id": "YY5BLYXZR8WHE",
+        "status": "PENDING"
+      },
+      {
+        "at": "2026-10-23T22:16:46.177945Z",
+        "batch_http_status": 200,
+        "batch_status": "SUCCESS",
+        "item_count": 1,
+        "total_items": 1,
+        "item_id": "YY5BLYXZR8WHE",
+        "status": "SUCCESS"
+      }
+    ],
+    "item_count": 1,
+    "item_id": "YY5BLYXZR8WHE",
+    "item_status": "SUCCESS"
+  },
+  "balance": {
+    "observations": [
+      {
+        "fetched_at": "2026-10-23T22:16:47.172024Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T19:59:59Z",
+        "as_of_time": "2026-10-23T19:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:21:48.189672Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T19:59:59Z",
+        "as_of_time": "2026-10-23T19:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:26:49.364416Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T20:59:59Z",
+        "as_of_time": "2026-10-23T20:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:31:50.789562Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T20:59:59Z",
+        "as_of_time": "2026-10-23T20:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:36:52.097517Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T20:59:59Z",
+        "as_of_time": "2026-10-23T20:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T06:58:02.896201Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      }
+    ],
+    "first_reflected_at": "2026-10-24T06:58:02.896201Z",
+    "baseline": {
+      "fetched_at": "2026-10-23T22:16:12.981254Z",
+      "status": 200,
+      "available": "5000.00",
+      "withheld": "0.00",
+      "total": "5000.00",
+      "last_refresh_time": "2026-10-23T19:59:59Z",
+      "as_of_time": "2026-10-23T19:59:59Z"
+    },
+    "expected_delta_minor": -100,
+    "notes": "Observed threshold only; D12 assesses freshness, fees and overlapping changes."
+  },
+  "create_had_item_ids": false,
+  "webhooks": [
+    {
+      "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+      "event_id": "WH-9YT26634XW059574V-3NB56144LN764490G",
+      "received_at": "2026-10-23T22:16:38.693792Z",
+      "delay_seconds": 10.773792,
+      "file": "webhooks/20261023T221638693792Z_001_WH-9YT26634XW059574V-3NB56144LN764490G.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+      "event_id": "WH-9FK69534YX169442G-38R40594LX642881E",
+      "received_at": "2026-10-23T22:16:48.781194Z",
+      "delay_seconds": 9.302194,
+      "file": "webhooks/20261023T221648781194Z_001_WH-9FK69534YX169442G-38R40594LX642881E.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+      "event_id": "WH-35127219PB963423B-8VE95561EX832351N",
+      "received_at": "2026-10-23T22:16:59.727083Z",
+      "delay_seconds": 12.248083,
+      "file": "webhooks/20261023T221659727083Z_001_WH-35127219PB963423B-8VE95561EX832351N.json"
+    }
+  ],
+  "blocked": null,
+  "notes": [
+    "The smallest check amount is $1; this is not the maker's production share."
+  ],
+  "observed_at": "2026-10-23T22:16:11.381420Z",
+  "evidence_files": [
+    "2026-10-23/D3/01_oauth_token.json",
+    "2026-10-23/D3/02_baseline_balance.json",
+    "2026-10-23/D3/03_balance_snapshot.json",
+    "2026-10-23/D3/04_maker_a.json",
+    "2026-10-23/D3/05_maker_a_batch.json",
+    "2026-10-23/D3/06_maker_a_item.json",
+    "2026-10-23/D3/07_maker_a_batch.json",
+    "2026-10-23/D3/08_maker_a_item.json",
+    "2026-10-23/D3/09_payout_balance.json",
+    "2026-10-23/D3/10_balance_snapshot.json",
+    "2026-10-23/D3/11_payout_balance.json",
+    "2026-10-23/D3/12_balance_snapshot.json",
+    "2026-10-23/D3/13_payout_balance.json",
+    "2026-10-23/D3/14_balance_snapshot.json",
+    "2026-10-23/D3/15_payout_balance.json",
+    "2026-10-23/D3/16_balance_snapshot.json",
+    "2026-10-23/D3/17_payout_balance.json"
+  ]
+}

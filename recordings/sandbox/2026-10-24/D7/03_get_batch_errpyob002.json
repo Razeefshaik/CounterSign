@@ -1,0 +1,86 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts/ERRPYOB002",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "matched-stub-id": "1fb8493e-e5de-4ba3-830f-db37ad6fdd12",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f815078cd4a02",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f815078cd4a02-fc45a0de0b050d7e-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:12 GMT",
+    "x-served-by": "cache-sin-wsap440030-SIN, cache-sin-wsap440030-SIN, cache-maa10223-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825092.553582,VS0,VE969",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "batch_header": {
+      "payout_batch_id": "2HQND3EJEWMLW",
+      "batch_status": "PENDING",
+      "time_created": "2017-08-22T15:15:07Z",
+      "sender_batch_header": {
+        "sender_batch_id": "API-155",
+        "email_subject": "Test batch status"
+      },
+      "amount": {
+        "currency": "USD",
+        "value": "2580.00"
+      }
+    },
+    "items": [
+      {
+        "payout_item_id": "3VFK6ZWG47BLU",
+        "transaction_status": "PENDING",
+        "payout_batch_id": "2HQND3EJEWMLW",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "2580.00"
+          },
+          "note": "payout to receiver test1",
+          "receiver": "email@redacted",
+          "sender_item_id": "ID-30"
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/3VFK6ZWG47BLU",
+            "rel": "item",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/2HQND3EJEWMLW",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T06:58:13.438315Z",
+  "t_recv": "2026-10-24T06:58:14.570141Z"
+}

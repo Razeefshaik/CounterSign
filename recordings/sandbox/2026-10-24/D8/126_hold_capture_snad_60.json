@@ -1,0 +1,81 @@
+{
+  "method": "GET",
+  "path": "/v2/payments/captures/69T54342EE2129538",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "date": "Sat, 24 Oct 2026 08:59:43 GMT",
+    "content-type": "application/json;charset=UTF-8",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f7c977ba53",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f7c977ba53-055938e84fb5aa29-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-encoding": "gzip",
+    "cf-ray": "a4f7c977ba532666-BOM"
+  },
+  "response_body": {
+    "id": "69T54342EE2129538",
+    "amount": {
+      "currency_code": "USD",
+      "value": "60.00"
+    },
+    "final_capture": true,
+    "seller_protection": {
+      "status": "ELIGIBLE",
+      "dispute_categories": [
+        "ITEM_NOT_RECEIVED",
+        "UNAUTHORIZED_TRANSACTION"
+      ]
+    },
+    "status": "PENDING",
+    "status_details": {
+      "reason": "BUYER_COMPLAINT"
+    },
+    "supplementary_data": {
+      "related_ids": {
+        "order_id": "7FC23242A91143321"
+      }
+    },
+    "payee": {
+      "email_address": "email@redacted",
+      "merchant_id": "B23JM5BDGPAF8"
+    },
+    "create_time": "2026-10-23T22:02:27Z",
+    "update_time": "2026-10-23T22:17:02Z",
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v2/payments/captures/69T54342EE2129538",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v2/payments/captures/69T54342EE2129538/refund",
+        "rel": "refund",
+        "method": "POST"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/7FC23242A91143321",
+        "rel": "up",
+        "method": "GET"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T08:59:44.797171Z",
+  "t_recv": "2026-10-24T08:59:45.307582Z"
+}

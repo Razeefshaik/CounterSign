@@ -1,0 +1,94 @@
+{
+  "received_at": "2026-10-24T12:19:30.272498Z",
+  "event_id": "WH-6T502407GS8131338-4GH26629BG465125B",
+  "event_type": "PAYMENT.CAPTURE.REFUNDED",
+  "resource_type": "refund",
+  "create_time": "2026-10-24T12:19:19.565Z",
+  "sha256": "dfd10628696e5654edade5deda8d12b81e31768b0277828b367c66b8366f7942",
+  "size": 1461,
+  "raw_file": "raw/webhooks/20261024T121930272498Z_001_WH-6T502407GS8131338-4GH26629BG465125B.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "1461",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "f1533393d2258",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "263cacdf-cfa5-11f1-9883-67fa190fd9ad",
+    "paypal-transmission-sig": "Du8e02vKBnTSSt55TtkD8mqC2hqVPoo4hzzIOSq3Ot+OjfIUopHNhe21K6LEHIGrZJuuIQfzZ/TFFB27qsJEejgpRL0fAV+kfzGxa/HbxVWcWOYg5jW+C4NlrT6NQCMmJ82/f0Fu4WXnNpOp+L/Gzw2T1YvW0L8FtqBBW7B4slGW4MHw+DZMVyUBPa523mlQGEQ/GGVM9d/PigN77pDA7ddTpmMupXnW7q+AR+eP6GmQekeikNvhgeleP4tSCNfpgu1at8OMSvAaVBrElbVZjr6xYnR51R6/jxAYKWmp4s+yuXca9kA7pvz/3liCJV5Mf+AHKw4t8dlgchIf9ig2/A==",
+    "paypal-transmission-time": "2026-10-24T12:19:24Z",
+    "x-forwarded-for": "173.0.80.117",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-6T502407GS8131338-4GH26629BG465125B",
+    "event_version": "1.0",
+    "create_time": "2026-10-24T12:19:19.565Z",
+    "resource_type": "refund",
+    "resource_version": "2.0",
+    "event_type": "PAYMENT.CAPTURE.REFUNDED",
+    "summary": "A $ 60.0 USD capture payment was refunded",
+    "resource": {
+      "id": "5FE62884TA6526206",
+      "amount": {
+        "currency_code": "USD",
+        "value": "60.00"
+      },
+      "note_to_payer": "60.0 USD; 2026-10-24 Credit has been processed and claim is now closed. Please refer Dispute ID PP-R-XJK-10194293. Thank you.",
+      "seller_payable_breakdown": {
+        "gross_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "paypal_fee": {
+          "currency_code": "USD",
+          "value": "0.00"
+        },
+        "net_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "total_refunded_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        }
+      },
+      "status": "COMPLETED",
+      "create_time": "2026-10-24T05:19:10-07:00",
+      "update_time": "2026-10-24T05:19:10-07:00",
+      "payer": {
+        "email_address": "email@redacted",
+        "merchant_id": "B23JM5BDGPAF8"
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v2/payments/refunds/5FE62884TA6526206",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v2/payments/captures/69T54342EE2129538",
+          "rel": "up",
+          "method": "GET"
+        }
+      ]
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-6T502407GS8131338-4GH26629BG465125B",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-6T502407GS8131338-4GH26629BG465125B/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

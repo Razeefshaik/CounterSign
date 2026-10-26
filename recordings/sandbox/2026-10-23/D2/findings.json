@@ -1,0 +1,536 @@
+{
+  "check_id": "D2",
+  "verdict": "CONFIRMED",
+  "captures": {
+    "inr_400": {
+      "capture_id": "1X031539U0011491U",
+      "status": "COMPLETED",
+      "seller_receivable_breakdown": {
+        "gross_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        },
+        "paypal_fee": {
+          "currency_code": "USD",
+          "value": "14.45"
+        },
+        "net_amount": {
+          "currency_code": "USD",
+          "value": "385.55"
+        }
+      },
+      "net_minor": 38555,
+      "currency": "USD",
+      "observed_at": "2026-10-23T22:02:28.015080Z",
+      "paypal_time": "2026-10-23T22:02:25Z"
+    },
+    "snad_60": {
+      "capture_id": "69T54342EE2129538",
+      "status": "COMPLETED",
+      "seller_receivable_breakdown": {
+        "gross_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "paypal_fee": {
+          "currency_code": "USD",
+          "value": "3.48"
+        },
+        "net_amount": {
+          "currency_code": "USD",
+          "value": "56.52"
+        }
+      },
+      "net_minor": 5652,
+      "currency": "USD",
+      "observed_at": "2026-10-23T22:02:30.307433Z",
+      "paypal_time": "2026-10-23T22:02:27Z"
+    },
+    "spare_25": {
+      "capture_id": "7UX45139662355119",
+      "status": "COMPLETED",
+      "seller_receivable_breakdown": {
+        "gross_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        },
+        "paypal_fee": {
+          "currency_code": "USD",
+          "value": "1.36"
+        },
+        "net_amount": {
+          "currency_code": "USD",
+          "value": "23.64"
+        }
+      },
+      "net_minor": 2364,
+      "currency": "USD",
+      "observed_at": "2026-10-23T22:02:32.390099Z",
+      "paypal_time": "2026-10-23T22:02:29Z"
+    }
+  },
+  "tracking": {
+    "inr_400": {
+      "carrier": "USPS",
+      "tracking_number": "9400111899223197428490"
+    }
+  },
+  "tracking_read": {
+    "trackers": [
+      {
+        "transaction_id": "1X031539U0011491U",
+        "tracking_number": "9400111899223197428490",
+        "tracking_number_type": "CARRIER_PROVIDED",
+        "status": "SHIPPED",
+        "shipment_date": "2026-10-23",
+        "carrier": "USPS",
+        "notify_buyer": false,
+        "last_updated_time": "1792792962619",
+        "shipment_direction": "FORWARD",
+        "shipment_uploader": "MERCHANT",
+        "account_id": "B23JM5BDGPAF8",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+            "rel": "replace",
+            "method": "PUT",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+            "rel": "edit",
+            "method": "PATCH",
+            "encType": "application/json"
+          }
+        ]
+      }
+    ],
+    "links": []
+  },
+  "tracking_read_status": 200,
+  "balance": {
+    "observations": [
+      {
+        "fetched_at": "2026-10-23T22:02:47.815242Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T19:59:59Z",
+        "as_of_time": "2026-10-23T19:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:07:49.114730Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T19:59:59Z",
+        "as_of_time": "2026-10-23T19:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:12:50.830216Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T19:59:59Z",
+        "as_of_time": "2026-10-23T19:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:17:52.321679Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T19:59:59Z",
+        "as_of_time": "2026-10-23T19:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:22:53.799770Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T20:59:59Z",
+        "as_of_time": "2026-10-23T20:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:27:54.712922Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T20:59:59Z",
+        "as_of_time": "2026-10-23T20:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-23T22:32:56.199506Z",
+        "status": 200,
+        "available": "5000.00",
+        "withheld": "0.00",
+        "total": "5000.00",
+        "last_refresh_time": "2026-10-23T20:59:59Z",
+        "as_of_time": "2026-10-23T20:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T06:58:03.370212Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:03:05.192370Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:08:06.917464Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:13:08.082095Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:18:09.484277Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:23:10.670300Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:28:11.909227Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:33:13.606433Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:38:14.239065Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:43:15.907422Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:48:30.132151Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:53:31.196543Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:58:32.610461Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:03:33.406077Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:08:34.098770Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:13:35.140629Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:18:36.391230Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:23:37.616307Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:28:38.336243Z",
+        "status": 200,
+        "available": "4995.00",
+        "withheld": "0.00",
+        "total": "4995.00",
+        "last_refresh_time": "2026-10-24T06:59:59Z",
+        "as_of_time": "2026-10-24T06:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:33:39.808956Z",
+        "status": 200,
+        "available": "4995.00",
+        "withheld": "0.00",
+        "total": "4995.00",
+        "last_refresh_time": "2026-10-24T06:59:59Z",
+        "as_of_time": "2026-10-24T06:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:38:40.463968Z",
+        "status": 200,
+        "available": "4995.00",
+        "withheld": "0.00",
+        "total": "4995.00",
+        "last_refresh_time": "2026-10-24T06:59:59Z",
+        "as_of_time": "2026-10-24T06:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:43:41.229502Z",
+        "status": 200,
+        "available": "4995.00",
+        "withheld": "0.00",
+        "total": "4995.00",
+        "last_refresh_time": "2026-10-24T06:59:59Z",
+        "as_of_time": "2026-10-24T06:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:48:41.869760Z",
+        "status": 200,
+        "available": "4995.00",
+        "withheld": "0.00",
+        "total": "4995.00",
+        "last_refresh_time": "2026-10-24T06:59:59Z",
+        "as_of_time": "2026-10-24T06:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:53:42.490877Z",
+        "status": 200,
+        "available": "4995.00",
+        "withheld": "0.00",
+        "total": "4995.00",
+        "last_refresh_time": "2026-10-24T06:59:59Z",
+        "as_of_time": "2026-10-24T06:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:58:43.143014Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T07:29:59Z",
+        "as_of_time": "2026-10-24T07:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T09:03:43.901592Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T07:29:59Z",
+        "as_of_time": "2026-10-24T07:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T09:08:44.600860Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T07:29:59Z",
+        "as_of_time": "2026-10-24T07:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T09:13:47.177578Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T07:29:59Z",
+        "as_of_time": "2026-10-24T07:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T09:18:48.295032Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T07:29:59Z",
+        "as_of_time": "2026-10-24T07:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T09:23:48.952591Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T07:59:59Z",
+        "as_of_time": "2026-10-24T07:59:59Z"
+      }
+    ],
+    "first_reflected_at": null,
+    "baseline": {
+      "fetched_at": "2026-10-23T21:29:56.421384Z",
+      "status": 200,
+      "available": "5000.00",
+      "withheld": "0.00",
+      "total": "5000.00",
+      "last_refresh_time": "2026-10-23T19:59:59Z",
+      "as_of_time": "2026-10-23T19:59:59Z"
+    },
+    "expected_delta_minor": 46571,
+    "notes": "Observed threshold only; D12 assesses freshness, fees and overlapping changes."
+  },
+  "webhooks": [
+    {
+      "event_type": "PAYMENT.CAPTURE.COMPLETED",
+      "event_id": "WH-00D6056744338980W-8JF548727K252801B",
+      "received_at": "2026-10-23T22:02:39.766029Z",
+      "delay_seconds": 8.919029,
+      "file": "webhooks/20261023T220239766029Z_001_WH-00D6056744338980W-8JF548727K252801B.json"
+    },
+    {
+      "event_type": "PAYMENT.CAPTURE.COMPLETED",
+      "event_id": "WH-81W79991HW000805X-8BE04011KX515524A",
+      "received_at": "2026-10-23T22:02:39.925372Z",
+      "delay_seconds": 10.291372,
+      "file": "webhooks/20261023T220239925372Z_001_WH-81W79991HW000805X-8BE04011KX515524A.json"
+    },
+    {
+      "event_type": "PAYMENT.CAPTURE.COMPLETED",
+      "event_id": "WH-76T57416PC147874X-34F92282AY629213K",
+      "received_at": "2026-10-23T22:02:49.184743Z",
+      "delay_seconds": 16.016743,
+      "file": "webhooks/20261023T220249184743Z_001_WH-76T57416PC147874X-34F92282AY629213K.json"
+    }
+  ],
+  "notes": [
+    "Tracking is merchant-supplied test data, not independent carrier proof.",
+    "Missing webhooks and balance lag are analysed by D11 and D12."
+  ],
+  "observed_at": "2026-10-23T21:29:53.736613Z",
+  "evidence_files": [
+    "2026-10-23/D2/01_oauth_token.json",
+    "2026-10-23/D2/02_baseline_balance.json",
+    "2026-10-23/D2/03_balance_snapshot.json",
+    "2026-10-23/D2/04_create_inr_400.json",
+    "2026-10-23/D2/05_create_snad_60.json",
+    "2026-10-23/D2/06_create_spare_25.json",
+    "2026-10-23/D2/07_balance_snapshot.json",
+    "2026-10-23/D2/08_approved_inr_400.json",
+    "2026-10-23/D2/09_oauth_token.json",
+    "2026-10-23/D2/10_balance_snapshot.json",
+    "2026-10-23/D2/11_balance_snapshot.json",
+    "2026-10-23/D2/12_approved_inr_400.json",
+    "2026-10-23/D2/13_oauth_token.json",
+    "2026-10-23/D2/14_balance_snapshot.json",
+    "2026-10-23/D2/15_balance_snapshot.json",
+    "2026-10-23/D2/16_balance_snapshot.json",
+    "2026-10-23/D2/17_approved_snad_60.json",
+    "2026-10-23/D2/18_approved_spare_25.json",
+    "2026-10-23/D2/19_before_capture_inr_400.json",
+    "2026-10-23/D2/20_capture_inr_400.json",
+    "2026-10-23/D2/21_before_capture_snad_60.json",
+    "2026-10-23/D2/22_capture_snad_60.json",
+    "2026-10-23/D2/23_before_capture_spare_25.json",
+    "2026-10-23/D2/24_capture_spare_25.json",
+    "2026-10-23/D2/25_track_inr_400.json",
+    "2026-10-23/D2/26_get_tracking.json",
+    "2026-10-23/D2/27_money_in_balance.json",
+    "2026-10-23/D2/28_balance_snapshot.json",
+    "2026-10-23/D2/29_money_in_balance.json",
+    "2026-10-23/D2/30_balance_snapshot.json",
+    "2026-10-23/D2/31_money_in_balance.json",
+    "2026-10-23/D2/32_balance_snapshot.json",
+    "2026-10-23/D2/33_money_in_balance.json",
+    "2026-10-23/D2/34_balance_snapshot.json",
+    "2026-10-23/D2/35_money_in_balance.json",
+    "2026-10-23/D2/36_balance_snapshot.json",
+    "2026-10-23/D2/37_money_in_balance.json",
+    "2026-10-23/D2/38_balance_snapshot.json",
+    "2026-10-23/D2/39_money_in_balance.json",
+    "2026-10-23/D2/40_balance_snapshot.json"
+  ]
+}

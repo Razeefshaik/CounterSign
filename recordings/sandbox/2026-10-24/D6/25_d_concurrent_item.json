@@ -1,0 +1,69 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts-item/7KPN54K59YFFL",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f650090707042",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f650090707042-353beb73e116954f-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 07:02:31 GMT",
+    "x-served-by": "cache-sin-wsss1830086-SIN, cache-sin-wsss1830086-SIN, cache-maa10246-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825351.508666,VS0,VE993",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "payout_item_id": "7KPN54K59YFFL",
+    "transaction_status": "PENDING",
+    "payout_batch_id": "MYBEX8P299JL4",
+    "sender_batch_id": "cs-01a16cb7-d1ac-7aa0-824e-c4f88429b459-a1",
+    "payout_item": {
+      "recipient_type": "EMAIL",
+      "amount": {
+        "currency": "USD",
+        "value": "1.00"
+      },
+      "note": "Staged sandbox action: CounterSign check.",
+      "receiver": "maker-b@redacted",
+      "sender_item_id": "cs-01a16cb7-d1ac-7aa0-824e-c4f88429b459-a1",
+      "recipient_wallet": "PAYPAL",
+      "purpose": "GOODS"
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/7KPN54K59YFFL",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/MYBEX8P299JL4",
+        "rel": "batch",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T07:02:32.507537Z",
+  "t_recv": "2026-10-24T07:02:33.572257Z"
+}

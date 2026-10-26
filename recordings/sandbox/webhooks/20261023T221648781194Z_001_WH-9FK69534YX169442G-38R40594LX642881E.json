@@ -1,0 +1,86 @@
+{
+  "received_at": "2026-10-23T22:16:48.781194Z",
+  "event_id": "WH-9FK69534YX169442G-38R40594LX642881E",
+  "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+  "resource_type": "payouts_item",
+  "create_time": "2026-10-23T22:16:39.479Z",
+  "sha256": "0850954364795de2b7b1d4d7c08c1681ba15ea0f12d5d329276c293d5841b84b",
+  "size": 1417,
+  "raw_file": "raw/webhooks/20261023T221648781194Z_001_WH-9FK69534YX169442G-38R40594LX642881E.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "1417",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "6f94b3416f351",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "6de51cce-cf2f-11f1-9e4a-97108400fc92",
+    "paypal-transmission-sig": "G6b0lh/CjZeKaX4OWAc00qjx69CNExIr9/bHAd9x1sOsAcwcWwe2nBK7HwGYDL8MQthd+lDS9Jp/QG2Ijb/lAaPEiMKWaUX1mXr4ceb76DshsOM+bwlLJLm6vBu5qY0lqXJBjaANYIitpc9Bovqxy/z2e5ONGVXIQ1J8BUyfKqJNIqJ0Au7gDgx5NNja7L6bka3pWz7+S0MBRNQgq4u58tQPvQK+SNoPqkJ4m2N+BGEtFjPPMHmh8pzTa4LMo4CRDGhKa/CqhbJsYv6jj1V8lJBhVMB643vBitGe/wBYD+45I2vwSRlQazXkqm1Zy+w45s3DXt291IEwj5l9pYAtPQ==",
+    "paypal-transmission-time": "2026-10-23T22:16:43Z",
+    "x-forwarded-for": "173.0.80.116",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-9FK69534YX169442G-38R40594LX642881E",
+    "event_version": "1.0",
+    "create_time": "2026-10-23T22:16:39.479Z",
+    "resource_type": "payouts_item",
+    "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+    "summary": "A payout item has succeeded",
+    "resource": {
+      "transaction_id": "45716010RL1846810",
+      "payout_item_fee": {
+        "currency": "USD",
+        "value": "0.25"
+      },
+      "transaction_status": "SUCCESS",
+      "sender_batch_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+      "time_processed": "2026-10-23T22:16:27Z",
+      "activity_id": "5NL64487259093922",
+      "payout_item": {
+        "recipient_type": "EMAIL",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "note": "Staged sandbox action: CounterSign check.",
+        "receiver": "maker-a@redacted",
+        "sender_item_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+        "recipient_wallet": "PAYPAL"
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/YY5BLYXZR8WHE",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/MZ6LMVL8FZDYG",
+          "rel": "batch",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ],
+      "payout_item_id": "YY5BLYXZR8WHE",
+      "payout_batch_id": "MZ6LMVL8FZDYG"
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-9FK69534YX169442G-38R40594LX642881E",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-9FK69534YX169442G-38R40594LX642881E/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

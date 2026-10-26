@@ -1,0 +1,1497 @@
+{
+  "check_id": "D11",
+  "verdict": "CONFIRMED",
+  "verdict_reason": "every real delivery verified SUCCESS",
+  "claim": "Webhook authenticity via the verify API; deliveries can be late, duplicated or missing.",
+  "signatures": {
+    "real_deliveries": 46,
+    "success": 46,
+    "failure": 0,
+    "unknown": 0,
+    "failed": [],
+    "unknown_names": [],
+    "results": {
+      "20261023T220239766029Z_001_WH-00D6056744338980W-8JF548727K252801B": {
+        "event_id": "WH-00D6056744338980W-8JF548727K252801B",
+        "verified_at": "2026-10-26T15:14:51.334786Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T220239925372Z_001_WH-81W79991HW000805X-8BE04011KX515524A": {
+        "event_id": "WH-81W79991HW000805X-8BE04011KX515524A",
+        "verified_at": "2026-10-26T15:14:52.740425Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T220249184743Z_001_WH-76T57416PC147874X-34F92282AY629213K": {
+        "event_id": "WH-76T57416PC147874X-34F92282AY629213K",
+        "verified_at": "2026-10-26T15:14:54.100126Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221437807619Z_001_WH-2LJ05453DV740643U-3DC22927617099520": {
+        "event_id": "WH-2LJ05453DV740643U-3DC22927617099520",
+        "verified_at": "2026-10-26T15:14:54.793351Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221507275666Z_001_WH-7VX91750YS240572Y-8077227119528001S": {
+        "event_id": "WH-7VX91750YS240572Y-8077227119528001S",
+        "verified_at": "2026-10-26T15:14:56.041302Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221638693792Z_001_WH-9YT26634XW059574V-3NB56144LN764490G": {
+        "event_id": "WH-9YT26634XW059574V-3NB56144LN764490G",
+        "verified_at": "2026-10-26T15:14:57.313644Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221648781194Z_001_WH-9FK69534YX169442G-38R40594LX642881E": {
+        "event_id": "WH-9FK69534YX169442G-38R40594LX642881E",
+        "verified_at": "2026-10-26T15:14:58.538826Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221659727083Z_001_WH-35127219PB963423B-8VE95561EX832351N": {
+        "event_id": "WH-35127219PB963423B-8VE95561EX832351N",
+        "verified_at": "2026-10-26T15:14:59.831676Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221707826153Z_001_WH-3F865444SY1605603-42W54259FR0589717": {
+        "event_id": "WH-3F865444SY1605603-42W54259FR0589717",
+        "verified_at": "2026-10-26T15:15:00.905666Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221739448405Z_001_WH-9FY6292551646951V-9PA40184663765516": {
+        "event_id": "WH-9FY6292551646951V-9PA40184663765516",
+        "verified_at": "2026-10-26T15:15:01.508036Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221837181670Z_001_WH-87U062412L835453W-465362520T6583722": {
+        "event_id": "WH-87U062412L835453W-465362520T6583722",
+        "verified_at": "2026-10-26T15:15:02.578935Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T221907387788Z_001_WH-3R90567547252362F-30F11691EL3580134": {
+        "event_id": "WH-3R90567547252362F-30F11691EL3580134",
+        "verified_at": "2026-10-26T15:15:04.141575Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T223207235850Z_001_WH-785431508X875724C-29N796966H5750217": {
+        "event_id": "WH-785431508X875724C-29N796966H5750217",
+        "verified_at": "2026-10-26T15:15:04.823738Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261023T223246399204Z_001_WH-67058378YY687983E-3CK78902BC0703355": {
+        "event_id": "WH-67058378YY687983E-3CK78902BC0703355",
+        "verified_at": "2026-10-26T15:15:06.589040Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065836342748Z_001_WH-3R740979TA5704906-5A888786W68953223": {
+        "event_id": "WH-3R740979TA5704906-5A888786W68953223",
+        "verified_at": "2026-10-26T15:15:07.884340Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065836882979Z_001_WH-1B226327JU244530L-60671825N3439782N": {
+        "event_id": "WH-1B226327JU244530L-60671825N3439782N",
+        "verified_at": "2026-10-26T15:15:08.945993Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065839168875Z_001_WH-7C3990648D871362H-2J309426LX7207406": {
+        "event_id": "WH-7C3990648D871362H-2J309426LX7207406",
+        "verified_at": "2026-10-26T15:15:10.202766Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065848328254Z_001_WH-9UE28573J5148071F-6KT711513X866651G": {
+        "event_id": "WH-9UE28573J5148071F-6KT711513X866651G",
+        "verified_at": "2026-10-26T15:15:10.912686Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065848981949Z_001_WH-9UE28573J5148071F-57L56074T79156416": {
+        "event_id": "WH-9UE28573J5148071F-57L56074T79156416",
+        "verified_at": "2026-10-26T15:15:12.194711Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065849239300Z_001_WH-9LD8678327212281P-7U2143369D333671L": {
+        "event_id": "WH-9LD8678327212281P-7U2143369D333671L",
+        "verified_at": "2026-10-26T15:15:13.466553Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065849546527Z_001_WH-74P90013W3641410G-5LG98973ME842842U": {
+        "event_id": "WH-74P90013W3641410G-5LG98973ME842842U",
+        "verified_at": "2026-10-26T15:15:14.667464Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065849956012Z_001_WH-8NM446336G889031X-5TF19138JU469022G": {
+        "event_id": "WH-8NM446336G889031X-5TF19138JU469022G",
+        "verified_at": "2026-10-26T15:15:15.959785Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T065856816742Z_001_WH-04589061Y70325803-8G862215T9905532M": {
+        "event_id": "WH-04589061Y70325803-8G862215T9905532M",
+        "verified_at": "2026-10-26T15:15:17.059529Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070109111942Z_001_WH-8NB02312B6616663C-02L43468U9204960C": {
+        "event_id": "WH-8NB02312B6616663C-02L43468U9204960C",
+        "verified_at": "2026-10-26T15:15:18.326619Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070115742640Z_001_WH-6E0218514J6281004-5LR27078S0878222A": {
+        "event_id": "WH-6E0218514J6281004-5LR27078S0878222A",
+        "verified_at": "2026-10-26T15:15:19.444524Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070118318153Z_001_WH-98X852881V524644K-7JH33300RP307320A": {
+        "event_id": "WH-98X852881V524644K-7JH33300RP307320A",
+        "verified_at": "2026-10-26T15:15:20.730815Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070138829975Z_001_WH-2LH7838027766830K-2EC47216S2736661V": {
+        "event_id": "WH-2LH7838027766830K-2EC47216S2736661V",
+        "verified_at": "2026-10-26T15:15:21.984409Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070148295545Z_001_WH-4FV14170E9313325R-6M875457GJ3162214": {
+        "event_id": "WH-4FV14170E9313325R-6M875457GJ3162214",
+        "verified_at": "2026-10-26T15:15:22.668897Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070159956398Z_001_WH-9X13348012129673W-1TU618320N512840S": {
+        "event_id": "WH-9X13348012129673W-1TU618320N512840S",
+        "verified_at": "2026-10-26T15:15:23.860632Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070218252767Z_001_WH-4EB86485UX350851A-6SK58559WF456551K": {
+        "event_id": "WH-4EB86485UX350851A-6SK58559WF456551K",
+        "verified_at": "2026-10-26T15:15:24.926052Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070229135952Z_001_WH-81L86817HH992842V-770618616S554943R": {
+        "event_id": "WH-81L86817HH992842V-770618616S554943R",
+        "verified_at": "2026-10-26T15:15:26.009405Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070238536224Z_001_WH-6RD99503T3316645A-21D23376S26126250": {
+        "event_id": "WH-6RD99503T3316645A-21D23376S26126250",
+        "verified_at": "2026-10-26T15:15:27.414516Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070258768863Z_001_WH-0YX71318RL1590204-17733083G7632883L": {
+        "event_id": "WH-0YX71318RL1590204-17733083G7632883L",
+        "verified_at": "2026-10-26T15:15:28.540840Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070308438052Z_001_WH-38680926VU9067107-2RH40993B8937491J": {
+        "event_id": "WH-38680926VU9067107-2RH40993B8937491J",
+        "verified_at": "2026-10-26T15:15:29.848484Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070318764770Z_001_WH-3XD697380X344573G-6SJ224557M401545T": {
+        "event_id": "WH-3XD697380X344573G-6SJ224557M401545T",
+        "verified_at": "2026-10-26T15:15:31.301192Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070337926805Z_001_WH-62X693526J0359638-8JY04431KK4275440": {
+        "event_id": "WH-62X693526J0359638-8JY04431KK4275440",
+        "verified_at": "2026-10-26T15:15:31.969223Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070348589699Z_001_WH-46H33561N8659261W-7ML08444XA964620R": {
+        "event_id": "WH-46H33561N8659261W-7ML08444XA964620R",
+        "verified_at": "2026-10-26T15:15:32.648082Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T070358442910Z_001_WH-6KV88941YU907831D-4EE547900A921950Y": {
+        "event_id": "WH-6KV88941YU907831D-4EE547900A921950Y",
+        "verified_at": "2026-10-26T15:15:33.359646Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T121609741311Z_001_WH-4BX26660W8212762H-9Y1148937B925651G": {
+        "event_id": "WH-4BX26660W8212762H-9Y1148937B925651G",
+        "verified_at": "2026-10-26T15:15:34.805122Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T121930272498Z_001_WH-6T502407GS8131338-4GH26629BG465125B": {
+        "event_id": "WH-6T502407GS8131338-4GH26629BG465125B",
+        "verified_at": "2026-10-26T15:15:35.898677Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T121937645339Z_001_WH-9F265567AR690063U-37860160SY5258744": {
+        "event_id": "WH-9F265567AR690063U-37860160SY5258744",
+        "verified_at": "2026-10-26T15:15:37.183318Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T121938075673Z_001_WH-0FJ520991X252332U-16F92576MK003192W": {
+        "event_id": "WH-0FJ520991X252332U-16F92576MK003192W",
+        "verified_at": "2026-10-26T15:15:38.257248Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T122117113446Z_001_WH-7P3563880T306724N-15G659343U8652353": {
+        "event_id": "WH-7P3563880T306724N-15G659343U8652353",
+        "verified_at": "2026-10-26T15:15:39.570410Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T122137239995Z_001_WH-7VM68302K83275237-54S06522UE099814B": {
+        "event_id": "WH-7VM68302K83275237-54S06522UE099814B",
+        "verified_at": "2026-10-26T15:15:40.865146Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261024T124908024056Z_001_WH-90P03166XY7210337-3XP85938SJ999024F": {
+        "event_id": "WH-90P03166XY7210337-3XP85938SJ999024F",
+        "verified_at": "2026-10-26T15:15:41.566574Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      },
+      "20261026T151443816843Z_001_WH-00D6056744338980W-8JF548727K252801B": {
+        "event_id": "WH-00D6056744338980W-8JF548727K252801B",
+        "verified_at": "2026-10-26T15:15:42.638843Z",
+        "status": 200,
+        "verification_status": "SUCCESS",
+        "error_name": null
+      }
+    }
+  },
+  "simulator": {
+    "event_type": "PAYMENT.CAPTURE.COMPLETED",
+    "sent_at": "2026-10-26T15:14:27.636841Z",
+    "status": 202,
+    "event_id": "WH-7Y7254563A4550640-11V2185806837105M",
+    "error_name": null,
+    "matched_by": "event_id",
+    "delivery_names": [
+      "20261026T151430728848Z_001_WH-7Y7254563A4550640-11V2185806837105M"
+    ],
+    "arrived": true,
+    "delay_seconds": 368828577.729,
+    "verification": {
+      "verified_at": "2026-10-26T15:14:38.359371Z",
+      "status": 200,
+      "verification_status": "SUCCESS",
+      "error_name": null
+    },
+    "matches_f11": false
+  },
+  "backfill": {
+    "event_list": {
+      "checked_at": "2026-10-26T15:13:38.917070Z",
+      "status": 200,
+      "works": true,
+      "error_name": null,
+      "count": 47,
+      "has_next_link": false,
+      "listed_not_stored": [
+        {
+          "event_id": "WH-45476351NG3631413-4R8798848B535260M",
+          "event_type": "CUSTOMER.DISPUTE.RESOLVED"
+        },
+        {
+          "event_id": "WH-7VA46024TB450341L-7WL939310W973394K",
+          "event_type": "CUSTOMER.DISPUTE.UPDATED"
+        }
+      ]
+    },
+    "resend": {
+      "event_id": "WH-00D6056744338980W-8JF548727K252801B",
+      "event_type": "PAYMENT.CAPTURE.COMPLETED",
+      "sent_at": "2026-10-26T15:14:39.580145Z",
+      "status": 202,
+      "works": true,
+      "error_name": null,
+      "duplicate_names": [
+        "20261026T151443816843Z_001_WH-00D6056744338980W-8JF548727K252801B"
+      ],
+      "duplicate_arrived": true
+    }
+  },
+  "analysis": {
+    "deliveries": 46,
+    "delay_seconds": {
+      "overall": {
+        "count": 46,
+        "min": 3.705,
+        "median": 10.477,
+        "max": 234732.97
+      },
+      "by_event_type": {
+        "CUSTOMER.DISPUTE.CREATED": {
+          "count": 3,
+          "min": 3.753,
+          "median": 4.02,
+          "max": 4.263
+        },
+        "CUSTOMER.DISPUTE.RESOLVED": {
+          "count": 2,
+          "min": 4.124,
+          "median": 4.375,
+          "max": 4.627
+        },
+        "CUSTOMER.DISPUTE.UPDATED": {
+          "count": 8,
+          "min": 3.705,
+          "median": 3.977,
+          "max": 6.226
+        },
+        "PAYMENT.CAPTURE.COMPLETED": {
+          "count": 4,
+          "min": 8.919,
+          "median": 13.154,
+          "max": 234732.97
+        },
+        "PAYMENT.CAPTURE.REFUNDED": {
+          "count": 1,
+          "min": 10.707,
+          "median": 10.707,
+          "max": 10.707
+        },
+        "PAYMENT.PAYOUTS-ITEM.RETURNED": {
+          "count": 1,
+          "min": 12.949,
+          "median": 12.949,
+          "max": 12.949
+        },
+        "PAYMENT.PAYOUTS-ITEM.SUCCEEDED": {
+          "count": 6,
+          "min": 9.302,
+          "median": 10.227,
+          "max": 10.943
+        },
+        "PAYMENT.PAYOUTS-ITEM.UNCLAIMED": {
+          "count": 3,
+          "min": 10.463,
+          "median": 10.969,
+          "max": 11.623
+        },
+        "PAYMENT.PAYOUTSBATCH.PROCESSING": {
+          "count": 9,
+          "min": 8.977,
+          "median": 10.926,
+          "max": 12.652
+        },
+        "PAYMENT.PAYOUTSBATCH.SUCCESS": {
+          "count": 9,
+          "min": 8.911,
+          "median": 11.187,
+          "max": 12.511
+        }
+      },
+      "without_times": 0
+    },
+    "duplicates": {
+      "WH-00D6056744338980W-8JF548727K252801B": {
+        "count": 2,
+        "event_type": "PAYMENT.CAPTURE.COMPLETED",
+        "received_at": [
+          "2026-10-23T22:02:39.766029Z",
+          "2026-10-26T15:14:43.816843Z"
+        ],
+        "names": [
+          "20261023T220239766029Z_001_WH-00D6056744338980W-8JF548727K252801B",
+          "20261026T151443816843Z_001_WH-00D6056744338980W-8JF548727K252801B"
+        ],
+        "induced_by_resend": true
+      }
+    },
+    "out_of_order": [
+      {
+        "resource_id": "69T54342EE2129538",
+        "event_id": "WH-00D6056744338980W-8JF548727K252801B",
+        "event_type": "PAYMENT.CAPTURE.COMPLETED",
+        "create_time": "2026-10-23T22:02:30.847Z",
+        "received_after": "WH-6T502407GS8131338-4GH26629BG465125B",
+        "received_after_type": "PAYMENT.CAPTURE.REFUNDED"
+      }
+    ],
+    "timeline_events": 28,
+    "missing": [
+      {
+        "event": "DISPUTE_RESOLVED",
+        "source": "D10",
+        "resource_id": "PP-R-UJV-10194294",
+        "observed_at": "2026-10-26T11:55:44.360248Z",
+        "expected": [
+          "CUSTOMER.DISPUTE.RESOLVED"
+        ],
+        "arrived": [],
+        "missing": true,
+        "first_received_at": null,
+        "webhook_minus_observed_seconds": null
+      }
+    ],
+    "matched": [
+      {
+        "event": "CAPTURE_COMPLETED",
+        "source": "D2",
+        "resource_id": "1X031539U0011491U",
+        "observed_at": "2026-10-23T22:02:28.015080Z",
+        "expected": [
+          "PAYMENT.CAPTURE.COMPLETED"
+        ],
+        "arrived": [
+          "PAYMENT.CAPTURE.COMPLETED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-23T22:02:39.925372Z",
+        "webhook_minus_observed_seconds": 11.91
+      },
+      {
+        "event": "CAPTURE_COMPLETED",
+        "source": "D2",
+        "resource_id": "69T54342EE2129538",
+        "observed_at": "2026-10-23T22:02:30.307433Z",
+        "expected": [
+          "PAYMENT.CAPTURE.COMPLETED"
+        ],
+        "arrived": [
+          "PAYMENT.CAPTURE.COMPLETED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-23T22:02:39.766029Z",
+        "webhook_minus_observed_seconds": 9.459
+      },
+      {
+        "event": "CAPTURE_COMPLETED",
+        "source": "D2",
+        "resource_id": "7UX45139662355119",
+        "observed_at": "2026-10-23T22:02:32.390099Z",
+        "expected": [
+          "PAYMENT.CAPTURE.COMPLETED"
+        ],
+        "arrived": [
+          "PAYMENT.CAPTURE.COMPLETED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-23T22:02:49.184743Z",
+        "webhook_minus_observed_seconds": 16.795
+      },
+      {
+        "event": "DISPUTE_CREATED",
+        "source": "D8",
+        "resource_id": "PP-R-JQM-10194292",
+        "observed_at": "2026-10-23T22:15:50.206856Z",
+        "expected": [
+          "CUSTOMER.DISPUTE.CREATED"
+        ],
+        "arrived": [
+          "CUSTOMER.DISPUTE.CREATED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-23T22:14:37.807619Z",
+        "webhook_minus_observed_seconds": -72.399
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D3",
+        "resource_id": "MZ6LMVL8FZDYG",
+        "observed_at": "2026-10-23T22:16:13.622142Z",
+        "expected": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-23T22:16:38.693792Z",
+        "webhook_minus_observed_seconds": 25.072
+      },
+      {
+        "event": "PAYOUT_ITEM_SUCCESS",
+        "source": "D3",
+        "resource_id": "YY5BLYXZR8WHE",
+        "observed_at": "2026-10-23T22:16:46.618292Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-23T22:16:48.781194Z",
+        "webhook_minus_observed_seconds": 2.163
+      },
+      {
+        "event": "DISPUTE_CREATED",
+        "source": "D8",
+        "resource_id": "PP-R-XJK-10194293",
+        "observed_at": "2026-10-23T22:17:54.177089Z",
+        "expected": [
+          "CUSTOMER.DISPUTE.CREATED"
+        ],
+        "arrived": [
+          "CUSTOMER.DISPUTE.CREATED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-23T22:17:07.826153Z",
+        "webhook_minus_observed_seconds": -46.351
+      },
+      {
+        "event": "DISPUTE_CREATED",
+        "source": "D8",
+        "resource_id": "PP-R-UJV-10194294",
+        "observed_at": "2026-10-23T22:18:58.271795Z",
+        "expected": [
+          "CUSTOMER.DISPUTE.CREATED"
+        ],
+        "arrived": [
+          "CUSTOMER.DISPUTE.CREATED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-23T22:18:37.181670Z",
+        "webhook_minus_observed_seconds": -21.09
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D4",
+        "resource_id": "BV5759UA95QU8",
+        "observed_at": "2026-10-24T06:58:07.926138Z",
+        "expected": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T06:58:39.168875Z",
+        "webhook_minus_observed_seconds": 31.243
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D4",
+        "resource_id": "66T9EUC3HR2JY",
+        "observed_at": "2026-10-24T06:58:09.187948Z",
+        "expected": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T06:58:36.342748Z",
+        "webhook_minus_observed_seconds": 27.155
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D4",
+        "resource_id": "3K6AWN33H4VSS",
+        "observed_at": "2026-10-24T06:58:10.344791Z",
+        "expected": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T06:58:36.882979Z",
+        "webhook_minus_observed_seconds": 26.538
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D6",
+        "resource_id": "NYJH5RKAXC9QW",
+        "observed_at": "2026-10-24T07:00:40.473054Z",
+        "expected": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T07:01:09.111942Z",
+        "webhook_minus_observed_seconds": 28.639
+      },
+      {
+        "event": "PAYOUT_ITEM_SUCCESS",
+        "source": "D6",
+        "resource_id": "W63CDWRX5QZ8W",
+        "observed_at": "2026-10-24T07:01:12.142517Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T07:01:15.742640Z",
+        "webhook_minus_observed_seconds": 3.6
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D6",
+        "resource_id": "S9TRM576VR36S",
+        "observed_at": "2026-10-24T07:01:17.599570Z",
+        "expected": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T07:01:38.829975Z",
+        "webhook_minus_observed_seconds": 21.23
+      },
+      {
+        "event": "PAYOUT_ITEM_SUCCESS",
+        "source": "D6",
+        "resource_id": "6R5WELGMZP5SQ",
+        "observed_at": "2026-10-24T07:01:50.114629Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T07:01:48.295545Z",
+        "webhook_minus_observed_seconds": -1.819
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D6",
+        "resource_id": "5H5397MBCBLM8",
+        "observed_at": "2026-10-24T07:01:55.461528Z",
+        "expected": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T07:02:18.252767Z",
+        "webhook_minus_observed_seconds": 22.791
+      },
+      {
+        "event": "PAYOUT_ITEM_UNCLAIMED",
+        "source": "D4",
+        "resource_id": "EH7G4GY74KLLY",
+        "observed_at": "2026-10-24T07:02:24.351016Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T06:58:48.981949Z",
+        "webhook_minus_observed_seconds": -215.369
+      },
+      {
+        "event": "PAYOUT_ITEM_UNCLAIMED",
+        "source": "D4",
+        "resource_id": "27K3KYVCVZZV6",
+        "observed_at": "2026-10-24T07:02:26.274212Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T06:58:49.956012Z",
+        "webhook_minus_observed_seconds": -216.318
+      },
+      {
+        "event": "PAYOUT_ITEM_SUCCESS",
+        "source": "D6",
+        "resource_id": "CT2XSZNX7EQTU",
+        "observed_at": "2026-10-24T07:02:27.597666Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T07:02:29.135952Z",
+        "webhook_minus_observed_seconds": 1.538
+      },
+      {
+        "event": "PAYOUT_ITEM_UNCLAIMED",
+        "source": "D4",
+        "resource_id": "W4GAN66Q6SYD2",
+        "observed_at": "2026-10-24T07:02:27.835559Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T06:58:48.328254Z",
+        "webhook_minus_observed_seconds": -219.507
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D6",
+        "resource_id": "MYBEX8P299JL4",
+        "observed_at": "2026-10-24T07:02:33.627514Z",
+        "expected": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTSBATCH.PROCESSING",
+          "PAYMENT.PAYOUTSBATCH.SUCCESS"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T07:02:58.768863Z",
+        "webhook_minus_observed_seconds": 25.141
+      },
+      {
+        "event": "PAYOUT_ITEM_SUCCESS",
+        "source": "D6",
+        "resource_id": "7KPN54K59YFFL",
+        "observed_at": "2026-10-24T07:03:06.641405Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.SUCCEEDED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T07:03:08.438052Z",
+        "webhook_minus_observed_seconds": 1.797
+      },
+      {
+        "event": "PAYOUT_ITEM_RETURNED",
+        "source": "D5",
+        "resource_id": "EH7G4GY74KLLY",
+        "observed_at": "2026-10-24T12:15:40.521719Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.RETURNED",
+          "PAYMENT.PAYOUTS-ITEM.CANCELED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.RETURNED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T12:16:09.741311Z",
+        "webhook_minus_observed_seconds": 29.22
+      },
+      {
+        "event": "DISPUTE_RESOLVED",
+        "source": "D10",
+        "resource_id": "PP-R-JQM-10194292",
+        "observed_at": "2026-10-24T12:19:10.059505Z",
+        "expected": [
+          "CUSTOMER.DISPUTE.RESOLVED"
+        ],
+        "arrived": [
+          "CUSTOMER.DISPUTE.RESOLVED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T12:19:37.645339Z",
+        "webhook_minus_observed_seconds": 27.586
+      },
+      {
+        "event": "DISPUTE_RESOLVED",
+        "source": "D10",
+        "resource_id": "PP-R-XJK-10194293",
+        "observed_at": "2026-10-24T12:21:21.456466Z",
+        "expected": [
+          "CUSTOMER.DISPUTE.RESOLVED"
+        ],
+        "arrived": [
+          "CUSTOMER.DISPUTE.RESOLVED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T12:21:17.113446Z",
+        "webhook_minus_observed_seconds": -4.343
+      },
+      {
+        "event": "CAPTURE_REFUNDED",
+        "source": "D10",
+        "resource_id": "69T54342EE2129538",
+        "observed_at": "2026-10-24T12:21:21.456466Z",
+        "expected": [
+          "PAYMENT.CAPTURE.REFUNDED"
+        ],
+        "arrived": [
+          "PAYMENT.CAPTURE.REFUNDED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T12:19:30.272498Z",
+        "webhook_minus_observed_seconds": -111.184
+      },
+      {
+        "event": "PAYOUT_ITEM_UNCLAIMED",
+        "source": "D5",
+        "resource_id": "27K3KYVCVZZV6",
+        "observed_at": "2026-10-26T11:55:56.485577Z",
+        "expected": [
+          "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+        ],
+        "arrived": [
+          "PAYMENT.PAYOUTS-ITEM.UNCLAIMED"
+        ],
+        "missing": false,
+        "first_received_at": "2026-10-24T06:58:49.956012Z",
+        "webhook_minus_observed_seconds": -190626.53
+      }
+    ],
+    "without_resource_id": [],
+    "per_delivery": [
+      {
+        "name": "20261023T220239766029Z_001_WH-00D6056744338980W-8JF548727K252801B",
+        "event_id": "WH-00D6056744338980W-8JF548727K252801B",
+        "event_type": "PAYMENT.CAPTURE.COMPLETED",
+        "resource_type": "capture",
+        "create_time": "2026-10-23T22:02:30.847Z",
+        "received_at": "2026-10-23T22:02:39.766029Z",
+        "resource_ids": [
+          "69T54342EE2129538"
+        ],
+        "delay_seconds": 8.919
+      },
+      {
+        "name": "20261023T220239925372Z_001_WH-81W79991HW000805X-8BE04011KX515524A",
+        "event_id": "WH-81W79991HW000805X-8BE04011KX515524A",
+        "event_type": "PAYMENT.CAPTURE.COMPLETED",
+        "resource_type": "capture",
+        "create_time": "2026-10-23T22:02:29.634Z",
+        "received_at": "2026-10-23T22:02:39.925372Z",
+        "resource_ids": [
+          "1X031539U0011491U"
+        ],
+        "delay_seconds": 10.291
+      },
+      {
+        "name": "20261023T220249184743Z_001_WH-76T57416PC147874X-34F92282AY629213K",
+        "event_id": "WH-76T57416PC147874X-34F92282AY629213K",
+        "event_type": "PAYMENT.CAPTURE.COMPLETED",
+        "resource_type": "capture",
+        "create_time": "2026-10-23T22:02:33.168Z",
+        "received_at": "2026-10-23T22:02:49.184743Z",
+        "resource_ids": [
+          "7UX45139662355119"
+        ],
+        "delay_seconds": 16.017
+      },
+      {
+        "name": "20261023T221437807619Z_001_WH-2LJ05453DV740643U-3DC22927617099520",
+        "event_id": "WH-2LJ05453DV740643U-3DC22927617099520",
+        "event_type": "CUSTOMER.DISPUTE.CREATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-23T22:14:34.055Z",
+        "received_at": "2026-10-23T22:14:37.807619Z",
+        "resource_ids": [
+          "PP-R-JQM-10194292"
+        ],
+        "delay_seconds": 3.753
+      },
+      {
+        "name": "20261023T221507275666Z_001_WH-7VX91750YS240572Y-8077227119528001S",
+        "event_id": "WH-7VX91750YS240572Y-8077227119528001S",
+        "event_type": "CUSTOMER.DISPUTE.UPDATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-23T22:15:03.414Z",
+        "received_at": "2026-10-23T22:15:07.275666Z",
+        "resource_ids": [
+          "PP-R-JQM-10194292"
+        ],
+        "delay_seconds": 3.862
+      },
+      {
+        "name": "20261023T221638693792Z_001_WH-9YT26634XW059574V-3NB56144LN764490G",
+        "event_id": "WH-9YT26634XW059574V-3NB56144LN764490G",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-23T22:16:27.920Z",
+        "received_at": "2026-10-23T22:16:38.693792Z",
+        "resource_ids": [
+          "MZ6LMVL8FZDYG"
+        ],
+        "delay_seconds": 10.774
+      },
+      {
+        "name": "20261023T221648781194Z_001_WH-9FK69534YX169442G-38R40594LX642881E",
+        "event_id": "WH-9FK69534YX169442G-38R40594LX642881E",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-23T22:16:39.479Z",
+        "received_at": "2026-10-23T22:16:48.781194Z",
+        "resource_ids": [
+          "YY5BLYXZR8WHE"
+        ],
+        "delay_seconds": 9.302
+      },
+      {
+        "name": "20261023T221659727083Z_001_WH-35127219PB963423B-8VE95561EX832351N",
+        "event_id": "WH-35127219PB963423B-8VE95561EX832351N",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-23T22:16:47.479Z",
+        "received_at": "2026-10-23T22:16:59.727083Z",
+        "resource_ids": [
+          "MZ6LMVL8FZDYG"
+        ],
+        "delay_seconds": 12.248
+      },
+      {
+        "name": "20261023T221707826153Z_001_WH-3F865444SY1605603-42W54259FR0589717",
+        "event_id": "WH-3F865444SY1605603-42W54259FR0589717",
+        "event_type": "CUSTOMER.DISPUTE.CREATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-23T22:17:03.563Z",
+        "received_at": "2026-10-23T22:17:07.826153Z",
+        "resource_ids": [
+          "PP-R-XJK-10194293"
+        ],
+        "delay_seconds": 4.263
+      },
+      {
+        "name": "20261023T221739448405Z_001_WH-9FY6292551646951V-9PA40184663765516",
+        "event_id": "WH-9FY6292551646951V-9PA40184663765516",
+        "event_type": "CUSTOMER.DISPUTE.UPDATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-23T22:17:33.222Z",
+        "received_at": "2026-10-23T22:17:39.448405Z",
+        "resource_ids": [
+          "PP-R-XJK-10194293"
+        ],
+        "delay_seconds": 6.226
+      },
+      {
+        "name": "20261023T221837181670Z_001_WH-87U062412L835453W-465362520T6583722",
+        "event_id": "WH-87U062412L835453W-465362520T6583722",
+        "event_type": "CUSTOMER.DISPUTE.CREATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-23T22:18:33.162Z",
+        "received_at": "2026-10-23T22:18:37.181670Z",
+        "resource_ids": [
+          "PP-R-UJV-10194294"
+        ],
+        "delay_seconds": 4.02
+      },
+      {
+        "name": "20261023T221907387788Z_001_WH-3R90567547252362F-30F11691EL3580134",
+        "event_id": "WH-3R90567547252362F-30F11691EL3580134",
+        "event_type": "CUSTOMER.DISPUTE.UPDATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-23T22:19:03.683Z",
+        "received_at": "2026-10-23T22:19:07.387788Z",
+        "resource_ids": [
+          "PP-R-UJV-10194294"
+        ],
+        "delay_seconds": 3.705
+      },
+      {
+        "name": "20261023T223207235850Z_001_WH-785431508X875724C-29N796966H5750217",
+        "event_id": "WH-785431508X875724C-29N796966H5750217",
+        "event_type": "CUSTOMER.DISPUTE.UPDATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-23T22:32:03.413Z",
+        "received_at": "2026-10-23T22:32:07.235850Z",
+        "resource_ids": [
+          "PP-R-JQM-10194292"
+        ],
+        "delay_seconds": 3.823
+      },
+      {
+        "name": "20261023T223246399204Z_001_WH-67058378YY687983E-3CK78902BC0703355",
+        "event_id": "WH-67058378YY687983E-3CK78902BC0703355",
+        "event_type": "CUSTOMER.DISPUTE.UPDATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-23T22:32:42.620Z",
+        "received_at": "2026-10-23T22:32:46.399204Z",
+        "resource_ids": [
+          "PP-R-JQM-10194292"
+        ],
+        "delay_seconds": 3.779
+      },
+      {
+        "name": "20261024T065836342748Z_001_WH-3R740979TA5704906-5A888786W68953223",
+        "event_id": "WH-3R740979TA5704906-5A888786W68953223",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T06:58:27.366Z",
+        "received_at": "2026-10-24T06:58:36.342748Z",
+        "resource_ids": [
+          "66T9EUC3HR2JY"
+        ],
+        "delay_seconds": 8.977
+      },
+      {
+        "name": "20261024T065836882979Z_001_WH-1B226327JU244530L-60671825N3439782N",
+        "event_id": "WH-1B226327JU244530L-60671825N3439782N",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T06:58:27.686Z",
+        "received_at": "2026-10-24T06:58:36.882979Z",
+        "resource_ids": [
+          "3K6AWN33H4VSS"
+        ],
+        "delay_seconds": 9.197
+      },
+      {
+        "name": "20261024T065839168875Z_001_WH-7C3990648D871362H-2J309426LX7207406",
+        "event_id": "WH-7C3990648D871362H-2J309426LX7207406",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T06:58:27.365Z",
+        "received_at": "2026-10-24T06:58:39.168875Z",
+        "resource_ids": [
+          "BV5759UA95QU8"
+        ],
+        "delay_seconds": 11.804
+      },
+      {
+        "name": "20261024T065848328254Z_001_WH-9UE28573J5148071F-6KT711513X866651G",
+        "event_id": "WH-9UE28573J5148071F-6KT711513X866651G",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T06:58:37.359Z",
+        "received_at": "2026-10-24T06:58:48.328254Z",
+        "resource_ids": [
+          "W4GAN66Q6SYD2"
+        ],
+        "delay_seconds": 10.969
+      },
+      {
+        "name": "20261024T065848981949Z_001_WH-9UE28573J5148071F-57L56074T79156416",
+        "event_id": "WH-9UE28573J5148071F-57L56074T79156416",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T06:58:37.359Z",
+        "received_at": "2026-10-24T06:58:48.981949Z",
+        "resource_ids": [
+          "EH7G4GY74KLLY"
+        ],
+        "delay_seconds": 11.623
+      },
+      {
+        "name": "20261024T065849239300Z_001_WH-9LD8678327212281P-7U2143369D333671L",
+        "event_id": "WH-9LD8678327212281P-7U2143369D333671L",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T06:58:39.489Z",
+        "received_at": "2026-10-24T06:58:49.239300Z",
+        "resource_ids": [
+          "BV5759UA95QU8"
+        ],
+        "delay_seconds": 9.75
+      },
+      {
+        "name": "20261024T065849546527Z_001_WH-74P90013W3641410G-5LG98973ME842842U",
+        "event_id": "WH-74P90013W3641410G-5LG98973ME842842U",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T06:58:37.352Z",
+        "received_at": "2026-10-24T06:58:49.546527Z",
+        "resource_ids": [
+          "66T9EUC3HR2JY"
+        ],
+        "delay_seconds": 12.195
+      },
+      {
+        "name": "20261024T065849956012Z_001_WH-8NM446336G889031X-5TF19138JU469022G",
+        "event_id": "WH-8NM446336G889031X-5TF19138JU469022G",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T06:58:39.493Z",
+        "received_at": "2026-10-24T06:58:49.956012Z",
+        "resource_ids": [
+          "27K3KYVCVZZV6"
+        ],
+        "delay_seconds": 10.463
+      },
+      {
+        "name": "20261024T065856816742Z_001_WH-04589061Y70325803-8G862215T9905532M",
+        "event_id": "WH-04589061Y70325803-8G862215T9905532M",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T06:58:47.906Z",
+        "received_at": "2026-10-24T06:58:56.816742Z",
+        "resource_ids": [
+          "3K6AWN33H4VSS"
+        ],
+        "delay_seconds": 8.911
+      },
+      {
+        "name": "20261024T070109111942Z_001_WH-8NB02312B6616663C-02L43468U9204960C",
+        "event_id": "WH-8NB02312B6616663C-02L43468U9204960C",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:00:57.906Z",
+        "received_at": "2026-10-24T07:01:09.111942Z",
+        "resource_ids": [
+          "NYJH5RKAXC9QW"
+        ],
+        "delay_seconds": 11.206
+      },
+      {
+        "name": "20261024T070115742640Z_001_WH-6E0218514J6281004-5LR27078S0878222A",
+        "event_id": "WH-6E0218514J6281004-5LR27078S0878222A",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T07:01:05.818Z",
+        "received_at": "2026-10-24T07:01:15.742640Z",
+        "resource_ids": [
+          "W63CDWRX5QZ8W"
+        ],
+        "delay_seconds": 9.925
+      },
+      {
+        "name": "20261024T070118318153Z_001_WH-98X852881V524644K-7JH33300RP307320A",
+        "event_id": "WH-98X852881V524644K-7JH33300RP307320A",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:01:05.807Z",
+        "received_at": "2026-10-24T07:01:18.318153Z",
+        "resource_ids": [
+          "NYJH5RKAXC9QW"
+        ],
+        "delay_seconds": 12.511
+      },
+      {
+        "name": "20261024T070138829975Z_001_WH-2LH7838027766830K-2EC47216S2736661V",
+        "event_id": "WH-2LH7838027766830K-2EC47216S2736661V",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:01:27.904Z",
+        "received_at": "2026-10-24T07:01:38.829975Z",
+        "resource_ids": [
+          "S9TRM576VR36S"
+        ],
+        "delay_seconds": 10.926
+      },
+      {
+        "name": "20261024T070148295545Z_001_WH-4FV14170E9313325R-6M875457GJ3162214",
+        "event_id": "WH-4FV14170E9313325R-6M875457GJ3162214",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T07:01:37.353Z",
+        "received_at": "2026-10-24T07:01:48.295545Z",
+        "resource_ids": [
+          "6R5WELGMZP5SQ"
+        ],
+        "delay_seconds": 10.943
+      },
+      {
+        "name": "20261024T070159956398Z_001_WH-9X13348012129673W-1TU618320N512840S",
+        "event_id": "WH-9X13348012129673W-1TU618320N512840S",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:01:49.464Z",
+        "received_at": "2026-10-24T07:01:59.956398Z",
+        "resource_ids": [
+          "S9TRM576VR36S"
+        ],
+        "delay_seconds": 10.492
+      },
+      {
+        "name": "20261024T070218252767Z_001_WH-4EB86485UX350851A-6SK58559WF456551K",
+        "event_id": "WH-4EB86485UX350851A-6SK58559WF456551K",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:02:07.345Z",
+        "received_at": "2026-10-24T07:02:18.252767Z",
+        "resource_ids": [
+          "5H5397MBCBLM8"
+        ],
+        "delay_seconds": 10.908
+      },
+      {
+        "name": "20261024T070229135952Z_001_WH-81L86817HH992842V-770618616S554943R",
+        "event_id": "WH-81L86817HH992842V-770618616S554943R",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T07:02:19.472Z",
+        "received_at": "2026-10-24T07:02:29.135952Z",
+        "resource_ids": [
+          "CT2XSZNX7EQTU"
+        ],
+        "delay_seconds": 9.664
+      },
+      {
+        "name": "20261024T070238536224Z_001_WH-6RD99503T3316645A-21D23376S26126250",
+        "event_id": "WH-6RD99503T3316645A-21D23376S26126250",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:02:27.349Z",
+        "received_at": "2026-10-24T07:02:38.536224Z",
+        "resource_ids": [
+          "5H5397MBCBLM8"
+        ],
+        "delay_seconds": 11.187
+      },
+      {
+        "name": "20261024T070258768863Z_001_WH-0YX71318RL1590204-17733083G7632883L",
+        "event_id": "WH-0YX71318RL1590204-17733083G7632883L",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:02:46.117Z",
+        "received_at": "2026-10-24T07:02:58.768863Z",
+        "resource_ids": [
+          "MYBEX8P299JL4"
+        ],
+        "delay_seconds": 12.652
+      },
+      {
+        "name": "20261024T070308438052Z_001_WH-38680926VU9067107-2RH40993B8937491J",
+        "event_id": "WH-38680926VU9067107-2RH40993B8937491J",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T07:02:57.908Z",
+        "received_at": "2026-10-24T07:03:08.438052Z",
+        "resource_ids": [
+          "7KPN54K59YFFL"
+        ],
+        "delay_seconds": 10.53
+      },
+      {
+        "name": "20261024T070318764770Z_001_WH-3XD697380X344573G-6SJ224557M401545T",
+        "event_id": "WH-3XD697380X344573G-6SJ224557M401545T",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:03:07.899Z",
+        "received_at": "2026-10-24T07:03:18.764770Z",
+        "resource_ids": [
+          "MYBEX8P299JL4"
+        ],
+        "delay_seconds": 10.866
+      },
+      {
+        "name": "20261024T070337926805Z_001_WH-62X693526J0359638-8JY04431KK4275440",
+        "event_id": "WH-62X693526J0359638-8JY04431KK4275440",
+        "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:03:25.633Z",
+        "received_at": "2026-10-24T07:03:37.926805Z",
+        "resource_ids": [
+          "53YFFR9A9YFEA"
+        ],
+        "delay_seconds": 12.294
+      },
+      {
+        "name": "20261024T070348589699Z_001_WH-46H33561N8659261W-7ML08444XA964620R",
+        "event_id": "WH-46H33561N8659261W-7ML08444XA964620R",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T07:03:37.914Z",
+        "received_at": "2026-10-24T07:03:48.589699Z",
+        "resource_ids": [
+          "HR4M4PS8QV4HC"
+        ],
+        "delay_seconds": 10.676
+      },
+      {
+        "name": "20261024T070358442910Z_001_WH-6KV88941YU907831D-4EE547900A921950Y",
+        "event_id": "WH-6KV88941YU907831D-4EE547900A921950Y",
+        "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "resource_type": "payouts",
+        "create_time": "2026-10-24T07:03:46.046Z",
+        "received_at": "2026-10-24T07:03:58.442910Z",
+        "resource_ids": [
+          "53YFFR9A9YFEA"
+        ],
+        "delay_seconds": 12.397
+      },
+      {
+        "name": "20261024T121609741311Z_001_WH-4BX26660W8212762H-9Y1148937B925651G",
+        "event_id": "WH-4BX26660W8212762H-9Y1148937B925651G",
+        "event_type": "PAYMENT.PAYOUTS-ITEM.RETURNED",
+        "resource_type": "payouts_item",
+        "create_time": "2026-10-24T12:15:56.792Z",
+        "received_at": "2026-10-24T12:16:09.741311Z",
+        "resource_ids": [
+          "EH7G4GY74KLLY"
+        ],
+        "delay_seconds": 12.949
+      },
+      {
+        "name": "20261024T121930272498Z_001_WH-6T502407GS8131338-4GH26629BG465125B",
+        "event_id": "WH-6T502407GS8131338-4GH26629BG465125B",
+        "event_type": "PAYMENT.CAPTURE.REFUNDED",
+        "resource_type": "refund",
+        "create_time": "2026-10-24T12:19:19.565Z",
+        "received_at": "2026-10-24T12:19:30.272498Z",
+        "resource_ids": [
+          "5FE62884TA6526206",
+          "69T54342EE2129538"
+        ],
+        "delay_seconds": 10.707
+      },
+      {
+        "name": "20261024T121937645339Z_001_WH-9F265567AR690063U-37860160SY5258744",
+        "event_id": "WH-9F265567AR690063U-37860160SY5258744",
+        "event_type": "CUSTOMER.DISPUTE.RESOLVED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-24T12:19:33.521Z",
+        "received_at": "2026-10-24T12:19:37.645339Z",
+        "resource_ids": [
+          "PP-R-JQM-10194292"
+        ],
+        "delay_seconds": 4.124
+      },
+      {
+        "name": "20261024T121938075673Z_001_WH-0FJ520991X252332U-16F92576MK003192W",
+        "event_id": "WH-0FJ520991X252332U-16F92576MK003192W",
+        "event_type": "CUSTOMER.DISPUTE.UPDATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-24T12:19:33.613Z",
+        "received_at": "2026-10-24T12:19:38.075673Z",
+        "resource_ids": [
+          "PP-R-XJK-10194293"
+        ],
+        "delay_seconds": 4.463
+      },
+      {
+        "name": "20261024T122117113446Z_001_WH-7P3563880T306724N-15G659343U8652353",
+        "event_id": "WH-7P3563880T306724N-15G659343U8652353",
+        "event_type": "CUSTOMER.DISPUTE.RESOLVED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-24T12:21:12.486Z",
+        "received_at": "2026-10-24T12:21:17.113446Z",
+        "resource_ids": [
+          "PP-R-XJK-10194293"
+        ],
+        "delay_seconds": 4.627
+      },
+      {
+        "name": "20261024T122137239995Z_001_WH-7VM68302K83275237-54S06522UE099814B",
+        "event_id": "WH-7VM68302K83275237-54S06522UE099814B",
+        "event_type": "CUSTOMER.DISPUTE.UPDATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-24T12:21:33.148Z",
+        "received_at": "2026-10-24T12:21:37.239995Z",
+        "resource_ids": [
+          "PP-R-UJV-10194294"
+        ],
+        "delay_seconds": 4.092
+      },
+      {
+        "name": "20261024T124908024056Z_001_WH-90P03166XY7210337-3XP85938SJ999024F",
+        "event_id": "WH-90P03166XY7210337-3XP85938SJ999024F",
+        "event_type": "CUSTOMER.DISPUTE.UPDATED",
+        "resource_type": "dispute",
+        "create_time": "2026-10-24T12:49:03.717Z",
+        "received_at": "2026-10-24T12:49:08.024056Z",
+        "resource_ids": [
+          "PP-R-UJV-10194294"
+        ],
+        "delay_seconds": 4.307
+      },
+      {
+        "name": "20261026T151443816843Z_001_WH-00D6056744338980W-8JF548727K252801B",
+        "event_id": "WH-00D6056744338980W-8JF548727K252801B",
+        "event_type": "PAYMENT.CAPTURE.COMPLETED",
+        "resource_type": "capture",
+        "create_time": "2026-10-23T22:02:30.847Z",
+        "received_at": "2026-10-26T15:14:43.816843Z",
+        "resource_ids": [
+          "69T54342EE2129538"
+        ],
+        "delay_seconds": 234732.97
+      }
+    ]
+  },
+  "notes": [
+    "verify-webhook-signature takes webhook_event as JSON, so PayPal checks a re-serialised event, not the exact received bytes; the raw bytes are kept (raw/webhooks/*.body) and the exact-bytes concern is recorded, not solved",
+    "simulator events use the mock webhook ID WEBHOOK_ID, so FAILURE is expected for them (F11); they are excluded from the verdict",
+    "resource IDs are read by event-name family from the documented resource schemas; the event-names page shows no sample payloads [pending D11]",
+    "a resent event shows up as a duplicate marked induced_by_resend",
+    "the event list was read with page_size=50; later pages were not followed"
+  ],
+  "observed_at": "2026-10-26T15:13:38.421939Z",
+  "evidence_files": [
+    "2026-10-23/D11/01_oauth_token.json",
+    "2026-10-23/D11/02_register_webhook.json"
+  ]
+}

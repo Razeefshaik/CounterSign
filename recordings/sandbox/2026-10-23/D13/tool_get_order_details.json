@@ -1,0 +1,186 @@
+{
+  "tool": "get_order_details",
+  "ok": true,
+  "output": {
+    "message": "The PayPal order 02028397HW8915403 has been successfully captured.",
+    "status": "COMPLETED",
+    "amount": "USD 400.00",
+    "raw": {
+      "id": "02028397HW8915403",
+      "intent": "CAPTURE",
+      "status": "COMPLETED",
+      "payment_source": {
+        "paypal": {
+          "email_address": "buyer-1@redacted",
+          "account_id": "HFJETABW9K8C6",
+          "account_status": "VERIFIED",
+          "name": {
+            "given_name": "John",
+            "surname": "Doe"
+          },
+          "address": {
+            "country_code": "US"
+          }
+        }
+      },
+      "purchase_units": [
+        {
+          "reference_id": "inr_400",
+          "amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          },
+          "payee": {
+            "email_address": "email@redacted",
+            "merchant_id": "B23JM5BDGPAF8"
+          },
+          "description": "Staged sandbox action: CounterSign check.",
+          "soft_descriptor": "TEST STORE",
+          "shipping": {
+            "name": {
+              "full_name": "John Doe"
+            },
+            "address": {
+              "address_line_1": "2211 N First St",
+              "admin_area_2": "San Jose",
+              "admin_area_1": "CA",
+              "postal_code": "95131",
+              "country_code": "US"
+            },
+            "trackers": [
+              {
+                "id": "1X031539U0011491U-9400111899223197428490",
+                "status": "SHIPPED",
+                "links": [
+                  {
+                    "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403",
+                    "rel": "up",
+                    "method": "GET"
+                  },
+                  {
+                    "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403/trackers/1X031539U0011491U-9400111899223197428490",
+                    "rel": "update",
+                    "method": "PATCH"
+                  }
+                ],
+                "notify_payer": false
+              }
+            ]
+          },
+          "payments": {
+            "captures": [
+              {
+                "id": "1X031539U0011491U",
+                "status": "PENDING",
+                "status_details": {
+                  "reason": "BUYER_COMPLAINT"
+                },
+                "amount": {
+                  "currency_code": "USD",
+                  "value": "400.00"
+                },
+                "final_capture": true,
+                "seller_protection": {
+                  "status": "ELIGIBLE",
+                  "dispute_categories": [
+                    "ITEM_NOT_RECEIVED",
+                    "UNAUTHORIZED_TRANSACTION"
+                  ]
+                },
+                "links": [
+                  {
+                    "href": "https://api.sandbox.paypal.com/v2/payments/captures/1X031539U0011491U",
+                    "rel": "self",
+                    "method": "GET"
+                  },
+                  {
+                    "href": "https://api.sandbox.paypal.com/v2/payments/captures/1X031539U0011491U/refund",
+                    "rel": "refund",
+                    "method": "POST"
+                  },
+                  {
+                    "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403",
+                    "rel": "up",
+                    "method": "GET"
+                  }
+                ],
+                "create_time": "2026-10-23T22:02:25Z",
+                "update_time": "2026-10-23T22:14:33Z"
+              }
+            ],
+            "refunds": [
+              {
+                "id": "1FJ49806UT252163G",
+                "amount": {
+                  "currency_code": "USD",
+                  "value": "385.55"
+                },
+                "seller_payable_breakdown": {
+                  "gross_amount": {
+                    "currency_code": "USD",
+                    "value": "385.55"
+                  },
+                  "paypal_fee": {
+                    "currency_code": "USD",
+                    "value": "0.00"
+                  },
+                  "platform_fees": [
+                    {
+                      "amount": {
+                        "currency_code": "USD",
+                        "value": "0.00"
+                      }
+                    }
+                  ],
+                  "net_amount": {
+                    "currency_code": "USD",
+                    "value": "385.55"
+                  },
+                  "total_refunded_amount": {
+                    "currency_code": "USD",
+                    "value": "0.00"
+                  }
+                },
+                "status": "PENDING",
+                "links": [
+                  {
+                    "href": "https://api.sandbox.paypal.com/v2/payments/refunds/1FJ49806UT252163G",
+                    "rel": "self",
+                    "method": "GET"
+                  },
+                  {
+                    "href": "https://api.sandbox.paypal.com/v2/payments/captures/1X031539U0011491U",
+                    "rel": "up",
+                    "method": "GET"
+                  }
+                ],
+                "create_time": "2026-10-23T15:14:33-07:00",
+                "update_time": "2026-10-23T15:14:33-07:00"
+              }
+            ]
+          }
+        }
+      ],
+      "payer": {
+        "name": {
+          "given_name": "John",
+          "surname": "Doe"
+        },
+        "email_address": "buyer-1@redacted",
+        "payer_id": "HFJETABW9K8C6",
+        "address": {
+          "country_code": "US"
+        }
+      },
+      "create_time": "2026-10-23T21:29:55Z",
+      "update_time": "2026-10-23T22:02:25Z",
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403",
+          "rel": "self",
+          "method": "GET"
+        }
+      ]
+    }
+  }
+}

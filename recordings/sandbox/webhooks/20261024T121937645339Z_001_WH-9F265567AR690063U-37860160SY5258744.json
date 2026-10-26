@@ -1,0 +1,136 @@
+{
+  "received_at": "2026-10-24T12:19:37.645339Z",
+  "event_id": "WH-9F265567AR690063U-37860160SY5258744",
+  "event_type": "CUSTOMER.DISPUTE.RESOLVED",
+  "resource_type": "dispute",
+  "create_time": "2026-10-24T12:19:33.521Z",
+  "sha256": "8ce59bbc1405f612429e56cfc138ddadf62005097884d23f7c191580fa60fe8f",
+  "size": 2279,
+  "raw_file": "raw/webhooks/20261024T121937645339Z_001_WH-9F265567AR690063U-37860160SY5258744.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "2279",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "ca4f8ea7dad34",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "2c59eba2-cfa5-11f1-a71f-c35ae6032c33",
+    "paypal-transmission-sig": "LHUaFS6PZOWRcKLbQY9MkUJn3CJyDdi4rpsxqFHPSizC3/inWwUL07VUZmBa4NMTAALdSldV5/7za0kV6qGA2z8XXuDNr2tkZt1C8dFfzFyGW/1ysJFeqT5l8QL8kn/qve0XIu+4Ialjv4+vw5G9X0QKOX3+Yxs4wLx2n/TJFr6vN6D15g+Gm50ygARO/r0mXyB/RjHTdyURy4oNx/ytcvRxsilvN1Hxv6mmj+qlZFSgoeYTQdqwWs3HWVX9474cwdRoBB12mVVPl6Ow58jQq9oo87zxdXvYB1ElV9rF6VmSL+OoUWAvXSwjdvtSK4VE28hLQvMUyeZkVF26Kjd8pg==",
+    "paypal-transmission-time": "2026-10-24T12:19:34Z",
+    "x-forwarded-for": "173.0.80.117",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-9F265567AR690063U-37860160SY5258744",
+    "event_version": "1.0",
+    "create_time": "2026-10-24T12:19:33.521Z",
+    "resource_type": "dispute",
+    "event_type": "CUSTOMER.DISPUTE.RESOLVED",
+    "summary": "A dispute was resolved with case # PP-R-JQM-10194292",
+    "resource": {
+      "dispute_id": "PP-R-JQM-10194292",
+      "create_time": "2026-10-23T22:11:16.275Z",
+      "update_time": "2026-10-24T12:19:03.892Z",
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "728873272J7565128",
+          "seller_transaction_id": "1X031539U0011491U",
+          "transaction_status": "COMPLETED",
+          "seller": {
+            "merchant_id": "B23JM5BDGPAF8",
+            "name": "Test Store"
+          },
+          "items": [
+            {
+              "item_name": "Staged sandbox action: CounterSign check.",
+              "item_description": "Staged sandbox action: CounterSign check.",
+              "item_quantity": "1",
+              "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+              "item_type": "PRODUCT"
+            }
+          ],
+          "seller_protection_eligible": true,
+          "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+        }
+      ],
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "status": "RESOLVED",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "400.00"
+      },
+      "dispute_outcome": {
+        "outcome_code": "RESOLVED_SELLER_FAVOUR",
+        "outcome_reason": "INELIGIBLE_BUYER_PROTECTION_POLICY"
+      },
+      "adjudications": [
+        {
+          "type": "DENY_BUYER",
+          "adjudication_time": "2026-10-24T12:17:02.172Z",
+          "reason": "INELIGIBLE_BUYER_PROTECTION_POLICY",
+          "dispute_life_cycle_stage": "CHARGEBACK"
+        }
+      ],
+      "fund_movements": [
+        {
+          "party": "RECEIVER",
+          "amount": {
+            "currency_code": "USD",
+            "value": "385.55"
+          },
+          "initiated_time": "2026-10-23T22:14:34.000Z",
+          "type": "DEBIT",
+          "reason": "HOLD_PLACED"
+        },
+        {
+          "party": "RECEIVER",
+          "amount": {
+            "currency_code": "USD",
+            "value": "385.55"
+          },
+          "initiated_time": "2026-10-24T12:18:03.000Z",
+          "type": "CREDIT",
+          "reason": "HOLD_RELEASED"
+        }
+      ],
+      "dispute_life_cycle_stage": "CHARGEBACK",
+      "dispute_channel": "INTERNAL",
+      "offer": {
+        "buyer_requested_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        }
+      },
+      "refund_details": {
+        "allowed_refund_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        }
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+          "rel": "self",
+          "method": "GET"
+        }
+      ]
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-9F265567AR690063U-37860160SY5258744",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-9F265567AR690063U-37860160SY5258744/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

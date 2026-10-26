@@ -1,0 +1,119 @@
+{
+  "received_at": "2026-10-24T12:49:08.024056Z",
+  "event_id": "WH-90P03166XY7210337-3XP85938SJ999024F",
+  "event_type": "CUSTOMER.DISPUTE.UPDATED",
+  "resource_type": "dispute",
+  "create_time": "2026-10-24T12:49:03.717Z",
+  "sha256": "e28cb2d2a1b6ddef9383034f0eae0e74b0c9b9d11886952078535c62b123d9bf",
+  "size": 1982,
+  "raw_file": "raw/webhooks/20261024T124908024056Z_001_WH-90P03166XY7210337-3XP85938SJ999024F.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "1982",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "f396968989d33",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "4b704f2d-cfa9-11f1-9e4a-9b496aa350f5",
+    "paypal-transmission-sig": "I5GEEFNtNfkCS/cOsvTT2ElCXsOnNJowXiD7HfTA4squRc/LebLWRGNvZ5GkHvWY/HWJ2+vHhDWeFFXtAJaJqQCuI5lRuikeH4ZvHAKdSop/PNgL0xKdISHvS/G8YxTViim4p6TWDqeoaRhhTwOjflecvrfIIrRjUnLwpLvpcbtAcYK22nSy9CeABDhre4ulYINCioMFw/86KesX7xA7+XJYIEPGrg93C+txrrocTr2/Rsy7TEllUuvaW04uD1nOCBopSH3mllsarZ00jkZqmzPVhbGbauCWyxMc36QZkD7FS0fg2zVJDKcp7D8xjCugFWgc00C+oNo8REFRGEU2Ew==",
+    "paypal-transmission-time": "2026-10-24T12:49:04Z",
+    "x-forwarded-for": "173.0.80.116",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-90P03166XY7210337-3XP85938SJ999024F",
+    "event_version": "1.0",
+    "create_time": "2026-10-24T12:49:03.717Z",
+    "resource_type": "dispute",
+    "event_type": "CUSTOMER.DISPUTE.UPDATED",
+    "summary": "A dispute was updated with case # PP-R-UJV-10194294",
+    "resource": {
+      "dispute_id": "PP-R-UJV-10194294",
+      "create_time": "2026-10-23T22:15:33.871Z",
+      "update_time": "2026-10-24T12:48:47.275Z",
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "0GS74555A8389573J",
+          "seller_transaction_id": "7UX45139662355119",
+          "transaction_status": "HELD",
+          "seller": {
+            "merchant_id": "B23JM5BDGPAF8",
+            "name": "Test Store"
+          },
+          "items": [
+            {
+              "item_name": "Staged sandbox action: CounterSign check.",
+              "item_description": "Staged sandbox action: CounterSign check.",
+              "item_quantity": "1",
+              "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+              "item_type": "PRODUCT"
+            }
+          ],
+          "seller_protection_eligible": true,
+          "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+        }
+      ],
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "status": "UNDER_REVIEW",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "25.00"
+      },
+      "fund_movements": [
+        {
+          "party": "RECEIVER",
+          "amount": {
+            "currency_code": "USD",
+            "value": "23.64"
+          },
+          "initiated_time": "2026-10-23T22:18:34.000Z",
+          "type": "DEBIT",
+          "reason": "HOLD_PLACED"
+        }
+      ],
+      "dispute_life_cycle_stage": "CHARGEBACK",
+      "dispute_channel": "INTERNAL",
+      "offer": {
+        "buyer_requested_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        }
+      },
+      "refund_details": {
+        "allowed_refund_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        }
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294/provide-supporting-info",
+          "rel": "provide_supporting_info",
+          "method": "POST"
+        }
+      ]
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-90P03166XY7210337-3XP85938SJ999024F",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-90P03166XY7210337-3XP85938SJ999024F/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "method": "POST",
+  "path": "/v1/payments/payouts-item/ERRPYO008/cancel",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "content-length": "0",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 400,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-length": "242",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f634964980425-662a0e84caeb45df-01\"",
+    "matched-stub-id": "2ae1ebca-78bb-40f2-ac75-b0e5f32f928f",
+    "paypal-debug-id": "f634964980425",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "server": "nginx",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "accept-ranges": "bytes",
+    "via": "1.1 varnish, 1.1 varnish",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:20 GMT",
+    "x-served-by": "cache-sin-wsap440085-SIN, cache-sin-wsap440085-SIN, cache-maa10236-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825100.607930,VS0,VE960",
+    "vary": "Accept-Encoding"
+  },
+  "response_body": {
+    "name": "ITEM_CANCELLATION_FAILED",
+    "message": "Cancel request for the item failed due to an internal error.",
+    "debug_id": "56236ee451ef4",
+    "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+  },
+  "t_sent": "2026-10-24T06:58:21.602461Z",
+  "t_recv": "2026-10-24T06:58:22.613082Z"
+}

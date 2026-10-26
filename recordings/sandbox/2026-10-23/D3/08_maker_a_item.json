@@ -1,0 +1,73 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts-item/YY5BLYXZR8WHE",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "date": "Fri, 23 Oct 2026 22:16:44 GMT",
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f41b9aec32",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f41b9aec32-660c36ed532a68b9-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-encoding": "gzip",
+    "cf-ray": "a4f41b9aec3274eb-BOM"
+  },
+  "response_body": {
+    "payout_item_id": "YY5BLYXZR8WHE",
+    "transaction_id": "45716010RL1846810",
+    "activity_id": "5NL64487259093922",
+    "transaction_status": "SUCCESS",
+    "payout_item_fee": {
+      "currency": "USD",
+      "value": "0.25"
+    },
+    "payout_batch_id": "MZ6LMVL8FZDYG",
+    "sender_batch_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+    "payout_item": {
+      "recipient_type": "EMAIL",
+      "amount": {
+        "currency": "USD",
+        "value": "1.00"
+      },
+      "note": "Staged sandbox action: CounterSign check.",
+      "receiver": "maker-a@redacted",
+      "sender_item_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+      "recipient_wallet": "PAYPAL",
+      "purpose": "GOODS"
+    },
+    "time_processed": "2026-10-23T22:16:27Z",
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/YY5BLYXZR8WHE",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/MZ6LMVL8FZDYG",
+        "rel": "batch",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-23T22:16:46.177945Z",
+  "t_recv": "2026-10-23T22:16:46.601394Z"
+}

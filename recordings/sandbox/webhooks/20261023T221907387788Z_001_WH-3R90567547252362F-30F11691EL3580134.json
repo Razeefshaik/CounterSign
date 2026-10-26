@@ -1,0 +1,133 @@
+{
+  "received_at": "2026-10-23T22:19:07.387788Z",
+  "event_id": "WH-3R90567547252362F-30F11691EL3580134",
+  "event_type": "CUSTOMER.DISPUTE.UPDATED",
+  "resource_type": "dispute",
+  "create_time": "2026-10-23T22:19:03.683Z",
+  "sha256": "29d944cb868c8b3c492e31657036249675813a40dcee904159c83d0e9b801987",
+  "size": 2263,
+  "raw_file": "raw/webhooks/20261023T221907387788Z_001_WH-3R90567547252362F-30F11691EL3580134.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "2263",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "000000000000000067eefbd8bb06659d",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "c1aaba85-cf2f-11f1-8c96-65fdc1e2ce0e",
+    "paypal-transmission-sig": "aB7nEStuYDWSKfAzs6PGVo1r4srS+1i2WKmXrllMGwMAlq6+czBqn0woffyxrCIcyj78LkUuS+PsnWVg878jhkTBFW2vabZrHqFlSSRVLHkl4qeKstkYjraEAcoBt2wA5TjFMeB2T6o1G5dWeSh9poKg5WeLC7yMBPDTzAtIywpE+kzdwvLiAeDVDKVcUSbgsFhsqx9s1I403jwLUCZVeX6H5g2Jf2JDN+hkALvqC0401m4Ymx7QAxdvEJcSeqvhKcNgzjZiGC3AwFjzow0ALSzA9zZfdlYfUysLXjko0oSOVMki0jwA9HQmbl7i/3BgPtN0ZmAkdRK3YL71fSFA5Q==",
+    "paypal-transmission-time": "2026-10-23T22:19:04Z",
+    "x-forwarded-for": "173.0.80.116",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-3R90567547252362F-30F11691EL3580134",
+    "event_version": "1.0",
+    "create_time": "2026-10-23T22:19:03.683Z",
+    "resource_type": "dispute",
+    "event_type": "CUSTOMER.DISPUTE.UPDATED",
+    "summary": "A dispute was updated with case # PP-R-UJV-10194294",
+    "resource": {
+      "dispute_id": "PP-R-UJV-10194294",
+      "create_time": "2026-10-23T22:15:33.871Z",
+      "update_time": "2026-10-23T22:18:44.070Z",
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "0GS74555A8389573J",
+          "seller_transaction_id": "7UX45139662355119",
+          "transaction_status": "HELD",
+          "seller": {
+            "merchant_id": "B23JM5BDGPAF8",
+            "name": "Test Store"
+          },
+          "items": [
+            {
+              "item_name": "Staged sandbox action: CounterSign check.",
+              "item_description": "Staged sandbox action: CounterSign check.",
+              "item_quantity": "1",
+              "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+              "item_type": "PRODUCT"
+            }
+          ],
+          "seller_protection_eligible": true,
+          "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+        }
+      ],
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "status": "WAITING_FOR_SELLER_RESPONSE",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "25.00"
+      },
+      "fund_movements": [
+        {
+          "party": "RECEIVER",
+          "amount": {
+            "currency_code": "USD",
+            "value": "23.64"
+          },
+          "initiated_time": "2026-10-23T22:18:34.000Z",
+          "type": "DEBIT",
+          "reason": "HOLD_PLACED"
+        }
+      ],
+      "dispute_life_cycle_stage": "CHARGEBACK",
+      "dispute_channel": "INTERNAL",
+      "seller_response_due_date": "2026-11-03T04:59:59.000Z",
+      "offer": {
+        "buyer_requested_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        }
+      },
+      "refund_details": {
+        "allowed_refund_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        }
+      },
+      "allowed_response_options": {
+        "accept_claim": {
+          "accept_claim_types": [
+            "REFUND",
+            "PARTIAL_REFUND"
+          ]
+        }
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294/provide-evidence",
+          "rel": "provide_evidence",
+          "method": "POST"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294/accept-claim",
+          "rel": "accept_claim",
+          "method": "POST"
+        }
+      ]
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-3R90567547252362F-30F11691EL3580134",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-3R90567547252362F-30F11691EL3580134/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

@@ -1,0 +1,967 @@
+{
+  "schema_version": 1,
+  "check_id": "D8",
+  "completed_steps": [
+    "load_inputs",
+    "api_route",
+    "open_in_resolution_center",
+    "find_disputes",
+    "inspect_disputes",
+    "observe_hold",
+    "findings"
+  ],
+  "data": {
+    "captures": {
+      "inr_400": "1X031539U0011491U",
+      "snad_60": "69T54342EE2129538",
+      "spare_25": "7UX45139662355119"
+    },
+    "create_scope": true,
+    "baseline_balance": {
+      "fetched_at": "2026-10-23T22:04:26.823640Z",
+      "status": 200,
+      "available": "5000.00",
+      "withheld": "0.00",
+      "total": "5000.00",
+      "last_refresh_time": "2026-10-23T19:59:59Z",
+      "as_of_time": "2026-10-23T19:59:59Z"
+    },
+    "api_attempted_at": "2026-10-23T22:07:02.909315Z",
+    "api_route": {
+      "verdict": "BLOCKED",
+      "status": 400,
+      "error_name": null
+    },
+    "disputes": {
+      "inr_400": {
+        "route": "RESOLUTION_CENTER",
+        "submitted_at": "2026-10-23T22:11:34.644294Z",
+        "dispute_id": "PP-R-JQM-10194292",
+        "first_seen_at": "2026-10-23T22:15:50.206856Z",
+        "seconds_to_appear": 255.563,
+        "matched_field": "seller_transaction_id",
+        "polls": 1,
+        "initial": {
+          "status": "UNDER_REVIEW",
+          "dispute_life_cycle_stage": "CHARGEBACK",
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+          "dispute_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          },
+          "seller_response_due_date": null,
+          "dispute_outcome": null,
+          "rels": [
+            "provide_supporting_info",
+            "self"
+          ]
+        },
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "728873272J7565128",
+            "seller_transaction_id": "1X031539U0011491U",
+            "create_time": "2026-10-23T22:02:25.000Z",
+            "transaction_status": "HELD",
+            "gross_amount": {
+              "currency_code": "USD",
+              "value": "400.00"
+            },
+            "buyer": {
+              "email": "buyer-1@redacted",
+              "payer_id": "HFJETABW9K8C6",
+              "name": "John Doe"
+            },
+            "seller": {
+              "email": "email@redacted",
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ]
+      },
+      "snad_60": {
+        "route": "RESOLUTION_CENTER",
+        "submitted_at": "2026-10-23T22:13:56.716712Z",
+        "dispute_id": "PP-R-XJK-10194293",
+        "first_seen_at": "2026-10-23T22:17:54.177089Z",
+        "seconds_to_appear": 237.46,
+        "matched_field": "seller_transaction_id",
+        "polls": 3,
+        "initial": {
+          "status": "WAITING_FOR_SELLER_RESPONSE",
+          "dispute_life_cycle_stage": "INQUIRY",
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+          "dispute_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          },
+          "seller_response_due_date": "2026-11-12T22:13:43.725Z",
+          "dispute_outcome": null,
+          "rels": [
+            "accept_claim",
+            "escalate",
+            "make_offer",
+            "self",
+            "send_message"
+          ]
+        },
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "1KC99580K1831703T",
+            "seller_transaction_id": "69T54342EE2129538",
+            "create_time": "2026-10-23T22:02:27.000Z",
+            "transaction_status": "HELD",
+            "gross_amount": {
+              "currency_code": "USD",
+              "value": "60.00"
+            },
+            "buyer": {
+              "email": "buyer-1@redacted",
+              "payer_id": "HFJETABW9K8C6",
+              "name": "John Doe"
+            },
+            "seller": {
+              "email": "email@redacted",
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+                "notes": "fdsfgsdf asljkdha  asdas da asdias udsaidu adj asdljasdlkajsdasd uoiudewoiru ceruoids ds dsdnsd asljkdasdeoidrueoiruoiruere",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ]
+      },
+      "spare_25": {
+        "route": "RESOLUTION_CENTER",
+        "submitted_at": "2026-10-23T22:15:48.776468Z",
+        "dispute_id": "PP-R-UJV-10194294",
+        "first_seen_at": "2026-10-23T22:18:58.271795Z",
+        "seconds_to_appear": 189.495,
+        "matched_field": "seller_transaction_id",
+        "polls": 2,
+        "initial": {
+          "status": "WAITING_FOR_SELLER_RESPONSE",
+          "dispute_life_cycle_stage": "CHARGEBACK",
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+          "dispute_amount": {
+            "currency_code": "USD",
+            "value": "25.00"
+          },
+          "seller_response_due_date": "2026-11-03T04:59:59.000Z",
+          "dispute_outcome": null,
+          "rels": [
+            "accept_claim",
+            "provide_evidence",
+            "self"
+          ]
+        },
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "0GS74555A8389573J",
+            "seller_transaction_id": "7UX45139662355119",
+            "create_time": "2026-10-23T22:02:29.000Z",
+            "transaction_status": "HELD",
+            "gross_amount": {
+              "currency_code": "USD",
+              "value": "25.00"
+            },
+            "buyer": {
+              "email": "buyer-1@redacted",
+              "payer_id": "HFJETABW9K8C6",
+              "name": "John Doe"
+            },
+            "seller": {
+              "email": "email@redacted",
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ]
+      }
+    },
+    "timeline": [
+      {
+        "at": "2026-10-23T22:15:50.206856Z",
+        "source": "D8",
+        "event": "DISPUTE_CREATED",
+        "resource_id": "PP-R-JQM-10194292",
+        "amount_minor": 40000,
+        "currency": "USD",
+        "paypal_time": "2026-10-23T22:11:16.275Z"
+      },
+      {
+        "at": "2026-10-23T22:17:54.177089Z",
+        "source": "D8",
+        "event": "DISPUTE_CREATED",
+        "resource_id": "PP-R-XJK-10194293",
+        "amount_minor": 6000,
+        "currency": "USD",
+        "paypal_time": "2026-10-23T22:13:43.725Z"
+      },
+      {
+        "at": "2026-10-23T22:18:58.271795Z",
+        "source": "D8",
+        "event": "DISPUTE_CREATED",
+        "resource_id": "PP-R-UJV-10194294",
+        "amount_minor": 2500,
+        "currency": "USD",
+        "paypal_time": "2026-10-23T22:15:33.871Z"
+      }
+    ],
+    "hold_observations": [
+      {
+        "at": "2026-10-23T22:19:02.469454Z",
+        "balance": {
+          "fetched_at": "2026-10-23T22:19:03.621474Z",
+          "status": 200,
+          "available": "5000.00",
+          "withheld": "0.00",
+          "total": "5000.00",
+          "last_refresh_time": "2026-10-23T19:59:59Z",
+          "as_of_time": "2026-10-23T19:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-23T22:24:05.909789Z",
+        "balance": {
+          "fetched_at": "2026-10-23T22:24:07.147370Z",
+          "status": 200,
+          "available": "5000.00",
+          "withheld": "0.00",
+          "total": "5000.00",
+          "last_refresh_time": "2026-10-23T19:59:59Z",
+          "as_of_time": "2026-10-23T19:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-23T22:29:10.446325Z",
+        "balance": {
+          "fetched_at": "2026-10-23T22:29:11.808492Z",
+          "status": 200,
+          "available": "5000.00",
+          "withheld": "0.00",
+          "total": "5000.00",
+          "last_refresh_time": "2026-10-23T20:59:59Z",
+          "as_of_time": "2026-10-23T20:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-23T22:34:14.295719Z",
+        "balance": {
+          "fetched_at": "2026-10-23T22:34:15.321597Z",
+          "status": 200,
+          "available": "5000.00",
+          "withheld": "0.00",
+          "total": "5000.00",
+          "last_refresh_time": "2026-10-23T20:59:59Z",
+          "as_of_time": "2026-10-23T20:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T06:58:01.769188Z",
+        "balance": {
+          "fetched_at": "2026-10-24T06:58:02.302589Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:29:59Z",
+          "as_of_time": "2026-10-24T05:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:03:05.832464Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:03:07.005659Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:29:59Z",
+          "as_of_time": "2026-10-24T05:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:08:10.158770Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:08:11.404701Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:29:59Z",
+          "as_of_time": "2026-10-24T05:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:13:13.184851Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:13:14.013059Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:29:59Z",
+          "as_of_time": "2026-10-24T05:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:18:16.971923Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:18:18.223917Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:29:59Z",
+          "as_of_time": "2026-10-24T05:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:23:21.433654Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:23:22.611828Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:59:59Z",
+          "as_of_time": "2026-10-24T05:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:28:25.941003Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:28:26.471782Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:59:59Z",
+          "as_of_time": "2026-10-24T05:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:33:29.986917Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:33:31.374182Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:59:59Z",
+          "as_of_time": "2026-10-24T05:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:38:33.153337Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:38:33.752712Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:59:59Z",
+          "as_of_time": "2026-10-24T05:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:43:36.366180Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:43:37.720138Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:59:59Z",
+          "as_of_time": "2026-10-24T05:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:48:41.561051Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:48:56.589255Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:59:59Z",
+          "as_of_time": "2026-10-24T05:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:54:01.146334Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:54:02.322806Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T05:59:59Z",
+          "as_of_time": "2026-10-24T05:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T07:59:05.225049Z",
+        "balance": {
+          "fetched_at": "2026-10-24T07:59:06.237440Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T06:29:59Z",
+          "as_of_time": "2026-10-24T06:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:04:09.706316Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:04:10.948737Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T06:29:59Z",
+          "as_of_time": "2026-10-24T06:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:09:14.047730Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:09:14.726305Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T06:29:59Z",
+          "as_of_time": "2026-10-24T06:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:14:16.535185Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:14:17.692859Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T06:29:59Z",
+          "as_of_time": "2026-10-24T06:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:19:20.555198Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:19:21.608515Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T06:29:59Z",
+          "as_of_time": "2026-10-24T06:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:24:25.291868Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:24:25.962355Z",
+          "status": 200,
+          "available": "4998.75",
+          "withheld": "0.00",
+          "total": "4998.75",
+          "last_refresh_time": "2026-10-24T06:29:59Z",
+          "as_of_time": "2026-10-24T06:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:29:28.225978Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:29:28.918135Z",
+          "status": 200,
+          "available": "4995.00",
+          "withheld": "0.00",
+          "total": "4995.00",
+          "last_refresh_time": "2026-10-24T06:59:59Z",
+          "as_of_time": "2026-10-24T06:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:34:31.507462Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:34:32.108047Z",
+          "status": 200,
+          "available": "4995.00",
+          "withheld": "0.00",
+          "total": "4995.00",
+          "last_refresh_time": "2026-10-24T06:59:59Z",
+          "as_of_time": "2026-10-24T06:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:39:33.981385Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:39:34.595108Z",
+          "status": 200,
+          "available": "4995.00",
+          "withheld": "0.00",
+          "total": "4995.00",
+          "last_refresh_time": "2026-10-24T06:59:59Z",
+          "as_of_time": "2026-10-24T06:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:44:36.368793Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:44:36.945823Z",
+          "status": 200,
+          "available": "4995.00",
+          "withheld": "0.00",
+          "total": "4995.00",
+          "last_refresh_time": "2026-10-24T06:59:59Z",
+          "as_of_time": "2026-10-24T06:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:49:38.713906Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:49:39.454442Z",
+          "status": 200,
+          "available": "4995.00",
+          "withheld": "0.00",
+          "total": "4995.00",
+          "last_refresh_time": "2026-10-24T06:59:59Z",
+          "as_of_time": "2026-10-24T06:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:54:41.241442Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:54:41.828394Z",
+          "status": 200,
+          "available": "4995.00",
+          "withheld": "0.00",
+          "total": "4995.00",
+          "last_refresh_time": "2026-10-24T06:59:59Z",
+          "as_of_time": "2026-10-24T06:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T08:59:43.635930Z",
+        "balance": {
+          "fetched_at": "2026-10-24T08:59:44.235245Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:29:59Z",
+          "as_of_time": "2026-10-24T07:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T09:04:46.267471Z",
+        "balance": {
+          "fetched_at": "2026-10-24T09:04:47.719237Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:29:59Z",
+          "as_of_time": "2026-10-24T07:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T09:09:49.613496Z",
+        "balance": {
+          "fetched_at": "2026-10-24T09:09:50.354673Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:29:59Z",
+          "as_of_time": "2026-10-24T07:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T09:14:53.198453Z",
+        "balance": {
+          "fetched_at": "2026-10-24T09:14:55.982574Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:29:59Z",
+          "as_of_time": "2026-10-24T07:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T09:20:00.575658Z",
+        "balance": {
+          "fetched_at": "2026-10-24T09:20:01.975049Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:29:59Z",
+          "as_of_time": "2026-10-24T07:29:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T09:25:03.916060Z",
+        "balance": {
+          "fetched_at": "2026-10-24T09:25:05.757758Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:59:59Z",
+          "as_of_time": "2026-10-24T07:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T09:30:09.580427Z",
+        "balance": {
+          "fetched_at": "2026-10-24T09:30:11.098305Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:59:59Z",
+          "as_of_time": "2026-10-24T07:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T09:35:13.043528Z",
+        "balance": {
+          "fetched_at": "2026-10-24T09:35:14.550329Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:59:59Z",
+          "as_of_time": "2026-10-24T07:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      },
+      {
+        "at": "2026-10-24T09:40:17.073926Z",
+        "balance": {
+          "fetched_at": "2026-10-24T09:40:17.707353Z",
+          "status": 200,
+          "available": "4988.75",
+          "withheld": "0.00",
+          "total": "4988.75",
+          "last_refresh_time": "2026-10-24T07:59:59Z",
+          "as_of_time": "2026-10-24T07:59:59Z"
+        },
+        "captures": {
+          "inr_400": "PENDING",
+          "snad_60": "PENDING",
+          "spare_25": "PENDING"
+        }
+      }
+    ],
+    "check_id": "D8",
+    "verdict": "DIFFERENT",
+    "creation_verdict": "CONFIRMED",
+    "hold_verdict": "DIFFERENT",
+    "not_found": [],
+    "hold": {
+      "valid_observations": 37,
+      "total_observations": 37,
+      "expected_withheld_increase_minor": 48500,
+      "largest_withheld_increase_minor": 0,
+      "first_full_hold_seen_at": null,
+      "hold_observed": false,
+      "hold_verdict": "DIFFERENT",
+      "capture_statuses_seen": [
+        "inr_400:PENDING",
+        "snad_60:PENDING",
+        "spare_25:PENDING"
+      ]
+    },
+    "created_webhooks": [
+      {
+        "event_id": "WH-2LJ05453DV740643U-3DC22927617099520",
+        "dispute_id": "PP-R-JQM-10194292",
+        "create_time": "2026-10-23T22:14:34.055Z",
+        "received_at": "2026-10-23T22:14:37.807619Z",
+        "file": "webhooks/20261023T221437807619Z_001_WH-2LJ05453DV740643U-3DC22927617099520.json",
+        "delay_seconds": 3.753
+      },
+      {
+        "event_id": "WH-3F865444SY1605603-42W54259FR0589717",
+        "dispute_id": "PP-R-XJK-10194293",
+        "create_time": "2026-10-23T22:17:03.563Z",
+        "received_at": "2026-10-23T22:17:07.826153Z",
+        "file": "webhooks/20261023T221707826153Z_001_WH-3F865444SY1605603-42W54259FR0589717.json",
+        "delay_seconds": 4.263
+      },
+      {
+        "event_id": "WH-87U062412L835453W-465362520T6583722",
+        "dispute_id": "PP-R-UJV-10194294",
+        "create_time": "2026-10-23T22:18:33.162Z",
+        "received_at": "2026-10-23T22:18:37.181670Z",
+        "file": "webhooks/20261023T221837181670Z_001_WH-87U062412L835453W-465362520T6583722.json",
+        "delay_seconds": 4.02
+      }
+    ],
+    "notes": [
+      "submitted_at is when the operator confirmed, an upper bound on the submit time",
+      "balance figures are as PayPal reported them; see D12 for refresh lag"
+    ],
+    "observed_at": "2026-10-23T22:04:24.280250Z",
+    "evidence_files": [
+      "2026-10-23/D8/01_oauth_token.json",
+      "2026-10-23/D8/02_baseline_balance.json",
+      "2026-10-23/D8/03_balance_snapshot.json",
+      "2026-10-23/D8/04_api_create_dispute.json",
+      "2026-10-23/D8/05_balance_snapshot.json",
+      "2026-10-23/D8/06_balance_snapshot.json",
+      "2026-10-23/D8/07_find_inr_400_list.json",
+      "2026-10-23/D8/08_find_inr_400_detail.json",
+      "2026-10-23/D8/09_find_snad_60_list.json",
+      "2026-10-23/D8/10_find_snad_60_list.json",
+      "2026-10-23/D8/11_find_snad_60_list.json",
+      "2026-10-23/D8/12_find_snad_60_detail.json",
+      "2026-10-23/D8/13_find_spare_25_list.json",
+      "2026-10-23/D8/14_find_spare_25_list.json",
+      "2026-10-23/D8/15_find_spare_25_detail.json",
+      "2026-10-23/D8/16_inspect_inr_400.json",
+      "2026-10-23/D8/17_inspect_snad_60.json",
+      "2026-10-23/D8/18_inspect_spare_25.json",
+      "2026-10-23/D8/19_hold_balance.json",
+      "2026-10-23/D8/20_hold_capture_inr_400.json",
+      "2026-10-23/D8/21_hold_capture_snad_60.json",
+      "2026-10-23/D8/22_hold_capture_spare_25.json",
+      "2026-10-23/D8/23_balance_snapshot.json",
+      "2026-10-23/D8/24_hold_balance.json",
+      "2026-10-23/D8/25_hold_capture_inr_400.json",
+      "2026-10-23/D8/26_hold_capture_snad_60.json",
+      "2026-10-23/D8/27_hold_capture_spare_25.json",
+      "2026-10-23/D8/28_balance_snapshot.json",
+      "2026-10-23/D8/29_hold_balance.json",
+      "2026-10-23/D8/30_hold_capture_inr_400.json",
+      "2026-10-23/D8/31_hold_capture_snad_60.json",
+      "2026-10-23/D8/32_hold_capture_spare_25.json",
+      "2026-10-23/D8/33_balance_snapshot.json",
+      "2026-10-23/D8/34_hold_balance.json",
+      "2026-10-23/D8/35_hold_capture_inr_400.json",
+      "2026-10-23/D8/36_hold_capture_snad_60.json",
+      "2026-10-23/D8/37_hold_capture_spare_25.json",
+      "2026-10-23/D8/38_balance_snapshot.json"
+    ]
+  },
+  "in_progress": null,
+  "started_at": "2026-10-23T22:04:24.280250Z",
+  "updated_at": "2026-10-24T09:40:21.069876Z"
+}

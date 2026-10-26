@@ -1,0 +1,83 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts-item/27K3KYVCVZZV6",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f89260977706f",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f89260977706f-e714bc34b3cba087-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 11:55:55 GMT",
+    "x-served-by": "cache-sin-wsss1830078-SIN, cache-sin-wsss1830072-SIN, cache-maa10236-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793015754.399189,VS0,VE992",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "payout_item_id": "27K3KYVCVZZV6",
+    "transaction_id": "72E96294377283213",
+    "activity_id": "0B0794250U629102C",
+    "transaction_status": "UNCLAIMED",
+    "payout_item_fee": {
+      "currency": "USD",
+      "value": "0.25"
+    },
+    "payout_batch_id": "66T9EUC3HR2JY",
+    "sender_batch_id": "cs-01a16cb3-d7da-756b-878b-97c7e0123522-a1",
+    "payout_item": {
+      "recipient_type": "EMAIL",
+      "amount": {
+        "currency": "USD",
+        "value": "1.00"
+      },
+      "note": "Staged sandbox action: CounterSign check.",
+      "receiver": "unreg-2@redacted",
+      "sender_item_id": "cs-01a16cb3-d7da-756b-878b-97c7e0123522-a1",
+      "recipient_wallet": "PAYPAL",
+      "purpose": "GOODS"
+    },
+    "time_processed": "2026-10-24T06:58:21Z",
+    "errors": {
+      "name": "RECEIVER_UNREGISTERED",
+      "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+      "details": [],
+      "links": []
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/27K3KYVCVZZV6",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/66T9EUC3HR2JY",
+        "rel": "batch",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-26T11:55:54.964986Z",
+  "t_recv": "2026-10-26T11:55:56.130794Z"
+}

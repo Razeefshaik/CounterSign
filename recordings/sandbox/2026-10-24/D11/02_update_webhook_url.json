@@ -1,0 +1,149 @@
+{
+  "method": "PATCH",
+  "path": "/v1/notifications/webhooks/33T43630L2343754N",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "101",
+    "content-type": "application/json"
+  },
+  "request_body": [
+    {
+      "op": "replace",
+      "path": "/url",
+      "value": "https://TUNNEL.ngrok-free.app/webhooks/paypal"
+    }
+  ],
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "paypal-debug-id": "f68272132e702",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-language": "",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f68272132e702-fa1129a4bffc9d20-01\"",
+    "content-type": "application/json",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:13 GMT",
+    "x-served-by": "cache-sin-wsat1880044-SIN, cache-sin-wsat1880044-SIN, cache-maa10222-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825093.626015,VS0,VE964",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "id": "33T43630L2343754N",
+    "url": "https://TUNNEL.ngrok-free.app/webhooks/paypal",
+    "event_types": [
+      {
+        "name": "CUSTOMER.DISPUTE.CREATED",
+        "description": "A customer dispute is created."
+      },
+      {
+        "name": "CUSTOMER.DISPUTE.RESOLVED",
+        "description": "A customer dispute is resolved."
+      },
+      {
+        "name": "CUSTOMER.DISPUTE.UPDATED",
+        "description": "A customer dispute is updated."
+      },
+      {
+        "name": "PAYMENT.CAPTURE.COMPLETED",
+        "description": "A payment capture completes."
+      },
+      {
+        "name": "PAYMENT.CAPTURE.DENIED",
+        "description": "A payment capture is denied."
+      },
+      {
+        "name": "PAYMENT.CAPTURE.PENDING",
+        "description": "The state of a payment capture changes to pending."
+      },
+      {
+        "name": "PAYMENT.CAPTURE.REFUNDED",
+        "description": "A merchant refunds a payment capture."
+      },
+      {
+        "name": "PAYMENT.CAPTURE.REVERSED",
+        "description": "PayPal reverses a payment capture."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.BLOCKED",
+        "description": "A payouts item was blocked."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.CANCELED",
+        "description": "A payouts item is canceled."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.DENIED",
+        "description": "A payouts item is denied."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.HELD",
+        "description": "A payouts item is held."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.REFUNDED",
+        "description": "A payouts item is refunded."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.RETURNED",
+        "description": "A payouts item is returned."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+        "description": "A payouts item succeeds."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+        "description": "A payouts item is unclaimed."
+      },
+      {
+        "name": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+        "description": "The state of a batch payout payment changes to processing."
+      },
+      {
+        "name": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+        "description": "A batch payout payment completes successfully."
+      },
+      {
+        "name": "PAYMENT.PAYOUTSBATCH.DENIED",
+        "description": "A batch payout payment is denied."
+      },
+      {
+        "name": "PAYMENT.PAYOUTS-ITEM.FAILED",
+        "description": "A payouts item fails."
+      }
+    ],
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks/33T43630L2343754N",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks/33T43630L2343754N",
+        "rel": "update",
+        "method": "PATCH"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks/33T43630L2343754N",
+        "rel": "delete",
+        "method": "DELETE"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T06:58:14.620234Z",
+  "t_recv": "2026-10-24T06:58:15.635158Z"
+}

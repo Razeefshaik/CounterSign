@@ -261,3 +261,17 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | C23b retains original assistant messages only for the current bounded investigation and returns tool results as ToolMessages; signatures stay private and history clears on completion or error | C23b offline Google transport tests | Accept | Reconstructing Gemini messages loses signed text and function-call metadata; tests preserve both across two tool turns for Flash and Flash-Lite |
 | C23b configured demo uses genuine read-tool startup and stops on an unexpected actual-model decision; scripted checkpoint identities remain compatible | C23b | Accept | Real reasoning is not guaranteed to reproduce the staged script or deliberately propose an unsafe red-team action |
 | Model calls get 3 total attempts (langchain-google-genai counts max_retries as attempts) and a 90 s timeout, instead of 1 attempt and 30 s | Owner (real-model rehearsal, Oct 26) | Accept | a single Gemini 503 or a slow first reply stopped the demo week; model calls only read and propose, so bounded retries cannot move money |
+
+## Oct 26 sandbox findings (C08/C09; details in docs/SANDBOX_FINDINGS.md)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Disputes for demos and the slice are staged only through the sandbox Resolution Center; API dispute creation is recorded BLOCKED | D8 | Accept | the API returned 400 "No permissions to set target_client_id" even with the disputes/create scope (F5) |
+| A dispute hold is read from the capture status (PENDING), never from withheld_balance; cash stays available-only and DISPUTE_EARMARK stays a non-cash reserve | D8, D12 | Accept | withheld stayed 0.00 in all 585 readings while every disputed capture turned PENDING |
+| Demo narration says the disputed capture is frozen (PENDING) and CounterSign reserves the share; it never claims "$400 withheld" | D8, D12 | Accept | HANDOFF section 10's withheld column did not happen in the sandbox; claims must match recordings |
+| Evidence is autonomous only while WAITING_FOR_SELLER_RESPONSE with a provide_evidence link; otherwise the shield blocks it and the demo shows the block | D9, D10 | Accept (already in C24) | the $400 item-not-received dispute went straight to UNDER_REVIEW with no evidence link; multipart evidence at WAITING/CHARGEBACK returned 200 |
+| OUTCOME_MAP adds CANCELED_BY_BUYER -> CANCELLED (no refund allowed; any refund gives UNKNOWN_OUTCOME) | D10 | Accept | the owner's buyer close resolved as CANCELED_BY_BUYER / BUYER_CANCELLED_CASE |
+| Defaults confirmed: evidence multipart, accept-claim JSON, settlement adjudicate, PAYPAL_REFUND_SOURCE=paypal:available | D10, D12 | Accept | each returned 200 in D10, and withheld was never used, so a refund can only come from available |
+| F11 corrected: simulator events can pass postback verification; we still verify every event, and the mock keeps its test-only signer | D11 | Accept | the D11 simulator event verified SUCCESS, like all 46 real deliveries |
+| GET /v1/notifications/webhooks-events is the webhook backfill source; resend can generate duplicate-delivery faults | D11 | Accept | it listed 47 events, including 2 never delivered to us, and one resend arrived |
+| The owner's public IP was redacted from published recordings (tunnel host headers and registration URLs read TUNNEL.ngrok-free.app) | C09 secret scan | Accept | the ngrok hostname embeds the caller's IP; no other private value was found in 1,129 files |

@@ -1,0 +1,78 @@
+{
+  "method": "POST",
+  "path": "/v1/payments/payouts",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "paypal-request-id": "cs-01a16cb7-3d82-7609-835f-80ddfb786e58-a1",
+    "content-length": "375",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "sender_batch_header": {
+      "sender_batch_id": "cs-01a16cb7-3d82-7609-835f-80ddfb786e58-a1",
+      "email_subject": "CounterSign sandbox check"
+    },
+    "items": [
+      {
+        "recipient_type": "EMAIL",
+        "receiver": "maker-b@redacted",
+        "amount": {
+          "value": "1.00",
+          "currency": "USD"
+        },
+        "sender_item_id": "cs-01a16cb7-3d82-7609-835f-80ddfb786e58-a1",
+        "note": "Staged sandbox action: deliberately changed note."
+      }
+    ]
+  },
+  "response_status": 400,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-length": "449",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f8942845f9459-cb89a19e2b2c564a-01\"",
+    "server": "nginx",
+    "paypal-debug-id": "f8942845f9459",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "accept-ranges": "bytes",
+    "via": "1.1 varnish, 1.1 varnish",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 07:01:50 GMT",
+    "x-served-by": "cache-sin-wsap440043-SIN, cache-sin-wsap440043-SIN, cache-maa10242-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825310.799368,VS0,VE1070",
+    "vary": "Accept-Encoding"
+  },
+  "response_body": {
+    "name": "USER_BUSINESS_ERROR",
+    "message": "User business error.",
+    "debug_id": "f8942845f9459",
+    "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+    "details": [
+      {
+        "field": "SENDER_BATCH_ID",
+        "location": "body",
+        "issue": "Batch with given sender_batch_id already exists",
+        "link": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/5H5397MBCBLM8",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    ],
+    "links": []
+  },
+  "t_sent": "2026-10-24T07:01:51.788546Z",
+  "t_recv": "2026-10-24T07:01:52.922400Z"
+}

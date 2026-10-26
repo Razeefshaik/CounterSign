@@ -1,0 +1,517 @@
+{
+  "check_id": "D4",
+  "verdict": "CONFIRMED",
+  "payouts": {
+    "unreg_1": {
+      "batch_id": "BV5759UA95QU8",
+      "create_status": 201,
+      "create_body": {
+        "batch_header": {
+          "payout_batch_id": "BV5759UA95QU8",
+          "batch_status": "PENDING",
+          "sender_batch_header": {
+            "sender_batch_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+            "email_subject": "CounterSign sandbox check"
+          }
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/BV5759UA95QU8",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      },
+      "amount_minor": 100,
+      "write_name": "unreg_1",
+      "item": {
+        "payout_item_id": "EH7G4GY74KLLY",
+        "transaction_id": "33F69987AN433441Y",
+        "activity_id": "7W316511R0818222X",
+        "transaction_status": "UNCLAIMED",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.25"
+        },
+        "payout_batch_id": "BV5759UA95QU8",
+        "sender_batch_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "1.00"
+          },
+          "note": "Staged sandbox action: CounterSign check.",
+          "receiver": "unreg-1@redacted",
+          "sender_item_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+          "recipient_wallet": "PAYPAL",
+          "purpose": "GOODS"
+        },
+        "time_processed": "2026-10-24T06:58:22Z",
+        "errors": {
+          "name": "RECEIVER_UNREGISTERED",
+          "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+          "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+          "details": [],
+          "links": []
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/EH7G4GY74KLLY",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/BV5759UA95QU8",
+            "rel": "batch",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      },
+      "history": [
+        {
+          "at": "2026-10-24T07:02:23.294237Z",
+          "batch_http_status": 200,
+          "batch_status": "SUCCESS",
+          "item_count": 1,
+          "total_items": 1,
+          "item_id": "EH7G4GY74KLLY",
+          "status": "UNCLAIMED"
+        }
+      ],
+      "item_count": 1,
+      "item_id": "EH7G4GY74KLLY",
+      "item_status": "UNCLAIMED"
+    },
+    "unreg_2": {
+      "batch_id": "66T9EUC3HR2JY",
+      "create_status": 201,
+      "create_body": {
+        "batch_header": {
+          "payout_batch_id": "66T9EUC3HR2JY",
+          "batch_status": "PENDING",
+          "sender_batch_header": {
+            "sender_batch_id": "cs-01a16cb3-d7da-756b-878b-97c7e0123522-a1",
+            "email_subject": "CounterSign sandbox check"
+          }
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/66T9EUC3HR2JY",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      },
+      "amount_minor": 100,
+      "write_name": "unreg_2",
+      "item": {
+        "payout_item_id": "27K3KYVCVZZV6",
+        "transaction_id": "72E96294377283213",
+        "activity_id": "0B0794250U629102C",
+        "transaction_status": "UNCLAIMED",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.25"
+        },
+        "payout_batch_id": "66T9EUC3HR2JY",
+        "sender_batch_id": "cs-01a16cb3-d7da-756b-878b-97c7e0123522-a1",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "1.00"
+          },
+          "note": "Staged sandbox action: CounterSign check.",
+          "receiver": "unreg-2@redacted",
+          "sender_item_id": "cs-01a16cb3-d7da-756b-878b-97c7e0123522-a1",
+          "recipient_wallet": "PAYPAL",
+          "purpose": "GOODS"
+        },
+        "time_processed": "2026-10-24T06:58:21Z",
+        "errors": {
+          "name": "RECEIVER_UNREGISTERED",
+          "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+          "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+          "details": [],
+          "links": []
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/27K3KYVCVZZV6",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/66T9EUC3HR2JY",
+            "rel": "batch",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      },
+      "history": [
+        {
+          "at": "2026-10-24T07:02:25.178283Z",
+          "batch_http_status": 200,
+          "batch_status": "SUCCESS",
+          "item_count": 1,
+          "total_items": 1,
+          "item_id": "27K3KYVCVZZV6",
+          "status": "UNCLAIMED"
+        }
+      ],
+      "item_count": 1,
+      "item_id": "27K3KYVCVZZV6",
+      "item_status": "UNCLAIMED"
+    },
+    "unreg_3": {
+      "batch_id": "3K6AWN33H4VSS",
+      "create_status": 201,
+      "create_body": {
+        "batch_header": {
+          "payout_batch_id": "3K6AWN33H4VSS",
+          "batch_status": "PENDING",
+          "sender_batch_header": {
+            "sender_batch_id": "cs-01a16cb3-dce1-74f0-999a-f51b78795dba-a1",
+            "email_subject": "CounterSign sandbox check"
+          }
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/3K6AWN33H4VSS",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      },
+      "amount_minor": 100,
+      "write_name": "unreg_3",
+      "item": {
+        "payout_item_id": "W4GAN66Q6SYD2",
+        "transaction_id": "1JL09966AX005792V",
+        "activity_id": "13K24831H95689633",
+        "transaction_status": "UNCLAIMED",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.25"
+        },
+        "payout_batch_id": "3K6AWN33H4VSS",
+        "sender_batch_id": "cs-01a16cb3-dce1-74f0-999a-f51b78795dba-a1",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "1.00"
+          },
+          "note": "Staged sandbox action: CounterSign check.",
+          "receiver": "unreg-3@redacted",
+          "sender_item_id": "cs-01a16cb3-dce1-74f0-999a-f51b78795dba-a1",
+          "recipient_wallet": "PAYPAL",
+          "purpose": "GOODS"
+        },
+        "time_processed": "2026-10-24T06:58:23Z",
+        "errors": {
+          "name": "RECEIVER_UNREGISTERED",
+          "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+          "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+          "details": [],
+          "links": []
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/W4GAN66Q6SYD2",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/3K6AWN33H4VSS",
+            "rel": "batch",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      },
+      "history": [
+        {
+          "at": "2026-10-24T07:02:27.368533Z",
+          "batch_http_status": 200,
+          "batch_status": "SUCCESS",
+          "item_count": 1,
+          "total_items": 1,
+          "item_id": "W4GAN66Q6SYD2",
+          "status": "UNCLAIMED"
+        }
+      ],
+      "item_count": 1,
+      "item_id": "W4GAN66Q6SYD2",
+      "item_status": "UNCLAIMED"
+    }
+  },
+  "unclaimed_verdict": "CONFIRMED",
+  "balance_verdict": "CONFIRMED",
+  "balance_effect": {
+    "available_delta_minor": -375,
+    "withheld_delta_minor": 0,
+    "available_dropped": true,
+    "withheld_changed": false
+  },
+  "balance": {
+    "observations": [
+      {
+        "fetched_at": "2026-10-24T07:02:29.631494Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:07:31.008786Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:12:32.495680Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:17:33.513480Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:29:59Z",
+        "as_of_time": "2026-10-24T05:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:22:34.167836Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:27:35.130835Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:32:36.528647Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:37:37.110688Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:42:38.374679Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:47:40.797733Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:52:42.572156Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T05:59:59Z",
+        "as_of_time": "2026-10-24T05:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T07:57:43.625983Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:02:44.573228Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:07:45.533623Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:12:46.917003Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:17:47.488844Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:22:48.632106Z",
+        "status": 200,
+        "available": "4998.75",
+        "withheld": "0.00",
+        "total": "4998.75",
+        "last_refresh_time": "2026-10-24T06:29:59Z",
+        "as_of_time": "2026-10-24T06:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T08:27:49.271971Z",
+        "status": 200,
+        "available": "4995.00",
+        "withheld": "0.00",
+        "total": "4995.00",
+        "last_refresh_time": "2026-10-24T06:59:59Z",
+        "as_of_time": "2026-10-24T06:59:59Z"
+      }
+    ],
+    "first_reflected_at": "2026-10-24T08:27:49.271971Z",
+    "baseline": {
+      "fetched_at": "2026-10-24T06:58:06.683513Z",
+      "status": 200,
+      "available": "4998.75",
+      "withheld": "0.00",
+      "total": "4998.75",
+      "last_refresh_time": "2026-10-24T05:29:59Z",
+      "as_of_time": "2026-10-24T05:29:59Z"
+    },
+    "expected_delta_minor": -300,
+    "notes": "Observed threshold only; D12 assesses freshness, fees and overlapping changes."
+  },
+  "webhooks": [
+    {
+      "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+      "event_id": "WH-3R740979TA5704906-5A888786W68953223",
+      "received_at": "2026-10-24T06:58:36.342748Z",
+      "delay_seconds": 8.976748,
+      "file": "webhooks/20261024T065836342748Z_001_WH-3R740979TA5704906-5A888786W68953223.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+      "event_id": "WH-1B226327JU244530L-60671825N3439782N",
+      "received_at": "2026-10-24T06:58:36.882979Z",
+      "delay_seconds": 9.196979,
+      "file": "webhooks/20261024T065836882979Z_001_WH-1B226327JU244530L-60671825N3439782N.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTSBATCH.PROCESSING",
+      "event_id": "WH-7C3990648D871362H-2J309426LX7207406",
+      "received_at": "2026-10-24T06:58:39.168875Z",
+      "delay_seconds": 11.803875,
+      "file": "webhooks/20261024T065839168875Z_001_WH-7C3990648D871362H-2J309426LX7207406.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+      "event_id": "WH-9UE28573J5148071F-6KT711513X866651G",
+      "received_at": "2026-10-24T06:58:48.328254Z",
+      "delay_seconds": 10.969254,
+      "file": "webhooks/20261024T065848328254Z_001_WH-9UE28573J5148071F-6KT711513X866651G.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+      "event_id": "WH-9UE28573J5148071F-57L56074T79156416",
+      "received_at": "2026-10-24T06:58:48.981949Z",
+      "delay_seconds": 11.622949,
+      "file": "webhooks/20261024T065848981949Z_001_WH-9UE28573J5148071F-57L56074T79156416.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+      "event_id": "WH-9LD8678327212281P-7U2143369D333671L",
+      "received_at": "2026-10-24T06:58:49.239300Z",
+      "delay_seconds": 9.7503,
+      "file": "webhooks/20261024T065849239300Z_001_WH-9LD8678327212281P-7U2143369D333671L.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+      "event_id": "WH-74P90013W3641410G-5LG98973ME842842U",
+      "received_at": "2026-10-24T06:58:49.546527Z",
+      "delay_seconds": 12.194527,
+      "file": "webhooks/20261024T065849546527Z_001_WH-74P90013W3641410G-5LG98973ME842842U.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+      "event_id": "WH-8NM446336G889031X-5TF19138JU469022G",
+      "received_at": "2026-10-24T06:58:49.956012Z",
+      "delay_seconds": 10.463012,
+      "file": "webhooks/20261024T065849956012Z_001_WH-8NM446336G889031X-5TF19138JU469022G.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTSBATCH.SUCCESS",
+      "event_id": "WH-04589061Y70325803-8G862215T9905532M",
+      "received_at": "2026-10-24T06:58:56.816742Z",
+      "delay_seconds": 8.910742,
+      "file": "webhooks/20261024T065856816742Z_001_WH-04589061Y70325803-8G862215T9905532M.json"
+    }
+  ],
+  "blocked": null,
+  "notes": [
+    "Three $1 payouts minimise the experiment amount.",
+    "unreg_2 remains uncancelled; D5 monitors it until the day-one deadline.",
+    "Balance deltas are observed snapshots; D12 checks freshness."
+  ],
+  "observed_at": "2026-10-24T06:58:04.421325Z",
+  "evidence_files": []
+}

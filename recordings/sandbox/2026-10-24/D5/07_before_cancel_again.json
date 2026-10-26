@@ -1,0 +1,80 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts-item/EH7G4GY74KLLY",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "date": "Sat, 24 Oct 2026 12:15:38 GMT",
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f8e8784aba",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f8e8784aba-1930447eb72a1e8c-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-encoding": "gzip",
+    "cf-ray": "a4f8e8784abaa6dc-BOM"
+  },
+  "response_body": {
+    "payout_item_id": "EH7G4GY74KLLY",
+    "transaction_id": "33F69987AN433441Y",
+    "activity_id": "7W316511R0818222X",
+    "transaction_status": "RETURNED",
+    "payout_item_fee": {
+      "currency": "USD",
+      "value": "0.25"
+    },
+    "payout_batch_id": "BV5759UA95QU8",
+    "sender_batch_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+    "payout_item": {
+      "recipient_type": "EMAIL",
+      "amount": {
+        "currency": "USD",
+        "value": "1.00"
+      },
+      "note": "Staged sandbox action: CounterSign check.",
+      "receiver": "unreg-1@redacted",
+      "sender_item_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+      "recipient_wallet": "PAYPAL",
+      "purpose": "GOODS"
+    },
+    "time_processed": "2026-10-24T06:58:22Z",
+    "errors": {
+      "name": "RECEIVER_UNREGISTERED",
+      "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+      "details": [],
+      "links": []
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/EH7G4GY74KLLY",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/BV5759UA95QU8",
+        "rel": "batch",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T12:15:40.631515Z",
+  "t_recv": "2026-10-24T12:15:41.053164Z"
+}

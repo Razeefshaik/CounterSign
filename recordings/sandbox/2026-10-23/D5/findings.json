@@ -1,0 +1,382 @@
+{
+  "check_id": "D5",
+  "verdict": "CONFIRMED",
+  "cancel": {
+    "before": {
+      "payout_item_id": "EH7G4GY74KLLY",
+      "transaction_id": "33F69987AN433441Y",
+      "activity_id": "7W316511R0818222X",
+      "transaction_status": "UNCLAIMED",
+      "payout_item_fee": {
+        "currency": "USD",
+        "value": "0.25"
+      },
+      "payout_batch_id": "BV5759UA95QU8",
+      "sender_batch_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+      "payout_item": {
+        "recipient_type": "EMAIL",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "note": "Staged sandbox action: CounterSign check.",
+        "receiver": "unreg-1@redacted",
+        "sender_item_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+        "recipient_wallet": "PAYPAL",
+        "purpose": "GOODS"
+      },
+      "time_processed": "2026-10-24T06:58:22Z",
+      "errors": {
+        "name": "RECEIVER_UNREGISTERED",
+        "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+        "details": [],
+        "links": []
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/EH7G4GY74KLLY",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/BV5759UA95QU8",
+          "rel": "batch",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    },
+    "response_status": 200,
+    "response_transaction_status": "RETURNED",
+    "write_state": "SUCCEEDED",
+    "final": {
+      "payout_item_id": "EH7G4GY74KLLY",
+      "transaction_id": "33F69987AN433441Y",
+      "activity_id": "7W316511R0818222X",
+      "transaction_status": "RETURNED",
+      "payout_item_fee": {
+        "currency": "USD",
+        "value": "0.25"
+      },
+      "payout_batch_id": "BV5759UA95QU8",
+      "sender_batch_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+      "payout_item": {
+        "recipient_type": "EMAIL",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "note": "Staged sandbox action: CounterSign check.",
+        "receiver": "unreg-1@redacted",
+        "sender_item_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+        "recipient_wallet": "PAYPAL",
+        "purpose": "GOODS"
+      },
+      "time_processed": "2026-10-24T06:58:22Z",
+      "errors": {
+        "name": "RECEIVER_UNREGISTERED",
+        "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+        "details": [],
+        "links": []
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/EH7G4GY74KLLY",
+          "rel": "self",
+          "method": "GET",
+          "encType": "application/json"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/payments/payouts/BV5759UA95QU8",
+          "rel": "batch",
+          "method": "GET",
+          "encType": "application/json"
+        }
+      ]
+    }
+  },
+  "negative_cases": {
+    "cancel_again": {
+      "status": 400,
+      "state": "REJECTED",
+      "error_name": "ITEM_ALREADY_CANCELLED"
+    },
+    "cancel_success": {
+      "status": 400,
+      "state": "REJECTED",
+      "error_name": "ITEM_INCORRECT_STATUS"
+    }
+  },
+  "balance": {
+    "observations": [
+      {
+        "fetched_at": "2026-10-24T12:15:43.464345Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T10:29:59Z",
+        "as_of_time": "2026-10-24T10:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T12:20:44.577413Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T10:29:59Z",
+        "as_of_time": "2026-10-24T10:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T12:25:45.806721Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T10:29:59Z",
+        "as_of_time": "2026-10-24T10:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T12:30:46.378577Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T10:59:59Z",
+        "as_of_time": "2026-10-24T10:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T12:35:47.088873Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T10:59:59Z",
+        "as_of_time": "2026-10-24T10:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T12:40:47.992028Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T10:59:59Z",
+        "as_of_time": "2026-10-24T10:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T12:45:49.122926Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T10:59:59Z",
+        "as_of_time": "2026-10-24T10:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T12:50:50.311919Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T10:59:59Z",
+        "as_of_time": "2026-10-24T10:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T12:55:50.828405Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:29:59Z",
+        "as_of_time": "2026-10-24T11:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:00:51.337040Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:29:59Z",
+        "as_of_time": "2026-10-24T11:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:05:51.850291Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:29:59Z",
+        "as_of_time": "2026-10-24T11:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:10:52.771589Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:29:59Z",
+        "as_of_time": "2026-10-24T11:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:15:53.888380Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:29:59Z",
+        "as_of_time": "2026-10-24T11:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:21:01.978965Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:29:59Z",
+        "as_of_time": "2026-10-24T11:29:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:26:02.748928Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:59:59Z",
+        "as_of_time": "2026-10-24T11:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:31:04.019993Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:59:59Z",
+        "as_of_time": "2026-10-24T11:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:36:04.946840Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:59:59Z",
+        "as_of_time": "2026-10-24T11:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:41:05.924404Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:59:59Z",
+        "as_of_time": "2026-10-24T11:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:46:06.464047Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:59:59Z",
+        "as_of_time": "2026-10-24T11:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:51:07.059378Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:59:59Z",
+        "as_of_time": "2026-10-24T11:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T13:56:09.134078Z",
+        "status": 200,
+        "available": "4988.75",
+        "withheld": "0.00",
+        "total": "4988.75",
+        "last_refresh_time": "2026-10-24T11:59:59Z",
+        "as_of_time": "2026-10-24T11:59:59Z"
+      },
+      {
+        "fetched_at": "2026-10-24T14:01:10.292625Z",
+        "status": 200,
+        "available": "5371.82",
+        "withheld": "0.00",
+        "total": "5371.82",
+        "last_refresh_time": "2026-10-24T12:29:59Z",
+        "as_of_time": "2026-10-24T12:29:59Z"
+      }
+    ],
+    "first_reflected_at": "2026-10-24T14:01:10.292625Z",
+    "baseline": {
+      "fetched_at": "2026-10-24T12:15:38.265515Z",
+      "status": 200,
+      "available": "4988.75",
+      "withheld": "0.00",
+      "total": "4988.75",
+      "last_refresh_time": "2026-10-24T10:29:59Z",
+      "as_of_time": "2026-10-24T10:29:59Z"
+    },
+    "expected_delta_minor": 100,
+    "notes": "Observed threshold only; D12 assesses freshness, fees and overlapping changes."
+  },
+  "claim_race": {
+    "skipped": true
+  },
+  "webhooks": [
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+      "event_id": "WH-9FK69534YX169442G-38R40594LX642881E",
+      "received_at": "2026-10-23T22:16:48.781194Z",
+      "delay_seconds": 9.302194,
+      "file": "webhooks/20261023T221648781194Z_001_WH-9FK69534YX169442G-38R40594LX642881E.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+      "event_id": "WH-9UE28573J5148071F-6KT711513X866651G",
+      "received_at": "2026-10-24T06:58:48.328254Z",
+      "delay_seconds": 10.969254,
+      "file": "webhooks/20261024T065848328254Z_001_WH-9UE28573J5148071F-6KT711513X866651G.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+      "event_id": "WH-9UE28573J5148071F-57L56074T79156416",
+      "received_at": "2026-10-24T06:58:48.981949Z",
+      "delay_seconds": 11.622949,
+      "file": "webhooks/20261024T065848981949Z_001_WH-9UE28573J5148071F-57L56074T79156416.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+      "event_id": "WH-8NM446336G889031X-5TF19138JU469022G",
+      "received_at": "2026-10-24T06:58:49.956012Z",
+      "delay_seconds": 10.463012,
+      "file": "webhooks/20261024T065849956012Z_001_WH-8NM446336G889031X-5TF19138JU469022G.json"
+    },
+    {
+      "event_type": "PAYMENT.PAYOUTS-ITEM.RETURNED",
+      "event_id": "WH-4BX26660W8212762H-9Y1148937B925651G",
+      "received_at": "2026-10-24T12:16:09.741311Z",
+      "delay_seconds": 12.949311,
+      "file": "webhooks/20261024T121609741311Z_001_WH-4BX26660W8212762H-9Y1148937B925651G.json"
+    }
+  ],
+  "monitor_deadline": "2026-10-25T18:29:59+00:00",
+  "blocked": null,
+  "notes": [
+    "Initial findings are saved before the long-running unreg-2 monitor.",
+    "RETURNED must be observed by GET; a cancel response or webhook is insufficient."
+  ],
+  "observed_at": "2026-10-24T12:15:36.554258Z",
+  "evidence_files": [],
+  "control_observations": [
+    {
+      "at": "2026-10-26T11:55:56.182864Z",
+      "item_id": "27K3KYVCVZZV6",
+      "status": "UNCLAIMED"
+    }
+  ]
+}

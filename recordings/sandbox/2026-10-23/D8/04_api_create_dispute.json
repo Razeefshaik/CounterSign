@@ -1,0 +1,44 @@
+{
+  "method": "POST",
+  "path": "/v1/customer/disputes",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "paypal-auth-assertion": "[REDACTED]",
+    "cookie": "[REDACTED]",
+    "content-length": "341",
+    "content-type": "multipart/form-data; boundary=1f22b4794da5cea2488d7a44f086bffb"
+  },
+  "request_body": "--1f22b4794da5cea2488d7a44f086bffb\r\nContent-Disposition: form-data; name=\"input\"\r\nContent-Type: application/json\r\n\r\n{\"disputed_transactions\": [{\"buyer_transaction_id\": \"0GS74555A8389573J\"}], \"reason\": \"MERCHANDISE_OR_SERVICE_NOT_RECEIVED\", \"dispute_amount\": {\"currency_code\": \"USD\", \"value\": \"25.00\"}}\r\n--1f22b4794da5cea2488d7a44f086bffb--\r\n",
+  "response_status": 400,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-length": "88",
+    "access-control-expose-headers": "Server-Timing",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f1258952cb768-b6627ae418d5aea7-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "paypal-debug-id": "f1258952cb768",
+    "server": "nginx",
+    "content-type": "application/json",
+    "accept-ranges": "bytes",
+    "via": "1.1 varnish, 1.1 varnish",
+    "edge-control": "max-age=0",
+    "date": "Fri, 23 Oct 2026 22:07:02 GMT",
+    "x-served-by": "cache-sin-wsss1830081-SIN, cache-sin-wsss1830081-SIN, cache-maa10234-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792793221.026088,VS0,VE1190",
+    "vary": "Accept-Encoding"
+  },
+  "response_body": {
+    "error": "invalid_request",
+    "error_description": "No permissions to set target_client_id"
+  },
+  "t_sent": "2026-10-23T22:07:02.919440Z",
+  "t_recv": "2026-10-23T22:07:04.461646Z"
+}

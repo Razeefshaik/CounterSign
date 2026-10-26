@@ -1,0 +1,47 @@
+{
+  "method": "POST",
+  "path": "/v1/oauth2/token",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "accept": "application/json",
+    "cookie": "[REDACTED]",
+    "content-length": "29",
+    "content-type": "application/x-www-form-urlencoded"
+  },
+  "request_body": "grant_type=client_credentials",
+  "response_status": 200,
+  "response_headers": {
+    "date": "Sat, 24 Oct 2026 21:17:36 GMT",
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "x-content-type-options": "nosniff",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "ca4fc025c5f8c",
+    "pragma": "no-cache",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4fc025c5f8c-b3cb02bab211c4c9-01\"",
+    "vary": "Accept-Encoding",
+    "x-paypal-token-service": "IAAS",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "set-cookie": "[REDACTED]",
+    "cf-cache-status": "DYNAMIC",
+    "content-encoding": "gzip",
+    "cf-ray": "a4fc025c5f8c71b6-BOM"
+  },
+  "response_body": {
+    "scope": "https://uri.paypal.com/services/invoicing https://uri.paypal.com/services/checkout/one-click-with-merchant-issued-token https://uri.paypal.com/services/payments/futurepayments https://uri.paypal.com/services/vault/payment-tokens/read https://uri.paypal.com/services/disputes/read-buyer https://uri.paypal.com/services/payments/realtimepayment https://uri.paypal.com/services/subscriptions/confirm-payment https://uri.paypal.com/services/payments/client-payments-eligibility https://api.paypal.com/v1/vault/credit-card https://api.paypal.com/v1/payments/.* https://uri.paypal.com/services/reporting/search/read https://uri.paypal.com/services/wallet/mandates/write https://uri.paypal.com/services/vault/payment-tokens/readwrite https://uri.paypal.com/services/applications/webhooks https://uri.paypal.com/services/pricing/exchange-currency/read https://uri.paypal.com/services/credit/client-offer-presentment/read https://uri.paypal.com/services/disputes/update-seller https://uri.paypal.com/services/payments/payment/authcapture openid Braintree:Vault https://uri.paypal.com/services/disputes/read-seller https://uri.paypal.com/services/payments/orders/client_sdk_orders_api https://uri.paypal.com/services/payments/refund https://uri.paypal.com/services/disputes/create https://uri.paypal.com/services/pricing/quote-exchange-rates/read https://uri.paypal.com/services/documents/disputes/download https://uri.paypal.com/services/billing-agreements https://uri.paypal.com/services/checkout/payment-resources https://uri.paypal.com/services/wallet/mandates/read https://uri.paypal.com/payments/payouts https://api.paypal.com/v1/vault/credit-card/.* https://uri.paypal.com/services/shipping/trackers/readwrite https://uri.paypal.com/services/subscriptions",
+    "access_token": "[REDACTED]",
+    "token_type": "Bearer",
+    "app_id": "APP-8BY260814M101043L",
+    "expires_in": 32400,
+    "nonce": "2026-10-24T21:17:36ZroxDg4oq4ScXkWRrr_5A-eDEB22ljHJ3NTbLn4tvlX0"
+  },
+  "t_sent": "2026-10-24T21:17:38.869161Z",
+  "t_recv": "2026-10-24T21:17:39.509572Z"
+}

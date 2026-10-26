@@ -1,0 +1,116 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "2105",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "263cacdf-cfa5-11f1-9883-67fa190fd9ad",
+    "transmission_sig": "Du8e02vKBnTSSt55TtkD8mqC2hqVPoo4hzzIOSq3Ot+OjfIUopHNhe21K6LEHIGrZJuuIQfzZ/TFFB27qsJEejgpRL0fAV+kfzGxa/HbxVWcWOYg5jW+C4NlrT6NQCMmJ82/f0Fu4WXnNpOp+L/Gzw2T1YvW0L8FtqBBW7B4slGW4MHw+DZMVyUBPa523mlQGEQ/GGVM9d/PigN77pDA7ddTpmMupXnW7q+AR+eP6GmQekeikNvhgeleP4tSCNfpgu1at8OMSvAaVBrElbVZjr6xYnR51R6/jxAYKWmp4s+yuXca9kA7pvz/3liCJV5Mf+AHKw4t8dlgchIf9ig2/A==",
+    "transmission_time": "2026-10-24T12:19:24Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-6T502407GS8131338-4GH26629BG465125B",
+      "event_version": "1.0",
+      "create_time": "2026-10-24T12:19:19.565Z",
+      "resource_type": "refund",
+      "resource_version": "2.0",
+      "event_type": "PAYMENT.CAPTURE.REFUNDED",
+      "summary": "A $ 60.0 USD capture payment was refunded",
+      "resource": {
+        "id": "5FE62884TA6526206",
+        "amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "note_to_payer": "60.0 USD; 2026-10-24 Credit has been processed and claim is now closed. Please refer Dispute ID PP-R-XJK-10194293. Thank you.",
+        "seller_payable_breakdown": {
+          "gross_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          },
+          "paypal_fee": {
+            "currency_code": "USD",
+            "value": "0.00"
+          },
+          "net_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          },
+          "total_refunded_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          }
+        },
+        "status": "COMPLETED",
+        "create_time": "2026-10-24T05:19:10-07:00",
+        "update_time": "2026-10-24T05:19:10-07:00",
+        "payer": {
+          "email_address": "email@redacted",
+          "merchant_id": "B23JM5BDGPAF8"
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v2/payments/refunds/5FE62884TA6526206",
+            "rel": "self",
+            "method": "GET"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v2/payments/captures/69T54342EE2129538",
+            "rel": "up",
+            "method": "GET"
+          }
+        ]
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-6T502407GS8131338-4GH26629BG465125B",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-6T502407GS8131338-4GH26629BG465125B/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "paypal-debug-id": "f560648065275",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "content-language": "",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f560648065275-f8d0be4eb71c0bdb-01\"",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:15:36 GMT",
+    "x-served-by": "cache-sin-wsap440022-SIN, cache-sin-wsap440022-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027735.067009,VS0,VE969",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:15:35.936920Z",
+  "t_recv": "2026-10-26T15:15:36.951528Z"
+}

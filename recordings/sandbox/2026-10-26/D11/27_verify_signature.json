@@ -1,0 +1,115 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "2463",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "5a37afd0-cf78-11f1-9883-bd12dddca7fe",
+    "transmission_sig": "Nz0MeNkx9RwAipgxkauagx8orV2a/oGEvy7qEzf/b3aklmcsOiClnsslVkl4kmP1gVqsxGBVxc+rXpMZ00Yaui9h5M4su/xW9YrlXgjOjEOjnfA1vjb49qwlkMwqjF+vB0dThtqOQCe4xTOKES4wYePxYn5a8lGcSfgiqBZjlU6X4/a9NXsyTzvrdvEDqF7KcZUjwhTVG+uG/j4zYRJ6p6n04doBjcbvbstDclN/SB2J0X/kq+s+IeMlwP4T+pHTuMTwIQXCpwi/jizDn63O0G5fdD1puJImCAAEsfEnYmqyJOqjalNbJQQPB4868qPn5kCyRXcEODNE59BBo2qppQ==",
+    "transmission_time": "2026-10-24T06:58:44Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-9UE28573J5148071F-57L56074T79156416",
+      "event_version": "1.0",
+      "create_time": "2026-10-24T06:58:37.359Z",
+      "resource_type": "payouts_item",
+      "event_type": "PAYMENT.PAYOUTS-ITEM.UNCLAIMED",
+      "summary": "A payout item is unclaimed",
+      "resource": {
+        "transaction_id": "33F69987AN433441Y",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.25"
+        },
+        "transaction_status": "UNCLAIMED",
+        "sender_batch_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+        "time_processed": "2026-10-24T06:58:22Z",
+        "activity_id": "7W316511R0818222X",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "1.00"
+          },
+          "note": "Staged sandbox action: CounterSign check.",
+          "receiver": "unreg-1@redacted",
+          "sender_item_id": "cs-01a16cb3-d2f7-7136-bf4a-e73aa8a2df7b-a1",
+          "recipient_wallet": "PAYPAL"
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/EH7G4GY74KLLY",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/BV5759UA95QU8",
+            "rel": "batch",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ],
+        "payout_item_id": "EH7G4GY74KLLY",
+        "payout_batch_id": "BV5759UA95QU8",
+        "errors": {
+          "name": "RECEIVER_UNREGISTERED",
+          "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+          "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+          "details": [],
+          "links": []
+        }
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-9UE28573J5148071F-57L56074T79156416",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-9UE28573J5148071F-57L56074T79156416/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-language": "",
+    "paypal-debug-id": "f2297956e36f4",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f2297956e36f4-6698e93a289f8f3b-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:15:12 GMT",
+    "x-served-by": "cache-sin-wsat1880025-SIN, cache-sin-wsat1880025-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027711.352516,VS0,VE974",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:15:12.219083Z",
+  "t_recv": "2026-10-26T15:15:13.241250Z"
+}

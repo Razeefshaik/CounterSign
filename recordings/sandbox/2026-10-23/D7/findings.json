@@ -1,0 +1,1074 @@
+{
+  "check_id": "D7",
+  "verdict": "CONFIRMED",
+  "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+  "values": [
+    {
+      "value": "ERRPYOB002",
+      "operations": [
+        "get_batch"
+      ],
+      "expected_name": "PENDING",
+      "matched": true,
+      "matched_on": [
+        "get_batch"
+      ],
+      "outcomes": {
+        "get_batch": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYOB003",
+      "operations": [
+        "get_batch"
+      ],
+      "expected_name": "PROCESSING",
+      "matched": true,
+      "matched_on": [
+        "get_batch"
+      ],
+      "outcomes": {
+        "get_batch": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYOB004",
+      "operations": [
+        "get_batch"
+      ],
+      "expected_name": "DENIED",
+      "matched": true,
+      "matched_on": [
+        "get_batch"
+      ],
+      "outcomes": {
+        "get_batch": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO015",
+      "operations": [
+        "get_batch",
+        "get_item"
+      ],
+      "expected_name": "CLOSED_MARKET",
+      "matched": true,
+      "matched_on": [
+        "get_batch"
+      ],
+      "outcomes": {
+        "get_batch": "RESPONDED",
+        "get_item": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO047",
+      "operations": [
+        "get_item"
+      ],
+      "expected_name": "RECEIVER_UNREGISTERED",
+      "matched": true,
+      "matched_on": [
+        "get_item"
+      ],
+      "outcomes": {
+        "get_item": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO052",
+      "operations": [
+        "get_item"
+      ],
+      "expected_name": "RISK_DECLINE",
+      "matched": true,
+      "matched_on": [
+        "get_item"
+      ],
+      "outcomes": {
+        "get_item": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO007",
+      "operations": [
+        "cancel"
+      ],
+      "expected_name": "ITEM_ALREADY_CANCELLED",
+      "matched": true,
+      "matched_on": [
+        "cancel"
+      ],
+      "outcomes": {
+        "cancel": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO008",
+      "operations": [
+        "cancel"
+      ],
+      "expected_name": "ITEM_CANCELLATION_FAILED",
+      "matched": true,
+      "matched_on": [
+        "cancel"
+      ],
+      "outcomes": {
+        "cancel": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO009",
+      "operations": [
+        "cancel"
+      ],
+      "expected_name": "ITEM_INCORRECT_STATUS",
+      "matched": true,
+      "matched_on": [
+        "cancel"
+      ],
+      "outcomes": {
+        "cancel": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO005",
+      "operations": [
+        "create"
+      ],
+      "expected_name": "INSUFFICIENT_FUNDS",
+      "matched": true,
+      "matched_on": [
+        "create"
+      ],
+      "outcomes": {
+        "create": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO006",
+      "operations": [
+        "create"
+      ],
+      "expected_name": "INTERNAL_ERROR",
+      "matched": true,
+      "matched_on": [
+        "create"
+      ],
+      "outcomes": {
+        "create": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO014",
+      "operations": [
+        "create"
+      ],
+      "expected_name": "USER_BUSINESS_ERROR",
+      "matched": true,
+      "matched_on": [
+        "create"
+      ],
+      "outcomes": {
+        "create": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO036",
+      "operations": [
+        "create"
+      ],
+      "expected_name": "REQUEST_TIMEOUT_EXCEEDED",
+      "matched": true,
+      "matched_on": [
+        "create"
+      ],
+      "outcomes": {
+        "create": "RESPONDED"
+      }
+    },
+    {
+      "value": "ERRPYO039",
+      "operations": [
+        "create"
+      ],
+      "expected_name": "PREVIOUS_REQUEST_IN_PROGRESS",
+      "matched": true,
+      "matched_on": [
+        "create"
+      ],
+      "outcomes": {
+        "create": "RESPONDED"
+      }
+    }
+  ],
+  "probes": [
+    {
+      "value": "ERRPYOB002",
+      "operation": "get_batch",
+      "expected_name": "PENDING",
+      "method": "GET",
+      "path": "/v1/payments/payouts/ERRPYOB002",
+      "trigger": "path:payout_batch_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 200,
+      "status": 200,
+      "error_name": "PENDING",
+      "debug_id": "f815078cd4a02",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:13.415393Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "PENDING"
+      ],
+      "response_body": {
+        "batch_header": {
+          "payout_batch_id": "2HQND3EJEWMLW",
+          "batch_status": "PENDING",
+          "time_created": "2017-08-22T15:15:07Z",
+          "sender_batch_header": {
+            "sender_batch_id": "API-155",
+            "email_subject": "Test batch status"
+          },
+          "amount": {
+            "currency": "USD",
+            "value": "2580.00"
+          }
+        },
+        "items": [
+          {
+            "payout_item_id": "3VFK6ZWG47BLU",
+            "transaction_status": "PENDING",
+            "payout_batch_id": "2HQND3EJEWMLW",
+            "payout_item": {
+              "recipient_type": "EMAIL",
+              "amount": {
+                "currency": "USD",
+                "value": "2580.00"
+              },
+              "note": "payout to receiver test1",
+              "receiver": "email@redacted",
+              "sender_item_id": "ID-30"
+            },
+            "links": [
+              {
+                "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/3VFK6ZWG47BLU",
+                "rel": "item",
+                "method": "GET",
+                "encType": "application/json"
+              }
+            ]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/2HQND3EJEWMLW",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "value": "ERRPYOB003",
+      "operation": "get_batch",
+      "expected_name": "PROCESSING",
+      "method": "GET",
+      "path": "/v1/payments/payouts/ERRPYOB003",
+      "trigger": "path:payout_batch_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 200,
+      "status": 200,
+      "error_name": "PROCESSING",
+      "debug_id": "f682721e0ae70",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:14.614233Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "PROCESSING",
+        "PENDING"
+      ],
+      "response_body": {
+        "batch_header": {
+          "payout_batch_id": "MQ5DXH23LZAM4",
+          "batch_status": "PROCESSING",
+          "time_created": "2017-08-22T15:00:45Z",
+          "sender_batch_header": {
+            "sender_batch_id": "API-15",
+            "email_subject": "Test batch status"
+          },
+          "amount": {
+            "currency": "USD",
+            "value": "25.80"
+          },
+          "fees": {
+            "currency": "USD",
+            "value": "0.25"
+          }
+        },
+        "items": [
+          {
+            "payout_item_id": "YL3JDBJ65GDGA",
+            "transaction_status": "PENDING",
+            "payout_item_fee": {
+              "currency": "USD",
+              "value": "0.25"
+            },
+            "payout_batch_id": "MQ5DXH23LZAM4",
+            "payout_item": {
+              "recipient_type": "EMAIL",
+              "amount": {
+                "currency": "USD",
+                "value": "25.80"
+              },
+              "note": "payout to  receiver test1",
+              "receiver": "email@redacted",
+              "sender_item_id": "ID-30"
+            },
+            "links": [
+              {
+                "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/YL3JDBJ65GDGA",
+                "rel": "item",
+                "method": "GET",
+                "encType": "application/json"
+              }
+            ]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/MQ5DXH23LZAM4",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "value": "ERRPYOB004",
+      "operation": "get_batch",
+      "expected_name": "DENIED",
+      "method": "GET",
+      "path": "/v1/payments/payouts/ERRPYOB004",
+      "trigger": "path:payout_batch_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 200,
+      "status": 200,
+      "error_name": "NON_HOLDING_CURRENCY",
+      "debug_id": "f2394347f824b",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:15.764473Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "NON_HOLDING_CURRENCY",
+        "DENIED",
+        "FAILED"
+      ],
+      "response_body": {
+        "batch_header": {
+          "payout_batch_id": "87FVC3NPD6Y8J",
+          "batch_status": "DENIED",
+          "time_created": "2017-08-22T15:18:48Z",
+          "sender_batch_header": {
+            "sender_batch_id": "API-1556",
+            "email_subject": "Test batch status"
+          },
+          "amount": {
+            "currency": "SGD",
+            "value": "2580.00"
+          },
+          "fees": {
+            "currency": "SGD",
+            "value": "0.00"
+          }
+        },
+        "items": [
+          {
+            "payout_item_id": "FYXYDFKV795Z2",
+            "transaction_status": "FAILED",
+            "payout_item_fee": {
+              "currency": "SGD",
+              "value": "0.00"
+            },
+            "payout_batch_id": "87FVC3NPD6Y8J",
+            "payout_item": {
+              "recipient_type": "EMAIL",
+              "amount": {
+                "currency": "SGD",
+                "value": "2580.00"
+              },
+              "note": "payout to receiver test1",
+              "receiver": "email@redacted",
+              "sender_item_id": "ID-30"
+            },
+            "errors": {
+              "name": "NON_HOLDING_CURRENCY",
+              "message": "Balance not available in the specified currency",
+              "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+              "details": []
+            },
+            "links": [
+              {
+                "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/FYXYDFKV795Z2",
+                "rel": "item",
+                "method": "GET",
+                "encType": "application/json"
+              }
+            ]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/87FVC3NPD6Y8J",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "value": "ERRPYO015",
+      "operation": "get_batch",
+      "expected_name": "CLOSED_MARKET",
+      "method": "GET",
+      "path": "/v1/payments/payouts/ERRPYO015",
+      "trigger": "path:payout_batch_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 200,
+      "status": 200,
+      "error_name": "CLOSED_MARKET",
+      "debug_id": "f500823b73504",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:16.992264Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "CLOSED_MARKET",
+        "DENIED",
+        "FAILED"
+      ],
+      "response_body": {
+        "batch_header": {
+          "payout_batch_id": "DQCP2UAJCBMNY",
+          "batch_status": "DENIED",
+          "time_created": "2017-08-21T11:22:33Z",
+          "time_completed": "2017-08-21T11:22:54Z",
+          "sender_batch_header": {
+            "email_subject": "user test case"
+          },
+          "amount": {
+            "currency": "USD",
+            "value": "190.00"
+          },
+          "fees": {
+            "currency": "USD",
+            "value": "0.00"
+          }
+        },
+        "items": [
+          {
+            "payout_item_id": "RWD4Y3H9VV8BA",
+            "transaction_status": "FAILED",
+            "payout_item_fee": {
+              "currency": "USD",
+              "value": "0.00"
+            },
+            "payout_batch_id": "DQCP2UAJCBMNY",
+            "payout_item": {
+              "recipient_type": "EMAIL",
+              "amount": {
+                "currency": "USD",
+                "value": "190.00"
+              },
+              "note": "payout to receiver",
+              "receiver": "email@redacted",
+              "sender_item_id": "MSI-2727"
+            },
+            "time_processed": "2017-08-21T11:22:44Z",
+            "errors": {
+              "name": "CLOSED_MARKET",
+              "message": "Market closed and transaction is between 2 different countries",
+              "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+              "details": []
+            },
+            "links": [
+              {
+                "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/RWD4Y3H9VV8BA",
+                "rel": "item",
+                "method": "GET",
+                "encType": "application/json"
+              }
+            ]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/DQCP2UAJCBMNY",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "value": "ERRPYO015",
+      "operation": "get_item",
+      "expected_name": "CLOSED_MARKET",
+      "method": "GET",
+      "path": "/v1/payments/payouts-item/ERRPYO015",
+      "trigger": "path:payout_item_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 200,
+      "status": 404,
+      "error_name": "INVALID_RESOURCE_ID",
+      "debug_id": "f900981cd9d6f",
+      "matched": false,
+      "sent_at": "2026-10-24T06:58:18.111624Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "INVALID_RESOURCE_ID"
+      ],
+      "response_body": {
+        "name": "INVALID_RESOURCE_ID",
+        "message": "The requested resource ID was not found",
+        "debug_id": "f900981cd9d6f",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+        "details": [],
+        "links": []
+      }
+    },
+    {
+      "value": "ERRPYO047",
+      "operation": "get_item",
+      "expected_name": "RECEIVER_UNREGISTERED",
+      "method": "GET",
+      "path": "/v1/payments/payouts-item/ERRPYO047",
+      "trigger": "path:payout_item_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 200,
+      "status": 200,
+      "error_name": "RECEIVER_UNREGISTERED",
+      "debug_id": "f7583774f5aba",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:18.641158Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "RECEIVER_UNREGISTERED",
+        "UNCLAIMED"
+      ],
+      "response_body": {
+        "payout_item_id": "JJ5Z53TN2SR5C",
+        "transaction_id": "7EA91403EK812680R",
+        "transaction_status": "UNCLAIMED",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.25"
+        },
+        "payout_batch_id": "8U28CZSK6JGLU",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "1.00"
+          },
+          "note": "payout to receiver test1",
+          "receiver": "email@redacted",
+          "sender_item_id": "30.30"
+        },
+        "errors": {
+          "name": "RECEIVER_UNREGISTERED",
+          "message": "Receiver is unregistered",
+          "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+          "details": []
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/JJ5Z53TN2SR5C",
+            "rel": "item",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "value": "ERRPYO052",
+      "operation": "get_item",
+      "expected_name": "RISK_DECLINE",
+      "method": "GET",
+      "path": "/v1/payments/payouts-item/ERRPYO052",
+      "trigger": "path:payout_item_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 200,
+      "status": 200,
+      "error_name": "RISK_DECLINE",
+      "debug_id": "f370116598c68",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:19.624508Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "RISK_DECLINE",
+        "FAILED"
+      ],
+      "response_body": {
+        "payout_item_id": "NL34TAVXXT4ZU",
+        "transaction_status": "FAILED",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.00"
+        },
+        "payout_batch_id": "PQUQGBBRSKM5Y",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "12.00"
+          },
+          "note": "payout to receiver from TEST merchant",
+          "receiver": "email@redacted",
+          "sender_item_id": "30.30"
+        },
+        "errors": {
+          "name": "RISK_DECLINE",
+          "message": "This transaction was declined due to risk concerns",
+          "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+          "details": []
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/NL34TAVXXT4ZU",
+            "rel": "item",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    },
+    {
+      "value": "ERRPYO007",
+      "operation": "cancel",
+      "expected_name": "ITEM_ALREADY_CANCELLED",
+      "method": "POST",
+      "path": "/v1/payments/payouts-item/ERRPYO007/cancel",
+      "trigger": "path:payout_item_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 400,
+      "status": 400,
+      "error_name": "ITEM_ALREADY_CANCELLED",
+      "debug_id": "99246ee451ec5",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:20.349039Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "ITEM_ALREADY_CANCELLED"
+      ],
+      "response_body": {
+        "name": "ITEM_ALREADY_CANCELLED",
+        "message": "Requested item is already cancelled.",
+        "debug_id": "99246ee451ec5",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+      }
+    },
+    {
+      "value": "ERRPYO008",
+      "operation": "cancel",
+      "expected_name": "ITEM_CANCELLATION_FAILED",
+      "method": "POST",
+      "path": "/v1/payments/payouts-item/ERRPYO008/cancel",
+      "trigger": "path:payout_item_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 400,
+      "status": 400,
+      "error_name": "ITEM_CANCELLATION_FAILED",
+      "debug_id": "56236ee451ef4",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:21.442886Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "ITEM_CANCELLATION_FAILED"
+      ],
+      "response_body": {
+        "name": "ITEM_CANCELLATION_FAILED",
+        "message": "Cancel request for the item failed due to an internal error.",
+        "debug_id": "56236ee451ef4",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+      }
+    },
+    {
+      "value": "ERRPYO009",
+      "operation": "cancel",
+      "expected_name": "ITEM_INCORRECT_STATUS",
+      "method": "POST",
+      "path": "/v1/payments/payouts-item/ERRPYO009/cancel",
+      "trigger": "path:payout_item_id",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 400,
+      "status": 400,
+      "error_name": "ITEM_INCORRECT_STATUS",
+      "debug_id": "53505ea6f6957",
+      "matched": true,
+      "sent_at": "2026-10-24T06:58:22.701080Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "ITEM_INCORRECT_STATUS"
+      ],
+      "response_body": {
+        "name": "ITEM_INCORRECT_STATUS",
+        "message": "Only items in Unclaimed status can be cancelled.",
+        "debug_id": "53505ea6f6957",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+      }
+    },
+    {
+      "value": "ERRPYO005",
+      "operation": "create",
+      "expected_name": "INSUFFICIENT_FUNDS",
+      "method": "POST",
+      "path": "/v1/payments/payouts",
+      "trigger": "body:items[0].note",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 422,
+      "status": 422,
+      "error_name": "INSUFFICIENT_FUNDS",
+      "debug_id": "9de0a086d00cd",
+      "matched": true,
+      "request_id": "cs-01a16cb4-1541-7ff5-9713-92c1988473d7-a1",
+      "sender_batch_id": "cs-01a16cb4-1541-7ff5-9713-92c1988473d7-a1",
+      "receiver_role": "maker-b",
+      "amount_minor": 100,
+      "currency": "USD",
+      "request_body": {
+        "sender_batch_header": {
+          "sender_batch_id": "cs-01a16cb4-1541-7ff5-9713-92c1988473d7-a1",
+          "email_subject": "CounterSign sandbox negative test"
+        },
+        "items": [
+          {
+            "recipient_type": "EMAIL",
+            "receiver": "maker-b@redacted",
+            "amount": {
+              "currency": "USD",
+              "value": "1.00"
+            },
+            "note": "ERRPYO005",
+            "sender_item_id": "cs-01a16cb4-1541-7ff5-9713-92c1988473d7-a1-i1"
+          }
+        ]
+      },
+      "sent_at": "2026-10-24T06:58:23.682144Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "INSUFFICIENT_FUNDS"
+      ],
+      "response_body": {
+        "name": "INSUFFICIENT_FUNDS",
+        "message": "An internal service error has occurred.",
+        "debug_id": "9de0a086d00cd",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+      }
+    },
+    {
+      "value": "ERRPYO006",
+      "operation": "create",
+      "expected_name": "INTERNAL_ERROR",
+      "method": "POST",
+      "path": "/v1/payments/payouts",
+      "trigger": "body:items[0].note",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 500,
+      "status": 500,
+      "error_name": "INTERNAL_ERROR",
+      "debug_id": "74b46c42107ee",
+      "matched": true,
+      "request_id": "cs-01a16cb4-1a9f-7922-9053-d511d4236cb0-a1",
+      "sender_batch_id": "cs-01a16cb4-1a9f-7922-9053-d511d4236cb0-a1",
+      "receiver_role": "maker-b",
+      "amount_minor": 100,
+      "currency": "USD",
+      "request_body": {
+        "sender_batch_header": {
+          "sender_batch_id": "cs-01a16cb4-1a9f-7922-9053-d511d4236cb0-a1",
+          "email_subject": "CounterSign sandbox negative test"
+        },
+        "items": [
+          {
+            "recipient_type": "EMAIL",
+            "receiver": "maker-b@redacted",
+            "amount": {
+              "currency": "USD",
+              "value": "1.00"
+            },
+            "note": "ERRPYO006",
+            "sender_item_id": "cs-01a16cb4-1a9f-7922-9053-d511d4236cb0-a1-i1"
+          }
+        ]
+      },
+      "sent_at": "2026-10-24T06:58:25.055561Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "INTERNAL_ERROR"
+      ],
+      "response_body": {
+        "name": "INTERNAL_ERROR",
+        "message": "An internal service error has occurred.",
+        "debug_id": "74b46c42107ee",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+      }
+    },
+    {
+      "value": "ERRPYO014",
+      "operation": "create",
+      "expected_name": "USER_BUSINESS_ERROR",
+      "method": "POST",
+      "path": "/v1/payments/payouts",
+      "trigger": "body:items[0].note",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 422,
+      "status": 400,
+      "error_name": "USER_BUSINESS_ERROR",
+      "debug_id": "9c7324f51c311",
+      "matched": true,
+      "request_id": "cs-01a16cb4-1f82-7e5b-9ff9-837218b05a86-a1",
+      "sender_batch_id": "cs-01a16cb4-1f82-7e5b-9ff9-837218b05a86-a1",
+      "receiver_role": "maker-b",
+      "amount_minor": 100,
+      "currency": "USD",
+      "request_body": {
+        "sender_batch_header": {
+          "sender_batch_id": "cs-01a16cb4-1f82-7e5b-9ff9-837218b05a86-a1",
+          "email_subject": "CounterSign sandbox negative test"
+        },
+        "items": [
+          {
+            "recipient_type": "EMAIL",
+            "receiver": "maker-b@redacted",
+            "amount": {
+              "currency": "USD",
+              "value": "1.00"
+            },
+            "note": "ERRPYO014",
+            "sender_item_id": "cs-01a16cb4-1f82-7e5b-9ff9-837218b05a86-a1-i1"
+          }
+        ]
+      },
+      "sent_at": "2026-10-24T06:58:26.306408Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "USER_BUSINESS_ERROR"
+      ],
+      "response_body": {
+        "name": "USER_BUSINESS_ERROR",
+        "message": "User business error.",
+        "debug_id": "9c7324f51c311",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+        "details": [
+          {
+            "field": "SENDER_BATCH_ID",
+            "issue": "Batch with given sender_batch_id already exists",
+            "link": [
+              {
+                "href": "https://api.sandbox.paypal.com/v1/payments/payouts/JGZ2AMH9HTGRA",
+                "rel": "self",
+                "method": "GET"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "value": "ERRPYO036",
+      "operation": "create",
+      "expected_name": "REQUEST_TIMEOUT_EXCEEDED",
+      "method": "POST",
+      "path": "/v1/payments/payouts",
+      "trigger": "body:items[0].note",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 504,
+      "status": 504,
+      "error_name": "REQUEST_TIMEOUT_EXCEEDED",
+      "debug_id": "dc5aba28bb036",
+      "matched": true,
+      "request_id": "cs-01a16cb4-24d0-7292-bf40-566f9fa9a061-a1",
+      "sender_batch_id": "cs-01a16cb4-24d0-7292-bf40-566f9fa9a061-a1",
+      "receiver_role": "maker-b",
+      "amount_minor": 100,
+      "currency": "USD",
+      "request_body": {
+        "sender_batch_header": {
+          "sender_batch_id": "cs-01a16cb4-24d0-7292-bf40-566f9fa9a061-a1",
+          "email_subject": "CounterSign sandbox negative test"
+        },
+        "items": [
+          {
+            "recipient_type": "EMAIL",
+            "receiver": "maker-b@redacted",
+            "amount": {
+              "currency": "USD",
+              "value": "1.00"
+            },
+            "note": "ERRPYO036",
+            "sender_item_id": "cs-01a16cb4-24d0-7292-bf40-566f9fa9a061-a1-i1"
+          }
+        ]
+      },
+      "sent_at": "2026-10-24T06:58:27.664203Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "REQUEST_TIMEOUT_EXCEEDED"
+      ],
+      "response_body": {
+        "name": "REQUEST_TIMEOUT_EXCEEDED",
+        "message": "Server did not receive a timely response from a system it needed to access to process the request. Please retry after some time.",
+        "debug_id": "dc5aba28bb036",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+      }
+    },
+    {
+      "value": "ERRPYO039",
+      "operation": "create",
+      "expected_name": "PREVIOUS_REQUEST_IN_PROGRESS",
+      "method": "POST",
+      "path": "/v1/payments/payouts",
+      "trigger": "body:items[0].note",
+      "docs": "https://developer.paypal.com/api/payouts/v5/standard/test-go-live/",
+      "mock_status": 409,
+      "status": 400,
+      "error_name": "PREVIOUS_REQUEST_IN_PROGRESS",
+      "debug_id": "dc5aba28bb036",
+      "matched": true,
+      "request_id": "cs-01a16cb4-2a06-761d-890d-8dfff4eea530-a1",
+      "sender_batch_id": "cs-01a16cb4-2a06-761d-890d-8dfff4eea530-a1",
+      "receiver_role": "maker-b",
+      "amount_minor": 100,
+      "currency": "USD",
+      "request_body": {
+        "sender_batch_header": {
+          "sender_batch_id": "cs-01a16cb4-2a06-761d-890d-8dfff4eea530-a1",
+          "email_subject": "CounterSign sandbox negative test"
+        },
+        "items": [
+          {
+            "recipient_type": "EMAIL",
+            "receiver": "maker-b@redacted",
+            "amount": {
+              "currency": "USD",
+              "value": "1.00"
+            },
+            "note": "ERRPYO039",
+            "sender_item_id": "cs-01a16cb4-2a06-761d-890d-8dfff4eea530-a1-i1"
+          }
+        ]
+      },
+      "sent_at": "2026-10-24T06:58:28.998211Z",
+      "outcome": "RESPONDED",
+      "names_seen": [
+        "PREVIOUS_REQUEST_IN_PROGRESS"
+      ],
+      "response_body": {
+        "name": "PREVIOUS_REQUEST_IN_PROGRESS",
+        "message": "A previous with the same sender batch id is in progress. Please try after some time.",
+        "debug_id": "dc5aba28bb036",
+        "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+      }
+    }
+  ],
+  "mismatched_values": [],
+  "unknown_values": [],
+  "money_moved": [],
+  "unknown_creates": [],
+  "fixtures": {
+    "ERRPYOB002": {
+      "operation": "get_batch",
+      "status": 200,
+      "name": "PENDING",
+      "mock_status": 200
+    },
+    "ERRPYOB003": {
+      "operation": "get_batch",
+      "status": 200,
+      "name": "PROCESSING",
+      "mock_status": 200
+    },
+    "ERRPYOB004": {
+      "operation": "get_batch",
+      "status": 200,
+      "name": "NON_HOLDING_CURRENCY",
+      "mock_status": 200
+    },
+    "ERRPYO015": {
+      "operation": "get_batch",
+      "status": 200,
+      "name": "CLOSED_MARKET",
+      "mock_status": 200
+    },
+    "ERRPYO047": {
+      "operation": "get_item",
+      "status": 200,
+      "name": "RECEIVER_UNREGISTERED",
+      "mock_status": 200
+    },
+    "ERRPYO052": {
+      "operation": "get_item",
+      "status": 200,
+      "name": "RISK_DECLINE",
+      "mock_status": 200
+    },
+    "ERRPYO007": {
+      "operation": "cancel",
+      "status": 400,
+      "name": "ITEM_ALREADY_CANCELLED",
+      "mock_status": 400
+    },
+    "ERRPYO008": {
+      "operation": "cancel",
+      "status": 400,
+      "name": "ITEM_CANCELLATION_FAILED",
+      "mock_status": 400
+    },
+    "ERRPYO009": {
+      "operation": "cancel",
+      "status": 400,
+      "name": "ITEM_INCORRECT_STATUS",
+      "mock_status": 400
+    },
+    "ERRPYO005": {
+      "operation": "create",
+      "status": 422,
+      "name": "INSUFFICIENT_FUNDS",
+      "mock_status": 422
+    },
+    "ERRPYO006": {
+      "operation": "create",
+      "status": 500,
+      "name": "INTERNAL_ERROR",
+      "mock_status": 500
+    },
+    "ERRPYO014": {
+      "operation": "create",
+      "status": 400,
+      "name": "USER_BUSINESS_ERROR",
+      "mock_status": 422
+    },
+    "ERRPYO036": {
+      "operation": "create",
+      "status": 504,
+      "name": "REQUEST_TIMEOUT_EXCEEDED",
+      "mock_status": 504
+    },
+    "ERRPYO039": {
+      "operation": "create",
+      "status": 400,
+      "name": "PREVIOUS_REQUEST_IN_PROGRESS",
+      "mock_status": 409
+    }
+  },
+  "notes": [
+    "ERRPYO015 is probed on both the batch and the item path; matched_on shows which one PayPal honours."
+  ],
+  "observed_at": "2026-10-24T06:58:11.289541Z",
+  "evidence_files": []
+}

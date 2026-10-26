@@ -1,0 +1,102 @@
+{
+  "received_at": "2026-10-23T22:14:37.807619Z",
+  "event_id": "WH-2LJ05453DV740643U-3DC22927617099520",
+  "event_type": "CUSTOMER.DISPUTE.CREATED",
+  "resource_type": "dispute",
+  "create_time": "2026-10-23T22:14:34.055Z",
+  "sha256": "158f89009c42116e07cfb7b2a0fa22f989cc7f4bae9dd5a454f2a85946e08c99",
+  "size": 1660,
+  "raw_file": "raw/webhooks/20261023T221437807619Z_001_WH-2LJ05453DV740643U-3DC22927617099520.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "1660",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "0000000000000000241c7e95a7648fca",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "20ff712c-cf2f-11f1-9e4a-9d0b4f2458dc",
+    "paypal-transmission-sig": "RoPwgwtqAs4yqsdWjIyJE5mJZgxycM4CrwBIB4/NzwnseZUBUDKq2RUQS9XpsrJqygorIM33sHpX0Jj9Jojv+qzYW8dgud6GSfQQEzppjaWGfj3WZA/rHxdj6dtgNFhXHLb0oGIFjsyoDO+IIbw0iX7ZO0MArSa+Fr9wzvOsEaC1gp8TCVlL14XGqZHgqZj9W1NTCj2D3y3mm/tCwQEZyvG1dlnZ8LlQ4FgcRFEIdxXHfT7AjoK/kCTJCcxwADeqVbxu257kI4goj0UxR+XlRi14P9/NZ9bPUB4Ep1W2P+xTPiSipbPdzL8f3EMbIC94D5L1YkGs42YSel30YVHuBw==",
+    "paypal-transmission-time": "2026-10-23T22:14:34Z",
+    "x-forwarded-for": "173.0.80.117",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-2LJ05453DV740643U-3DC22927617099520",
+    "event_version": "1.0",
+    "create_time": "2026-10-23T22:14:34.055Z",
+    "resource_type": "dispute",
+    "event_type": "CUSTOMER.DISPUTE.CREATED",
+    "summary": "A new dispute opened with case # PP-R-JQM-10194292",
+    "resource": {
+      "dispute_id": "PP-R-JQM-10194292",
+      "create_time": "2026-10-23T22:11:16.275Z",
+      "update_time": "2026-10-23T22:14:07.179Z",
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "728873272J7565128",
+          "seller_transaction_id": "1X031539U0011491U",
+          "transaction_status": "HELD",
+          "seller": {
+            "merchant_id": "B23JM5BDGPAF8",
+            "name": "Test Store"
+          },
+          "items": [
+            {
+              "item_name": "Staged sandbox action: CounterSign check.",
+              "item_description": "Staged sandbox action: CounterSign check.",
+              "item_quantity": "1",
+              "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+              "item_type": "PRODUCT"
+            }
+          ],
+          "seller_protection_eligible": true,
+          "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+        }
+      ],
+      "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+      "status": "UNDER_REVIEW",
+      "dispute_amount": {
+        "currency_code": "USD",
+        "value": "400.00"
+      },
+      "dispute_life_cycle_stage": "CHARGEBACK",
+      "dispute_channel": "INTERNAL",
+      "offer": {
+        "buyer_requested_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        }
+      },
+      "refund_details": {
+        "allowed_refund_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        }
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+          "rel": "self",
+          "method": "GET"
+        }
+      ]
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-2LJ05453DV740643U-3DC22927617099520",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-2LJ05453DV740643U-3DC22927617099520/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

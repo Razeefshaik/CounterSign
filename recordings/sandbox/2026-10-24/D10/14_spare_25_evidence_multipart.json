@@ -1,0 +1,49 @@
+{
+  "method": "POST",
+  "path": "/v1/customer/disputes/PP-R-UJV-10194294/provide-evidence",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]",
+    "content-length": "406",
+    "content-type": "multipart/form-data; boundary=35eaf93d2b9a0bc47631c1bfc270aba4"
+  },
+  "request_body": "--35eaf93d2b9a0bc47631c1bfc270aba4\r\nContent-Disposition: form-data; name=\"input\"\r\nContent-Type: application/json\r\n\r\n{\"evidences\": [{\"evidence_type\": \"PROOF_OF_FULFILLMENT\", \"evidence_info\": {\"tracking_info\": [{\"carrier_name\": \"USPS\", \"tracking_number\": \"9400111899223197428490\"}]}, \"notes\": \"Tracking for this order, uploaded by the marketplace (staged sandbox).\"}]}\r\n--35eaf93d2b9a0bc47631c1bfc270aba4--\r\n",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "server": "nginx",
+    "access-control-expose-headers": "Server-Timing",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f396968989d33-9a2d27e66355cf5d-01\"",
+    "paypal-debug-id": "f396968989d33",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 12:21:21 GMT",
+    "x-served-by": "cache-sin-wsat1880081-SIN, cache-sin-wsat1880081-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792844480.323980,VS0,VE1662",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "links": [
+      {
+        "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294",
+        "rel": "detail",
+        "method": "GET"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T12:21:22.679797Z",
+  "t_recv": "2026-10-24T12:21:24.393284Z"
+}

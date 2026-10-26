@@ -1,0 +1,502 @@
+{
+  "tools": [
+    "get_order_details",
+    "list_disputes",
+    "get_dispute",
+    "get_shipment_tracking",
+    "list_transactions"
+  ],
+  "base_url": "https://api-m.sandbox.paypal.com",
+  "calls": [
+    {
+      "tool": "list_disputes",
+      "ok": true,
+      "output": {
+        "items": [
+          {
+            "dispute_id": "PP-R-UJV-10194294",
+            "create_time": "2026-10-23T22:15:33.000Z",
+            "update_time": "2026-10-23T22:18:44.000Z",
+            "disputed_transactions": [
+              {
+                "buyer_transaction_id": "0GS74555A8389573J",
+                "buyer": {
+                  "payer_id": "HFJETABW9K8C6"
+                },
+                "seller": {
+                  "merchant_id": "B23JM5BDGPAF8"
+                }
+              }
+            ],
+            "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+            "status": "WAITING_FOR_SELLER_RESPONSE",
+            "dispute_state": "REQUIRED_ACTION",
+            "dispute_amount": {
+              "currency_code": "USD",
+              "value": "25.00"
+            },
+            "dispute_life_cycle_stage": "CHARGEBACK",
+            "dispute_channel": "INTERNAL",
+            "seller_response_due_date": "2026-11-03T04:59:59.000Z",
+            "links": [
+              {
+                "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294",
+                "rel": "self",
+                "method": "GET"
+              }
+            ]
+          },
+          {
+            "dispute_id": "PP-R-XJK-10194293",
+            "create_time": "2026-10-23T22:13:43.000Z",
+            "update_time": "2026-10-23T22:17:23.000Z",
+            "disputed_transactions": [
+              {
+                "buyer_transaction_id": "1KC99580K1831703T",
+                "buyer": {
+                  "payer_id": "HFJETABW9K8C6"
+                },
+                "seller": {
+                  "merchant_id": "B23JM5BDGPAF8"
+                }
+              }
+            ],
+            "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+            "status": "WAITING_FOR_SELLER_RESPONSE",
+            "dispute_state": "REQUIRED_ACTION",
+            "dispute_amount": {
+              "currency_code": "USD",
+              "value": "60.00"
+            },
+            "dispute_life_cycle_stage": "INQUIRY",
+            "dispute_channel": "INTERNAL",
+            "seller_response_due_date": "2026-11-12T22:13:43.000Z",
+            "links": [
+              {
+                "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293",
+                "rel": "self",
+                "method": "GET"
+              }
+            ]
+          },
+          {
+            "dispute_id": "PP-R-JQM-10194292",
+            "create_time": "2026-10-23T22:11:16.000Z",
+            "update_time": "2026-10-23T22:32:33.000Z",
+            "disputed_transactions": [
+              {
+                "buyer_transaction_id": "728873272J7565128",
+                "buyer": {
+                  "payer_id": "HFJETABW9K8C6"
+                },
+                "seller": {
+                  "merchant_id": "B23JM5BDGPAF8"
+                }
+              }
+            ],
+            "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+            "status": "UNDER_REVIEW",
+            "dispute_state": "UNDER_PAYPAL_REVIEW",
+            "dispute_amount": {
+              "currency_code": "USD",
+              "value": "400.00"
+            },
+            "dispute_life_cycle_stage": "CHARGEBACK",
+            "dispute_channel": "INTERNAL",
+            "links": [
+              {
+                "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+                "rel": "self",
+                "method": "GET"
+              }
+            ]
+          }
+        ],
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes?page_size=10",
+            "rel": "self",
+            "method": "GET"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes?page_size=10",
+            "rel": "first",
+            "method": "GET"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "get_dispute",
+      "ok": true,
+      "output": {
+        "dispute_id": "PP-R-JQM-10194292",
+        "create_time": "2026-10-23T22:11:16.275Z",
+        "update_time": "2026-10-23T22:32:33.999Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "728873272J7565128",
+            "seller_transaction_id": "1X031539U0011491U",
+            "create_time": "2026-10-23T22:02:25.000Z",
+            "transaction_status": "HELD",
+            "gross_amount": {
+              "currency_code": "USD",
+              "value": "400.00"
+            },
+            "buyer": {
+              "email": "buyer-1@redacted",
+              "payer_id": "HFJETABW9K8C6",
+              "name": "John Doe"
+            },
+            "seller": {
+              "email": "email@redacted",
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "status": "UNDER_REVIEW",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        },
+        "dispute_state": "UNDER_PAYPAL_REVIEW",
+        "fund_movements": [
+          {
+            "party": "RECEIVER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "385.55"
+            },
+            "initiated_time": "2026-10-23T22:14:34.000Z",
+            "type": "DEBIT",
+            "reason": "HOLD_PLACED"
+          }
+        ],
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "dispute_channel": "INTERNAL",
+        "extensions": {
+          "merchant_contacted": false,
+          "buyer_contacted_time": "2026-10-23T22:11:15.659Z"
+        },
+        "evidences": [
+          {
+            "evidence_type": "CREATE",
+            "notes": "hii",
+            "source": "SUBMITTED_BY_BUYER",
+            "date": "2026-10-23T22:11:16.275Z",
+            "dispute_life_cycle_stage": "CHARGEBACK"
+          }
+        ],
+        "offer": {
+          "buyer_requested_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          }
+        },
+        "refund_details": {
+          "allowed_refund_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          }
+        },
+        "allowed_response_options": {
+          "accept_claim": {
+            "accept_claim_types": [
+              "REFUND"
+            ]
+          }
+        },
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+            "rel": "self",
+            "method": "GET"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/accept-claim",
+            "rel": "accept_claim",
+            "method": "POST"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/adjudicate",
+            "rel": "adjudicate",
+            "method": "POST"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/require-evidence",
+            "rel": "require_evidence",
+            "method": "POST"
+          },
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/provide-supporting-info",
+            "rel": "provide_supporting_info",
+            "method": "POST"
+          }
+        ]
+      }
+    },
+    {
+      "tool": "get_order_details",
+      "ok": true,
+      "output": {
+        "message": "The PayPal order 02028397HW8915403 has been successfully captured.",
+        "status": "COMPLETED",
+        "amount": "USD 400.00",
+        "raw": {
+          "id": "02028397HW8915403",
+          "intent": "CAPTURE",
+          "status": "COMPLETED",
+          "payment_source": {
+            "paypal": {
+              "email_address": "buyer-1@redacted",
+              "account_id": "HFJETABW9K8C6",
+              "account_status": "VERIFIED",
+              "name": {
+                "given_name": "John",
+                "surname": "Doe"
+              },
+              "address": {
+                "country_code": "US"
+              }
+            }
+          },
+          "purchase_units": [
+            {
+              "reference_id": "inr_400",
+              "amount": {
+                "currency_code": "USD",
+                "value": "400.00"
+              },
+              "payee": {
+                "email_address": "email@redacted",
+                "merchant_id": "B23JM5BDGPAF8"
+              },
+              "description": "Staged sandbox action: CounterSign check.",
+              "soft_descriptor": "TEST STORE",
+              "shipping": {
+                "name": {
+                  "full_name": "John Doe"
+                },
+                "address": {
+                  "address_line_1": "2211 N First St",
+                  "admin_area_2": "San Jose",
+                  "admin_area_1": "CA",
+                  "postal_code": "95131",
+                  "country_code": "US"
+                },
+                "trackers": [
+                  {
+                    "id": "1X031539U0011491U-9400111899223197428490",
+                    "status": "SHIPPED",
+                    "links": [
+                      {
+                        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403",
+                        "rel": "up",
+                        "method": "GET"
+                      },
+                      {
+                        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403/trackers/1X031539U0011491U-9400111899223197428490",
+                        "rel": "update",
+                        "method": "PATCH"
+                      }
+                    ],
+                    "notify_payer": false
+                  }
+                ]
+              },
+              "payments": {
+                "captures": [
+                  {
+                    "id": "1X031539U0011491U",
+                    "status": "PENDING",
+                    "status_details": {
+                      "reason": "BUYER_COMPLAINT"
+                    },
+                    "amount": {
+                      "currency_code": "USD",
+                      "value": "400.00"
+                    },
+                    "final_capture": true,
+                    "seller_protection": {
+                      "status": "ELIGIBLE",
+                      "dispute_categories": [
+                        "ITEM_NOT_RECEIVED",
+                        "UNAUTHORIZED_TRANSACTION"
+                      ]
+                    },
+                    "links": [
+                      {
+                        "href": "https://api.sandbox.paypal.com/v2/payments/captures/1X031539U0011491U",
+                        "rel": "self",
+                        "method": "GET"
+                      },
+                      {
+                        "href": "https://api.sandbox.paypal.com/v2/payments/captures/1X031539U0011491U/refund",
+                        "rel": "refund",
+                        "method": "POST"
+                      },
+                      {
+                        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403",
+                        "rel": "up",
+                        "method": "GET"
+                      }
+                    ],
+                    "create_time": "2026-10-23T22:02:25Z",
+                    "update_time": "2026-10-23T22:14:33Z"
+                  }
+                ],
+                "refunds": [
+                  {
+                    "id": "1FJ49806UT252163G",
+                    "amount": {
+                      "currency_code": "USD",
+                      "value": "385.55"
+                    },
+                    "seller_payable_breakdown": {
+                      "gross_amount": {
+                        "currency_code": "USD",
+                        "value": "385.55"
+                      },
+                      "paypal_fee": {
+                        "currency_code": "USD",
+                        "value": "0.00"
+                      },
+                      "platform_fees": [
+                        {
+                          "amount": {
+                            "currency_code": "USD",
+                            "value": "0.00"
+                          }
+                        }
+                      ],
+                      "net_amount": {
+                        "currency_code": "USD",
+                        "value": "385.55"
+                      },
+                      "total_refunded_amount": {
+                        "currency_code": "USD",
+                        "value": "0.00"
+                      }
+                    },
+                    "status": "PENDING",
+                    "links": [
+                      {
+                        "href": "https://api.sandbox.paypal.com/v2/payments/refunds/1FJ49806UT252163G",
+                        "rel": "self",
+                        "method": "GET"
+                      },
+                      {
+                        "href": "https://api.sandbox.paypal.com/v2/payments/captures/1X031539U0011491U",
+                        "rel": "up",
+                        "method": "GET"
+                      }
+                    ],
+                    "create_time": "2026-10-23T15:14:33-07:00",
+                    "update_time": "2026-10-23T15:14:33-07:00"
+                  }
+                ]
+              }
+            }
+          ],
+          "payer": {
+            "name": {
+              "given_name": "John",
+              "surname": "Doe"
+            },
+            "email_address": "buyer-1@redacted",
+            "payer_id": "HFJETABW9K8C6",
+            "address": {
+              "country_code": "US"
+            }
+          },
+          "create_time": "2026-10-23T21:29:55Z",
+          "update_time": "2026-10-23T22:02:25Z",
+          "links": [
+            {
+              "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403",
+              "rel": "self",
+              "method": "GET"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "tool": "get_shipment_tracking",
+      "ok": true,
+      "output": {
+        "trackers": [
+          {
+            "transaction_id": "1X031539U0011491U",
+            "tracking_number": "9400111899223197428490",
+            "tracking_number_type": "CARRIER_PROVIDED",
+            "status": "SHIPPED",
+            "shipment_date": "2026-10-23",
+            "carrier": "USPS",
+            "notify_buyer": false,
+            "created_time": "2026-10-23T22:02:42.000Z",
+            "last_updated_time": "1792792962000",
+            "shipment_direction": "FORWARD",
+            "shipment_uploader": "MERCHANT",
+            "links": [
+              {
+                "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+                "rel": "self",
+                "method": "GET",
+                "encType": "application/json"
+              },
+              {
+                "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+                "rel": "replace",
+                "method": "PUT",
+                "encType": "application/json"
+              },
+              {
+                "href": "https://api-m.sandbox.paypal.com/v1/shipping/trackers/1X031539U0011491U-9400111899223197428490",
+                "rel": "edit",
+                "method": "PATCH",
+                "encType": "application/json"
+              }
+            ]
+          }
+        ],
+        "links": []
+      }
+    },
+    {
+      "tool": "list_transactions",
+      "ok": true,
+      "output": {
+        "account_number": "B23JM5BDGPAF8",
+        "start_date": "2026-09-24T07:00:11Z",
+        "end_date": "2026-10-24T05:29:59Z",
+        "last_refreshed_datetime": "2026-10-24T05:29:59Z",
+        "page": 1,
+        "total_items": 0,
+        "total_pages": 0,
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/reporting/transactions?transaction_id=None&transaction_status=S&end_date=2026-10-24T07%3A00%3A11Z&start_date=2026-09-24T07%3A00%3A11Z&page_size=20&page=1",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    }
+  ],
+  "skipped": {}
+}

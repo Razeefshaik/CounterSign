@@ -1,0 +1,101 @@
+{
+  "check_id": "D13",
+  "verdict": "CONFIRMED",
+  "reason": "tool set equals the allowlist",
+  "toolkit": "paypal-agent-toolkit==1.11.0",
+  "adapter": "paypal_agent_toolkit.langchain.toolkit.PayPalToolkit",
+  "actions": {
+    "disputes": {
+      "list": true,
+      "get": true
+    },
+    "shipment": {
+      "get": true
+    },
+    "orders": {
+      "get": true
+    },
+    "transactions": {
+      "list": true
+    }
+  },
+  "allowed_tools": [
+    "get_dispute",
+    "get_order_details",
+    "get_shipment_tracking",
+    "list_disputes",
+    "list_transactions"
+  ],
+  "versions": {
+    "langchain": "0.3.23",
+    "langchain-core": "0.3.86",
+    "paypal-agent-toolkit": "1.11.0",
+    "pydantic": "2.14.1",
+    "requests": "2.34.2"
+  },
+  "listing": {
+    "ok": true,
+    "tools": [
+      "get_order_details",
+      "list_disputes",
+      "get_dispute",
+      "get_shipment_tracking",
+      "list_transactions"
+    ],
+    "tool_classes": [
+      "paypal_agent_toolkit.langchain.tool.PayPalTool"
+    ],
+    "sandbox_base_url": true,
+    "network_attempts_while_listing": 0
+  },
+  "allowlist": {
+    "exact": true,
+    "tools": [
+      "get_dispute",
+      "get_order_details",
+      "get_shipment_tracking",
+      "list_disputes",
+      "list_transactions"
+    ],
+    "unexpected": [],
+    "missing": []
+  },
+  "tool_calls": {
+    "ran": true,
+    "results": {
+      "list_disputes": {
+        "ok": true
+      },
+      "get_dispute": {
+        "ok": true
+      },
+      "get_order_details": {
+        "ok": true
+      },
+      "get_shipment_tracking": {
+        "ok": true
+      },
+      "list_transactions": {
+        "ok": true
+      }
+    },
+    "skipped": {}
+  },
+  "observed_at": "2026-10-24T06:58:31.904795Z",
+  "completed_at": "2026-10-24T07:00:28.140756Z",
+  "evidence_files": [
+    "2026-10-23/D13/call_tools.json",
+    "2026-10-23/D13/call_tools_stderr.json",
+    "2026-10-23/D13/install_adapter.json",
+    "2026-10-23/D13/install_toolkit.json",
+    "2026-10-23/D13/install_venv.json",
+    "2026-10-23/D13/install_versions.json",
+    "2026-10-23/D13/list_tools.json",
+    "2026-10-23/D13/list_tools_stderr.json",
+    "2026-10-23/D13/tool_get_dispute.json",
+    "2026-10-23/D13/tool_get_order_details.json",
+    "2026-10-23/D13/tool_get_shipment_tracking.json",
+    "2026-10-23/D13/tool_list_disputes.json",
+    "2026-10-23/D13/tool_list_transactions.json"
+  ]
+}

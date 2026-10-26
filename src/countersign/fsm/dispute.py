@@ -23,10 +23,11 @@ RESOLVED_STATUS = "RESOLVED"
 
 # PayPal outcome_code -> phase, confirmed by D10 sandbox settlement/accept-claim.
 # A loss code may map to LOST_FULL or LOST_PARTIAL: the refunded amount decides which.
-# Buyer-close remains pending D10; CANCELED_BY_BUYER is a mock-only fixture.
+# Buyer-close was confirmed last: D10 recorded CANCELED_BY_BUYER / BUYER_CANCELLED_CASE.
 OUTCOME_MAP: dict[str, Phase] = {
     "RESOLVED_SELLER_FAVOUR": Phase.WON,
     "RESOLVED_BUYER_FAVOUR": Phase.LOST_FULL,
+    "CANCELED_BY_BUYER": Phase.CANCELLED,
 }
 
 # UNKNOWN_OUTCOME fails closed: the reserve stays and an incident opens, scoped to this dispute.

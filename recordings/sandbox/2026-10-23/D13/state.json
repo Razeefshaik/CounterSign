@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "check_id": "D13",
+  "completed_steps": [
+    "create_venv",
+    "list_tools",
+    "assert_allowlist",
+    "call_tools",
+    "findings"
+  ],
+  "data": {
+    "temp_dir_name": "countersign-d13-uwv_po18",
+    "venv_ready": true,
+    "versions": {
+      "langchain": "0.3.23",
+      "langchain-core": "0.3.86",
+      "paypal-agent-toolkit": "1.11.0",
+      "pydantic": "2.14.1",
+      "requests": "2.34.2"
+    },
+    "install": {
+      "installed": true
+    },
+    "listing": {
+      "ok": true,
+      "tools": [
+        "get_order_details",
+        "list_disputes",
+        "get_dispute",
+        "get_shipment_tracking",
+        "list_transactions"
+      ],
+      "tool_classes": [
+        "paypal_agent_toolkit.langchain.tool.PayPalTool"
+      ],
+      "sandbox_base_url": true,
+      "network_attempts_while_listing": 0
+    },
+    "allowlist": {
+      "exact": true,
+      "tools": [
+        "get_dispute",
+        "get_order_details",
+        "get_shipment_tracking",
+        "list_disputes",
+        "list_transactions"
+      ],
+      "unexpected": [],
+      "missing": []
+    },
+    "tool_calls": {
+      "ran": true,
+      "results": {
+        "list_disputes": {
+          "ok": true
+        },
+        "get_dispute": {
+          "ok": true
+        },
+        "get_order_details": {
+          "ok": true
+        },
+        "get_shipment_tracking": {
+          "ok": true
+        },
+        "list_transactions": {
+          "ok": true
+        }
+      },
+      "skipped": {}
+    },
+    "verdict": "CONFIRMED"
+  },
+  "in_progress": null,
+  "started_at": "2026-10-24T06:58:31.904795Z",
+  "updated_at": "2026-10-24T07:00:32.298269Z"
+}
