@@ -337,6 +337,23 @@ lagging balance remains pending instead of being mistaken for a new movement.
 Existing checkpoints from the failed Wednesday rehearsal can establish their
 starting cash from the saved Monday freeze event; no historical write is replayed.
 
+C25d repeats the completed-action check after every staged-step tick as well as
+on entry/resume. Only an `EXECUTED` proposal with the same action and target on
+another incident counts. Cancellation still requires a matching item GET showing
+`RETURNED`. A same-step completion logs `CONFIGURED_MODEL_ACTED_EARLIER` once with
+the original proposal time and `same_step=true`. An already-blocked staged
+duplicate is retained as `CONFIGURED_MODEL_DUPLICATE_BLOCKED` with its rules;
+it does not produce a new different-decision event. Without an executed match,
+the ordinary BLOCK/different-decision stop remains.
+
+The existing lifecycle forbids manually resolving a generic staged incident.
+C25d therefore parks a satisfied staged goal in `WAITING_EXTERNAL` through the
+existing incident service and records `CONFIGURED_MODEL_STAGED_GOAL_PARKED`
+(`terminal=false`, `TERMINAL_REQUIRES_RECONCILIATION`). This excludes it from
+model selection without inventing a terminal transition or closing the original
+financial incident. A saved stop with an executed cancel and blocked staged
+duplicate follows the same cleanup before continuing; no cancel is replayed.
+
 `MODEL_QUOTA_EXHAUSTED` is a fixed resumable stop. Preserve all state and resume
 the same command after the provider's quota resets; the script does not guess
 the reset time or switch models. A quota stop does not consume the incident's
@@ -355,3 +372,24 @@ Scripted mode retains its existing exact amounts and all three required moments.
 Automated configured-week checks use fake models with real core services and
 the local mock. Only the owner and Claude perform a real-model rehearsal; these
 tests make no claims about live Gemini decisions or sandbox execution.
+
+C25d validation (Oct 27): the five dedicated same-step/resume/unmatched-BLOCK
+tests passed in 611.85 seconds. The full suite passed with **3,592 passed, five
+skipped, zero failures in 2,177.92 seconds (36m 17s)**. Both test settings were
+set: `COUNTERSIGN_TEST_DATABASE_URL` used the disposable server at
+`127.0.0.1:55433` with an isolated `cs_c25d_6e8d38eed939` database, and
+`COUNTERSIGN_TEST_TOOLKIT_PYTHON` selected
+`CounterSign-db/.venv/toolkit/Scripts/python.exe`. The database was removed after
+the run. The real toolkit-child proof and all five C25d cases passed in the full
+suite; the skips were optional legacy-toolkit checks in the main environment.
+Ruff passed and import-linter kept all three contracts. No real provider or
+PayPal request was made. Claude's next rehearsal should watch for the original
+executed proposal, its matched RETURNED GET, a single cancel operation, and no
+further model calls on the parked staged goal. A blocked staged duplicate stays
+visible; a BLOCK without an executed match still stops.
+
+Pytest printed that passing summary and wrote final JUnit outcomes for all 3,597
+cases, but its process remained alive for more than six minutes afterward with
+roughly 6 GB resident memory and paging waits. The test process was then stopped
+to release resources. This is a passing case result, not a normal pytest process
+exit; the shutdown cause was not established or changed as part of C25d.
