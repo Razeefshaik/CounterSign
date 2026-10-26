@@ -186,12 +186,42 @@ async def test_interrupted_invocation_poisons_gateway_and_kills_child(cancel):
         with pytest.raises(asyncio.CancelledError):
             await pending
     else:
-        with pytest.raises(ToolError, match="^TOOLKIT_CALL_FAILED$"):
+        with pytest.raises(ToolError, match="^TOOLKIT_CLOSED$"):
             await pending
     assert process.killed and process.closed
     with pytest.raises(ToolError, match="^TOOLKIT_CLOSED$"):
         await read.handler({"id": "PP-D-1"})
     assert len(process.messages) == 2
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("code", ["TOOLKIT_CALL_FAILED", "INVALID_TOOL_ARGUMENTS"])
+async def test_complete_read_failure_frame_keeps_gateway_ready_for_corrected_call(code):
+    process = FakeProcess([
+        {"ok": True, "tools": definitions()}, {"ok": False, "error": code},
+        {"ok": True, "output": {"status": "OK"}},
+    ])
+    async with gateway(process) as instance:
+        read = next(tool for tool in instance.read_tools() if tool.name == "get_dispute")
+        with pytest.raises(ToolError, match="^" + code + "$"):
+            await read.handler({"id": "bad"})
+        assert not process.killed and not process.closed
+        assert await read.handler({"id": "PP-D-1"}) == {"status": "OK"}
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("code", ["TOOLKIT_REQUEST_BLOCKED", "TOOLKIT_SET_MISMATCH",
+                                  "TOOLKIT_MESSAGE_INVALID"])
+async def test_unsafe_child_frame_closes_gateway_immediately(code):
+    process = FakeProcess([
+        {"ok": True, "tools": definitions()}, {"ok": False, "error": code},
+    ])
+    instance = gateway(process)
+    await instance.open()
+    read = next(tool for tool in instance.read_tools() if tool.name == "get_dispute")
+    with pytest.raises(ToolError, match="^" + code + "$"):
+        await read.handler({"id": "PP-D-1"})
+    assert process.killed and process.closed
 
 
 @pytest.mark.parametrize(
@@ -394,6 +424,20 @@ def test_even_a_read_tool_adapter_bug_cannot_send_a_financial_post(fake_sdk):
         runtime.invoke("get_dispute", {"id": "PP-D-1"})
 
 
+def test_guard_failure_stays_fatal_even_when_the_sdk_swallows_it(fake_sdk):
+    runtime = child.Runtime(SETTINGS)
+
+    def swallowed(args, config):
+        try:
+            runtime._guard.check("POST", SETTINGS["base_url"] + "/v1/payments/payouts")
+        except child.ChildError:
+            return "Error executing PayPalTool: private details"
+
+    runtime._tools["get_dispute"].invoke = swallowed
+    with pytest.raises(child.ChildError, match="^TOOLKIT_REQUEST_BLOCKED$"):
+        runtime.invoke("get_dispute", {"id": "PP-D-1"})
+
+
 def test_child_stdout_is_only_redacted_protocol_even_when_sdk_prints_private_data(fake_sdk, monkeypatch):
     fake_sdk.noisy = True
     input_data = b"\n".join(
@@ -422,6 +466,31 @@ def test_child_stdout_is_only_redacted_protocol_even_when_sdk_prints_private_dat
     responses = [json.loads(line) for line in output.splitlines()]
     assert all(response["ok"] is True for response in responses)
     assert responses[1]["output"]["messages"][0]["content"] == "refund to account X"
+
+
+def test_child_protocol_continues_after_complete_read_error_only(fake_sdk, monkeypatch):
+    original = child.Runtime.invoke
+
+    def invoke(self, name, args):
+        if args.get("id") == "wrong":
+            raise child.ChildError("TOOLKIT_CALL_FAILED")
+        return original(self, name, args)
+
+    monkeypatch.setattr(child.Runtime, "invoke", invoke)
+    messages = [
+        {"op": "open", "settings": SETTINGS},
+        {"op": "invoke", "tool": "get_dispute", "arguments": {"id": "wrong"}},
+        {"op": "invoke", "tool": "get_dispute", "arguments": {"id": "PP-D-1"}},
+    ]
+    source = io.BytesIO(b"\n".join(json.dumps(m).encode() for m in messages) + b"\n")
+    output = io.BytesIO()
+    monkeypatch.setattr(child.sys, "stdin", types.SimpleNamespace(buffer=source))
+    monkeypatch.setattr(child.sys, "stdout", types.SimpleNamespace(buffer=output))
+    monkeypatch.setattr(child.logging.root.manager, "disable", child.logging.root.manager.disable)
+    assert child.main() == 0
+    responses = [json.loads(line) for line in output.getvalue().splitlines()]
+    assert responses[1] == {"ok": False, "error": "TOOLKIT_CALL_FAILED"}
+    assert responses[2]["ok"] is True
 
 
 def test_optional_installed_toolkit_lists_exactly_five_without_network(monkeypatch):
@@ -545,7 +614,7 @@ def test_actual_child_interrupted_read_is_reaped_and_gateway_stays_closed(local_
             with pytest.raises(asyncio.CancelledError):
                 await pending
         else:
-            with pytest.raises(ToolError, match="^TOOLKIT_CALL_FAILED$"):
+            with pytest.raises(ToolError, match="^TOOLKIT_CLOSED$"):
                 await pending
         assert processes[0].returncode is not None
         assert processes[0]._process.stdin.closed
@@ -572,7 +641,7 @@ def test_actual_child_blocked_stdin_times_out_without_blocking_event_loop(local_
             advanced.set()
 
         pulse = asyncio.create_task(heartbeat())
-        with pytest.raises(ToolError, match="^TOOLKIT_CALL_FAILED$"):
+        with pytest.raises(ToolError, match="^TOOLKIT_CLOSED$"):
             await read.handler({"data": "x" * 200000})
         await pulse
         assert advanced.is_set()

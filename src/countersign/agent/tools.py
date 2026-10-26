@@ -20,6 +20,19 @@ _ERROR_CODES = frozenset(
      "TOOLKIT_START_FAILED", "TOOLKIT_CALL_FAILED", "TOOLKIT_MESSAGE_INVALID",
      "TOOLKIT_DEPENDENCIES_MISSING", "TOOLKIT_VERSION_UNSUPPORTED", "TOOLKIT_REQUEST_BLOCKED"}
 )
+# Only these fixed read failures may become model observations. Configuration,
+# capability, protocol and response-integrity failures always abort the step.
+RECOVERABLE_TOOL_ERRORS = frozenset(
+    {"INVALID_TOOL_ARGUMENTS", "TOOL_CALL_FAILED", "TOOLKIT_CALL_FAILED",
+     "INVALID_READ_TOOL_ARGUMENTS", "INVALID_GRAPH_IDENTIFIER", "UNKNOWN_MONEY_GRAPH_QUERY",
+     "INVALID_GRAPH_LIMIT", "MONEY_GRAPH_UNAVAILABLE", "INVALID_PAYOUT_ITEM_IDENTIFIER",
+     "PAYOUT_ITEM_UNAVAILABLE", "INVALID_SIMULATION_ARGUMENTS", "SIMULATION_UNAVAILABLE"}
+)
+_READ_ERROR_CODES = RECOVERABLE_TOOL_ERRORS | frozenset(
+    {"MONEY_GRAPH_DATABASE_REQUIRED", "INVALID_GRAPH_SCHEMA", "MONEY_GRAPH_ROLE_REFUSED",
+     "INVALID_MONEY_GRAPH_RESPONSE", "INVALID_PAYOUT_ITEM_RESPONSE", "UNSAFE_PAYOUT_ITEM_RESPONSE",
+     "INVALID_SIMULATION_RESPONSE"}
+)
 
 
 class ToolError(ValueError):
@@ -27,6 +40,13 @@ class ToolError(ValueError):
 
     def __init__(self, code="TOOL_CALL_FAILED"):
         super().__init__(code if isinstance(code, str) and code in _ERROR_CODES else "TOOL_CALL_FAILED")
+
+
+class ReadToolError(ToolError):
+    """Application read codes survive registry wrapping without private text."""
+
+    def __init__(self, code):
+        ValueError.__init__(self, code if code in _READ_ERROR_CODES else "TOOL_CALL_FAILED")
 
 
 def check_toolkit_names(names: Iterable[str]) -> None:

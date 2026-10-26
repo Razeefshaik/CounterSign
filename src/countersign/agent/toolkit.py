@@ -295,15 +295,19 @@ class ToolkitGateway:
                 response = await self._exchange(
                     {"op": "invoke", "tool": name, "arguments": arguments}
                 )
-                return sanitize(
-                    response.get("output"),
-                    secrets=(self._settings.client_id, self._settings.client_secret),
-                )
             except BaseException as error:
                 await self._stop(force=True)
                 if isinstance(error, (asyncio.CancelledError, ToolError)):
                     raise
-                raise ToolError("TOOLKIT_CALL_FAILED") from None
+                raise ToolError("TOOLKIT_CLOSED") from None
+            # A complete, validated error frame leaves IPC synchronized. Only
+            # ordinary read failures keep the child available for another turn.
+            if response.get("ok") is not True:
+                raise ToolError(response["error"])
+            return sanitize(
+                response.get("output"),
+                secrets=(self._settings.client_id, self._settings.client_secret),
+            )
 
     async def _exchange(self, message):
         encoded = json.dumps(message, allow_nan=False).encode("utf-8") + b"\n"
@@ -321,7 +325,11 @@ class ToolkitGateway:
                 raise ToolError("TOOLKIT_MESSAGE_INVALID")
             if response.get("ok") is not True:
                 code = response.get("error")
-                raise ToolError(code if code in _CHILD_ERRORS else "TOOLKIT_CALL_FAILED")
+                if message.get("op") == "invoke" and code in {
+                    "TOOLKIT_CALL_FAILED", "INVALID_TOOL_ARGUMENTS"
+                }:
+                    return response
+                raise ToolError(code if code in _CHILD_ERRORS else "TOOLKIT_MESSAGE_INVALID")
             return response
 
         return await asyncio.wait_for(exchange(), self._timeout)

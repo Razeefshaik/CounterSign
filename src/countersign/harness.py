@@ -322,13 +322,43 @@ class Engine:
                 document = (await cursor.fetchone())["doc"]
                 subject = observed["subject"]
                 cursor = await conn.execute(
-                    "SELECT raw FROM disputes WHERE id::text=%s OR paypal_dispute_id=%s",
-                    (str(subject.get("dispute_id", "")), subject.get("paypal_dispute_id", "")),
+                    "SELECT id, order_id, paypal_dispute_id, raw FROM disputes "
+                    "WHERE id::text=%s OR paypal_dispute_id=%s OR order_id::text=%s",
+                    (str(subject.get("dispute_id", "")), subject.get("paypal_dispute_id", ""),
+                     str(subject.get("order_id", ""))),
                 )
-                disputes = [row["raw"] for row in await cursor.fetchall()]
+                dispute_rows = await cursor.fetchall()
+                disputes = [
+                    {"countersign_dispute_id": str(row["id"]),
+                     "countersign_order_id": str(row["order_id"]) if row["order_id"] else None,
+                     "paypal_dispute_id": row["paypal_dispute_id"], "raw": row["raw"]}
+                    for row in dispute_rows
+                ]
+                cursor = await conn.execute(
+                    "SELECT id, paypal_order_id, paypal_capture_id FROM orders "
+                    "WHERE id::text=%s OR id IN "
+                    "(SELECT order_id FROM disputes WHERE id=ANY(%s::uuid[])) ORDER BY id",
+                    (str(subject.get("order_id", "")), [row["id"] for row in dispute_rows]),
+                )
+                identifiers = [
+                    {"countersign_order_id": str(row["id"]),
+                     "paypal_order_id": row["paypal_order_id"],
+                     "paypal_capture_id": row["paypal_capture_id"]}
+                    for row in await cursor.fetchall()
+                ]
+                def label_subject(value):
+                    return {
+                        ("countersign_" + key if key in {
+                            "order_id", "dispute_id", "maker_id", "run_id"
+                        } else key): item for key, item in value.items()
+                    }
+
+                # Model-only projection: dashboard views/contracts stay intact.
+                document = {**document, "subject": label_subject(document["subject"])}
                 # The commander labels and redacts these observations as data;
                 # raw buyer messages never become the trusted system prompt.
-                context = {"incident_subject": subject, "disputes": disputes}
+                context = {"incident_subject": label_subject(subject), "disputes": disputes,
+                           "orders": identifiers}
             proposed = await self._agent.step(document, context)
             await self._store_agent_proposal(observed, proposed)
 
