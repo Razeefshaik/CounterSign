@@ -61,27 +61,27 @@ def truth(client):
 
 def test_seed_orders_captures_trackers(client):
     assert (
-        client.get("/v2/checkout/orders/MOCKORD1042").json()["purchase_units"][0][
-            "amount"
-        ]["value"]
+        client.get("/v2/checkout/orders/MOCKORD1042").json()["purchase_units"][0]["amount"]["value"]
         == "400.00"
     )
     assert (
-        client.get("/v2/payments/captures/MOCKCAP400").json()[
-            "seller_receivable_breakdown"
-        ]["paypal_fee"]["value"]
+        client.get("/v2/payments/captures/MOCKCAP400").json()["seller_receivable_breakdown"][
+            "paypal_fee"
+        ]["value"]
         == "0.00"
     )
     assert (
-        client.get("/v1/shipping/trackers?transaction_id=MOCKCAP400").json()[
-            "trackers"
-        ][0]["shipment_uploader"]
+        client.get("/v1/shipping/trackers?transaction_id=MOCKCAP400").json()["trackers"][0][
+            "shipment_uploader"
+        ]
         == "MERCHANT"
     )
     assert client.get("/v2/checkout/orders/missing").status_code == 404
 
 
 def test_hold_and_snapshot_refresh(client):
+    # Synthetic legacy balance holds remain an explicit fault mode, not the default.
+    client.post("/_mock/config", json={"dispute_hold": True})
     first = client.get("/v1/reporting/balances").json()
     d = staged(client)
     assert truth(client)["balances"]["available"]["value"] == "1100.00"
@@ -93,11 +93,67 @@ def test_hold_and_snapshot_refresh(client):
     fresh = client.get("/v1/reporting/balances").json()
     assert fresh["balances"][0]["available_balance"]["value"] == "1100.00"
     assert fresh["last_refresh_time"] == "2026-11-02T12:00:00Z"
-    assert (
-        client.get("/v1/reporting/balances?as_of_time=2026-11-02T09:00:00Z").json()
-        == first
-    )
+    assert client.get("/v1/reporting/balances?as_of_time=2026-11-02T09:00:00Z").json() == first
     assert client.get("/v1/customer/disputes/" + d["dispute_id"]).status_code == 200
+
+
+def test_default_dispute_freezes_capture_without_a_balance_hold(client):
+    before = truth(client)["balances"]
+    first, second = staged(client), staged(client)
+    capture_path = "/v2/payments/captures/MOCKCAP400"
+    assert client.get(capture_path).json()["status"] == "PENDING"
+    assert truth(client)["balances"] == before
+    advance(client, 10800)
+    snapshot = client.get("/v1/reporting/balances").json()["balances"][0]
+    assert snapshot["available_balance"]["value"] == "1500.00"
+    assert snapshot["withheld_balance"]["value"] == "0.00"
+    for dispute, expected in [(first, "PENDING"), (second, "COMPLETED")]:
+        closed = client.post("/_mock/disputes/" + dispute["dispute_id"] + "/buyer-close", json={})
+        assert closed.status_code == 200
+        assert closed.json()["dispute_outcome"]["outcome_code"] == "CANCELED_BY_BUYER"
+        assert client.get(capture_path).json()["status"] == expected
+        assert truth(client)["balances"] == before
+
+
+def test_seeded_legacy_hold_marker_cannot_create_cash_by_default(client):
+    dispute = {**staged(client), "hold_observed": True}
+    assert client.post("/_mock/seed", json={**SEED, "disputes": [dispute]}).status_code == 200
+    assert client.get("/v2/payments/captures/MOCKCAP400").json()["status"] == "PENDING"
+    assert (
+        client.post(
+            "/_mock/disputes/" + dispute["dispute_id"] + "/buyer-close", json={}
+        ).status_code
+        == 200
+    )
+    assert truth(client)["balances"]["available"]["value"] == "1500.00"
+    assert truth(client)["balances"]["withheld"]["value"] == "0.00"
+
+
+@pytest.mark.parametrize(
+    "status,link,expected",
+    [
+        ("WAITING_FOR_SELLER_RESPONSE", False, 422),
+        ("UNDER_REVIEW", True, 422),
+        ("WAITING_FOR_SELLER_RESPONSE", True, 200),
+    ],
+)
+def test_recorded_evidence_requires_status_and_actual_link(client, status, link, expected):
+    dispute = staged(client)
+    path = "/v1/customer/disputes/" + dispute["dispute_id"]
+    dispute.update(status=status, dispute_life_cycle_stage="PRE_ARBITRATION")
+    dispute["links"] = [{"href": path, "rel": "self", "method": "GET"}]
+    if link:
+        dispute["links"].append(
+            {"href": path + "/provide-evidence", "rel": "provide_evidence", "method": "POST"}
+        )
+    assert client.post("/_mock/seed", json={**SEED, "disputes": [dispute]}).status_code == 200
+    before = truth(client)["balances"]
+    response = client.post(
+        path + "/provide-evidence", json={"evidences": [{"notes": "Merchant tracking"}]}
+    )
+    assert response.status_code == expected
+    assert truth(client)["balances"] == before
+    assert client.get(path).json()["status"] == ("UNDER_REVIEW" if expected == 200 else status)
 
 
 def test_dispute_pagination_filters_and_buyer_message(client):
@@ -110,14 +166,12 @@ def test_dispute_pagination_filters_and_buyer_message(client):
     second = client.get(response["links"][0]["href"]).json()
     assert len(second["items"]) == 1
     assert second["items"][0]["dispute_id"] != response["items"][0]["dispute_id"]
-    assert (
-        client.get("/v1/customer/disputes?dispute_state=RESOLVED").json()["items"] == []
-    )
+    assert client.get("/v1/customer/disputes?dispute_state=RESOLVED").json()["items"] == []
     path = "/_mock/disputes/" + first["dispute_id"]
     assert (
-        client.post(
-            path + "/buyer-message", json={"content": "Please check tracking"}
-        ).json()["messages"][-1]["posted_by"]
+        client.post(path + "/buyer-message", json={"content": "Please check tracking"}).json()[
+            "messages"
+        ][-1]["posted_by"]
         == "BUYER"
     )
     assert client.get("/v1/customer/disputes?next_page_token=bad").status_code == 422
@@ -127,10 +181,7 @@ def test_evidence_multipart_hateoas_and_seller_win(client):
     d = staged(client)
     path = "/v1/customer/disputes/" + d["dispute_id"]
     assert "provide_evidence" in [link["rel"] for link in d["links"]]
-    assert (
-        client.post(path + "/provide-evidence", json={"evidences": []}).status_code
-        == 422
-    )
+    assert client.post(path + "/provide-evidence", json={"evidences": []}).status_code == 422
     response = client.post(
         path + "/provide-evidence",
         files={
@@ -151,26 +202,20 @@ def test_evidence_multipart_hateoas_and_seller_win(client):
         },
     )
     assert response.status_code == 200
-    assert response.json()["status"] == "UNDER_REVIEW"
-    assert "provide_evidence" not in [link["rel"] for link in response.json()["links"]]
-    assert (
-        client.post(
-            path + "/provide-evidence", files={"input": (None, "{}")}
-        ).status_code
-        == 422
-    )
-    result = client.post(
-        path + "/adjudicate", json={"adjudication_outcome": "SELLER_FAVOR"}
-    )
-    assert result.json()["dispute_outcome"]["outcome_code"] == "RESOLVED_SELLER_FAVOUR"
+    assert set(response.json()) == {"links"}
+    observed = client.get(path).json()
+    assert observed["status"] == "UNDER_REVIEW"
+    assert "provide_evidence" not in [link["rel"] for link in observed["links"]]
+    assert client.post(path + "/provide-evidence", files={"input": (None, "{}")}).status_code == 422
+    result = client.post(path + "/adjudicate", json={"adjudication_outcome": "SELLER_FAVOR"})
+    observed = client.get(path).json()
+    assert observed["dispute_outcome"]["outcome_code"] == "RESOLVED_SELLER_FAVOUR"
     assert truth(client)["balances"]["available"]["value"] == "1500.00"
     assert truth(client)["balances"]["withheld"]["value"] == "0.00"
-    assert [link["rel"] for link in result.json()["links"]] == ["self"]
+    assert result.json()["rel"] == "self"
+    assert [link["rel"] for link in observed["links"]] == ["self"]
     assert (
-        client.post(
-            path + "/accept-claim", json={"accept_claim_type": "REFUND"}
-        ).status_code
-        == 422
+        client.post(path + "/accept-claim", json={"accept_claim_type": "REFUND"}).status_code == 422
     )
 
 
@@ -183,7 +228,23 @@ def test_accept_claim_refund_with_or_without_hold(client, hold):
         json={"accept_claim_type": "REFUND", "note": "Owner approved"},
     )
     assert response.status_code == 200
-    assert response.json()["dispute_outcome"]["amount_refunded"]["value"] == "400.00"
+    assert (
+        client.get("/v1/customer/disputes/" + d["dispute_id"]).json()["dispute_outcome"][
+            "amount_refunded"
+        ]["value"]
+        == "400.00"
+    )
+    assert client.get("/v2/payments/captures/MOCKCAP400").json()["status"] == "REFUNDED"
+    assert (
+        client.get("/v1/customer/disputes/" + d["dispute_id"]).json()["dispute_outcome"][
+            "outcome_code"
+        ]
+        == "RESOLVED_BUYER_FAVOUR"
+    )
+    events = client.get("/v1/notifications/webhooks-events").json()["events"]
+    assert (
+        len([event for event in events if event["event_type"] == "PAYMENT.CAPTURE.REFUNDED"]) == 1
+    )
     actual = truth(client)
     assert len(actual["refunds"]) == 1
     assert actual["refunds"][0]["via"] == "accept_claim"
@@ -197,11 +258,7 @@ def test_dispute_writes_accept_both_formats(client, action, wire_format):
     d = staged(client)
     path = "/v1/customer/disputes/" + d["dispute_id"]
     payload = (
-        {
-            "evidences": [
-                {"evidence_type": "PROOF_OF_FULFILLMENT", "notes": "Stored tracking"}
-            ]
-        }
+        {"evidences": [{"evidence_type": "PROOF_OF_FULFILLMENT", "notes": "Stored tracking"}]}
         if action == "provide-evidence"
         else {"accept_claim_type": "REFUND", "note": "Owner approved"}
     )
@@ -257,27 +314,20 @@ def test_escalate_require_evidence_buyer_win(client):
     d = staged(client)
     path = "/v1/customer/disputes/" + d["dispute_id"]
     assert (
-        client.post(
-            path + "/require-evidence", json={"action": "SELLER_EVIDENCE"}
-        ).status_code
+        client.post(path + "/require-evidence", json={"action": "SELLER_EVIDENCE"}).status_code
         == 422
     )
     assert (
-        client.post(path + "/escalate", json={"note": "Review"}).json()["status"]
-        == "UNDER_REVIEW"
+        client.post(path + "/escalate", json={"note": "Review"}).json()["status"] == "UNDER_REVIEW"
     )
-    response = client.post(
-        path + "/require-evidence", json={"action": "BUYER_EVIDENCE"}
-    )
+    response = client.post(path + "/require-evidence", json={"action": "BUYER_EVIDENCE"})
     assert response.json()["status"] == "WAITING_FOR_BUYER_RESPONSE"
     client.post(
         "/_mock/disputes/" + d["dispute_id"] + "/transition",
         json={"status": "UNDER_REVIEW", "stage": "CHARGEBACK"},
     )
-    response = client.post(
-        path + "/adjudicate", json={"adjudication_outcome": "BUYER_FAVOR"}
-    )
-    assert response.json()["dispute_outcome"]["outcome_code"] == "RESOLVED_BUYER_FAVOUR"
+    response = client.post(path + "/adjudicate", json={"adjudication_outcome": "BUYER_FAVOR"})
+    assert client.get(path).json()["dispute_outcome"]["outcome_code"] == "RESOLVED_BUYER_FAVOUR"
     assert truth(client)["refunds"][0]["via"] == "adjudicate"
 
 
@@ -285,8 +335,7 @@ def test_buyer_close_releases_hold_once(client):
     d = staged(client)
     path = "/_mock/disputes/" + d["dispute_id"] + "/buyer-close"
     assert (
-        client.post(path, json={}).json()["dispute_outcome"]["outcome_code"]
-        == "CANCELED_BY_BUYER"
+        client.post(path, json={}).json()["dispute_outcome"]["outcome_code"] == "CANCELED_BY_BUYER"
     )
     assert client.post(path, json={}).status_code == 422
     assert truth(client)["balances"]["available"]["value"] == "1500.00"
@@ -294,7 +343,7 @@ def test_buyer_close_releases_hold_once(client):
 
 def test_transactions_lag_and_duplicate_ids(client):
     create(client, body(value="1.00"))
-    assert client.get("/v1/reporting/transactions").json()["transaction_details"] == []
+    assert client.get("/v1/reporting/transactions").json().get("transaction_details", []) == []
     advance(client, 10800)
     response = client.get("/v1/reporting/transactions").json()
     assert response["total_items"] == 2
@@ -306,9 +355,9 @@ def test_transactions_lag_and_duplicate_ids(client):
     assert client.post("/_mock/seed", json=seed).status_code == 200
     create(client, body(value="1.00"))
     advance(client, 10800)
-    records = client.get(
-        "/v1/reporting/transactions?transaction_id=MOCKT-REPEATED"
-    ).json()["transaction_details"]
+    records = client.get("/v1/reporting/transactions?transaction_id=MOCKT-REPEATED").json()[
+        "transaction_details"
+    ]
     assert len(records) == 2
 
 
@@ -328,16 +377,12 @@ def test_seed_existing_unclaimed_and_invalid_seed_is_atomic(client):
     assert client.post("/_mock/seed", json=seed).status_code == 200
     assert truth(client)["balances"]["available"]["value"] == "1500.00"
     assert (
-        client.post(
-            "/_mock/seed", json={**seed, "balances": {"available": "1.123"}}
-        ).status_code
+        client.post("/_mock/seed", json={**seed, "balances": {"available": "1.123"}}).status_code
         == 422
     )
     assert truth(client)["payout_items"][0]["payout_item_id"] == "MOCKI-OLD"
     assert (
-        client.post("/v1/payments/payouts-item/MOCKI-OLD/cancel").json()[
-            "transaction_status"
-        ]
+        client.post("/v1/payments/payouts-item/MOCKI-OLD/cancel").json()["transaction_status"]
         == "RETURNED"
     )
     assert truth(client)["balances"]["available"]["value"] == "1800.00"
@@ -374,6 +419,7 @@ def test_negative_available_minor_unit_is_reported_exactly(client):
         "balances": {"available": "0.00", "withheld": "0.00", "currency_code": "USD"},
     }
     assert client.post("/_mock/seed", json=seed).status_code == 200
+    client.post("/_mock/config", json={"dispute_hold": True})
     response = client.post(
         "/_mock/disputes",
         json={"capture_id": "MOCKCAP400", "amount": "0.01", "reason": "TEST"},
