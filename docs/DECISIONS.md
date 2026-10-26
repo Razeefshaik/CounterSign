@@ -302,3 +302,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Only PAYEE_INTEGRITY's fixed PAYEE_KEYS list is tolerated as policy-only fields, excluded from valid prompt params, with required targets still enforced; other unknown keys trigger INVALID_PROPOSAL_PARAMS | C23e, owner approved | Accept | Recognized destination attacks must reach the shield and retain PAYEE_INTEGRITY plus INJECTION_GUARD refusals and injection flags in the dashboard/audit rather than disappear as parser errors |
 | An agent proposal that raises ApprovalError during locked binding rolls back entirely and records one RECONCILE_MISMATCH audit with reason AGENT_PROPOSAL_UNBOUND and count=1; the incident stays retryable and tick.errors excludes this recoverable agent miss | C23e rehearsal | Accept | A model's unresolved reference must not stop the demo or persist an unbound proposal; the audit counts misses without changing facade contracts, while deterministic owner/executor callers still raise and database/audit failures still fail the tick |
 | After two agent failures (failed step or unbound proposal) at the same incident version, the agent skips that incident until its version changes | C23e review | Accept | The agent picks the oldest open incident without a proposal; without a cap one bad incident would call the model every tick and starve every newer incident |
+
+## Oct 27 C25b no-hold demo
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| C25b narrates a dispute freeze confirmed by capture GET PENDING plus our non-cash DISPUTE_EARMARK reserve, never a balance hold; dispute opening and seller-favour resolution leave available unchanged | D8, D12; owner C25b prompt | Accept | The demo must match recorded sandbox behavior rather than invent $400 or $60 withheld cash |
+| C25b compares the protected $1,086 Friday run with a read-only $1,500 naive run against $1,800 available; the naive run pays $414 disputed shares with zero shortfall | C25b | Accept | The real risk is paying disputed obligations from an apparently sufficient balance; funds sufficiency cannot replace the reserve rule |
