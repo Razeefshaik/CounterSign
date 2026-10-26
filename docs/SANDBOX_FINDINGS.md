@@ -47,4 +47,9 @@ Evidence lives under `recordings/sandbox/`. `recordings/sandbox/INDEX.md` maps e
 ## Still open
 
 - **Transaction Search lag (D12):** BLOCKED. It was recorded and not chased.
-- **Exact cash attribution of dispute resolutions.** Available rose by $383.07 between the 12:00 and 12:30 UTC refreshes on Oct 24, after the $400 seller-favour ruling and the $60 refund. The individual events overlap, so the reflection rows could not attribute that change. The design does not depend on it: cash uses available plus our own outflows only.
+- **Already-available captures:** NOT TESTED. Each sandbox dispute opened about 12 minutes after its capture, before the money reached available. Whether PayPal debits available when a capture that settled days earlier is disputed is unknown. The design does not depend on it: maker shares are protected by our own DISPUTE_EARMARK, and cash uses available plus our own outflows only.
+
+## Resolved after the first write-up (Oct 27)
+
+- **Disputed captures stay out of available.** The three captures (Oct 23, 22:02 UTC) were disputed between 22:14 and 22:18. From then until the 07:29 refresh on Oct 24 (9.5 h, well past the 2.4 h maximum lag), available moved only by our payouts (5,000.00 to 4,988.75), and withheld stayed 0.00. The disputed money was frozen in the PENDING captures, not moved into withheld (D8, D12).
+- **The $383.07 rise is attributed.** The rulings came at 12:19 on Oct 24, and available rose $383.07 at the 12:29 refresh. That is +$385.55 (the $400 capture's net, released by the seller-favour ruling) − $2.48 (the net effect of the $60 capture refunded in full through accept-claim). The $25 capture's dispute was still open, so it stayed out of available.
