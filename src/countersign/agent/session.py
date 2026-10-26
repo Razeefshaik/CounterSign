@@ -22,6 +22,8 @@ _STARTUP_CODES = frozenset(
         "TOOL_SET_MISMATCH",
     }
 )
+# One real-model reply may take up to 90 s; a step holds several tool rounds.
+REAL_MODEL_STEP_TIMEOUT = 300
 
 
 class AgentSessionError(RuntimeError):
@@ -77,6 +79,7 @@ class AgentSession:
                 self._commander = Commander(
                     self._model,
                     tools,
+                    timeout=REAL_MODEL_STEP_TIMEOUT if isinstance(self._model, LangChainModel) else 60,
                     secrets=(
                         self._paypal.client_id,
                         self._paypal.client_secret,

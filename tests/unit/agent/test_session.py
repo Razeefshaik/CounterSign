@@ -164,3 +164,21 @@ async def test_missing_real_model_dependencies_fail_before_toolkit_or_database(m
             pytest.fail("missing dependencies accepted")
     assert observed.graph_starts == observed.gateway_opens == 0
     assert "FAKE-MODEL-KEY" not in str(error.value)
+
+
+@pytest.mark.asyncio
+async def test_real_model_steps_get_room_for_several_slow_rounds(monkeypatch):
+    dependencies(monkeypatch)
+
+    async def ready(self):
+        return None
+
+    async def closed(self):
+        return None
+
+    monkeypatch.setattr(session.LangChainModel, "prepare", ready, raising=False)
+    monkeypatch.setattr(session.LangChainModel, "aclose", closed, raising=False)
+    async with configured(ChatModelConfig("offline-provider", "offline-model", "FAKE")) as agent:
+        assert agent._commander.timeout == session.REAL_MODEL_STEP_TIMEOUT == 300
+    async with configured(ScriptedModel([proposal()])) as agent:
+        assert agent._commander.timeout == 60
