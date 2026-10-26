@@ -11,7 +11,7 @@ from urllib.parse import urlencode
 import httpx
 import psycopg
 import pytest
-from conftest import dashboard
+from dashboard_support import dashboard
 
 
 def run(coro):
