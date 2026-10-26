@@ -11,6 +11,7 @@ import pytest
 
 from countersign.agent.commander import Commander
 from countersign.agent.models import MODEL_ATTEMPTS, ChatModelConfig, LangChainModel, ModelError
+from countersign.agent.tools import ToolError
 
 
 @pytest.fixture
@@ -155,6 +156,49 @@ async def test_commander_preserves_gemini_signature_through_a_real_tool_round(go
         }
         assert model._conversation is None
         assert "FAKE-KEY" not in json.dumps(requests) and "FAKE-KEY" not in caplog.text
+    finally:
+        for client in clients:
+            await client.aio.aclose()
+
+
+@pytest.mark.asyncio
+async def test_gemini_signatures_survive_failed_read_and_corrected_retry(google_stub):
+    requests, clients, replies = google_stub
+    signatures = [base64.b64encode(value).decode() for value in (b"failed-turn", b"retry-turn")]
+    for identifier, signature in zip(("internal-uuid", "TEST-DISPUTE"), signatures, strict=True):
+        replies.append((200, response([{
+            "functionCall": {"name": "get_dispute", "args": {"dispute_id": identifier}},
+            "thoughtSignature": signature,
+        }])))
+    replies.append((200, response([{"text": json.dumps({
+        "incident_id": "incident-1", "action": "WAIT", "params": {}, "evidence_refs": [],
+        "rationale": "Await confirmed review.",
+        "expected_effect": {"available_change": {"minor": 0, "currency": "USD"}},
+    })}])))
+
+    class RecoveringReads(Reads):
+        async def invoke(self, name, args):
+            if args["dispute_id"] == "internal-uuid":
+                self.calls.append((name, args))
+                raise ToolError("TOOLKIT_CALL_FAILED")
+            return await super().invoke(name, args)
+
+    tools = RecoveringReads()
+    model = LangChainModel(ChatModelConfig("google_genai", "gemini-3.5-flash", "FAKE-KEY"))
+    try:
+        assert (await Commander(model, tools).step({"id": "incident-1"})).action == "WAIT"
+        assert len(requests) == 3 and len(tools.calls) == 2
+        for index in (1, 2):
+            parts = [part for turn in requests[index]["contents"] for part in turn["parts"]]
+            assert [p["thoughtSignature"] for p in parts if "functionCall" in p] == signatures[:index]
+            results = [p["functionResponse"] for p in parts if "functionResponse" in p]
+            assert len(results) == index
+            assert results[0]["response"]["untrusted_result"] == {
+                "error": "TOOLKIT_CALL_FAILED", "tool": "get_dispute"
+            }
+            if index == 2:
+                assert results[1]["response"]["untrusted_result"]["dispute_id"] == "TEST-DISPUTE"
+        assert model._conversation is None
     finally:
         for client in clients:
             await client.aio.aclose()

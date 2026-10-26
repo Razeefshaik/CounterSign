@@ -6,6 +6,7 @@ import pytest
 from countersign.agent.commander import Commander, CommanderError
 from countersign.agent.models import ScriptedModel
 from countersign.agent.proposal import ProposalError
+from countersign.agent.tools import ALLOWED_TOOLS, ReadTool, ReadToolError, ToolError, ToolRegistry
 
 
 def proposal(**changes):
@@ -177,3 +178,123 @@ def test_injected_model_id_defaults_and_known_private_values_are_masked():
     model = ScriptedModel([])
     model.model_id = "FAKE-PRIVATE-MODEL-ID"
     assert Commander(model, Tools(), secrets=(model.model_id,)).model_id == "<REDACTED>"
+
+
+def call(number, name="get_order_details", args=None):
+    return {"tool_calls": [{"id": str(number), "name": name, "args": args or {}}]}
+
+
+def registry(handler):
+    return ToolRegistry(
+        ReadTool(name, "Fixed reader", {"type": "object"}, handler)
+        for name in ALLOWED_TOOLS
+    )
+
+
+@pytest.mark.asyncio
+async def test_failed_read_is_a_fixed_observation_then_the_model_corrects_the_id():
+    async def read(args):
+        if args["order_id"] == "internal-uuid":
+            raise ToolError("TOOLKIT_CALL_FAILED")
+        return {"paypal_order_id": args["order_id"]}
+
+    model = ScriptedModel([
+        call(1, args={"order_id": "internal-uuid"}),
+        call(2, args={"order_id": "PAYPALORDER123456789"}), proposal(),
+    ])
+    assert (await Commander(model, registry(read)).step({"id": "incident-1"})).action == "WAIT"
+    assert model.requests[1]["observations"][0]["untrusted_result"] == {
+        "error": "TOOLKIT_CALL_FAILED", "tool": "get_order_details"
+    }
+    assert model.requests[2]["observations"][1]["untrusted_result"] == {
+        "paypal_order_id": "PAYPALORDER123456789"
+    }
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("error", [
+    ToolError("INVALID_TOOL_ARGUMENTS"), ReadToolError("INVALID_GRAPH_IDENTIFIER"),
+    ReadToolError("MONEY_GRAPH_UNAVAILABLE"),
+])
+async def test_read_errors_keep_only_fixed_codes_through_the_real_registry(error):
+    async def fail(_args):
+        raise error
+
+    model = ScriptedModel([call(1), proposal()])
+    await Commander(model, registry(fail)).step({"id": "incident-1"})
+    assert model.requests[1]["observations"][0]["untrusted_result"]["error"] == str(error)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("code", [
+    "TOOL_NOT_ALLOWED", "TOOLKIT_REQUEST_BLOCKED", "TOOLKIT_SET_MISMATCH",
+    "TOOL_SET_MISMATCH", "TOOLKIT_CLOSED", "TOOLKIT_NOT_READY", "TOOLKIT_CONFIG_INVALID",
+    "TOOLKIT_MESSAGE_INVALID",
+])
+async def test_unsafe_tool_failures_never_reach_another_model_turn(code):
+    async def fail(_args):
+        raise ToolError(code)
+
+    model = ScriptedModel([call(1), proposal()])
+    with pytest.raises(CommanderError, match="^COMMANDER_TOOL_FAILED$"):
+        await Commander(model, registry(fail)).step({"id": "incident-1"})
+    assert len(model.requests) == 1
+
+
+@pytest.mark.asyncio
+async def test_unsafe_custom_read_role_failure_is_not_wrapped_as_a_recoverable_failure():
+    async def fail(_args):
+        raise ReadToolError("MONEY_GRAPH_ROLE_REFUSED")
+
+    model = ScriptedModel([call(1), proposal()])
+    with pytest.raises(CommanderError, match="^COMMANDER_TOOL_FAILED$"):
+        await Commander(model, registry(fail)).step({"id": "incident-1"})
+    assert len(model.requests) == 1
+
+
+@pytest.mark.asyncio
+async def test_failure_budget_allows_three_observations_and_aborts_on_fourth_failure():
+    invoked = []
+
+    async def fail(args):
+        invoked.append(args)
+        raise RuntimeError("PRIVATE-EXCEPTION buyer@example.test")
+
+    model = ScriptedModel([call(n) for n in range(5)] + [proposal()])
+    with pytest.raises(CommanderError, match="^COMMANDER_TOOL_BUDGET_EXCEEDED$"):
+        await Commander(model, registry(fail)).step({"id": "incident-1"})
+    assert len(invoked) == len(model.requests) == 4
+    assert len(model.requests[-1]["observations"]) == 3
+    assert "PRIVATE-EXCEPTION" not in json.dumps(model.requests)
+    assert "buyer@example.test" not in json.dumps(model.requests)
+
+
+@pytest.mark.asyncio
+async def test_total_tool_budget_stops_successful_reads_too():
+    invoked = []
+
+    async def read(args):
+        invoked.append(args)
+        return {}
+
+    model = ScriptedModel([call(n) for n in range(4)] + [proposal()])
+    with pytest.raises(CommanderError, match="^COMMANDER_TOOL_BUDGET_EXCEEDED$"):
+        await Commander(model, registry(read), max_tool_calls=2).step({"id": "incident-1"})
+    assert len(invoked) == 2
+
+
+@pytest.mark.asyncio
+async def test_failed_tool_budget_resets_for_each_step():
+    async def fail(_args):
+        raise ToolError("TOOLKIT_CALL_FAILED")
+
+    model = ScriptedModel([call(1), proposal(), call(2), proposal()])
+    commander = Commander(model, registry(fail), max_failed_tool_calls=1)
+    for _ in range(2):
+        assert (await commander.step({"id": "incident-1"})).action == "WAIT"
+
+
+@pytest.mark.parametrize("limit", [True, -1, 17, 1.5, None])
+def test_failure_budget_must_be_a_bounded_integer(limit):
+    with pytest.raises(CommanderError, match="^INVALID_COMMANDER_LIMITS$"):
+        Commander(ScriptedModel([]), Tools(), max_failed_tool_calls=limit)

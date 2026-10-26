@@ -285,3 +285,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The isolated child adapts only SDK 1.11.0's missing tracking-by-order helper and transaction-search GET payload/JSON conventions, retaining the genuine five handlers and guarded read paths | C23c real-child tests | Accept | These are SDK client-interface defects, not missing mock endpoints; compatibility must not introduce writes, extra tools or alternate hosts |
 | Mock rehearsal setup starts a loopback mock with a minimal environment, reuses its webhook and preserves existing state unless --reset is explicitly supplied | C23c | Accept | The owner needs reproducible setup without leaking model keys to the mock, duplicating callbacks or silently discarding another rehearsal |
 | Configured demo incident subjects contain fixed action codes and resource identifiers; descriptive staging is recorded separately without granting permission | C23c integration review | Accept | IncidentService rejects prose in subjects, so the previous configured goal string failed before the next model step |
+
+## Oct 26 C23d bounded read recovery
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Fixed recoverable read errors become tool observations, with at most three observed failures, sixteen total calls and eight model rounds per step; a fourth failure or exceeded call budget aborts without storing a proposal | C23d rehearsal | Accept | A mistaken resource ID must be correctable in the same signed conversation, while capability, request-guard, configuration and protocol failures remain fatal; only complete ordinary error frames keep the isolated toolkit open |
+| The model-only incident projection labels internal subject IDs countersign_* and supplies linked paypal_order_id, paypal_capture_id and paypal_dispute_id from stored records; fixed trusted instructions name each tool's ID namespace | C23d rehearsal | Accept | An internal order UUID is not a PayPal order ID; explicit labels prevent confusing identifiers without changing dashboard views or promoting buyer text into the system prompt |

@@ -142,6 +142,7 @@ class RequestGuard:
         self.base_url = validated_origin(base_url)
         self.secrets = secrets
         self.ready = False
+        self.blocked = False
 
     def check(self, method, url):
         try:
@@ -163,6 +164,7 @@ class RequestGuard:
             ):
                 raise ValueError
         except (ValueError, TypeError, AttributeError):
+            self.blocked = True
             raise ChildError("TOOLKIT_REQUEST_BLOCKED") from None
 
     def wrap(self, original):
@@ -269,6 +271,7 @@ class Runtime:
                     "page",
                 }
             ):
+                self._guard.blocked = True
                 raise ChildError("TOOLKIT_REQUEST_BLOCKED")
             query = {key: value for key, value in payload.items() if value is not None}
             return json.dumps(original_get(uri + "?" + urlencode(query)))
@@ -291,6 +294,8 @@ class Runtime:
 
     def invoke(self, name, arguments):
         check_names(self._tools)
+        if self._guard.blocked:
+            raise ChildError("TOOLKIT_REQUEST_BLOCKED")
         # Context(sandbox=True) is required to disable live APIs, but the
         # selected HTTP origin is independent. Refuse SDK/config drift before
         # an OAuth request, rather than falling back to a sandbox default.
@@ -309,6 +314,10 @@ class Runtime:
                 output = self._tools[name].invoke(
                     arguments, config={"callbacks": [], "tags": [], "metadata": {}}
                 )
+            # Some SDK handlers catch transport exceptions and return text.
+            # A swallowed guard refusal must never become a recoverable read.
+            if self._guard.blocked:
+                raise ChildError("TOOLKIT_REQUEST_BLOCKED")
             if isinstance(output, str):
                 if output.startswith("Error executing PayPalTool"):
                     raise ChildError("TOOLKIT_CALL_FAILED")
@@ -321,6 +330,8 @@ class Runtime:
         except ChildError:
             raise
         except Exception:  # noqa: BLE001 - adapter failures must not carry private request values.
+            if self._guard.blocked:
+                raise ChildError("TOOLKIT_REQUEST_BLOCKED") from None
             raise ChildError("TOOLKIT_CALL_FAILED") from None
 
 
@@ -338,6 +349,7 @@ def main():
             raw = source.readline(MAX_MESSAGE_BYTES + 1)
             if not raw:
                 return 0
+            recoverable = False
             try:
                 if len(raw) > MAX_MESSAGE_BYTES:
                     raise ChildError("TOOLKIT_MESSAGE_INVALID")
@@ -357,14 +369,19 @@ def main():
                         raise ChildError("TOOLKIT_MESSAGE_INVALID")
             except ChildError as error:
                 response = {"ok": False, "error": error.args[0]}
+                recoverable = (
+                    runtime is not None and type(message) is dict and message.get("op") == "invoke"
+                    and error.args[0] in {"TOOLKIT_CALL_FAILED", "INVALID_TOOL_ARGUMENTS"}
+                )
             except Exception:  # noqa: BLE001 - never emit dependency exception text on the wire.
                 response = {"ok": False, "error": "TOOLKIT_CALL_FAILED"}
             encoded = json.dumps(response, allow_nan=False).encode("utf-8") + b"\n"
             if len(encoded) > MAX_MESSAGE_BYTES:
                 encoded = b'{"ok":false,"error":"TOOLKIT_MESSAGE_INVALID"}\n'
+                recoverable = False
             destination.write(encoded)
             destination.flush()
-            if response.get("ok") is not True:
+            if response.get("ok") is not True and not recoverable:
                 return 2
 
 

@@ -7,6 +7,7 @@ from countersign.agent.models import create_model
 from countersign.agent.prompts import SYSTEM_PROMPT
 from countersign.agent.proposal import ProposalError, StructuredProposal, parse_proposal
 from countersign.agent.safety import injection_flags, sanitize
+from countersign.agent.tools import RECOVERABLE_TOOL_ERRORS, ToolError
 
 
 class CommanderError(RuntimeError):
@@ -14,12 +15,15 @@ class CommanderError(RuntimeError):
 
 
 class Commander:
-    def __init__(self, model, tools, *, max_rounds=8, max_tool_calls=16, timeout=60, secrets=()):
+    def __init__(self, model, tools, *, max_rounds=8, max_tool_calls=16,
+                 max_failed_tool_calls=3, timeout=60, secrets=()):
         if (
             type(max_rounds) is not int
             or not 1 <= max_rounds <= 32
             or type(max_tool_calls) is not int
             or not 1 <= max_tool_calls <= 64
+            or type(max_failed_tool_calls) is not int
+            or not 0 <= max_failed_tool_calls <= 16
             or type(timeout) not in (int, float)
             or not 0 < timeout <= 300
         ):
@@ -27,6 +31,7 @@ class Commander:
         self.model = create_model(model)
         self.tools = tools
         self.max_rounds, self.max_tool_calls, self.timeout = max_rounds, max_tool_calls, timeout
+        self.max_failed_tool_calls = max_failed_tool_calls
         model_key = getattr(getattr(self.model, "config", None), "api_key", None)
         self._secrets = tuple(secrets) + ((model_key,) if model_key else ())
         self._lock = asyncio.Lock()
@@ -74,6 +79,7 @@ class Commander:
         if data["incident"]["id"] != identifier:
             raise CommanderError("INVALID_INCIDENT")
         observations, seen_calls = [], set()
+        failed_calls = 0
         for _ in range(self.max_rounds):
             request = {
                 "system": SYSTEM_PROMPT,
@@ -114,11 +120,19 @@ class Commander:
                     raise CommanderError("INVALID_MODEL_TOOL_CALLS")
                 seen_calls.add(call["id"])
                 if len(seen_calls) > self.max_tool_calls:
-                    raise CommanderError("COMMANDER_BUDGET_EXHAUSTED")
+                    raise CommanderError("COMMANDER_TOOL_BUDGET_EXCEEDED")
                 pending.append(sanitize(call, self._secrets))
             for call in pending:
                 try:
                     result = await self.tools.invoke(call["name"], call["args"])
+                except ToolError as error:
+                    code = error.args[0]
+                    if code not in RECOVERABLE_TOOL_ERRORS:
+                        raise CommanderError("COMMANDER_TOOL_FAILED") from None
+                    failed_calls += 1
+                    if failed_calls > self.max_failed_tool_calls:
+                        raise CommanderError("COMMANDER_TOOL_BUDGET_EXCEEDED") from None
+                    result = {"error": code, "tool": call["name"]}
                 except Exception:  # noqa: BLE001 - tool errors may contain credentials or buyer text.
                     raise CommanderError("COMMANDER_TOOL_FAILED") from None
                 flags.extend(
