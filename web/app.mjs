@@ -1,7 +1,27 @@
-import {filterIncidents, summary, atRisk, label, isStaged, modeLabel, loadWorkspace} from "./data.mjs";
+import {filterIncidents, summary, atRisk, label, isStaged, modeLabel, loadWorkspace, bannerText} from "./data.mjs";
 import {createWorkspaceViews} from "./workspace.mjs";
+import {createDemoBar} from "./demo.mjs";
 const $ = id => document.getElementById(id);
 const views = createWorkspaceViews(document, window.location);
+const utc = value => new Date(value).toLocaleString("en-GB", {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"UTC"});
+let demoState = null;
+function showClock() {
+  // The staged week runs on the mock's clock; show it while the demo bar is present.
+  const staged = Boolean(demoState?.clock);
+  $("clock-label").textContent = staged ? "STAGED CLOCK · UTC" : "WORKSPACE CLOCK · UTC";
+  const value = staged ? demoState.clock : workspace?.meta.clock;
+  if (value) $("clock").textContent = utc(value);
+}
+function showBanner() {
+  // The persistent label comes only from the server's simulation_label.
+  const text = bannerText(workspace?.meta, demoState);
+  $("simulation").hidden = !text;
+  $("simulation").textContent = text;
+}
+const demo = createDemoBar(document, {
+  onState: state => {demoState = state; showClock(); showBanner();},
+  onChange: () => refresh(),
+});
 window.addEventListener("hashchange", () => views.render());
 let workspace, api;
 function badge(text, kind = "") {
@@ -54,10 +74,11 @@ async function refresh() {
   try {
     workspace = await loadWorkspace();
     $("mode").textContent = modeLabel(workspace.meta);
-    $("simulation").hidden = !workspace.meta.simulated;
-    $("simulation").textContent = workspace.meta.simulation_label || "";
-    $("clock").textContent = new Date(workspace.meta.clock).toLocaleString("en-GB", {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"UTC"});
+    showBanner();
+    showClock();
     $("source").textContent = workspace.fixture ? "Contract fixtures · preview" : "Connected to dashboard API";
+    $("view-source-note").textContent = workspace.fixture ? "Contract fixture preview. Owner decisions require the core approval service." : "Records from the dashboard API. Payments and refunds still need an exact owner approval.";
+    $("amount-note").textContent = workspace.meta.simulated ? "Amounts in USD · " + workspace.meta.simulation_label : "Amounts in USD";
     $("contract").textContent = "Contract v" + workspace.meta.contract_version;
     const stats = summary(workspace.incidents);
     $("stat-open").textContent = stats.open; $("stat-owner").textContent = stats.owner;
@@ -73,3 +94,4 @@ $("search").addEventListener("input", update);
 $("refresh").addEventListener("click", refresh);
 $("clear").addEventListener("click", () => {for (const id of ["state","kind","search"]) $(id).value = ""; update();});
 refresh();
+demo.load();

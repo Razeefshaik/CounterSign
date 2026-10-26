@@ -4,6 +4,7 @@ import {readFile} from "node:fs/promises";
 import {createClient, submitDecision} from "../api.mjs";
 import {decisionView, runView, cashView, auditView, graphView, canDecide, esc} from "../views.mjs";
 import {route, createWorkspaceViews} from "../workspace.mjs";
+import {demoBarView, createDemoBar, resultText} from "../demo.mjs";
 
 const fixture = async name => JSON.parse(await readFile(new URL(`../fixtures/${name}.json`, import.meta.url)));
 const proposals = (await fixture("proposals")).items;
@@ -207,4 +208,116 @@ test("simulation banner sits outside all routed panels and navigation stays avai
   assert.ok(!html.includes("dismiss"));
   assert.match(css,/\.simulation\{position:sticky;top:0/);
   assert.match(css,/\.sidebar nav\{display:flex;order:3;width:100%;overflow-x:auto/);
+});
+
+// M17 demo bar. State shape follows GET /api/v1/demo/state (CONTRACTS section 3).
+const demoSteps = [["setup","Monday: stage orders",true],["friday_plan","Friday: plan the run",false],["pay","Following week: pay A",true]];
+const demoState = (done = 0, extra = {}) => ({scenario:"demo_week", step:done, total:demoSteps.length, complete:done === demoSteps.length,
+  replaying:true, running:false, simulated:true, simulation_label:"Simulated: mock PayPal", model:"scripted",
+  staged_note:"Staged: simulated on the mock.", clock:"2026-11-02T09:00:00+00:00", last_result:null,
+  steps:demoSteps.map(([name,label,staged], i) => ({index:i + 1, name, label, staged, done:i < done, interrupted:false})),
+  next_label:demoSteps[done]?.[1] ?? null, ...extra});
+function barDouble() {
+  const elements = new Map(), bar = {hidden:true};
+  let html = "";
+  Object.defineProperty(bar, "innerHTML", {get: () => html, set: value => {
+    html = value; elements.clear();
+    for (const match of value.matchAll(/<(button|p)[^>]*id="([^"]+)"[^>]*>/g)) elements.set(match[2], {disabled:match[0].includes("disabled"), textContent:""});
+  }});
+  return {bar, getElementById: id => id === "demo-bar" ? bar : elements.get(id) || null};
+}
+
+test("demo bar is never empty on first load and labels every staged step", () => {
+  const html = demoBarView(demoState(0));
+  assert.match(html, /Step <strong>0<\/strong> of 3/);
+  assert.match(html, /NEXT<\/span> Monday: stage orders <span class="staged">staged<\/span>/);
+  assert.match(html, /Nothing yet/);
+  assert.equal((html.match(/class="staged">staged/g) || []).length, 1 + 1 + 2);
+  assert.match(html, /Scripted model · mock PayPal/);
+  assert.match(html, /Mon, 02 Nov 2026, 09:00 UTC/);
+  assert.match(html, /id="demo-step" class="primary" >Run next staged step/);
+  const done = demoBarView(demoState(3, {last_result:{action:"step", ok:true, code:"DEMO_STEP_DONE"}}));
+  assert.match(done, /Week complete/);
+  assert.match(done, /id="demo-step"[^>]*disabled/);
+  assert.match(demoBarView(demoState(1, {running:true, action:"step"})), /id="demo-reset"[^>]*disabled/);
+});
+
+test("demo bar text is escaped and failures show only fixed codes", () => {
+  const attack = demoState(0, {steps:[{index:1, name:"x", label:'<img src=x onerror="1">', staged:true, done:false}], last_result:{action:"step", ok:false, code:"<b>X</b>"}});
+  const html = demoBarView(attack);
+  assert.ok(!html.includes("<img") && !html.includes("<b>X"));
+  assert.match(resultText(demoState(0, {last_result:{action:"step", ok:false, code:"DEMO_TICK_FAILED"}})), /stopped \(DEMO_TICK_FAILED\)/);
+  assert.match(resultText(demoState(0, {last_result:{action:"reset", ok:true, code:"DEMO_RESET"}})), /Week restarted/);
+  assert.match(resultText(demoState(0)), /Run the first staged step/);
+});
+
+test("demo bar stays hidden when the server has no demo endpoints (live mode)", async () => {
+  const doc = barDouble();
+  const demo = createDemoBar(doc, {fetcher: async () => response({error:{code:"NOT_FOUND"}}, 404)});
+  assert.equal(await demo.load(), null);
+  assert.equal(doc.bar.hidden, true);
+  assert.equal(doc.bar.innerHTML, "");
+});
+
+test("one click posts once without a body, follows the step and refreshes the dashboard", async () => {
+  const doc = barDouble(), calls = [];
+  let reads = 0, changed = 0;
+  const fetcher = async (url, options = {}) => {
+    calls.push({url, method:options.method || "GET", body:options.body});
+    if (options.method === "POST") return response(demoState(0, {running:true, action:"step"}), 202);
+    reads++;
+    return response(reads === 1 ? demoState(0) : reads === 2 ? demoState(0, {running:true, action:"step"}) : demoState(1, {last_result:{action:"step", ok:true, code:"DEMO_PAUSED_AFTER_SETUP"}}));
+  };
+  const demo = createDemoBar(doc, {fetcher, wait: async () => {}, onChange: async () => {changed++;}});
+  await demo.load();
+  assert.equal(doc.bar.hidden, false);
+  const first = doc.getElementById("demo-step").onclick();
+  await doc.getElementById("demo-step").onclick?.();
+  await first;
+  assert.deepEqual(calls.filter(c => c.method === "POST").map(c => [c.url, c.body]), [["/api/v1/demo/step", undefined]]);
+  assert.equal(changed, 1);
+  assert.equal(demo.state.step, 1);
+  assert.match(doc.bar.innerHTML, /Step complete/);
+});
+
+test("a busy or finished week reports the server's fixed reason and restart asks first", async () => {
+  const doc = barDouble(), posts = [];
+  const fetcher = async (url, options = {}) => {
+    if (options.method === "POST") {posts.push(url); return response({error:{code:"DEMO_BUSY", message:"private"}}, 409);}
+    return response(demoState(1));
+  };
+  let asked = 0;
+  const demo = createDemoBar(doc, {fetcher, confirm: () => {asked++; return asked > 1;}});
+  await demo.load();
+  await doc.getElementById("demo-step").onclick();
+  assert.equal(doc.getElementById("demo-status").textContent, "A staged step is already running. Wait for it to finish.");
+  await doc.getElementById("demo-reset").onclick();
+  assert.deepEqual(posts, ["/api/v1/demo/step"]);
+  await doc.getElementById("demo-reset").onclick();
+  assert.deepEqual(posts, ["/api/v1/demo/step", "/api/v1/demo/reset"]);
+});
+
+test("demo bar sits with the banner outside every routed view", async () => {
+  const html = await readFile(new URL("../index.html",import.meta.url),"utf8");
+  const bar = html.indexOf('id="demo-bar"');
+  assert.ok(bar > html.indexOf('id="simulation"') && bar < html.indexOf('class="layout"'));
+  assert.match(html, /<section id="demo-bar"[^>]*hidden><\/section>/);
+});
+
+test("cash before the first balance read says unavailable, not zero or a generic failure", async () => {
+  const doc = documentDouble(), location = {hash:"#cash"};
+  const views = createWorkspaceViews(doc, location, async () => response({error:{code:"DATA_UNAVAILABLE"}}, 503));
+  await views.setWorkspace({meta, fixture:false, incidents:[], disputes:[]});
+  assert.match(doc.getElementById("view-body").innerHTML, /No PayPal balance has been read yet/);
+  location.hash = "#audit";
+  await views.render();
+  assert.match(doc.getElementById("view-body").innerHTML, /could not be loaded/);
+});
+
+test("the decision view opens the proposal waiting for the owner when none is chosen", async () => {
+  const doc = documentDouble(), location = {hash:"#decision"};
+  const executed = proposals.find(p => p.state === "EXECUTED");
+  const views = createWorkspaceViews(doc, location, async url => response(url.endsWith("/proposals") ? {items:[executed, owner], next_cursor:null} : url.endsWith(owner.id) ? owner : executed));
+  await views.setWorkspace({meta, fixture:false, incidents:[], disputes:[]});
+  assert.ok(doc.getElementById("view-body").innerHTML.includes(owner.approval_request.payload_hash));
 });
