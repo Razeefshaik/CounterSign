@@ -48,6 +48,11 @@ from countersign.shield.snapshot import NON_FINANCIAL, PAYING, Action
 from countersign.simulator import RunSimulator
 from countersign.worker import worker_once
 
+# Failed agent steps (or unbound proposals) per incident version before the agent
+# skips that incident until its version changes; others are not starved.
+AGENT_ATTEMPTS_PER_VERSION = 2
+_AGENT_CODE = re.compile(r"[A-Z][A-Z0-9_]{2,60}")
+
 __all__ = ["ChatModelConfig", "Engine", "EngineError", "EngineSettings"]
 
 
@@ -311,7 +316,12 @@ class Engine:
                     "AND NOT EXISTS (SELECT 1 FROM proposals p WHERE p.incident_id=i.id AND "
                     "(p.state IN ('CREATED','ALLOWED','NEEDS_OWNER','APPROVED','EXECUTING') OR "
                     "p.raw_output#>>'{agent_context,incident_version}'=i.version::text)) "
-                    "ORDER BY i.opened_at,i.id LIMIT 1"
+                    "AND (SELECT count(*) FROM audit_log a WHERE a.actor='agent' "
+                    "AND a.details->>'incident_id'=i.id::text "
+                    "AND a.details->>'incident_version'=i.version::text "
+                    "AND a.details->>'reason' IN ('AGENT_STEP_FAILED','AGENT_PROPOSAL_UNBOUND')) < %s "
+                    "ORDER BY i.opened_at,i.id LIMIT 1",
+                    (AGENT_ATTEMPTS_PER_VERSION,),
                 )
                 observed = await cursor.fetchone()
                 if observed is None:
@@ -359,8 +369,24 @@ class Engine:
                 # raw buyer messages never become the trusted system prompt.
                 context = {"incident_subject": label_subject(subject), "disputes": disputes,
                            "orders": identifiers}
-            proposed = await self._agent.step(document, context)
+            try:
+                proposed = await self._agent.step(document, context)
+            except Exception as error:  # only a fixed code is recorded, then re-raised
+                code = error.args[0] if error.args and isinstance(error.args[0], str) else ""
+                await self._audit_agent_failure(
+                    observed, "AGENT_STEP_FAILED",
+                    code=code if _AGENT_CODE.fullmatch(code) else "AGENT_STEP_FAILED",
+                )
+                raise
             await self._store_agent_proposal(observed, proposed)
+
+    async def _audit_agent_failure(self, observed, reason, **extra):
+        async with self._database.tx() as conn:
+            await Repositories(conn).audit_log.insert(
+                actor="agent", kind="RECONCILE_MISMATCH",
+                details={"reason": reason, "count": 1, "incident_id": str(observed["id"]),
+                         "incident_version": observed["version"], **extra},
+            )
 
     async def _resume_agent_incident(self, conn):
         """Resume a rejected/expired owner decision, including HTTP-side decisions.
@@ -395,6 +421,18 @@ class Engine:
         )
 
     async def _store_agent_proposal(self, observed, proposed):
+        try:
+            await self._bind_agent_proposal(observed, proposed)
+        except ApprovalError:
+            # The failed transaction rolls back the proposal and incident move.
+            # Count this recoverable agent error in the audit, not tick.errors:
+            # a bad model reference must not stop the resumable demo/worker.
+            # The same ApprovalError still escapes owner/executor callers.
+            await self._audit_agent_failure(observed, "AGENT_PROPOSAL_UNBOUND")
+            return "AGENT_PROPOSAL_UNBOUND"
+        return None
+
+    async def _bind_agent_proposal(self, observed, proposed):
         async with self._database.tx() as conn:
             await journal.serialize_on(conn, "countersign:owner-decisions")
             repos = Repositories(conn)

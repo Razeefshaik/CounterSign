@@ -9,7 +9,7 @@ from typing import ClassVar
 import httpx
 import pytest
 
-from countersign.agent.commander import Commander
+from countersign.agent.commander import Commander, CommanderError
 from countersign.agent.models import MODEL_ATTEMPTS, ChatModelConfig, LangChainModel, ModelError
 from countersign.agent.tools import ToolError
 
@@ -199,6 +199,78 @@ async def test_gemini_signatures_survive_failed_read_and_corrected_retry(google_
             if index == 2:
                 assert results[1]["response"]["untrusted_result"]["dispute_id"] == "TEST-DISPUTE"
         assert model._conversation is None
+    finally:
+        for client in clients:
+            await client.aio.aclose()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("correct", [True, False], ids=["corrected", "second-invalid"])
+async def test_gemini_preserves_signed_proposal_text_across_params_correction(google_stub, correct):
+    requests, clients, replies = google_stub
+    signatures = [base64.b64encode(value).decode() for value in (b"invalid-proposal", b"read-retry")]
+    bad = {"incident_id": "incident-1", "action": "PROVIDE_EVIDENCE", "params": {},
+           "evidence_refs": ["tracking:TRACK1"], "rationale": "Use stored evidence.",
+           "expected_effect": {"available_change": {"minor": 0, "currency": "USD"}}}
+    replies.append((200, response([{"text": json.dumps(bad), "thoughtSignature": signatures[0]}])))
+    if correct:
+        replies.extend([
+            (200, response([{"functionCall": {"name": "get_dispute",
+                "args": {"dispute_id": "TEST-DISPUTE"}}, "thoughtSignature": signatures[1]}])),
+            (200, response([{"text": json.dumps({**bad,
+                "params": {"paypal_dispute_id": "TEST-DISPUTE"}})}])),
+        ])
+    else:
+        replies.append((200, response([{"text": json.dumps(bad)}])))
+    model = LangChainModel(ChatModelConfig("google_genai", "gemini-3.5-flash", "FAKE-KEY"))
+    tools = Reads()
+    try:
+        if correct:
+            result = await Commander(model, tools).step({"id": "incident-1"})
+            assert result.params == {"paypal_dispute_id": "TEST-DISPUTE"}
+            assert len(requests) == 3 and len(tools.calls) == 1
+        else:
+            with pytest.raises(CommanderError, match="^COMMANDER_PROPOSAL_INVALID$"):
+                await Commander(model, tools).step({"id": "incident-1"})
+            assert len(requests) == 2 and not tools.calls
+        parts = [p for turn in requests[1]["contents"] for p in turn["parts"]]
+        assert any(p.get("thoughtSignature") == signatures[0] and json.loads(p["text"]) == bad
+                   for p in parts if "text" in p and p.get("thoughtSignature"))
+        feedback = json.loads(requests[1]["contents"][-1]["parts"][0]["text"])
+        assert feedback == {"observation": {
+            "error": "INVALID_PROPOSAL_PARAMS", "action": "PROVIDE_EVIDENCE"
+        }}
+        assert not any("functionResponse" in p for p in parts)
+        if correct:
+            parts = [p for turn in requests[2]["contents"] for p in turn["parts"]]
+            assert any(p.get("thoughtSignature") == signatures[1] and "functionCall" in p for p in parts)
+            assert sum("functionResponse" in p for p in parts) == 1
+        assert model._conversation is None and model._proposal_turn is None
+    finally:
+        for client in clients:
+            await client.aio.aclose()
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("tamper", ["incident", "feedback"])
+async def test_proposal_correction_cannot_cross_incidents_or_echo_arbitrary_feedback(google_stub, tamper):
+    requests, clients, replies = google_stub
+    replies.append((200, response([{"text": '{"action":"WAIT"}',
+                                   "thoughtSignature": base64.b64encode(b"private-turn").decode()}])))
+    model = LangChainModel(ChatModelConfig("google_genai", "gemini-3.5-flash", "FAKE-KEY"))
+    initial = {"system": "trusted", "data": {"incident": "first"}, "observations": [], "tools": []}
+    try:
+        await model.complete(initial)
+        continuation = copy.deepcopy(initial)
+        continuation["observations"] = [{"error": "INVALID_PROPOSAL_PARAMS", "action": "WAIT"}]
+        if tamper == "incident":
+            continuation["data"]["incident"] = "second"
+        else:
+            continuation["observations"][0]["action"] = "PRIVATE-UNTRUSTED-FEEDBACK"
+        with pytest.raises(ModelError, match="^MODEL_CONVERSATION_MISMATCH$"):
+            await model.complete(continuation)
+        assert len(requests) == 1
+        assert model._conversation is None and model._proposal_turn is None
     finally:
         for client in clients:
             await client.aio.aclose()

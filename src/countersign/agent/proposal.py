@@ -6,6 +6,7 @@ import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 
+from countersign.agent.params import ProposalError, validate_action_params
 from countersign.agent.safety import SafetyError, sanitize
 from countersign.shield.snapshot import Action
 
@@ -14,10 +15,6 @@ FIELDS = frozenset(
 )
 FLAG_TYPES = frozenset({"PROMPT_INJECTION", "PAYEE_CHANGE_REQUEST", "SUSPICIOUS_EVIDENCE"})
 _CURRENCY = re.compile(r"[A-Z]{3}\Z")
-
-
-class ProposalError(ValueError):
-    """Invalid output without echoing model content."""
 
 
 def _plain(value):
@@ -83,13 +80,12 @@ class StructuredProposal:
                 raise ProposalError("INVALID_PROPOSAL")
             # Enforce bounded JSON before recursively validating numeric types.
             safe = sanitize(value, secrets)
-            _plain(value)
             if type(value["incident_id"]) is not str or value["incident_id"] != incident_id:
                 raise ProposalError("PROPOSAL_INCIDENT_MISMATCH")
             if type(value["action"]) is not str or value["action"] not in set(Action):
                 raise ProposalError("INVALID_PROPOSAL_ACTION")
             if type(value["params"]) is not dict:
-                raise ProposalError("INVALID_PROPOSAL_PARAMS")
+                validate_action_params(value["action"], value["params"], ())
             refs = safe["evidence_refs"]
             if (
                 type(refs) is not list
@@ -124,6 +120,8 @@ class StructuredProposal:
                     combined.append(clean)
             raw = copy.deepcopy(safe)
             raw["flags"] = combined
+            validate_action_params(safe["action"], safe["params"], refs)
+            _plain(value)
             return cls(
                 safe["incident_id"],
                 safe["action"],
