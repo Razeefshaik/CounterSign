@@ -137,12 +137,13 @@ async def test_poll_protects_share_without_any_webhook(test_db_url, initial):
         assert len(await rows(db, "reservations")) == 1
 
 
-async def test_won_releases_earmark_and_opens_obligation_once(test_db_url):
+@pytest.mark.parametrize("code", ["SYNTHETIC_WON", "RESOLVED_SELLER_FAVOUR"])
+async def test_won_releases_earmark_and_opens_obligation_once(test_db_url, code):
     async with Database(test_db_url) as db:
         await seed(db)
         reader = Reader()
-        reader.resolve("SYNTHETIC_WON")
-        result = await run(db, reader)
+        reader.resolve(code)
+        result = await run(db, reader, outcomes=None if code.startswith("RESOLVED_") else OUTCOMES)
         assert result.errors == 0 and result.updated == 1
         assert (await rows(db, "obligations"))[0]["state"] == "OPEN"
         assert (await rows(db, "reservations"))[0]["state"] == "RELEASED"
@@ -169,7 +170,7 @@ async def test_unknown_outcome_keeps_earmark_and_deduplicates_incident(test_db_u
         reader.resolve("NOT_VERIFIED_IN_D10")
         first = await run(db, reader, outcomes=None)
         second = await run(db, reader, outcomes=None)
-        assert OUTCOME_MAP == {}
+        assert "NOT_VERIFIED_IN_D10" not in OUTCOME_MAP
         assert first.unknown == second.unknown == 1
         assert first.incidents == 1 and second.incidents == 0
         assert (await rows(db, "obligations"))[0]["state"] == "RESERVED"
@@ -199,12 +200,13 @@ async def test_cancelled_only_releases_its_own_earmark(test_db_url):
         assert sorted(r["state"] for r in await rows(db, "reservations")) == ["ACTIVE", "RELEASED"]
 
 
-async def test_full_loss_voids_and_consumes_without_guessing_refund_funding(test_db_url):
+@pytest.mark.parametrize("code", ["SYNTHETIC_LOSS", "RESOLVED_BUYER_FAVOUR"])
+async def test_full_loss_voids_and_consumes_without_guessing_refund_funding(test_db_url, code):
     async with Database(test_db_url) as db:
         await seed(db)
         reader = Reader()
-        reader.resolve("SYNTHETIC_LOSS", "400.00")
-        result = await run(db, reader)
+        reader.resolve(code, "400.00")
+        result = await run(db, reader, outcomes=None if code.startswith("RESOLVED_") else OUTCOMES)
         assert result.errors == 0
         assert (await rows(db, "obligations"))[0]["state"] == "VOID"
         assert (await rows(db, "reservations"))[0]["state"] == "CONSUMED"
@@ -215,12 +217,16 @@ async def test_full_loss_voids_and_consumes_without_guessing_refund_funding(test
         )
 
 
-async def test_partial_loss_has_one_negative_adjustment_and_atomic_resolution_marker(test_db_url):
+@pytest.mark.parametrize("code", ["SYNTHETIC_LOSS", "RESOLVED_BUYER_FAVOUR"])
+async def test_partial_loss_has_one_negative_adjustment_and_atomic_resolution_marker(
+    test_db_url, code
+):
     async with Database(test_db_url) as db:
         _, obligation, dispute = await seed(db)
         reader = Reader()
-        reader.resolve("SYNTHETIC_LOSS", "10.05")
-        assert (await run(db, reader)).errors == 0
+        reader.resolve(code, "10.05")
+        outcomes = None if code.startswith("RESOLVED_") else OUTCOMES
+        assert (await run(db, reader, outcomes=outcomes)).errors == 0
         obligations = await rows(db, "obligations")
         original = next(r for r in obligations if r["kind"] == "ORDER_SHARE")
         adjustment = next(r for r in obligations if r["kind"] == "ADJUSTMENT")
@@ -228,11 +234,11 @@ async def test_partial_loss_has_one_negative_adjustment_and_atomic_resolution_ma
         assert adjustment["amount_minor"] == -905  # 1005 * 90% = 904.5 -> half-up
         assert adjustment["due_date"] == obligation["due_date"]
         assert (await rows(db, "reservations"))[0]["state"] == "CONSUMED"
-        assert (await run(db, reader)).seen == 0
+        assert (await run(db, reader, outcomes=outcomes)).seen == 0
         # A later stale webhook may put the mirror back in the polling set.
         async with db.tx() as conn:
             await Repositories(conn).disputes.update(dispute["id"], phase="UNKNOWN_OUTCOME")
-        assert (await run(db, reader)).errors == 0
+        assert (await run(db, reader, outcomes=outcomes)).errors == 0
         assert len(await rows(db, "obligations")) == 2
         assert len(await rows(db, "reservations")) == 1
         audits = [

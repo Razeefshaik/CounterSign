@@ -238,3 +238,15 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | C20 adds an opt-in postgres-test service on localhost:55433 with tmpfs data and fsync, synchronous_commit and full_page_writes disabled; the existing postgres service and volume are unchanged | Owner test-infrastructure prompt | Accept | Disposable test databases can trade crash durability for faster Windows test runs; sandbox working state must retain crash-safe storage |
+
+## Oct 25 C25 demo week
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| C25 defaults settlement to adjudicate after D10 confirmed SELLER_FAVOR returned 200; buyer_close remains an explicit alternative pending a confirmed outcome code | C25, D10 owner findings | Accept | Use verified settlement behavior while unmapped buyer-close outcomes keep the reserve |
+| C25 submits evidence only when fresh status and provide_evidence links permit it; otherwise the real shield blocks the proposal and the week continues | C25 | Accept | D8 and D9 showed that dispute stage alone cannot determine evidence availability |
+| C25 CLI parses the database name and refuses names not ending in _demo or _test before opening connections | C25 | Accept | A resumable staged money workflow must never operate on the owner's working database |
+| D10 maps RESOLVED_SELLER_FAVOUR to WON and sizes RESOLVED_BUYER_FAVOUR as LOST_FULL or LOST_PARTIAL from amount_refunded; CANCELED_BY_BUYER stays mock-only | D10, owner confirmed Oct 26 | Accept | Sandbox adjudication recorded INELIGIBLE_BUYER_PROTECTION_POLICY and accept-claim recorded SELLER_ISSUED_REFUND; unrecognized outcomes retain reserves |
+| D10 confirms multipart input JSON evidence at WAITING_FOR_SELLER_RESPONSE / CHARGEBACK and JSON accept-claim, both returning 200; evidence submission then moved the case to UNDER_REVIEW | D10, owner confirmed Oct 26 | Accept | Existing adapter defaults match the observed formats and action links still determine evidence permission |
+| C25 plans a GET-confirmed RETURNED line as a new attempt on that same UNPAID line in the run's exact replacement manifest; approval, simulation and run reconciliation include it | C25, owner approved | Accept | C's historical $300 must join Friday's single $1,086 approval without duplicating its obligation, allocation or executor write path |
+| C25 keeps unavailable initial evidence proposals only when the real shield returns BLOCK, recording existing proposal rule_results and SHIELD_VERDICT audits; executable request construction stays strict | C25, owner approved | Accept | An unavailable action must remain visible as a refusal rather than fail before the shield can record its decision |

@@ -21,9 +21,13 @@ class Phase(StrEnum):
 
 RESOLVED_STATUS = "RESOLVED"
 
-# PayPal outcome_code -> phase, filled ONLY from codes recorded in D10 [pending D10].
+# PayPal outcome_code -> phase, confirmed by D10 sandbox settlement/accept-claim.
 # A loss code may map to LOST_FULL or LOST_PARTIAL: the refunded amount decides which.
-OUTCOME_MAP: dict[str, Phase] = {}
+# Buyer-close remains pending D10; CANCELED_BY_BUYER is a mock-only fixture.
+OUTCOME_MAP: dict[str, Phase] = {
+    "RESOLVED_SELLER_FAVOUR": Phase.WON,
+    "RESOLVED_BUYER_FAVOUR": Phase.LOST_FULL,
+}
 
 # UNKNOWN_OUTCOME fails closed: the reserve stays and an incident opens, scoped to this dispute.
 KEEPS_RESERVE = frozenset({Phase.ACTIVE, Phase.UNKNOWN_OUTCOME})

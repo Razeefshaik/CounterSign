@@ -23,6 +23,7 @@ from countersign.ledger.journal import serialize_on
 from countersign.ledger.reservations import create_reservation, release_reservation
 from countersign.money import Money
 from countersign.paypal.http import PayPalDataError, canonical_payload_hash
+from countersign.reconcile.attempts import _matches
 from countersign.shield import snapshot as model
 from countersign.shield.engine import Verdict, evaluate
 from countersign.shield.rules.idempotency import derive_keys
@@ -56,6 +57,57 @@ async def _rows(conn, table):
         sql.SQL("SELECT * FROM {} ORDER BY id FOR UPDATE").format(sql.Identifier(table))
     )
     return await cursor.fetchall()
+
+
+def _returned(attempt):
+    """Only an identity-matched item GET establishes the returned funds."""
+    return (
+        attempt is not None
+        and attempt["state"] == "RETURNED"
+        and attempt["last_checked_at"] is not None
+        and isinstance(attempt["paypal_raw"], dict)
+        and attempt["paypal_raw"].get("transaction_status") == "RETURNED"
+        and bool(attempt["paypal_item_id"])
+        and _matches(attempt, attempt["paypal_raw"], item_id=attempt["paypal_item_id"])
+    )
+
+
+def _replacement_ids(params, data, run_id):
+    """Bind every replacement field to locked records, including its next keys."""
+    entries = params.get("replacements", [])
+    if not isinstance(entries, list):
+        raise ApprovalError("STALE_PROPOSAL")
+    result = set()
+    for entry in entries:
+        if not isinstance(entry, dict) or set(entry) != {
+            "line_id", "maker_id", "amount", "attempt_no"
+        }:
+            raise ApprovalError("STALE_PROPOSAL")
+        line_id = entry["line_id"]
+        found = [line for line in data["payout_lines"] if str(line["id"]) == line_id]
+        if len(found) != 1 or line_id in result:
+            raise ApprovalError("STALE_PROPOSAL")
+        line = found[0]
+        amount = entry["amount"]
+        if (
+            not isinstance(amount, dict) or set(amount) != {"minor", "currency"}
+            or type(amount["minor"]) is not int
+        ):
+            raise ApprovalError("STALE_PROPOSAL")
+        attempts = [a for a in data["payout_attempts"] if a["line_id"] == line["id"]]
+        latest = max(attempts, key=lambda a: a["attempt_no"], default=None)
+        if (
+            str(line["run_id"]) == run_id
+            or line["state"] != "UNPAID"
+            or entry["maker_id"] != str(line["maker_id"])
+            or entry["amount"] != {"minor": line["amount_minor"], "currency": line["currency"].strip()}
+            or type(entry["attempt_no"]) is not int
+            or not _returned(latest)
+            or entry["attempt_no"] != latest["attempt_no"] + 1
+        ):
+            raise ApprovalError("STALE_PROPOSAL")
+        result.add(line_id)
+    return result
 
 
 async def load_rule_facts(conn, snap, *, data, proposal_row):
@@ -180,12 +232,17 @@ async def load_context(conn, row: dict, *, now: datetime | None = None, behavior
     ):
         raise ApprovalError("STALE_PROPOSAL")
     run_id = params.get("run_id")
+    replacement_ids = (
+        _replacement_ids(params, data, run_id)
+        if action is model.Action.SCHEDULE_PAYOUT_RUN else set()
+    )
     lines = [
         r
         for r in data["payout_lines"]
         if (
             (run_id is not None and str(r["run_id"]) == run_id)
             or str(r["id"]) == params.get("line_id")
+            or str(r["id"]) in replacement_ids
         )
     ]
     makers = {str(r["id"]): r for r in data["makers"]}
@@ -227,6 +284,7 @@ async def load_context(conn, row: dict, *, now: datetime | None = None, behavior
                 }
             )
     payload = {"action": str(action), "params": params}
+    request_unavailable = False
     if action in model.PAYING:
         payload["payouts"] = bodies
     elif action in {model.Action.CANCEL_UNCLAIMED_PAYOUT, model.Action.PROVIDE_EVIDENCE,
@@ -235,7 +293,12 @@ async def load_context(conn, row: dict, *, now: datetime | None = None, behavior
             payload["request"] = build_request(
                 row, action, data, direct_targets, behavior or PayPalBehavior())
         except (ValueError, TypeError, AttributeError, PayPalDataError):
-            raise ApprovalError("ACTION_PRECONDITION_FAILED") from None
+            # Initial proposals must be auditable when the shield rejects an
+            # unavailable action. Ready proposals still require the strict
+            # executable request, including every execution-time precondition.
+            if row["state"] != "CREATED":
+                raise ApprovalError("ACTION_PRECONDITION_FAILED") from None
+            request_unavailable = True
     currency = payouts[0].amount.currency if payouts else "USD"
     balances = sorted(
         (r for r in data["balance_snapshots"] if r["currency"].strip() == currency),
@@ -370,14 +433,13 @@ async def load_context(conn, row: dict, *, now: datetime | None = None, behavior
         ),
     )
     snap = await load_rule_facts(conn, snap, data=data, proposal_row=row)
-    return (
-        model.Proposal(
-            str(row["id"]), action, params, canonical_payload_hash(payload),
-            flags=tuple((row.get("raw_output") or {}).get("flags", ())),
-        ),
-        snap,
-        payload,
+    proposal = model.Proposal(
+        str(row["id"]), action, params, canonical_payload_hash(payload),
+        flags=tuple((row.get("raw_output") or {}).get("flags", ())),
     )
+    if request_unavailable and evaluate(proposal, snap).verdict is not Verdict.BLOCK:
+        raise ApprovalError("ACTION_PRECONDITION_FAILED")
+    return proposal, snap, payload
 
 
 class ApprovalService:
@@ -392,6 +454,64 @@ class ApprovalService:
 
     async def _lock(self, conn):
         await serialize_on(conn, "countersign:owner-decisions")
+
+    async def _plan_replacements(self, conn, week_start, open_obligations):
+        """Reuse returned historical lines; never fabricate another obligation."""
+        data = {
+            table: await _rows(conn, table)
+            for table in ("payout_lines", "payout_attempts", "obligations", "proposals")
+        }
+        cursor = await conn.execute(
+            "SELECT * FROM payout_line_obligations WHERE active ORDER BY line_id,obligation_id "
+            "FOR UPDATE"
+        )
+        links = await cursor.fetchall()
+        claimed = set()
+        for proposal in data["proposals"]:
+            if proposal["state"] not in {"CREATED", "NEEDS_OWNER", "ALLOWED", "APPROVED", "EXECUTING"}:
+                continue
+            params = proposal["params"] or {}
+            if proposal["action"] == "SCHEDULE_PAYOUT_RUN":
+                claimed.update(
+                    entry.get("line_id") for entry in params.get("replacements", [])
+                    if isinstance(entry, dict)
+                )
+            elif proposal["action"] == "CREATE_REPLACEMENT_PAYOUT":
+                claimed.add(params.get("line_id"))
+        # A separate historical line cannot be resized to absorb new adjustments.
+        # Defer it whenever this maker has an offset that needs netting first.
+        negative_makers = {o["maker_id"] for o in open_obligations if o["amount_minor"] < 0}
+        obligations = {o["id"]: o for o in data["obligations"]}
+        replacements = []
+        for line in data["payout_lines"]:
+            if (
+                line["state"] != "UNPAID" or str(line["id"]) in claimed
+                or line["maker_id"] in negative_makers or line["amount_minor"] <= 0
+            ):
+                continue
+            attempts = [a for a in data["payout_attempts"] if a["line_id"] == line["id"]]
+            latest = max(attempts, key=lambda a: a["attempt_no"], default=None)
+            allocation = [link for link in links if link["line_id"] == line["id"]]
+            if not _returned(latest) or not allocation:
+                continue
+            shares = [obligations[link["obligation_id"]] for link in allocation]
+            if (
+                any(
+                    share["state"] != "SCHEDULED" or share["maker_id"] != line["maker_id"]
+                    or share["currency"] != line["currency"]
+                    or share["due_date"] > week_start + timedelta(days=6)
+                    or share["amount_minor"] != link["amount_minor"]
+                    for share, link in zip(shares, allocation, strict=True)
+                )
+                or sum(share["amount_minor"] for share in shares) != line["amount_minor"]
+            ):
+                continue
+            replacements.append({
+                "line_id": str(line["id"]), "maker_id": str(line["maker_id"]),
+                "amount": {"minor": line["amount_minor"], "currency": line["currency"].strip()},
+                "attempt_no": latest["attempt_no"] + 1,
+            })
+        return replacements
 
     async def plan_run(self, week_start: date) -> dict:
         async with self.database.tx() as conn:
@@ -411,10 +531,7 @@ class ApprovalService:
                 (week_start + timedelta(days=6),),
             )
             obligations = await cursor.fetchall()
-            if not obligations:
-                raise ApprovalError("NO_PAYABLE_OBLIGATIONS")
-            if len({r["currency"].strip() for r in obligations}) != 1:
-                raise ApprovalError("MIXED_CURRENCY_RUN")
+            replacements = await self._plan_replacements(conn, week_start, obligations)
             grouped = defaultdict(list)
             planned_lines = []
             for obligation in obligations:
@@ -427,8 +544,17 @@ class ApprovalService:
                 if sum(share["amount_minor"] for share in shares) > 0
             }
             obligations = [share for shares in grouped.values() for share in shares]
-            if not obligations:
+            if not obligations and not replacements:
                 raise ApprovalError("NO_PAYABLE_OBLIGATIONS")
+            currencies = {r["currency"].strip() for r in obligations} | {
+                r["amount"]["currency"] for r in replacements
+            }
+            if len(currencies) != 1:
+                raise ApprovalError("MIXED_CURRENCY_RUN")
+            currency = currencies.pop()
+            total = sum(r["amount_minor"] for r in obligations) + sum(
+                r["amount"]["minor"] for r in replacements
+            )
             run = await repos.payout_runs.insert(week_start=week_start, state="AWAITING_OWNER")
             for maker_id, shares in sorted(grouped.items()):
                 line = await repos.payout_lines.insert(
@@ -465,15 +591,15 @@ class ApprovalService:
                     )
             row = await repos.proposals.insert(
                 action="SCHEDULE_PAYOUT_RUN",
-                params={"run_id": str(run["id"]), "lines": planned_lines, "replacements": []},
+                params={"run_id": str(run["id"]), "lines": planned_lines, "replacements": replacements},
                 evidence_refs=[],
                 model="deterministic-planner",
                 raw_output={},
                 rationale="Pay eligible open obligations once",
                 expected_effect={
                     "available_change": {
-                        "minor": -sum(r["amount_minor"] for r in obligations),
-                        "currency": obligations[0]["currency"].strip(),
+                        "minor": -total,
+                        "currency": currency,
                     }
                 },
                 state="CREATED",
@@ -570,7 +696,10 @@ class ApprovalService:
                     {"proposal_id": proposal_id, "state": "ACTIVE", "kind": "PROPOSAL_CASH"}
                 ):
                     await release_reservation(conn, reservation["id"])
-                    await create_reservation(conn, "RUN_CASH", _money(reservation), run_id=run_id)
+                    await create_reservation(
+                        conn, "RUN_CASH", _money(reservation), run_id=run_id,
+                        proposal_id=proposal_id,
+                    )
             await cas_transition(
                 conn,
                 PROPOSAL,

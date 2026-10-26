@@ -25,6 +25,48 @@ async def rows(conn, statement, params=()):
     return await cursor.fetchall()
 
 
+async def run_replacement_entries(conn, run):
+    """Read the owner-bound manifest, never an unrelated later agent proposal."""
+    if run["approval_id"] is not None:
+        manifests = await rows(
+            conn,
+            "SELECT p.params FROM proposals p JOIN approvals a ON a.proposal_id=p.id "
+            "WHERE a.id=%s AND p.action='SCHEDULE_PAYOUT_RUN' AND p.params->>'run_id'=%s",
+            (run["approval_id"], str(run["id"])),
+        )
+    else:
+        manifests = await rows(
+            conn,
+            "SELECT params FROM proposals WHERE action='SCHEDULE_PAYOUT_RUN' "
+            "AND model='deterministic-planner' AND params->>'run_id'=%s "
+            "AND state IN ('CREATED','NEEDS_OWNER')",
+            (str(run["id"]),),
+        )
+    if not manifests:
+        if run["approval_id"] is not None:
+            raise SimulationError("RUN_MANIFEST_UNAVAILABLE")
+        return {}
+    if len(manifests) != 1:
+        raise SimulationError("RUN_MANIFEST_UNAVAILABLE")
+    replacements = manifests[0]["params"].get("replacements", [])
+    if not isinstance(replacements, list):
+        raise SimulationError("RUN_MANIFEST_UNAVAILABLE")
+    result = {}
+    for entry in replacements:
+        try:
+            line_id, attempt_no = UUID(entry["line_id"]), entry["attempt_no"]
+        except (KeyError, ValueError, TypeError, AttributeError):
+            raise SimulationError("RUN_MANIFEST_UNAVAILABLE") from None
+        if line_id in result or type(attempt_no) is not int or attempt_no < 2:
+            raise SimulationError("RUN_MANIFEST_UNAVAILABLE")
+        result[line_id] = attempt_no
+    return result
+
+
+async def run_replacements(conn, run):
+    return list(await run_replacement_entries(conn, run))
+
+
 async def simulate_run(conn, run_id, *, respect_reserves=True):
     runs = await rows(conn, "SELECT * FROM payout_runs WHERE id=%s", (run_id,))
     if not runs:
@@ -32,14 +74,15 @@ async def simulate_run(conn, run_id, *, respect_reserves=True):
     run = runs[0]
     if run["state"] not in {"DRAFT", "AWAITING_OWNER", "APPROVED"}:
         return {"available": False, "reason": "RUN_ALREADY_EXECUTING_OR_FINISHED"}
+    replacements = await run_replacements(conn, run)
     obligations = await rows(
         conn,
         "SELECT o.*,x.line_id,l.run_id FROM obligations o "
         "LEFT JOIN payout_line_obligations x ON x.obligation_id=o.id AND x.active "
         "LEFT JOIN payout_lines l ON l.id=x.line_id "
         "WHERE o.due_date<=%s AND o.state IN ('OPEN','RESERVED','SCHEDULED') "
-        "AND (x.line_id IS NULL OR l.run_id=%s) ORDER BY o.id",
-        (run["week_start"] + timedelta(days=6), run_id),
+        "AND (x.line_id IS NULL OR l.run_id=%s OR l.id=ANY(%s)) ORDER BY o.id",
+        (run["week_start"] + timedelta(days=6), run_id, replacements),
     )
     if not obligations:
         return {"available": False, "reason": "NO_OUTSTANDING_RUN_OBLIGATIONS"}
