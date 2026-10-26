@@ -11,8 +11,39 @@ from countersign.agent.models import (
     LangChainModel,
     ModelError,
     ScriptedModel,
+    _quota_exhausted,
     create_model,
 )
+
+
+def test_quota_classification_checks_numeric_status_without_inspecting_exception_text():
+    class PrivateFailure(RuntimeError):
+        def __str__(self):
+            raise AssertionError("quota classification must not inspect provider error text")
+
+    cause = PrivateFailure()
+    cause.code = 429
+    wrapped = PrivateFailure()
+    wrapped.__cause__ = cause
+    assert _quota_exhausted(wrapped)
+    cause.code = 503
+    assert not _quota_exhausted(wrapped)
+    cause.code = "429"
+    assert not _quota_exhausted(wrapped)
+    cause.__cause__ = wrapped
+    assert not _quota_exhausted(wrapped)
+
+
+def test_quota_classification_traversal_is_bounded_and_response_status_is_supported():
+    leaf = RuntimeError()
+    leaf.response = SimpleNamespace(status_code=429)
+    assert _quota_exhausted(leaf)
+    wrapped = leaf
+    for _ in range(8):
+        outer = RuntimeError()
+        outer.__cause__ = wrapped
+        wrapped = outer
+    assert not _quota_exhausted(wrapped)
 
 
 @pytest.fixture(autouse=True)

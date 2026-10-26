@@ -19,6 +19,21 @@ class ModelError(RuntimeError):
     """Fixed model configuration/call errors, never provider exception text."""
 
 
+def _quota_exhausted(error):
+    """Classify numeric HTTP 429 through bounded provider wrapping, never text."""
+    seen = set()
+    for _ in range(8):
+        if error is None or id(error) in seen:
+            return False
+        seen.add(id(error))
+        for value in (getattr(error, "code", None), getattr(error, "status_code", None),
+                      getattr(getattr(error, "response", None), "status_code", None)):
+            if type(value) is int and value == 429:
+                return True
+        error = error.__cause__ or error.__context__
+    return False
+
+
 class ChatModel(Protocol):
     async def complete(self, request: dict) -> dict: ...
 
@@ -286,8 +301,10 @@ class LangChainModel:
         except ModelError:
             self.finish_step()
             raise
-        except Exception:  # noqa: BLE001 - provider errors may contain credentials or prompt text.
+        except Exception as error:  # noqa: BLE001 - never expose provider text or quota details.
             self.finish_step()
+            if _quota_exhausted(error):
+                raise ModelError("MODEL_QUOTA_EXHAUSTED") from None
             raise ModelError("MODEL_CALL_FAILED") from None
 
 

@@ -6,7 +6,12 @@ import pytest
 
 from countersign.agent.commander import Commander, CommanderError
 from countersign.agent.models import ScriptedModel
-from countersign.agent.params import ACTION_PARAMS, ProposalParamsError, validate_action_params
+from countersign.agent.params import (
+    ACTION_PARAMS,
+    EVIDENCE_PREFIXES,
+    ProposalParamsError,
+    validate_action_params,
+)
 from countersign.agent.prompts import SYSTEM_PROMPT
 from countersign.shield.rules.payee_integrity import PAYEE_KEYS
 from countersign.shield.snapshot import Action
@@ -51,6 +56,10 @@ def test_every_action_has_one_prompt_line_from_the_validator_table():
     assert "refund_to" not in SYSTEM_PROMPT
     assert all(not set(spec.required + spec.optional) & PAYEE_KEYS for spec in ACTION_PARAMS.values())
     assert set(ACTION_PARAMS["ACCEPT_CLAIM"].policy_only) == PAYEE_KEYS
+    expected = ("PROVIDE_EVIDENCE evidence_refs prefixes only: "
+                + ", ".join(prefix + ":" for prefix in sorted(EVIDENCE_PREFIXES))
+                + "; at least one tracking: reference is required.")
+    assert SYSTEM_PROMPT.splitlines().count(expected) == 1
 
 
 @pytest.mark.parametrize("action", EXAMPLES)

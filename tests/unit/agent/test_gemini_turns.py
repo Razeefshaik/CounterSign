@@ -277,8 +277,9 @@ async def test_proposal_correction_cannot_cross_incidents_or_echo_arbitrary_feed
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("through_commander", [False, True])
 async def test_google_rate_limit_retries_boundedly_and_never_exposes_private_error(
-    google_stub, caplog
+    google_stub, caplog, through_commander
 ):
     requests, clients, replies = google_stub
     replies.extend(
@@ -287,8 +288,11 @@ async def test_google_rate_limit_retries_boundedly_and_never_exposes_private_err
     )
     model = LangChainModel(ChatModelConfig("google_genai", "gemini-3.5-flash", "FAKE-KEY"))
     try:
-        with pytest.raises(ModelError, match="^MODEL_CALL_FAILED$") as caught:
-            await model.complete({"system": "trusted", "data": {}, "observations": [], "tools": []})
+        with pytest.raises((ModelError, CommanderError), match="^MODEL_QUOTA_EXHAUSTED$") as caught:
+            if through_commander:
+                await Commander(model, Reads()).step({"id": "incident-1"})
+            else:
+                await model.complete({"system": "trusted", "data": {}, "observations": [], "tools": []})
         assert len(requests) == MODEL_ATTEMPTS and "FAKE-KEY" not in str(caught.value)
         assert "FAKE-KEY" not in caplog.text
         assert model._conversation is None

@@ -374,7 +374,8 @@ class Engine:
             except Exception as error:  # only a fixed code is recorded, then re-raised
                 code = error.args[0] if error.args and isinstance(error.args[0], str) else ""
                 await self._audit_agent_failure(
-                    observed, "AGENT_STEP_FAILED",
+                    observed, "MODEL_QUOTA_EXHAUSTED" if code == "MODEL_QUOTA_EXHAUSTED"
+                    else "AGENT_STEP_FAILED",
                     code=code if _AGENT_CODE.fullmatch(code) else "AGENT_STEP_FAILED",
                 )
                 raise
