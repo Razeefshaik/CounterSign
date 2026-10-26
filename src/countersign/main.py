@@ -2,14 +2,21 @@
 
 import asyncio
 from contextlib import AsyncExitStack, asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
 
 from countersign.api import dashboard, owner, runs, webhooks
-from countersign.config import Settings, load_settings
+from countersign.config import (
+    Settings,
+    load_hosted_settings,
+    load_settings,
+    require_hosted_demo,
+)
 from countersign.db import Database
 from countersign.executor import Executor
 from countersign.inbox import Inbox
@@ -56,6 +63,7 @@ def create_app(
     reconciler=None,
     worker_settings=None,
     start_worker: bool = True,
+    static_dir: Path | None = None,
 ) -> FastAPI:
     """Injected dependencies belong to the caller; only internally opened ones close.
 
@@ -103,6 +111,9 @@ def create_app(
             app.include_router(
                 dashboard.build_router(_DashboardFixtures(runtime)), prefix="/api/v1"
             )
+            if static_dir is not None:
+                # Mounted last so every API and webhook route above keeps priority.
+                app.mount("/", StaticFiles(directory=static_dir, html=True), name="web")
             app.openapi_schema = None
             stop = asyncio.Event()
             task = None
@@ -160,6 +171,22 @@ def create_app(
 
 
 app = create_app()
+
+WEB_DIR = Path(__file__).resolve().parents[2] / "web"
+
+
+def create_hosted_app(**overrides) -> FastAPI:
+    """C27 public demo: demo mode on the loopback mock only, no background workers.
+
+    Settings are validated when the server calls this factory, so a live or
+    sandbox configuration stops the hosted process before it serves anything.
+    Only the staged demo CLI ticks the engine, as with demo_week --serve.
+    """
+    if overrides.get("settings") is None:
+        overrides["settings"] = load_hosted_settings()
+    require_hosted_demo(overrides["settings"])
+    overrides.setdefault("static_dir", WEB_DIR)
+    return create_app(start_worker=False, **overrides)
 
 
 def main():

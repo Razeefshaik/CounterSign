@@ -1,0 +1,19 @@
+# C27 hosted demo (Render Blueprint). One free Docker web service; PostgreSQL 16
+# and the PayPal mock run inside the container on loopback. Demo mode only.
+# No secrets are needed or allowed: never add PayPal sandbox or model keys here
+# or in the Render dashboard (the start script refuses to boot if they are set).
+services:
+  - type: web
+    name: countersign-demo
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/meta
+    autoDeployTrigger: off
+    envVars:
+      # none: dashboard, API and mock only (fits 512 MB). week: also play the
+      # scripted demo week at boot; needs the mock snapshot fix (c27-hosting.md).
+      - key: COUNTERSIGN_HOSTED_SEED
+        value: none

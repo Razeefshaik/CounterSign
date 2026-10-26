@@ -309,3 +309,14 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | --- | --- | --- | --- |
 | C25b narrates a dispute freeze confirmed by capture GET PENDING plus our non-cash DISPUTE_EARMARK reserve, never a balance hold; dispute opening and seller-favour resolution leave available unchanged | D8, D12; owner C25b prompt | Accept | The demo must match recorded sandbox behavior rather than invent $400 or $60 withheld cash |
 | C25b compares the protected $1,086 Friday run with a read-only $1,500 naive run against $1,800 available; the naive run pays $414 disputed shares with zero shortfall | C25b | Accept | The real risk is paying disputed obligations from an apparently sufficient balance; funds sufficiency cannot replace the reserve rule |
+
+## Oct 27 C27 hosting
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| The hosted demo is one Docker container: app and dashboard on $PORT, the PayPal mock on loopback 8099 and an embedded PostgreSQL 16 on loopback 55433, rebuilt on every boot | C27 free-tier research | Proposed (owner approval) | The mock is in-memory, so a disposable database always matches it, and no free managed PostgreSQL (Render expires after 30 days) has to outlive judging |
+| Render free Docker web service is the recommended host; Google Cloud Run with the same image is the runner-up | C27 free-tier research (Oct 27) | Proposed (owner chooses) | Render needs no card and 750 free hours cover one service all month; Cloud Run boots faster but needs a billing account; Fly.io has no free tier and Hugging Face Docker Spaces now need PRO |
+| The hosted app is built by create_hosted_app(): demo mode on the loopback mock only, no background workers, dashboard from web/ mounted after every API route | C27 | Accept | Live mode must be impossible on the public instance, and only the staged demo CLI or the M17 bar may tick the engine, as with demo_week --serve |
+| The hosted boot refuses PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET and GOOGLE_API_KEY, naming the variable only, and forces COUNTERSIGN_MODE=demo, the mock URL and fake mock credentials | C27 | Accept | The public demo must never hold sandbox or model credentials, and a platform setting must not be able to switch it to live |
+| Migrations run at image build into an empty template cluster; each boot copies it and sets a random database password | C27 boot measured at 0.1 CPU | Accept | initdb and a no-op alembic run cost about 50 s of a 160 s boot on Render-sized CPU; the template is built from the same image's migrations |
+| The scripted demo week at boot is optional (COUNTERSIGN_HOSTED_SEED=week) and off by default | C27 local run | Accept | demo_week seeds balance_refresh_seconds=1 and the mock keeps every snapshot, reaching 813 MB over the week; a 512 MB host would restart in a loop |
