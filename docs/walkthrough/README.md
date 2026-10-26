@@ -66,6 +66,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | [m09a-mock-sandbox-facts.md](m09a-mock-sandbox-facts.md) | Duplicate payout recovery, confirmed cancellation responses and both dispute request formats in the local mock |
 | [c27-hosting.md](c27-hosting.md) | Free hosting options compared, the single-container demo image, owner deploy steps and what stays off |
 | [c28-submission-checklist.md](c28-submission-checklist.md) | README placeholders, claims check, video shot list, GitHub About, hosting and the Devpost form |
+| [m17-demo-bar.md](m17-demo-bar.md) | The dashboard's staged-week control bar, why it cannot bypass the shield, and the step-by-step video recording flow |
 
 ## Words used everywhere
 
