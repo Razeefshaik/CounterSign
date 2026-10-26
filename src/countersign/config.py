@@ -152,3 +152,22 @@ def load_settings() -> Settings:
     return Settings(
         database, mode=mode, paypal=paypal, owner_token=os.environ.get("OWNER_TOKEN", "")
     )
+
+
+# The public demo never holds sandbox or model credentials; names only are reported.
+HOSTED_REFUSED_ENVIRONMENT = ("PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET", "GOOGLE_API_KEY")
+
+
+def require_hosted_demo(settings: Settings) -> Settings:
+    """C27: a hosted instance runs demo mode against the loopback mock, never live."""
+    if settings.mode != "demo" or not settings.paypal.is_mock:
+        raise SettingsError("The hosted instance runs demo mode on the local mock only")
+    return settings
+
+
+def load_hosted_settings() -> Settings:
+    """Refuse live configuration and any sandbox or model credential before loading."""
+    present = [name for name in HOSTED_REFUSED_ENVIRONMENT if os.environ.get(name, "").strip()]
+    if present:
+        raise SettingsError("The hosted demo refuses these variables: " + ", ".join(present))
+    return require_hosted_demo(load_settings())
