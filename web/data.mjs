@@ -14,6 +14,8 @@ export function money(value) {
   const n = Math.abs(value.minor);
   return sign + "$" + Math.trunc(n / 100).toLocaleString("en-US") + "." + String(n % 100).padStart(2, "0");
 }
+// Reconciliation incidents carry no amount at risk; the grid shows a dash, not an error.
+export const atRisk = value => value == null ? "—" : money(value);
 export function isStaged(row, disputes) {
   return disputes.some(d => d.id === row.subject?.dispute_id && d.staged === true);
 }

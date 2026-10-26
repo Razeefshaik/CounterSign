@@ -1,4 +1,4 @@
-import {filterIncidents, summary, money, label, isStaged, modeLabel, loadWorkspace} from "./data.mjs";
+import {filterIncidents, summary, atRisk, label, isStaged, modeLabel, loadWorkspace} from "./data.mjs";
 import {createWorkspaceViews} from "./workspace.mjs";
 const $ = id => document.getElementById(id);
 const views = createWorkspaceViews(document, window.location);
@@ -40,7 +40,7 @@ function setupGrid() {
         div.append(title, ref); return div;
       }},
       {headerName: "STATE", field: "state", width: 158, cellRenderer: p => badge(label(p.value), p.value === "WAITING_EXTERNAL" ? "wait" : "")},
-      {headerName: "AT RISK", field: "amount_at_risk.minor", width: 113, type: "numericColumn", valueFormatter: p => money(p.data.amount_at_risk)},
+      {headerName: "AT RISK", field: "amount_at_risk.minor", width: 113, type: "numericColumn", valueFormatter: p => atRisk(p.data.amount_at_risk)},
       {headerName: "LATEST CHECK", field: "latest_proposal.verdict", width: 135, cellRenderer: p => p.value ? badge(p.value, p.value === "ALLOW" ? "allow" : p.value === "BLOCK" ? "block" : "") : "—"},
       {headerName: "RESPONSE DUE", field: "deadline", width: 140, valueFormatter: p => p.value ? new Date(p.value).toLocaleDateString("en-GB", {day:"2-digit",month:"short",timeZone:"UTC"}) : "—"},
     ],
