@@ -135,20 +135,25 @@ mock week plays and its tests check. The full table is in
 [HANDOFF section 10](docs/HANDOFF.md) and the
 [demo week walkthrough](docs/walkthrough/c25-demo-week.md).
 
-- **Monday:** last week's $300 payout to Maker C is UNCLAIMED (email typo). A
-  buyer disputes Maker A's $400 order (item not received; tracking was uploaded).
-- **Wednesday:** a buyer disputes Maker B's $60 order (not as described).
+- **Monday:** $1,500 available. Last week's $300 payout to Maker C is UNCLAIMED
+  (email typo). A buyer disputes Maker A's $400 order (item not received;
+  tracking was uploaded). As in the sandbox (D8, D12), PayPal does not move the
+  balance: a GET shows the capture **PENDING**, available stays $1,500, and
+  CounterSign reserves A's $360 share (a non-cash earmark).
+- **Wednesday:** a buyer disputes Maker B's $60 order (not as described). B's
+  capture turns PENDING and B's $54 share is reserved; available stays $1,500.
 - **Thursday:** the agent cancels C's unclaimed payout **on its own**. A fresh
-  GET must show the item RETURNED before any resend. Available: $1,340.
-- **Friday:** $1,500 is owed. A naive system would try to pay $1,500 with $1,340,
-  and would pay Maker A for an order that may be refunded. CounterSign reserves
-  A's $360 and B's $54. The owner approves the exact run **once**: B $486, C $300,
-  and C's $300 resend to the owner-verified email, **$1,086** in total. $254 stays
-  unreserved. The agent drafts a note to Maker A. The $60 refund waits for the
+  GET must show the item RETURNED before any resend. Available: $1,800.
+- **Friday:** $1,500 is owed and $1,800 is available, so a naive system sees
+  enough cash and pays everyone, including **$414 of disputed shares** (A's $360,
+  B's $54) for orders that may be refunded. CounterSign's reserves hold them back.
+  The owner approves the exact run **once**: B $486, C $300, and C's $300 resend
+  to the owner-verified email, **$1,086** in total. Available after: $714. The agent drafts a note to Maker A. The $60 refund waits for the
   owner.
 - **Following week:** the sandbox settles A's dispute for the marketplace. This
   is a **staged** sandbox action, not something the AI caused. The reconciler
-  sees the outcome, the reserve is released, and Maker A is paid.
+  sees the outcome, the reserve is released, and Maker A is paid $360
+  (available: $354). B's $54 stays reserved while its dispute is open.
 
 **Three live safety moments:**
 

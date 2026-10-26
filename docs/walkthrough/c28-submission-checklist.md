@@ -80,10 +80,10 @@ Suggested shot list, from HANDOFF section 16, adjusted for the sandbox findings:
 
 | Time | Shot | Demo moment (HANDOFF section 10) | Notes |
 | --- | --- | --- | --- |
-| 0:00 to 0:15 | Hook: a naive agent pays a maker twice after a network drop, and pays for a disputed order | Naive vs CounterSign | Use the M19 replay view, or the simulator's read-only "naive" comparison ($1,500 asked, $1,340 available). Label it mock. |
+| 0:00 to 0:15 | Hook: a naive agent pays a maker twice after a network drop, and pays for a disputed order | Naive vs CounterSign | Use the M19 replay view, or the simulator's read-only "naive" comparison ($1,800 available, so it pays $414 of disputed shares). Label it mock. |
 | 0:15 to 0:35 | The marketplace's week; the cash view with its freshness time | Monday to Wednesday | Show the disputed capture as PENDING and our reserve. **Never say "$400 withheld".** |
 | 0:35 to 1:05 | The AI reads a dispute and tracking, judges evidence strength | Autonomous evidence for Maker A | D9: the sandbox $400 dispute had no `provide_evidence` link. If so, show the shield's EVIDENCE_INTEGRITY block instead of a submission, and say why. Call tracking "merchant-uploaded". |
-| 1:05 to 1:40 | Cancel C's unclaimed payout; GET shows RETURNED; owner approves the exact Friday run once | Thursday and Friday: $1,086 approved, $254 unreserved, $414 reserved | Show real sandbox resource ids (batch and item ids). The $60 claim stays waiting for the owner. |
+| 1:05 to 1:40 | Cancel C's unclaimed payout; GET shows RETURNED; owner approves the exact Friday run once | Thursday and Friday: $1,086 approved, $414 reserved, $714 available after | Show real sandbox resource ids (batch and item ids). The $60 claim stays waiting for the owner. |
 | 1:40 to 2:05 | Network drop after PayPal accepts; retry with the same keys; one payment | Safety moment 1 | Label the drop as staged. Show the 400 with the original batch link (D6) and one item in the GET. |
 | 2:05 to 2:30 | Blocked unsafe proposals, with rule names | Safety moments 2 and 3 | Injection note: PROMPT_INJECTION flag, INJECTION_GUARD and PAYEE_INTEGRITY. Settled obligation: SETTLEMENT. |
 | 2:30 to 2:45 | Results table, model used, how judges can run it | Evaluation | Only real numbers. Mock and sandbox shown separately. Point to the README quickstart and the hosted URL. |
