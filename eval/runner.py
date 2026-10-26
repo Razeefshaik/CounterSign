@@ -6,11 +6,19 @@ Smoke check (no PayPal credentials or services required):
 Each repetition owns a fresh in-process mock. Supply System factories to
 run_suite() for actual evaluation. The dummy does nothing; it is not a baseline.
 Scenario time, owner delays, deliveries and deadlines use the mock clock.
+
+mock_transport="asgi" (default) serves the mock through httpx's in-process
+transport. mock_transport="tcp" serves the same in-process app on an ephemeral
+127.0.0.1 port (eval/tcp_mock.py), so a separate process such as CounterSign's
+genuine toolkit child can reach mock_base_url. Configured-model runs use "tcp".
+A run whose model reports MODEL_QUOTA_EXHAUSTED is labelled with that fixed code,
+and run_suite stops: it writes runs.partial.jsonl only, never a summary.
 """
 
 import argparse
 import asyncio
 import json
+from contextlib import asynccontextmanager
 from copy import deepcopy
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -26,6 +34,55 @@ from eval.systems.base import EvalEnv, MockControlClient, System, SystemTrace
 from eval.validate import seconds, validate
 from mock_paypal.app import create_app
 from mock_paypal.clock import MockClock, timestamp
+
+MOCK_TRANSPORTS = ("asgi", "tcp")
+QUOTA_EXHAUSTED = "MODEL_QUOTA_EXHAUSTED"
+ASGI_BASE_URL = "http://localhost:8099"
+
+
+class ModelQuotaExhausted(RuntimeError):
+    """Fixed stop code: the model provider refused further calls (HTTP 429)."""
+
+    def __init__(self):
+        super().__init__(QUOTA_EXHAUSTED)
+
+
+@asynccontextmanager
+async def mock_session(delivery, mock_transport="asgi"):
+    """Yield (app, client) for one fresh control-enabled mock.
+
+    The app always stays in this process: the runner replaces its clock and
+    receives its webhook deliveries directly. Only the HTTP path differs.
+    """
+    if mock_transport not in MOCK_TRANSPORTS:
+        raise ValueError("Unknown mock transport")
+
+    def factory(base_url):
+        return create_app(control_enabled=True, webhook_delivery=delivery, mock_base_url=base_url)
+
+    if mock_transport == "asgi":
+        app = factory(ASGI_BASE_URL)
+        async with httpx.AsyncClient(
+            base_url=ASGI_BASE_URL,
+            transport=httpx.ASGITransport(app=app),
+            trust_env=False,
+            follow_redirects=False,
+        ) as client:
+            yield app, client
+        return
+    from eval.tcp_mock import serve_loopback
+
+    async with (
+        serve_loopback(factory) as (app, base_url),
+        httpx.AsyncClient(
+            base_url=base_url,
+            trust_env=False,
+            follow_redirects=False,
+            # Webhook deliveries run inside a clock advance and may call the mock again.
+            timeout=httpx.Timeout(60),
+        ) as client,
+    ):
+        yield app, client
 
 
 class DummySystem:
@@ -53,7 +110,14 @@ class DummySystem:
 
 
 async def run_one(
-    scenario: dict, system: System, *, run_id: str, k_index: int, model: str = "none", llm=None
+    scenario: dict,
+    system: System,
+    *,
+    run_id: str,
+    k_index: int,
+    model: str = "none",
+    llm=None,
+    mock_transport: str = "asgi",
 ) -> dict:
     validate(scenario)
     scenario = deepcopy(scenario)
@@ -61,6 +125,8 @@ async def run_one(
         raise ValueError("The M11 runner accepts mock scenarios only")
     if system.name not in {"dummy", "baseline_llm", "rules_only", "countersign"}:
         raise ValueError("Unknown evaluation system")
+    if mock_transport not in MOCK_TRANSPORTS:
+        raise ValueError("Unknown mock transport")
     start = instant(scenario["start"])
     deadline = start + timedelta(seconds=seconds(scenario["expected"]["deadline"]))
     owner = OwnerPolicies(scenario["expected"])
@@ -75,13 +141,7 @@ async def run_one(
         await system.on_webhook(deepcopy(headers), bytes(raw_body))
         return 200
 
-    app = create_app(control_enabled=True, webhook_delivery=delivery)
-    async with httpx.AsyncClient(
-        base_url="http://localhost:8099",
-        transport=httpx.ASGITransport(app=app),
-        trust_env=False,
-        follow_redirects=False,
-    ) as client:
+    async with mock_session(delivery, mock_transport) as (app, client):
         control = MockControlClient(client)
         owner.observe_truth = control.ground_truth
         await control.reset(scenario["seed"])
@@ -221,6 +281,11 @@ async def run_one(
         failed = failed or bool(trace.errors)
         if failed:
             metrics["passed"] = False
+        error = None
+        if QUOTA_EXHAUSTED in trace.errors:
+            error = QUOTA_EXHAUSTED
+        elif failed:
+            error = "EVALUATION_FAILED"
         metrics["owner_escalations"] = max(metrics["owner_escalations"], len(owner.seen))
         return {
             "run_id": run_id,
@@ -236,7 +301,7 @@ async def run_one(
             "duration_ms": (perf_counter_ns() - started) // 1_000_000,
             "llm_calls": trace.llm_calls,
             "tokens": {"in": trace.tokens_in, "out": trace.tokens_out},
-            "error": "EVALUATION_FAILED" if failed else None,
+            "error": error,
         }
 
 
@@ -249,9 +314,12 @@ async def run_suite(
     run_id: str | None = None,
     model="none",
     llm=None,
+    mock_transport: str = "asgi",
 ) -> list[dict]:
     if type(k) is not int or k < 1 or not scenarios or not factories:
         raise ValueError("Scenarios, systems and positive k are required")
+    if mock_transport not in MOCK_TRANSPORTS:
+        raise ValueError("Unknown mock transport")
     if len({s["id"] for s in scenarios}) != len(scenarios):
         raise ValueError("Duplicate scenario IDs")
     # Preflight all scenarios before a system can run or any files are written.
@@ -264,11 +332,26 @@ async def run_suite(
     for factory in factories:
         for scenario in scenarios:
             for index in range(k):
-                rows.append(
-                    await run_one(
-                        scenario, factory(), run_id=run_id, k_index=index, model=model, llm=llm
-                    )
+                row = await run_one(
+                    scenario,
+                    factory(),
+                    run_id=run_id,
+                    k_index=index,
+                    model=model,
+                    llm=llm,
+                    mock_transport=mock_transport,
                 )
+                rows.append(row)
+                if row["error"] == QUOTA_EXHAUSTED:
+                    # Later runs would only fail on quota too; an incomplete
+                    # comparison gets no summary, report or pass^k.
+                    folder = Path(output)
+                    folder.mkdir(parents=True, exist_ok=True)
+                    (folder / "runs.partial.jsonl").write_text(
+                        "".join(json.dumps(r, sort_keys=True) + "\n" for r in rows),
+                        encoding="utf-8",
+                    )
+                    raise ModelQuotaExhausted()
     write_results(rows, output, k)
     return rows
 
