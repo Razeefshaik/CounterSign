@@ -1,0 +1,21 @@
+{
+  "tool": "list_transactions",
+  "ok": true,
+  "output": {
+    "account_number": "B23JM5BDGPAF8",
+    "start_date": "2026-09-24T07:00:11Z",
+    "end_date": "2026-10-24T05:29:59Z",
+    "last_refreshed_datetime": "2026-10-24T05:29:59Z",
+    "page": 1,
+    "total_items": 0,
+    "total_pages": 0,
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/reporting/transactions?transaction_id=None&transaction_status=S&end_date=2026-10-24T07%3A00%3A11Z&start_date=2026-09-24T07%3A00%3A11Z&page_size=20&page=1",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  }
+}

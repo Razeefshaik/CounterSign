@@ -1,0 +1,275 @@
+{
+  "check_id": "D8",
+  "verdict": "DIFFERENT",
+  "creation_verdict": "CONFIRMED",
+  "hold_verdict": "DIFFERENT",
+  "api_route": {
+    "verdict": "BLOCKED",
+    "status": 400,
+    "error_name": null
+  },
+  "disputes": {
+    "inr_400": {
+      "route": "RESOLUTION_CENTER",
+      "submitted_at": "2026-10-23T22:11:34.644294Z",
+      "dispute_id": "PP-R-JQM-10194292",
+      "first_seen_at": "2026-10-23T22:15:50.206856Z",
+      "seconds_to_appear": 255.563,
+      "matched_field": "seller_transaction_id",
+      "polls": 1,
+      "initial": {
+        "status": "UNDER_REVIEW",
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        },
+        "seller_response_due_date": null,
+        "dispute_outcome": null,
+        "rels": [
+          "provide_supporting_info",
+          "self"
+        ]
+      },
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "728873272J7565128",
+          "seller_transaction_id": "1X031539U0011491U",
+          "create_time": "2026-10-23T22:02:25.000Z",
+          "transaction_status": "HELD",
+          "gross_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          },
+          "buyer": {
+            "email": "buyer-1@redacted",
+            "payer_id": "HFJETABW9K8C6",
+            "name": "John Doe"
+          },
+          "seller": {
+            "email": "email@redacted",
+            "merchant_id": "B23JM5BDGPAF8",
+            "name": "Test Store"
+          },
+          "items": [
+            {
+              "item_name": "Staged sandbox action: CounterSign check.",
+              "item_description": "Staged sandbox action: CounterSign check.",
+              "item_quantity": "1",
+              "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+              "item_type": "PRODUCT"
+            }
+          ],
+          "seller_protection_eligible": true,
+          "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+        }
+      ]
+    },
+    "snad_60": {
+      "route": "RESOLUTION_CENTER",
+      "submitted_at": "2026-10-23T22:13:56.716712Z",
+      "dispute_id": "PP-R-XJK-10194293",
+      "first_seen_at": "2026-10-23T22:17:54.177089Z",
+      "seconds_to_appear": 237.46,
+      "matched_field": "seller_transaction_id",
+      "polls": 3,
+      "initial": {
+        "status": "WAITING_FOR_SELLER_RESPONSE",
+        "dispute_life_cycle_stage": "INQUIRY",
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "seller_response_due_date": "2026-11-12T22:13:43.725Z",
+        "dispute_outcome": null,
+        "rels": [
+          "accept_claim",
+          "escalate",
+          "make_offer",
+          "self",
+          "send_message"
+        ]
+      },
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "1KC99580K1831703T",
+          "seller_transaction_id": "69T54342EE2129538",
+          "create_time": "2026-10-23T22:02:27.000Z",
+          "transaction_status": "HELD",
+          "gross_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          },
+          "buyer": {
+            "email": "buyer-1@redacted",
+            "payer_id": "HFJETABW9K8C6",
+            "name": "John Doe"
+          },
+          "seller": {
+            "email": "email@redacted",
+            "merchant_id": "B23JM5BDGPAF8",
+            "name": "Test Store"
+          },
+          "items": [
+            {
+              "item_name": "Staged sandbox action: CounterSign check.",
+              "item_description": "Staged sandbox action: CounterSign check.",
+              "item_quantity": "1",
+              "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+              "notes": "fdsfgsdf asljkdha  asdas da asdias udsaidu adj asdljasdlkajsdasd uoiudewoiru ceruoids ds dsdnsd asljkdasdeoidrueoiruoiruere",
+              "item_type": "PRODUCT"
+            }
+          ],
+          "seller_protection_eligible": true,
+          "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+        }
+      ]
+    },
+    "spare_25": {
+      "route": "RESOLUTION_CENTER",
+      "submitted_at": "2026-10-23T22:15:48.776468Z",
+      "dispute_id": "PP-R-UJV-10194294",
+      "first_seen_at": "2026-10-23T22:18:58.271795Z",
+      "seconds_to_appear": 189.495,
+      "matched_field": "seller_transaction_id",
+      "polls": 2,
+      "initial": {
+        "status": "WAITING_FOR_SELLER_RESPONSE",
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        },
+        "seller_response_due_date": "2026-11-03T04:59:59.000Z",
+        "dispute_outcome": null,
+        "rels": [
+          "accept_claim",
+          "provide_evidence",
+          "self"
+        ]
+      },
+      "disputed_transactions": [
+        {
+          "buyer_transaction_id": "0GS74555A8389573J",
+          "seller_transaction_id": "7UX45139662355119",
+          "create_time": "2026-10-23T22:02:29.000Z",
+          "transaction_status": "HELD",
+          "gross_amount": {
+            "currency_code": "USD",
+            "value": "25.00"
+          },
+          "buyer": {
+            "email": "buyer-1@redacted",
+            "payer_id": "HFJETABW9K8C6",
+            "name": "John Doe"
+          },
+          "seller": {
+            "email": "email@redacted",
+            "merchant_id": "B23JM5BDGPAF8",
+            "name": "Test Store"
+          },
+          "items": [
+            {
+              "item_name": "Staged sandbox action: CounterSign check.",
+              "item_description": "Staged sandbox action: CounterSign check.",
+              "item_quantity": "1",
+              "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+              "item_type": "PRODUCT"
+            }
+          ],
+          "seller_protection_eligible": true,
+          "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+        }
+      ]
+    }
+  },
+  "not_found": [],
+  "hold": {
+    "valid_observations": 37,
+    "total_observations": 37,
+    "expected_withheld_increase_minor": 48500,
+    "largest_withheld_increase_minor": 0,
+    "first_full_hold_seen_at": null,
+    "hold_observed": false,
+    "hold_verdict": "DIFFERENT",
+    "capture_statuses_seen": [
+      "inr_400:PENDING",
+      "snad_60:PENDING",
+      "spare_25:PENDING"
+    ]
+  },
+  "created_webhooks": [
+    {
+      "event_id": "WH-2LJ05453DV740643U-3DC22927617099520",
+      "dispute_id": "PP-R-JQM-10194292",
+      "create_time": "2026-10-23T22:14:34.055Z",
+      "received_at": "2026-10-23T22:14:37.807619Z",
+      "file": "webhooks/20261023T221437807619Z_001_WH-2LJ05453DV740643U-3DC22927617099520.json",
+      "delay_seconds": 3.753
+    },
+    {
+      "event_id": "WH-3F865444SY1605603-42W54259FR0589717",
+      "dispute_id": "PP-R-XJK-10194293",
+      "create_time": "2026-10-23T22:17:03.563Z",
+      "received_at": "2026-10-23T22:17:07.826153Z",
+      "file": "webhooks/20261023T221707826153Z_001_WH-3F865444SY1605603-42W54259FR0589717.json",
+      "delay_seconds": 4.263
+    },
+    {
+      "event_id": "WH-87U062412L835453W-465362520T6583722",
+      "dispute_id": "PP-R-UJV-10194294",
+      "create_time": "2026-10-23T22:18:33.162Z",
+      "received_at": "2026-10-23T22:18:37.181670Z",
+      "file": "webhooks/20261023T221837181670Z_001_WH-87U062412L835453W-465362520T6583722.json",
+      "delay_seconds": 4.02
+    }
+  ],
+  "notes": [
+    "submitted_at is when the operator confirmed, an upper bound on the submit time",
+    "balance figures are as PayPal reported them; see D12 for refresh lag"
+  ],
+  "observed_at": "2026-10-23T22:04:24.280250Z",
+  "evidence_files": [
+    "2026-10-23/D8/01_oauth_token.json",
+    "2026-10-23/D8/02_baseline_balance.json",
+    "2026-10-23/D8/03_balance_snapshot.json",
+    "2026-10-23/D8/04_api_create_dispute.json",
+    "2026-10-23/D8/05_balance_snapshot.json",
+    "2026-10-23/D8/06_balance_snapshot.json",
+    "2026-10-23/D8/07_find_inr_400_list.json",
+    "2026-10-23/D8/08_find_inr_400_detail.json",
+    "2026-10-23/D8/09_find_snad_60_list.json",
+    "2026-10-23/D8/10_find_snad_60_list.json",
+    "2026-10-23/D8/11_find_snad_60_list.json",
+    "2026-10-23/D8/12_find_snad_60_detail.json",
+    "2026-10-23/D8/13_find_spare_25_list.json",
+    "2026-10-23/D8/14_find_spare_25_list.json",
+    "2026-10-23/D8/15_find_spare_25_detail.json",
+    "2026-10-23/D8/16_inspect_inr_400.json",
+    "2026-10-23/D8/17_inspect_snad_60.json",
+    "2026-10-23/D8/18_inspect_spare_25.json",
+    "2026-10-23/D8/19_hold_balance.json",
+    "2026-10-23/D8/20_hold_capture_inr_400.json",
+    "2026-10-23/D8/21_hold_capture_snad_60.json",
+    "2026-10-23/D8/22_hold_capture_spare_25.json",
+    "2026-10-23/D8/23_balance_snapshot.json",
+    "2026-10-23/D8/24_hold_balance.json",
+    "2026-10-23/D8/25_hold_capture_inr_400.json",
+    "2026-10-23/D8/26_hold_capture_snad_60.json",
+    "2026-10-23/D8/27_hold_capture_spare_25.json",
+    "2026-10-23/D8/28_balance_snapshot.json",
+    "2026-10-23/D8/29_hold_balance.json",
+    "2026-10-23/D8/30_hold_capture_inr_400.json",
+    "2026-10-23/D8/31_hold_capture_snad_60.json",
+    "2026-10-23/D8/32_hold_capture_spare_25.json",
+    "2026-10-23/D8/33_balance_snapshot.json",
+    "2026-10-23/D8/34_hold_balance.json",
+    "2026-10-23/D8/35_hold_capture_inr_400.json",
+    "2026-10-23/D8/36_hold_capture_snad_60.json",
+    "2026-10-23/D8/37_hold_capture_spare_25.json",
+    "2026-10-23/D8/38_balance_snapshot.json"
+  ]
+}

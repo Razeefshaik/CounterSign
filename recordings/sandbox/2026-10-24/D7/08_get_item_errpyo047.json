@@ -1,0 +1,72 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts-item/ERRPYO047",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "matched-stub-id": "df62107e-2a3c-4baa-b479-2b6e4fcf5ff1",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f7583774f5aba",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f7583774f5aba-859eae9405a73087-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:17 GMT",
+    "x-served-by": "cache-sin-wsap440062-SIN, cache-sin-wsap440062-SIN, cache-maa10236-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825097.709763,VS0,VE767",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "payout_item_id": "JJ5Z53TN2SR5C",
+    "transaction_id": "7EA91403EK812680R",
+    "transaction_status": "UNCLAIMED",
+    "payout_item_fee": {
+      "currency": "USD",
+      "value": "0.25"
+    },
+    "payout_batch_id": "8U28CZSK6JGLU",
+    "payout_item": {
+      "recipient_type": "EMAIL",
+      "amount": {
+        "currency": "USD",
+        "value": "1.00"
+      },
+      "note": "payout to receiver test1",
+      "receiver": "email@redacted",
+      "sender_item_id": "30.30"
+    },
+    "errors": {
+      "name": "RECEIVER_UNREGISTERED",
+      "message": "Receiver is unregistered",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+      "details": []
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/JJ5Z53TN2SR5C",
+        "rel": "item",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T06:58:18.703540Z",
+  "t_recv": "2026-10-24T06:58:19.522168Z"
+}

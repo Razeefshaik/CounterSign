@@ -1,0 +1,80 @@
+{
+  "method": "GET",
+  "path": "/v1/reporting/transactions?transaction_id=1X031539U0011491U&start_date=2026-10-22T22%3A02%3A28Z&end_date=2026-10-24T06%3A58%3A01Z&fields=transaction_info",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f174567784859",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f174567784859-f00f0159be988ee9-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:00 GMT",
+    "x-served-by": "cache-sin-wsss1830029-SIN, cache-sin-wsss1830029-SIN, cache-maa10245-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825080.859031,VS0,VE987",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "transaction_details": [
+      {
+        "transaction_info": {
+          "paypal_account_id": "HFJETABW9K8C6",
+          "transaction_id": "1X031539U0011491U",
+          "paypal_reference_id": "728873272J7565128",
+          "paypal_reference_id_type": "TXN",
+          "transaction_event_code": "T0006",
+          "transaction_initiation_date": "2026-10-23T22:02:25Z",
+          "transaction_updated_date": "2026-10-23T22:02:25Z",
+          "transaction_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          },
+          "fee_amount": {
+            "currency_code": "USD",
+            "value": "-14.45"
+          },
+          "transaction_status": "S",
+          "transaction_subject": "Staged sandbox action: CounterSign check.",
+          "protection_eligibility": "01",
+          "instrument_type": "PayPal PayLater",
+          "instrument_sub_type": "0% for 4 months"
+        }
+      }
+    ],
+    "account_number": "B23JM5BDGPAF8",
+    "start_date": "2026-10-22T22:02:28Z",
+    "end_date": "2026-10-24T05:29:59Z",
+    "last_refreshed_datetime": "2026-10-24T05:29:59Z",
+    "page": 1,
+    "total_items": 1,
+    "total_pages": 1,
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/reporting/transactions?start_date=2026-10-22T22%3A02%3A28Z&transaction_id=1X031539U0011491U&fields=transaction_info&end_date=2026-10-24T06%3A58%3A01Z&page_size=100&page=1",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T06:58:01.639334Z",
+  "t_recv": "2026-10-24T06:58:02.890182Z"
+}

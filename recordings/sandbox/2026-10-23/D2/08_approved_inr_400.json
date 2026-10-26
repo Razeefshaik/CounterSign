@@ -1,0 +1,77 @@
+{
+  "method": "GET",
+  "path": "/v2/checkout/orders/02028397HW8915403",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "date": "Fri, 23 Oct 2026 21:37:53 GMT",
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "set-cookie": "[REDACTED]",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "x-content-type-options": "nosniff",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "ca4f3e2b0fc0e",
+    "cf-cache-status": "DYNAMIC",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f3e2b0fc0e-b6cc4a04417d3057-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "content-encoding": "gzip",
+    "cf-ray": "a4f3e2b0fc0e2dfe-BOM"
+  },
+  "response_body": {
+    "id": "02028397HW8915403",
+    "intent": "CAPTURE",
+    "status": "CREATED",
+    "purchase_units": [
+      {
+        "reference_id": "inr_400",
+        "amount": {
+          "currency_code": "USD",
+          "value": "400.00",
+          "breakdown": {}
+        },
+        "payee": {
+          "email_address": "email@redacted",
+          "merchant_id": "B23JM5BDGPAF8"
+        },
+        "description": "Staged sandbox action: CounterSign check."
+      }
+    ],
+    "create_time": "2026-10-23T21:29:55Z",
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://www.sandbox.paypal.com/checkoutnow?token=02028397HW8915403",
+        "rel": "approve",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403",
+        "rel": "update",
+        "method": "PATCH"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/02028397HW8915403/capture",
+        "rel": "capture",
+        "method": "POST"
+      }
+    ]
+  },
+  "t_sent": "2026-10-23T21:37:54.813730Z",
+  "t_recv": "2026-10-23T21:37:56.156894Z"
+}

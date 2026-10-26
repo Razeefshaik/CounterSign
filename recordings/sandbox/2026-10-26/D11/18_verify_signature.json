@@ -1,0 +1,180 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "3466",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "8d42e5c6-cf2f-11f1-8c96-2b7904ed244f",
+    "transmission_sig": "ZfIJ1edwIcv1sGE0nc8cvMcvwJUyYLcVNup8HhprAb0aO6XGiayRZTDpzYLOPM48OpSD096ywgIQ0YcV0K3I1pB042yOjoZc6dfZwjj4fUWIRbTkF/mOGuOBo0jyEFCoxwaP+Qq233QX6zhfJn3w4BicetxDbyLW7MYDkMdr2AZI8M1hHcrNKhx7qvdBCHcV77AwkH6NudHiTfiaWCkfe1QOuVz5Qmx99oApBE7ZuFmxtdNb/pxvWCajWXO5IEDSOYizWN2tELxFeKa3Ed7298BPqgmnaVs1WE9mjvAbgo2Zrtehur/WbeIc9e+VlG53xowmZowNn8ENT2Pp3iwfzA==",
+    "transmission_time": "2026-10-23T22:17:36Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-9FY6292551646951V-9PA40184663765516",
+      "event_version": "1.0",
+      "create_time": "2026-10-23T22:17:33.222Z",
+      "resource_type": "dispute",
+      "event_type": "CUSTOMER.DISPUTE.UPDATED",
+      "summary": "A dispute was updated with case # PP-R-XJK-10194293",
+      "resource": {
+        "dispute_id": "PP-R-XJK-10194293",
+        "create_time": "2026-10-23T22:13:43.725Z",
+        "update_time": "2026-10-23T22:17:23.863Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "1KC99580K1831703T",
+            "seller_transaction_id": "69T54342EE2129538",
+            "transaction_status": "HELD",
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+                "notes": "fdsfgsdf asljkdha  asdas da asdias udsaidu adj asdljasdlkajsdasd uoiudewoiru ceruoids ds dsdnsd asljkdasdeoidrueoiruoiruere",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+        "status": "WAITING_FOR_SELLER_RESPONSE",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "fund_movements": [
+          {
+            "party": "RECEIVER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "56.52"
+            },
+            "initiated_time": "2026-10-23T22:17:02.000Z",
+            "type": "DEBIT",
+            "reason": "HOLD_PLACED"
+          }
+        ],
+        "dispute_life_cycle_stage": "INQUIRY",
+        "dispute_channel": "INTERNAL",
+        "messages": [
+          {
+            "posted_by": "BUYER",
+            "time_posted": "2026-10-23T22:13:43.725Z",
+            "content": "sdrfwer"
+          }
+        ],
+        "seller_response_due_date": "2026-11-12T22:13:43.725Z",
+        "offer": {
+          "buyer_requested_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          }
+        },
+        "refund_details": {
+          "allowed_refund_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          }
+        },
+        "allowed_response_options": {
+          "accept_claim": {
+            "accept_claim_types": [
+              "PARTIAL_REFUND",
+              "REFUND_WITH_RETURN",
+              "REFUND"
+            ]
+          },
+          "make_offer": {
+            "offer_types": [
+              "REFUND",
+              "REFUND_WITH_RETURN"
+            ]
+          }
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293",
+            "rel": "self",
+            "method": "GET"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293/escalate",
+            "rel": "escalate",
+            "method": "POST"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293/send-message",
+            "rel": "send_message",
+            "method": "POST"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293/accept-claim",
+            "rel": "accept_claim",
+            "method": "POST"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293/make-offer",
+            "rel": "make_offer",
+            "method": "POST"
+          }
+        ]
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-9FY6292551646951V-9PA40184663765516",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-9FY6292551646951V-9PA40184663765516/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "server": "nginx",
+    "access-control-expose-headers": "Server-Timing",
+    "content-language": "",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f61126316fe4c",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f61126316fe4c-3b7e2ba0353797a3-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-type": "application/json",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:15:01 GMT",
+    "x-served-by": "cache-sin-wsss1830033-SIN, cache-sin-wsss1830033-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027701.663559,VS0,VE793",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:15:01.533546Z",
+  "t_recv": "2026-10-26T15:15:02.371162Z"
+}

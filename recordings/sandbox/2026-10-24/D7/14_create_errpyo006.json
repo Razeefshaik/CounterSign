@@ -1,0 +1,63 @@
+{
+  "method": "POST",
+  "path": "/v1/payments/payouts",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "paypal-request-id": "cs-01a16cb4-1a9f-7922-9053-d511d4236cb0-a1",
+    "content-length": "346",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "sender_batch_header": {
+      "sender_batch_id": "cs-01a16cb4-1a9f-7922-9053-d511d4236cb0-a1",
+      "email_subject": "CounterSign sandbox negative test"
+    },
+    "items": [
+      {
+        "recipient_type": "EMAIL",
+        "receiver": "maker-b@redacted",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "note": "ERRPYO006",
+        "sender_item_id": "cs-01a16cb4-1a9f-7922-9053-d511d4236cb0-a1-i1"
+      }
+    ]
+  },
+  "response_status": 500,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-length": "211",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f7478964729f5-167fdec963a3556d-01\"",
+    "server": "nginx",
+    "paypal-debug-id": "f7478964729f5",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "matched-stub-id": "0533e2d2-a842-491e-aec6-1d20a58d2358",
+    "accept-ranges": "bytes",
+    "via": "1.1 varnish, 1.1 varnish",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:24 GMT",
+    "x-served-by": "cache-sin-wsat1880030-SIN, cache-sin-wsat1880030-SIN, cache-maa10236-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825103.245583,VS0,VE755",
+    "vary": "Accept-Encoding"
+  },
+  "response_body": {
+    "name": "INTERNAL_ERROR",
+    "message": "An internal service error has occurred.",
+    "debug_id": "74b46c42107ee",
+    "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors"
+  },
+  "t_sent": "2026-10-24T06:58:25.240864Z",
+  "t_recv": "2026-10-24T06:58:26.049452Z"
+}

@@ -1,0 +1,894 @@
+{
+  "check_id": "D12",
+  "verdict": "DIFFERENT",
+  "claim": "balances can lag up to 3 hours",
+  "part_verdicts": {
+    "freshness": "CONFIRMED",
+    "consistency": "CONFIRMED",
+    "reflection": "DIFFERENT",
+    "transactions": "BLOCKED"
+  },
+  "blocked_parts": [
+    "transactions"
+  ],
+  "readings": {
+    "total": 619,
+    "valid": 585,
+    "invalid": 34,
+    "malformed_lines": 0,
+    "by_source": {
+      "balances.jsonl": 579,
+      "D8.baseline_balance": 1,
+      "D12.fresh_balance": 1,
+      "D8.hold_observations": 37,
+      "D10.release_observations": 1
+    },
+    "first_fetched_at": "2026-10-23T13:40:35.802990Z",
+    "last_fetched_at": "2026-10-26T14:51:12.497418Z"
+  },
+  "timeline_events": 28,
+  "freshness": {
+    "stale_examples": [],
+    "last_refresh_time": {
+      "count": 585,
+      "min_seconds": 4890.544,
+      "median_seconds": 6057.747,
+      "max_seconds": 8671.996,
+      "over_3h": 0,
+      "missing_or_unparseable": 0
+    },
+    "as_of_time": {
+      "count": 585,
+      "min_seconds": 4890.544,
+      "median_seconds": 6057.747,
+      "max_seconds": 8671.996,
+      "over_3h": 0,
+      "missing_or_unparseable": 0
+    },
+    "any_over_3h": false,
+    "verdict": "CONFIRMED"
+  },
+  "consistency": {
+    "verdict": "CONFIRMED",
+    "checked": 585,
+    "mismatches": 0,
+    "incomplete": 0,
+    "mismatch_examples": []
+  },
+  "reflection": {
+    "verdict": "DIFFERENT",
+    "events": 19,
+    "measured": 14,
+    "over_3h": 5,
+    "overlapping": 17,
+    "by_event_type": {
+      "CAPTURE_COMPLETED": {
+        "REFLECTED": 3,
+        "NOT_REFLECTED": 0,
+        "BLOCKED": 0,
+        "max_lag_seconds": 57439.378,
+        "first_reflected_in": {
+          "source": "balances.jsonl:268",
+          "fetched_at": "2026-10-24T13:59:47.393073Z",
+          "value_minor": 537182,
+          "change_minor": 37182
+        }
+      },
+      "DISPUTE_CREATED": {
+        "REFLECTED": 0,
+        "NOT_REFLECTED": 0,
+        "BLOCKED": 3,
+        "max_lag_seconds": null
+      },
+      "PAYOUT_SUBMITTED": {
+        "REFLECTED": 8,
+        "NOT_REFLECTED": 0,
+        "BLOCKED": 0,
+        "max_lag_seconds": 31008.002,
+        "first_reflected_in": {
+          "source": "balances.jsonl:37",
+          "fetched_at": "2026-10-24T06:53:01.624152Z",
+          "value_minor": 499875,
+          "change_minor": -125
+        }
+      },
+      "PAYOUT_ITEM_RETURNED": {
+        "REFLECTED": 1,
+        "NOT_REFLECTED": 0,
+        "BLOCKED": 0,
+        "max_lag_seconds": 6246.871,
+        "first_reflected_in": {
+          "source": "balances.jsonl:268",
+          "fetched_at": "2026-10-24T13:59:47.393073Z",
+          "value_minor": 537182,
+          "change_minor": 38307
+        }
+      },
+      "DISPUTE_RESOLVED": {
+        "REFLECTED": 0,
+        "NOT_REFLECTED": 2,
+        "BLOCKED": 1,
+        "max_lag_seconds": null
+      },
+      "CAPTURE_REFUNDED": {
+        "REFLECTED": 0,
+        "NOT_REFLECTED": 0,
+        "BLOCKED": 1,
+        "max_lag_seconds": null
+      }
+    },
+    "rows": [
+      {
+        "event": "CAPTURE_COMPLETED",
+        "source": "D2",
+        "resource_id": "1X031539U0011491U",
+        "at": "2026-10-23T22:02:28.015080Z",
+        "paypal_time": "2026-10-23T22:02:25Z",
+        "balance": "available",
+        "direction": 1,
+        "amount_minor": 38555,
+        "threshold_minor": 19278,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "CAPTURE_COMPLETED:69T54342EE2129538",
+          "CAPTURE_COMPLETED:7UX45139662355119",
+          "DISPUTE_CREATED:PP-R-JQM-10194292",
+          "PAYOUT_SUBMITTED:MZ6LMVL8FZDYG",
+          "DISPUTE_CREATED:PP-R-XJK-10194293",
+          "DISPUTE_CREATED:PP-R-UJV-10194294",
+          "PAYOUT_SUBMITTED:BV5759UA95QU8",
+          "PAYOUT_SUBMITTED:66T9EUC3HR2JY",
+          "PAYOUT_SUBMITTED:3K6AWN33H4VSS",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4",
+          "PAYOUT_ITEM_RETURNED:EH7G4GY74KLLY",
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "CAPTURE_REFUNDED:69T54342EE2129538"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:8",
+          "fetched_at": "2026-10-23T21:59:53.672950Z",
+          "value_minor": 500000
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 57439.378,
+        "lag_lower_bound_seconds": 57299.944,
+        "exceeds_3h": true,
+        "reflected_in": {
+          "source": "balances.jsonl:268",
+          "fetched_at": "2026-10-24T13:59:47.393073Z",
+          "value_minor": 537182,
+          "change_minor": 37182
+        }
+      },
+      {
+        "event": "CAPTURE_COMPLETED",
+        "source": "D2",
+        "resource_id": "69T54342EE2129538",
+        "at": "2026-10-23T22:02:30.307433Z",
+        "paypal_time": "2026-10-23T22:02:27Z",
+        "balance": "available",
+        "direction": 1,
+        "amount_minor": 5652,
+        "threshold_minor": 2826,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "CAPTURE_COMPLETED:1X031539U0011491U",
+          "CAPTURE_COMPLETED:7UX45139662355119",
+          "DISPUTE_CREATED:PP-R-JQM-10194292",
+          "PAYOUT_SUBMITTED:MZ6LMVL8FZDYG",
+          "DISPUTE_CREATED:PP-R-XJK-10194293",
+          "DISPUTE_CREATED:PP-R-UJV-10194294",
+          "PAYOUT_SUBMITTED:BV5759UA95QU8",
+          "PAYOUT_SUBMITTED:66T9EUC3HR2JY",
+          "PAYOUT_SUBMITTED:3K6AWN33H4VSS",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4",
+          "PAYOUT_ITEM_RETURNED:EH7G4GY74KLLY",
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "CAPTURE_REFUNDED:69T54342EE2129538"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:8",
+          "fetched_at": "2026-10-23T21:59:53.672950Z",
+          "value_minor": 500000
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 57437.086,
+        "lag_lower_bound_seconds": 57297.651,
+        "exceeds_3h": true,
+        "reflected_in": {
+          "source": "balances.jsonl:268",
+          "fetched_at": "2026-10-24T13:59:47.393073Z",
+          "value_minor": 537182,
+          "change_minor": 37182
+        }
+      },
+      {
+        "event": "CAPTURE_COMPLETED",
+        "source": "D2",
+        "resource_id": "7UX45139662355119",
+        "at": "2026-10-23T22:02:32.390099Z",
+        "paypal_time": "2026-10-23T22:02:29Z",
+        "balance": "available",
+        "direction": 1,
+        "amount_minor": 2364,
+        "threshold_minor": 1182,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "CAPTURE_COMPLETED:1X031539U0011491U",
+          "CAPTURE_COMPLETED:69T54342EE2129538",
+          "DISPUTE_CREATED:PP-R-JQM-10194292",
+          "PAYOUT_SUBMITTED:MZ6LMVL8FZDYG",
+          "DISPUTE_CREATED:PP-R-XJK-10194293",
+          "DISPUTE_CREATED:PP-R-UJV-10194294",
+          "PAYOUT_SUBMITTED:BV5759UA95QU8",
+          "PAYOUT_SUBMITTED:66T9EUC3HR2JY",
+          "PAYOUT_SUBMITTED:3K6AWN33H4VSS",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4",
+          "PAYOUT_ITEM_RETURNED:EH7G4GY74KLLY",
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "CAPTURE_REFUNDED:69T54342EE2129538"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:8",
+          "fetched_at": "2026-10-23T21:59:53.672950Z",
+          "value_minor": 500000
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 57435.003,
+        "lag_lower_bound_seconds": 57295.569,
+        "exceeds_3h": true,
+        "reflected_in": {
+          "source": "balances.jsonl:268",
+          "fetched_at": "2026-10-24T13:59:47.393073Z",
+          "value_minor": 537182,
+          "change_minor": 37182
+        }
+      },
+      {
+        "event": "DISPUTE_CREATED",
+        "source": "D8",
+        "resource_id": "PP-R-JQM-10194292",
+        "at": "2026-10-23T22:15:50.206856Z",
+        "paypal_time": "2026-10-23T22:11:16.275Z",
+        "balance": "withheld",
+        "direction": 1,
+        "amount_minor": 40000,
+        "threshold_minor": 20000,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:MZ6LMVL8FZDYG",
+          "DISPUTE_CREATED:PP-R-XJK-10194293",
+          "DISPUTE_CREATED:PP-R-UJV-10194294",
+          "PAYOUT_SUBMITTED:BV5759UA95QU8",
+          "PAYOUT_SUBMITTED:66T9EUC3HR2JY",
+          "PAYOUT_SUBMITTED:3K6AWN33H4VSS",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4",
+          "PAYOUT_ITEM_RETURNED:EH7G4GY74KLLY",
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "CAPTURE_REFUNDED:69T54342EE2129538",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:17",
+          "fetched_at": "2026-10-23T22:14:57.481999Z",
+          "value_minor": 0
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 34,
+        "result": "BLOCKED",
+        "observed_until_seconds": 232522.291,
+        "exceeds_3h": null,
+        "reason": "an overlapping opposite event on the same balance may have cancelled it",
+        "possible_cancelling_events": [
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ]
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D3",
+        "resource_id": "MZ6LMVL8FZDYG",
+        "at": "2026-10-23T22:16:13.622142Z",
+        "paypal_time": null,
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "DISPUTE_CREATED:PP-R-XJK-10194293",
+          "DISPUTE_CREATED:PP-R-UJV-10194294"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:18",
+          "fetched_at": "2026-10-23T22:16:11.926022Z",
+          "value_minor": 500000
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 31008.002,
+        "lag_lower_bound_seconds": 1201.952,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:37",
+          "fetched_at": "2026-10-24T06:53:01.624152Z",
+          "value_minor": 499875,
+          "change_minor": -125
+        }
+      },
+      {
+        "event": "DISPUTE_CREATED",
+        "source": "D8",
+        "resource_id": "PP-R-XJK-10194293",
+        "at": "2026-10-23T22:17:54.177089Z",
+        "paypal_time": "2026-10-23T22:13:43.725Z",
+        "balance": "withheld",
+        "direction": 1,
+        "amount_minor": 6000,
+        "threshold_minor": 3000,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:MZ6LMVL8FZDYG",
+          "DISPUTE_CREATED:PP-R-UJV-10194294",
+          "PAYOUT_SUBMITTED:BV5759UA95QU8",
+          "PAYOUT_SUBMITTED:66T9EUC3HR2JY",
+          "PAYOUT_SUBMITTED:3K6AWN33H4VSS",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4",
+          "PAYOUT_ITEM_RETURNED:EH7G4GY74KLLY",
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "CAPTURE_REFUNDED:69T54342EE2129538",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:18",
+          "fetched_at": "2026-10-23T22:16:11.926022Z",
+          "value_minor": 0
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 34,
+        "result": "BLOCKED",
+        "observed_until_seconds": 232398.32,
+        "exceeds_3h": null,
+        "reason": "an overlapping opposite event on the same balance may have cancelled it",
+        "possible_cancelling_events": [
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ]
+      },
+      {
+        "event": "DISPUTE_CREATED",
+        "source": "D8",
+        "resource_id": "PP-R-UJV-10194294",
+        "at": "2026-10-23T22:18:58.271795Z",
+        "paypal_time": "2026-10-23T22:15:33.871Z",
+        "balance": "withheld",
+        "direction": 1,
+        "amount_minor": 2500,
+        "threshold_minor": 1250,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:MZ6LMVL8FZDYG",
+          "DISPUTE_CREATED:PP-R-XJK-10194293",
+          "PAYOUT_SUBMITTED:BV5759UA95QU8",
+          "PAYOUT_SUBMITTED:66T9EUC3HR2JY",
+          "PAYOUT_SUBMITTED:3K6AWN33H4VSS",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4",
+          "PAYOUT_ITEM_RETURNED:EH7G4GY74KLLY",
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "CAPTURE_REFUNDED:69T54342EE2129538",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:18",
+          "fetched_at": "2026-10-23T22:16:11.926022Z",
+          "value_minor": 0
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 34,
+        "result": "BLOCKED",
+        "observed_until_seconds": 232334.226,
+        "exceeds_3h": null,
+        "reason": "an overlapping opposite event on the same balance may have cancelled it",
+        "possible_cancelling_events": [
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ]
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D4",
+        "resource_id": "BV5759UA95QU8",
+        "at": "2026-10-24T06:58:07.926138Z",
+        "paypal_time": null,
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:66T9EUC3HR2JY",
+          "PAYOUT_SUBMITTED:3K6AWN33H4VSS",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:42",
+          "fetched_at": "2026-10-24T06:58:05.322023Z",
+          "value_minor": 499875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 5377.073,
+        "lag_lower_bound_seconds": 5271.25,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:131",
+          "fetched_at": "2026-10-24T08:27:44.999429Z",
+          "value_minor": 499500,
+          "change_minor": -375
+        }
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D4",
+        "resource_id": "66T9EUC3HR2JY",
+        "at": "2026-10-24T06:58:09.187948Z",
+        "paypal_time": null,
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:BV5759UA95QU8",
+          "PAYOUT_SUBMITTED:3K6AWN33H4VSS",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:42",
+          "fetched_at": "2026-10-24T06:58:05.322023Z",
+          "value_minor": 499875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 5375.811,
+        "lag_lower_bound_seconds": 5269.988,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:131",
+          "fetched_at": "2026-10-24T08:27:44.999429Z",
+          "value_minor": 499500,
+          "change_minor": -375
+        }
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D4",
+        "resource_id": "3K6AWN33H4VSS",
+        "at": "2026-10-24T06:58:10.344791Z",
+        "paypal_time": null,
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:BV5759UA95QU8",
+          "PAYOUT_SUBMITTED:66T9EUC3HR2JY",
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:42",
+          "fetched_at": "2026-10-24T06:58:05.322023Z",
+          "value_minor": 499875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 5374.655,
+        "lag_lower_bound_seconds": 5268.831,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:131",
+          "fetched_at": "2026-10-24T08:27:44.999429Z",
+          "value_minor": 499500,
+          "change_minor": -375
+        }
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D6",
+        "resource_id": "NYJH5RKAXC9QW",
+        "at": "2026-10-24T07:00:40.473054Z",
+        "paypal_time": "2026-10-24T07:00:34Z",
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:45",
+          "fetched_at": "2026-10-24T07:00:35.456887Z",
+          "value_minor": 499875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 5224.526,
+        "lag_lower_bound_seconds": 5118.703,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:131",
+          "fetched_at": "2026-10-24T08:27:44.999429Z",
+          "value_minor": 499500,
+          "change_minor": -375
+        }
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D6",
+        "resource_id": "S9TRM576VR36S",
+        "at": "2026-10-24T07:01:17.599570Z",
+        "paypal_time": "2026-10-24T07:01:11Z",
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:5H5397MBCBLM8",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:45",
+          "fetched_at": "2026-10-24T07:00:35.456887Z",
+          "value_minor": 499875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 5187.4,
+        "lag_lower_bound_seconds": 5081.576,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:131",
+          "fetched_at": "2026-10-24T08:27:44.999429Z",
+          "value_minor": 499500,
+          "change_minor": -375
+        }
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D6",
+        "resource_id": "5H5397MBCBLM8",
+        "at": "2026-10-24T07:01:55.461528Z",
+        "paypal_time": "2026-10-24T07:01:49Z",
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "PAYOUT_SUBMITTED:NYJH5RKAXC9QW",
+          "PAYOUT_SUBMITTED:S9TRM576VR36S",
+          "PAYOUT_SUBMITTED:MYBEX8P299JL4"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:45",
+          "fetched_at": "2026-10-24T07:00:35.456887Z",
+          "value_minor": 499875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 5149.538,
+        "lag_lower_bound_seconds": 5043.714,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:131",
+          "fetched_at": "2026-10-24T08:27:44.999429Z",
+          "value_minor": 499500,
+          "change_minor": -375
+        }
+      },
+      {
+        "event": "PAYOUT_SUBMITTED",
+        "source": "D6",
+        "resource_id": "MYBEX8P299JL4",
+        "at": "2026-10-24T07:02:33.627514Z",
+        "paypal_time": "2026-10-24T07:02:28Z",
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [],
+        "baseline": {
+          "source": "balances.jsonl:46",
+          "fetched_at": "2026-10-24T07:02:21.116448Z",
+          "value_minor": 499875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 5111.372,
+        "lag_lower_bound_seconds": 5005.548,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:131",
+          "fetched_at": "2026-10-24T08:27:44.999429Z",
+          "value_minor": 499500,
+          "change_minor": -375
+        }
+      },
+      {
+        "event": "PAYOUT_ITEM_RETURNED",
+        "source": "D5",
+        "resource_id": "EH7G4GY74KLLY",
+        "at": "2026-10-24T12:15:40.521719Z",
+        "paypal_time": "2026-10-24T06:58:22Z",
+        "balance": "available",
+        "direction": 1,
+        "amount_minor": 100,
+        "threshold_minor": 50,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "DISPUTE_RESOLVED:PP-R-JQM-10194292",
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "CAPTURE_REFUNDED:69T54342EE2129538"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:206",
+          "fetched_at": "2026-10-24T12:15:37.184878Z",
+          "value_minor": 498875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "REFLECTED",
+        "lag_seconds": 6246.871,
+        "lag_lower_bound_seconds": 6107.437,
+        "exceeds_3h": false,
+        "reflected_in": {
+          "source": "balances.jsonl:268",
+          "fetched_at": "2026-10-24T13:59:47.393073Z",
+          "value_minor": 537182,
+          "change_minor": 38307
+        }
+      },
+      {
+        "event": "DISPUTE_RESOLVED",
+        "source": "D10",
+        "resource_id": "PP-R-JQM-10194292",
+        "at": "2026-10-24T12:19:10.059505Z",
+        "paypal_time": null,
+        "balance": "withheld",
+        "direction": -1,
+        "amount_minor": 40000,
+        "threshold_minor": 20000,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "CAPTURE_REFUNDED:69T54342EE2129538",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:207",
+          "fetched_at": "2026-10-24T12:17:01.487387Z",
+          "value_minor": 0
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 34,
+        "result": "NOT_REFLECTED",
+        "observed_until_seconds": 181922.438,
+        "exceeds_3h": true
+      },
+      {
+        "event": "DISPUTE_RESOLVED",
+        "source": "D10",
+        "resource_id": "PP-R-XJK-10194293",
+        "at": "2026-10-24T12:21:21.456466Z",
+        "paypal_time": null,
+        "balance": "withheld",
+        "direction": -1,
+        "amount_minor": 6000,
+        "threshold_minor": 3000,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "CAPTURE_REFUNDED:69T54342EE2129538",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:209",
+          "fetched_at": "2026-10-24T12:20:38.478014Z",
+          "value_minor": 0
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 34,
+        "result": "NOT_REFLECTED",
+        "observed_until_seconds": 181791.041,
+        "exceeds_3h": true
+      },
+      {
+        "event": "CAPTURE_REFUNDED",
+        "source": "D10",
+        "resource_id": "69T54342EE2129538",
+        "at": "2026-10-24T12:21:21.456466Z",
+        "paypal_time": null,
+        "balance": "available",
+        "direction": -1,
+        "amount_minor": 6000,
+        "threshold_minor": 3000,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [
+          "DISPUTE_RESOLVED:PP-R-XJK-10194293",
+          "DISPUTE_RESOLVED:PP-R-UJV-10194294"
+        ],
+        "baseline": {
+          "source": "balances.jsonl:209",
+          "fetched_at": "2026-10-24T12:20:38.478014Z",
+          "value_minor": 498875
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 34,
+        "result": "BLOCKED",
+        "observed_until_seconds": 181791.041,
+        "exceeds_3h": null,
+        "reason": "an overlapping opposite event on the same balance may have cancelled it",
+        "possible_cancelling_events": [
+          "PAYOUT_ITEM_RETURNED:EH7G4GY74KLLY"
+        ]
+      },
+      {
+        "event": "DISPUTE_RESOLVED",
+        "source": "D10",
+        "resource_id": "PP-R-UJV-10194294",
+        "at": "2026-10-26T11:55:44.360248Z",
+        "paypal_time": null,
+        "balance": "withheld",
+        "direction": -1,
+        "amount_minor": 2500,
+        "threshold_minor": 1250,
+        "currency": "USD",
+        "currency_assumed": false,
+        "overlapping_events": [],
+        "baseline": {
+          "source": "balances.jsonl:543",
+          "fetched_at": "2026-10-26T11:55:21.703332Z",
+          "value_minor": 0
+        },
+        "failed_readings_between_baseline_and_event": 0,
+        "failed_readings_after_event": 0,
+        "result": "BLOCKED",
+        "reason": "valid readings end 10528.137 s after the event, within 3 hours"
+      }
+    ]
+  },
+  "transactions": {
+    "capture": {
+      "source": "D2",
+      "resource_id": "1X031539U0011491U",
+      "at": "2026-10-23T22:02:28.015080Z",
+      "paypal_time": "2026-10-23T22:02:25Z"
+    },
+    "polls": 8,
+    "valid_polls": 8,
+    "failed_polls": 0,
+    "first_seen_at": "2026-10-24T06:58:01.638613Z",
+    "first_seen_poll": 8,
+    "seconds_after_event": 32133.624,
+    "not_seen_until_seconds": 1924.955,
+    "upper_bound": false,
+    "first_seen": {
+      "at": "2026-10-24T06:58:01.638613Z",
+      "start_date": "2026-10-22T22:02:28Z",
+      "end_date": "2026-10-24T06:58:01Z",
+      "status": 200,
+      "found": true,
+      "last_refreshed_datetime": "2026-10-24T05:29:59Z",
+      "transaction_status": "S",
+      "transaction_initiation_date": "2026-10-23T22:02:25Z",
+      "transaction_updated_date": "2026-10-23T22:02:25Z"
+    },
+    "seconds_after_paypal_time": 32136.639,
+    "verdict": "BLOCKED",
+    "reason": "first seen more than 3 hours after the capture with no earlier miss beyond 3 hours, so the lag is not pinned down"
+  },
+  "notes": [
+    "event 'at' is when a check observed the change, an upper bound on PayPal's own time, so lags measured from it can understate the true lag; paypal_time is shown where a check recorded it",
+    "a reflection lag is the reflecting reading's fetched_at (upper bound); the last valid unreflected reading gives the lower bound; resolution is the polling interval",
+    "an event counts as reflected once its balance moves the expected way by at least half of amount_minor (any amount when unknown), because fees make net movements smaller than the gross amount; change_minor shows the move",
+    "overlapping events in the same window can confound attribution; such rows list overlapping_events, and a not-reflected row with an overlapping opposite event is BLOCKED",
+    "not reflected requires a valid reading more than 3 hours after the event; failed or missing readings make a row BLOCKED, never not reflected",
+    "events without a currency are assumed USD; D8 and D10 snapshots carry USD only",
+    "fetched_at is the local clock; clock skew shifts freshness lags, and a negative lag indicates skew",
+    "PayPal times without a UTC offset are treated as missing",
+    "Transaction Search is queried with transaction_id = capture ID, assuming the capture ID is the searchable transaction ID (unverified)"
+  ],
+  "observed_at": "2026-10-23T22:04:24.288255Z",
+  "evidence_files": [
+    "2026-10-23/D12/01_oauth_token.json",
+    "2026-10-23/D12/02_fresh_balance.json",
+    "2026-10-23/D12/03_balance_snapshot.json",
+    "2026-10-23/D12/04_transaction_search.json",
+    "2026-10-23/D12/05_balance_snapshot.json",
+    "2026-10-23/D12/06_transaction_search.json",
+    "2026-10-23/D12/07_transaction_search.json",
+    "2026-10-23/D12/08_balance_snapshot.json",
+    "2026-10-23/D12/09_balance_snapshot.json",
+    "2026-10-23/D12/10_transaction_search.json",
+    "2026-10-23/D12/11_balance_snapshot.json",
+    "2026-10-23/D12/12_transaction_search.json",
+    "2026-10-23/D12/13_balance_snapshot.json",
+    "2026-10-23/D12/14_transaction_search.json",
+    "2026-10-23/D12/15_transaction_search.json",
+    "2026-10-23/D12/16_balance_snapshot.json"
+  ]
+}

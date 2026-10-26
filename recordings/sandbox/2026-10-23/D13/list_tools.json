@@ -1,0 +1,14 @@
+{
+  "tools": [
+    "get_order_details",
+    "list_disputes",
+    "get_dispute",
+    "get_shipment_tracking",
+    "list_transactions"
+  ],
+  "tool_classes": [
+    "paypal_agent_toolkit.langchain.tool.PayPalTool"
+  ],
+  "base_url": "https://api-m.sandbox.paypal.com",
+  "network_attempts": 0
+}

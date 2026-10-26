@@ -1,0 +1,141 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "2630",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "3286bf20-cf2f-11f1-ab13-c5a700615378",
+    "transmission_sig": "TfAK0qRIoaZxmryytA7Bi7rFamxx4LVF8VZSpFkusvwE7rh17f0Jd8FiK59L2MuA5s9ihvJ8cI/1TSG4/9PhiKi6bivTl95hkEPZfwt7bmiXin6RKBAwEI8PZw7qLv9T9owXM0BrPQZIfjqY5WE42hfpAesAzhAozJxl7KFRdpbSZRjyVECavhy1W1VqiTNt9MoaKRhLrU3kDWZLt79bsIuxbkkq+881Nwt8Hm+Dq1GuqE7X/PR0auNz8H6XkLU9ilNlMULjYv/hD07W2g2gWPIour3rQwBw2UQf6MhVmvohNenj0v/SJIq9yYsBxN5qmyQjjMRkfpYRlRrFJHYOHg==",
+    "transmission_time": "2026-10-23T22:15:04Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-7VX91750YS240572Y-8077227119528001S",
+      "event_version": "1.0",
+      "create_time": "2026-10-23T22:15:03.414Z",
+      "resource_type": "dispute",
+      "event_type": "CUSTOMER.DISPUTE.UPDATED",
+      "summary": "A dispute was updated with case # PP-R-JQM-10194292",
+      "resource": {
+        "dispute_id": "PP-R-JQM-10194292",
+        "create_time": "2026-10-23T22:11:16.275Z",
+        "update_time": "2026-10-23T22:14:44.021Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "728873272J7565128",
+            "seller_transaction_id": "1X031539U0011491U",
+            "transaction_status": "HELD",
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "status": "UNDER_REVIEW",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        },
+        "fund_movements": [
+          {
+            "party": "RECEIVER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "385.55"
+            },
+            "initiated_time": "2026-10-23T22:14:34.000Z",
+            "type": "DEBIT",
+            "reason": "HOLD_PLACED"
+          }
+        ],
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "dispute_channel": "INTERNAL",
+        "offer": {
+          "buyer_requested_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          }
+        },
+        "refund_details": {
+          "allowed_refund_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          }
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+            "rel": "self",
+            "method": "GET"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/provide-supporting-info",
+            "rel": "provide_supporting_info",
+            "method": "POST"
+          }
+        ]
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-7VX91750YS240572Y-8077227119528001S",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-7VX91750YS240572Y-8077227119528001S/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f694316dd8d20-c6803130e5d351fb-01\"",
+    "paypal-debug-id": "f694316dd8d20",
+    "access-control-expose-headers": "Server-Timing",
+    "content-language": "",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:14:56 GMT",
+    "x-served-by": "cache-sin-wsss1830044-SIN, cache-sin-wsss1830044-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027695.209091,VS0,VE996",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:14:56.077705Z",
+  "t_recv": "2026-10-26T15:14:57.119913Z"
+}

@@ -1,0 +1,19 @@
+{
+  "method": "GET",
+  "path": "/v1/reporting/balances",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": null,
+  "response_headers": {},
+  "response_body": null,
+  "t_sent": "2026-10-24T17:25:34.234922Z",
+  "t_recv": "2026-10-24T17:25:34.261505Z",
+  "error": "ConnectError"
+}

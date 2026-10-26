@@ -1,0 +1,5 @@
+{
+  "returncode": 0,
+  "stdout_tail": "Collecting paypal-agent-toolkit==1.11.0\r\n  Using cached paypal_agent_toolkit-1.11.0-py3-none-any.whl.metadata (12 kB)\r\nUsing cached paypal_agent_toolkit-1.11.0-py3-none-any.whl (49 kB)\r\nInstalling collected packages: paypal-agent-toolkit\r\nSuccessfully installed paypal-agent-toolkit-1.11.0\r\n",
+  "stderr_tail": ""
+}

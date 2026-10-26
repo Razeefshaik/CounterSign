@@ -1,0 +1,129 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "2204",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "73beae03-cf2d-11f1-8c96-a3e266c3ebda",
+    "transmission_sig": "QFeBLCH5IfDsXdy5hkrv/Xud8uKFXE8DsE+XbdDYTnT4cZjZBYaFWI8PbpawNacRsz/7WSoi7DLG0Fc35ztBFIzQ9zv1o6N0C7feKaYM9qyh9MUre8duexhIQhbI/lLGx7aZLdtt2ciDqLi6ewwTDogmgZaIpAwgs7toWs8HOK55F7/64ZZXKHIa7p5s4x8a09ovguRhhLVxsC/ChajGYXpLMlqd5SU2JTQA+uAzSVpozKvq/npGbGcbcvrzhF2iVtfJkIuITqs4obOAZhyU8Cell20r6Kl0bJkdL63v5wEwOp/rBMfwt4YZvqVQtWZ/CsrK+9DvK2NPJrpGiBOivQ==",
+    "transmission_time": "2026-10-23T22:02:34Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-00D6056744338980W-8JF548727K252801B",
+      "event_version": "1.0",
+      "create_time": "2026-10-23T22:02:30.847Z",
+      "resource_type": "capture",
+      "resource_version": "2.0",
+      "event_type": "PAYMENT.CAPTURE.COMPLETED",
+      "summary": "Payment completed for $ 60.0 USD",
+      "resource": {
+        "id": "69T54342EE2129538",
+        "amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "final_capture": true,
+        "seller_protection": {
+          "status": "ELIGIBLE",
+          "dispute_categories": [
+            "ITEM_NOT_RECEIVED",
+            "UNAUTHORIZED_TRANSACTION"
+          ]
+        },
+        "seller_receivable_breakdown": {
+          "gross_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          },
+          "paypal_fee": {
+            "currency_code": "USD",
+            "value": "3.48"
+          },
+          "net_amount": {
+            "currency_code": "USD",
+            "value": "56.52"
+          }
+        },
+        "status": "COMPLETED",
+        "supplementary_data": {
+          "related_ids": {
+            "order_id": "7FC23242A91143321"
+          }
+        },
+        "payee": {
+          "email_address": "email@redacted",
+          "merchant_id": "B23JM5BDGPAF8"
+        },
+        "create_time": "2026-10-23T22:02:27Z",
+        "update_time": "2026-10-23T22:02:27Z",
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v2/payments/captures/69T54342EE2129538",
+            "rel": "self",
+            "method": "GET"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v2/payments/captures/69T54342EE2129538/refund",
+            "rel": "refund",
+            "method": "POST"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v2/checkout/orders/7FC23242A91143321",
+            "rel": "up",
+            "method": "GET"
+          }
+        ]
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-00D6056744338980W-8JF548727K252801B",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-00D6056744338980W-8JF548727K252801B/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-language": "",
+    "paypal-debug-id": "f507593e20f26",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f507593e20f26-e81ec147580f2ba5-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:14:51 GMT",
+    "x-served-by": "cache-sin-wsap440060-SIN, cache-sin-wsap440060-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027691.611463,VS0,VE977",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:14:51.357444Z",
+  "t_recv": "2026-10-26T15:14:52.503754Z"
+}

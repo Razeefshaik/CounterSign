@@ -1,0 +1,156 @@
+{
+  "method": "POST",
+  "path": "/v2/checkout/orders/7FC23242A91143321/capture",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "prefer": "return=representation",
+    "paypal-request-id": "cs-01a16ac9-6f36-7954-9867-4ea51be487df-a1",
+    "cookie": "[REDACTED]",
+    "content-length": "2",
+    "content-type": "application/json"
+  },
+  "request_body": {},
+  "response_status": 201,
+  "response_headers": {
+    "date": "Fri, 23 Oct 2026 22:02:27 GMT",
+    "content-type": "application/json",
+    "content-length": "1949",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f406ab8d3a",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f406ab8d3a-d9872b3e3688f89e-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cf-ray": "a4f406ab8d3a85ff-BOM"
+  },
+  "response_body": {
+    "id": "7FC23242A91143321",
+    "intent": "CAPTURE",
+    "status": "COMPLETED",
+    "payment_source": {
+      "paypal": {
+        "email_address": "buyer-1@redacted",
+        "account_id": "HFJETABW9K8C6",
+        "account_status": "VERIFIED",
+        "name": {
+          "given_name": "John",
+          "surname": "Doe"
+        },
+        "address": {
+          "country_code": "US"
+        }
+      }
+    },
+    "purchase_units": [
+      {
+        "reference_id": "snad_60",
+        "amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "payee": {
+          "email_address": "email@redacted",
+          "merchant_id": "B23JM5BDGPAF8"
+        },
+        "description": "Staged sandbox action: CounterSign check.",
+        "soft_descriptor": "TEST STORE",
+        "shipping": {
+          "name": {
+            "full_name": "John Doe"
+          },
+          "address": {
+            "address_line_1": "2211 N First St",
+            "admin_area_2": "San Jose",
+            "admin_area_1": "CA",
+            "postal_code": "95131",
+            "country_code": "US"
+          }
+        },
+        "payments": {
+          "captures": [
+            {
+              "id": "69T54342EE2129538",
+              "status": "COMPLETED",
+              "amount": {
+                "currency_code": "USD",
+                "value": "60.00"
+              },
+              "final_capture": true,
+              "seller_protection": {
+                "status": "ELIGIBLE",
+                "dispute_categories": [
+                  "ITEM_NOT_RECEIVED",
+                  "UNAUTHORIZED_TRANSACTION"
+                ]
+              },
+              "seller_receivable_breakdown": {
+                "gross_amount": {
+                  "currency_code": "USD",
+                  "value": "60.00"
+                },
+                "paypal_fee": {
+                  "currency_code": "USD",
+                  "value": "3.48"
+                },
+                "net_amount": {
+                  "currency_code": "USD",
+                  "value": "56.52"
+                }
+              },
+              "links": [
+                {
+                  "href": "https://api.sandbox.paypal.com/v2/payments/captures/69T54342EE2129538",
+                  "rel": "self",
+                  "method": "GET"
+                },
+                {
+                  "href": "https://api.sandbox.paypal.com/v2/payments/captures/69T54342EE2129538/refund",
+                  "rel": "refund",
+                  "method": "POST"
+                },
+                {
+                  "href": "https://api.sandbox.paypal.com/v2/checkout/orders/7FC23242A91143321",
+                  "rel": "up",
+                  "method": "GET"
+                }
+              ],
+              "create_time": "2026-10-23T22:02:27Z",
+              "update_time": "2026-10-23T22:02:27Z"
+            }
+          ]
+        }
+      }
+    ],
+    "payer": {
+      "name": {
+        "given_name": "John",
+        "surname": "Doe"
+      },
+      "email_address": "buyer-1@redacted",
+      "payer_id": "HFJETABW9K8C6",
+      "address": {
+        "country_code": "US"
+      }
+    },
+    "create_time": "2026-10-23T21:29:56Z",
+    "update_time": "2026-10-23T22:02:27Z",
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v2/checkout/orders/7FC23242A91143321",
+        "rel": "self",
+        "method": "GET"
+      }
+    ]
+  },
+  "t_sent": "2026-10-23T22:02:28.663087Z",
+  "t_recv": "2026-10-23T22:02:30.139138Z"
+}

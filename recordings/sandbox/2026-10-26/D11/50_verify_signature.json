@@ -1,0 +1,206 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "3687",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "2ca43bd0-cfa5-11f1-9e4a-8961361b5507",
+    "transmission_sig": "Fw1NCpZ58bF9xda3lw2xCTW9AW61YjlPHM3GnubZPPaVzm1NSOakFRGR/8mbDE+aKXWct6jBJUwtEOfGpWHuzrs2CY8Cu0E7KMRCK7LXTxAxkr9ndBqMv0pke+ITPGOLFrp0O5qfZzd9q+jO4nvU3dgB8uMEDoruBqBOxkwqsPT6e5uLKYVrFzAoOSgJQhu8YIJKnW2xdkaWGrm/C9NICJITAnzmqGmtORjAvTWWUKQU6jVgc9a9JU/gSSEZGdEOP7dVDaxH0I4fll8YuCBTxCkrvJBP7+wBwIPsWNkjllAypWHbLs1867/OKHqI4sD9kb5AXKDNIl/yOAYJWMMdRA==",
+    "transmission_time": "2026-10-24T12:19:35Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-0FJ520991X252332U-16F92576MK003192W",
+      "event_version": "1.0",
+      "create_time": "2026-10-24T12:19:33.613Z",
+      "resource_type": "dispute",
+      "event_type": "CUSTOMER.DISPUTE.UPDATED",
+      "summary": "A dispute was updated with case # PP-R-XJK-10194293",
+      "resource": {
+        "dispute_id": "PP-R-XJK-10194293",
+        "create_time": "2026-10-23T22:13:43.725Z",
+        "update_time": "2026-10-24T12:19:24.077Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "1KC99580K1831703T",
+            "seller_transaction_id": "69T54342EE2129538",
+            "transaction_status": "REFUNDED",
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+                "notes": "fdsfgsdf asljkdha  asdas da asdias udsaidu adj asdljasdlkajsdasd uoiudewoiru ceruoids ds dsdnsd asljkdasdeoidrueoiruoiruere",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+        "status": "UNDER_REVIEW",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "money_movements": [
+          {
+            "affected_party": "SELLER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "60.00"
+            },
+            "initiated_time": "2026-10-24T12:19:11.606Z",
+            "type": "DEBIT",
+            "reason": "DISPUTE_SETTLEMENT"
+          },
+          {
+            "affected_party": "SELLER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "3.48"
+            },
+            "initiated_time": "2026-10-24T12:19:11.606Z",
+            "type": "DEBIT",
+            "reason": "DISPUTE_SETTLEMENT_FEE"
+          },
+          {
+            "affected_party": "BUYER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "60.00"
+            },
+            "initiated_time": "2026-10-24T12:19:11.606Z",
+            "type": "CREDIT",
+            "reason": "DISPUTE_SETTLEMENT"
+          }
+        ],
+        "fund_movements": [
+          {
+            "party": "RECEIVER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "56.52"
+            },
+            "initiated_time": "2026-10-23T22:17:02.000Z",
+            "type": "DEBIT",
+            "reason": "HOLD_PLACED"
+          },
+          {
+            "party": "SELLER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "60.00"
+            },
+            "initiated_time": "2026-10-24T12:19:11.606Z",
+            "type": "DEBIT",
+            "reason": "DISPUTE_SETTLEMENT"
+          },
+          {
+            "party": "BUYER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "60.00"
+            },
+            "initiated_time": "2026-10-24T12:19:11.606Z",
+            "type": "CREDIT",
+            "reason": "DISPUTE_SETTLEMENT"
+          }
+        ],
+        "dispute_life_cycle_stage": "INQUIRY",
+        "dispute_channel": "INTERNAL",
+        "messages": [
+          {
+            "posted_by": "BUYER",
+            "time_posted": "2026-10-23T22:13:43.725Z",
+            "content": "sdrfwer"
+          }
+        ],
+        "offer": {
+          "buyer_requested_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          }
+        },
+        "refund_details": {
+          "allowed_refund_amount": {
+            "currency_code": "USD",
+            "value": "60.00"
+          },
+          "transactions": [
+            {
+              "id": "5FE62884TA6526206",
+              "gross_amount": {
+                "currency_code": "USD",
+                "value": "60.00"
+              },
+              "create_time": "2026-10-24T12:19:11.000Z"
+            }
+          ]
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-0FJ520991X252332U-16F92576MK003192W",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-0FJ520991X252332U-16F92576MK003192W/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-language": "",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f997508564a69",
+    "server": "nginx",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "access-control-expose-headers": "Server-Timing",
+    "content-type": "application/json",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f997508564a69-e35e553fb29dc199-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:15:38 GMT",
+    "x-served-by": "cache-sin-wsat1880043-SIN, cache-sin-wsat1880043-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027737.411143,VS0,VE976",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:15:38.281787Z",
+  "t_recv": "2026-10-26T15:15:39.303157Z"
+}

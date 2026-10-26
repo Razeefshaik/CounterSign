@@ -1,0 +1,43 @@
+{
+  "method": "POST",
+  "path": "/v1/customer/disputes/PP-R-JQM-10194292/adjudicate",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]",
+    "content-length": "39",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "adjudication_outcome": "SELLER_FAVOR"
+  },
+  "response_status": 200,
+  "response_headers": {
+    "date": "Sat, 24 Oct 2026 12:17:02 GMT",
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f8ea7dad34",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f8ea7dad34-5bd1e3edc4ab0f14-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-encoding": "gzip",
+    "cf-ray": "a4f8ea7dad34aed9-BOM"
+  },
+  "response_body": {
+    "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+    "rel": "self",
+    "method": "GET"
+  },
+  "t_sent": "2026-10-24T12:17:03.409694Z",
+  "t_recv": "2026-10-24T12:17:05.118911Z"
+}

@@ -1,0 +1,118 @@
+{
+  "tool": "list_disputes",
+  "ok": true,
+  "output": {
+    "items": [
+      {
+        "dispute_id": "PP-R-UJV-10194294",
+        "create_time": "2026-10-23T22:15:33.000Z",
+        "update_time": "2026-10-23T22:18:44.000Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "0GS74555A8389573J",
+            "buyer": {
+              "payer_id": "HFJETABW9K8C6"
+            },
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8"
+            }
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "status": "WAITING_FOR_SELLER_RESPONSE",
+        "dispute_state": "REQUIRED_ACTION",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        },
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "dispute_channel": "INTERNAL",
+        "seller_response_due_date": "2026-11-03T04:59:59.000Z",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      },
+      {
+        "dispute_id": "PP-R-XJK-10194293",
+        "create_time": "2026-10-23T22:13:43.000Z",
+        "update_time": "2026-10-23T22:17:23.000Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "1KC99580K1831703T",
+            "buyer": {
+              "payer_id": "HFJETABW9K8C6"
+            },
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8"
+            }
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+        "status": "WAITING_FOR_SELLER_RESPONSE",
+        "dispute_state": "REQUIRED_ACTION",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "dispute_life_cycle_stage": "INQUIRY",
+        "dispute_channel": "INTERNAL",
+        "seller_response_due_date": "2026-11-12T22:13:43.000Z",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      },
+      {
+        "dispute_id": "PP-R-JQM-10194292",
+        "create_time": "2026-10-23T22:11:16.000Z",
+        "update_time": "2026-10-23T22:32:33.000Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "728873272J7565128",
+            "buyer": {
+              "payer_id": "HFJETABW9K8C6"
+            },
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8"
+            }
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "status": "UNDER_REVIEW",
+        "dispute_state": "UNDER_PAYPAL_REVIEW",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        },
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "dispute_channel": "INTERNAL",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes?page_size=10",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes?page_size=10",
+        "rel": "first",
+        "method": "GET"
+      }
+    ]
+  }
+}

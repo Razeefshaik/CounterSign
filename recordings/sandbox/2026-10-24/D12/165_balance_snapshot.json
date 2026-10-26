@@ -1,0 +1,30 @@
+{
+  "method": "GET",
+  "path": "/v1/reporting/balances",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": 503,
+  "response_headers": {
+    "connection": "keep-alive",
+    "x-sigsci-internal": "2",
+    "accept-ranges": "bytes",
+    "via": "1.1 varnish, 1.1 varnish",
+    "edge-control": "max-age=120",
+    "date": "Sat, 24 Oct 2026 20:21:15 GMT",
+    "x-served-by": "cache-sin-wsap440039-SIN, cache-sin-wsap440020-SIN, cache-maa10221-MAA",
+    "x-cache": "MISS, MISS",
+    "x-cache-hits": "0, 0",
+    "x-timer": "S1792873276.603609,VS0,VE161",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": "\n",
+  "t_sent": "2026-10-24T20:21:18.392744Z",
+  "t_recv": "2026-10-24T20:21:18.713174Z"
+}

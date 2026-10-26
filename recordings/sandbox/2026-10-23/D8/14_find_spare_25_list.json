@@ -1,0 +1,152 @@
+{
+  "method": "GET",
+  "path": "/v1/customer/disputes?start_time=2026-10-23T22%3A05%3A48.776468Z&page_size=50",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f9936403e4dfa-bfa326ad245047b5-01\"",
+    "paypal-debug-id": "f9936403e4dfa",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "server": "nginx",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Fri, 23 Oct 2026 22:18:54 GMT",
+    "x-served-by": "cache-sin-wsss1830089-SIN, cache-sin-wsss1830089-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792793933.229946,VS0,VE988",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "items": [
+      {
+        "dispute_id": "PP-R-UJV-10194294",
+        "create_time": "2026-10-23T22:15:33.000Z",
+        "update_time": "2026-10-23T22:18:44.000Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "0GS74555A8389573J",
+            "buyer": {
+              "payer_id": "HFJETABW9K8C6"
+            },
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8"
+            }
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "status": "WAITING_FOR_SELLER_RESPONSE",
+        "dispute_state": "REQUIRED_ACTION",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "25.00"
+        },
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "dispute_channel": "INTERNAL",
+        "seller_response_due_date": "2026-11-03T04:59:59.000Z",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-UJV-10194294",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      },
+      {
+        "dispute_id": "PP-R-XJK-10194293",
+        "create_time": "2026-10-23T22:13:43.000Z",
+        "update_time": "2026-10-23T22:17:23.000Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "1KC99580K1831703T",
+            "buyer": {
+              "payer_id": "HFJETABW9K8C6"
+            },
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8"
+            }
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+        "status": "WAITING_FOR_SELLER_RESPONSE",
+        "dispute_state": "REQUIRED_ACTION",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "dispute_life_cycle_stage": "INQUIRY",
+        "dispute_channel": "INTERNAL",
+        "seller_response_due_date": "2026-11-12T22:13:43.000Z",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      },
+      {
+        "dispute_id": "PP-R-JQM-10194292",
+        "create_time": "2026-10-23T22:11:16.000Z",
+        "update_time": "2026-10-23T22:14:44.000Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "728873272J7565128",
+            "buyer": {
+              "payer_id": "HFJETABW9K8C6"
+            },
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8"
+            }
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "status": "UNDER_REVIEW",
+        "dispute_state": "UNDER_PAYPAL_REVIEW",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        },
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "dispute_channel": "INTERNAL",
+        "links": [
+          {
+            "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes?start_time=2026-10-23T22:05:48.776468Z&page_size=50",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes?start_time=2026-10-23T22:05:48.776468Z&page_size=50",
+        "rel": "first",
+        "method": "GET"
+      }
+    ]
+  },
+  "t_sent": "2026-10-23T22:18:55.226824Z",
+  "t_recv": "2026-10-23T22:18:56.471397Z"
+}

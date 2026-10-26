@@ -1,0 +1,42 @@
+{
+  "codes": {
+    "RESOLVED_SELLER_FAVOUR": [
+      {
+        "amount_refunded": null,
+        "role": "inr_400",
+        "dispute_id": "PP-R-JQM-10194292",
+        "path": [
+          "start",
+          "adjudicate"
+        ],
+        "observed_at": "2026-10-26T11:55:46.244760Z"
+      }
+    ],
+    "RESOLVED_BUYER_FAVOUR": [
+      {
+        "amount_refunded": {
+          "currency_code": "USD",
+          "value": "60.00"
+        },
+        "role": "snad_60",
+        "dispute_id": "PP-R-XJK-10194293",
+        "path": [
+          "start",
+          "accept_claim_json"
+        ],
+        "observed_at": "2026-10-26T11:55:46.244760Z"
+      }
+    ],
+    "CANCELED_BY_BUYER": [
+      {
+        "amount_refunded": null,
+        "role": "spare_25",
+        "dispute_id": "PP-R-UJV-10194294",
+        "path": [
+          "buyer_close"
+        ],
+        "observed_at": "2026-10-26T11:55:46.244760Z"
+      }
+    ]
+  }
+}

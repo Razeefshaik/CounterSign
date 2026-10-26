@@ -1,0 +1,76 @@
+{
+  "method": "POST",
+  "path": "/v1/payments/payouts",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "paypal-request-id": "cs-01a16cb4-1f82-7e5b-9ff9-837218b05a86-a1",
+    "content-length": "346",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "sender_batch_header": {
+      "sender_batch_id": "cs-01a16cb4-1f82-7e5b-9ff9-837218b05a86-a1",
+      "email_subject": "CounterSign sandbox negative test"
+    },
+    "items": [
+      {
+        "recipient_type": "EMAIL",
+        "receiver": "maker-b@redacted",
+        "amount": {
+          "currency": "USD",
+          "value": "1.00"
+        },
+        "note": "ERRPYO014",
+        "sender_item_id": "cs-01a16cb4-1f82-7e5b-9ff9-837218b05a86-a1-i1"
+      }
+    ]
+  },
+  "response_status": 400,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-length": "510",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f1099036b7d95-1ae4d5d0da6fcc92-01\"",
+    "server": "nginx",
+    "paypal-debug-id": "f1099036b7d95",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "matched-stub-id": "112206a2-e928-48eb-8046-66e9616d654f",
+    "accept-ranges": "bytes",
+    "via": "1.1 varnish, 1.1 varnish",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:25 GMT",
+    "x-served-by": "cache-sin-wsat1880038-SIN, cache-sin-wsat1880038-SIN, cache-maa10236-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825104.495155,VS0,VE967",
+    "vary": "Accept-Encoding"
+  },
+  "response_body": {
+    "name": "USER_BUSINESS_ERROR",
+    "message": "User business error.",
+    "debug_id": "9c7324f51c311",
+    "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+    "details": [
+      {
+        "field": "SENDER_BATCH_ID",
+        "issue": "Batch with given sender_batch_id already exists",
+        "link": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/JGZ2AMH9HTGRA",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T06:58:26.489513Z",
+  "t_recv": "2026-10-24T06:58:27.507857Z"
+}

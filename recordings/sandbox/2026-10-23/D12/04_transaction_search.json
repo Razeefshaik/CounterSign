@@ -1,0 +1,51 @@
+{
+  "method": "GET",
+  "path": "/v1/reporting/transactions?transaction_id=1X031539U0011491U&start_date=2026-10-22T22%3A02%3A28Z&end_date=2026-10-23T22%3A04%3A27Z&fields=transaction_info",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "date": "Fri, 23 Oct 2026 22:04:25 GMT",
+    "content-type": "application/json",
+    "transfer-encoding": "chunked",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f40993c869",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f40993c869-e3fdfb93d08d13e3-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-encoding": "gzip",
+    "cf-ray": "a4f40993c8696ed7-BOM"
+  },
+  "response_body": {
+    "account_number": "B23JM5BDGPAF8",
+    "start_date": "2026-10-22T22:02:28Z",
+    "end_date": "2026-10-23T19:59:59Z",
+    "last_refreshed_datetime": "2026-10-23T19:59:59Z",
+    "page": 1,
+    "total_items": 0,
+    "total_pages": 0,
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/reporting/transactions?end_date=2026-10-23T22%3A04%3A27Z&start_date=2026-10-22T22%3A02%3A28Z&transaction_id=1X031539U0011491U&fields=transaction_info&page_size=100&page=1",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-23T22:04:27.741543Z",
+  "t_recv": "2026-10-23T22:04:28.170640Z"
+}

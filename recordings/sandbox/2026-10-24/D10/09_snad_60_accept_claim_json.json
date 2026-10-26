@@ -1,0 +1,52 @@
+{
+  "method": "POST",
+  "path": "/v1/customer/disputes/PP-R-XJK-10194293/accept-claim",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "cookie": "[REDACTED]",
+    "content-length": "93",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "note": "Staged sandbox action for CounterSign day one checks.",
+    "accept_claim_type": "REFUND"
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f1533393d2258-232422ae9cf778d1-01\"",
+    "paypal-debug-id": "f1533393d2258",
+    "content-type": "application/json",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "server": "nginx",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 12:19:12 GMT",
+    "x-served-by": "cache-sin-wsap440064-SIN, cache-sin-wsap440064-SIN, cache-maa10242-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792844349.924153,VS0,VE3485",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "links": [
+      {
+        "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-R-XJK-10194293",
+        "rel": "detail",
+        "method": "GET"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T12:19:11.271829Z",
+  "t_recv": "2026-10-24T12:19:14.814625Z"
+}

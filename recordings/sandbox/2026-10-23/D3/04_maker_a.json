@@ -1,0 +1,71 @@
+{
+  "method": "POST",
+  "path": "/v1/payments/payouts",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "paypal-request-id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+    "cookie": "[REDACTED]",
+    "content-length": "367",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "sender_batch_header": {
+      "sender_batch_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+      "email_subject": "CounterSign sandbox check"
+    },
+    "items": [
+      {
+        "recipient_type": "EMAIL",
+        "receiver": "maker-a@redacted",
+        "amount": {
+          "value": "1.00",
+          "currency": "USD"
+        },
+        "sender_item_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+        "note": "Staged sandbox action: CounterSign check."
+      }
+    ]
+  },
+  "response_status": 201,
+  "response_headers": {
+    "date": "Fri, 23 Oct 2026 22:16:11 GMT",
+    "content-type": "application/json",
+    "content-length": "351",
+    "connection": "keep-alive",
+    "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+    "server": "cloudflare",
+    "access-control-expose-headers": "Server-Timing",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "cf-cache-status": "DYNAMIC",
+    "paypal-debug-id": "ca4f41acbbcd3",
+    "x-content-type-options": "nosniff",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000ca4f41acbbcd3-ff8ea49606a33870-01\"",
+    "vary": "Accept-Encoding",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cf-ray": "a4f41acbbcd32074-BOM"
+  },
+  "response_body": {
+    "batch_header": {
+      "payout_batch_id": "MZ6LMVL8FZDYG",
+      "batch_status": "PENDING",
+      "sender_batch_header": {
+        "sender_batch_id": "cs-01a16ad6-03cb-7d5d-82a3-174cad54289c-a1",
+        "email_subject": "CounterSign sandbox check"
+      }
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/MZ6LMVL8FZDYG",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-23T22:16:13.030537Z",
+  "t_recv": "2026-10-23T22:16:13.596513Z"
+}

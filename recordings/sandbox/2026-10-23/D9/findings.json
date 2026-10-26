@@ -1,0 +1,64 @@
+{
+  "check_id": "D9",
+  "verdict": "DIFFERENT",
+  "dispute_id": "PP-R-JQM-10194292",
+  "evidence_accepted_stage": null,
+  "evidence": {
+    "submitted": false,
+    "reason": "provide_evidence link absent",
+    "stage": "CHARGEBACK",
+    "status": "UNDER_REVIEW"
+  },
+  "before": {
+    "status": "UNDER_REVIEW",
+    "dispute_life_cycle_stage": "CHARGEBACK",
+    "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+    "dispute_amount": {
+      "currency_code": "USD",
+      "value": "400.00"
+    },
+    "seller_response_due_date": null,
+    "dispute_outcome": null,
+    "rels": [
+      "accept_claim",
+      "adjudicate",
+      "provide_supporting_info",
+      "require_evidence",
+      "self"
+    ]
+  },
+  "after": null,
+  "after_history": [],
+  "updated_webhooks": [
+    {
+      "event_id": "WH-7VX91750YS240572Y-8077227119528001S",
+      "dispute_id": "PP-R-JQM-10194292",
+      "create_time": "2026-10-23T22:15:03.414Z",
+      "received_at": "2026-10-23T22:15:07.275666Z",
+      "file": "webhooks/20261023T221507275666Z_001_WH-7VX91750YS240572Y-8077227119528001S.json",
+      "delay_seconds": 3.862
+    },
+    {
+      "event_id": "WH-785431508X875724C-29N796966H5750217",
+      "dispute_id": "PP-R-JQM-10194292",
+      "create_time": "2026-10-23T22:32:03.413Z",
+      "received_at": "2026-10-23T22:32:07.235850Z",
+      "file": "webhooks/20261023T223207235850Z_001_WH-785431508X875724C-29N796966H5750217.json",
+      "delay_seconds": 3.823
+    },
+    {
+      "event_id": "WH-67058378YY687983E-3CK78902BC0703355",
+      "dispute_id": "PP-R-JQM-10194292",
+      "create_time": "2026-10-23T22:32:42.620Z",
+      "received_at": "2026-10-23T22:32:46.399204Z",
+      "file": "webhooks/20261023T223246399204Z_001_WH-67058378YY687983E-3CK78902BC0703355.json",
+      "delay_seconds": 3.779
+    }
+  ],
+  "notes": [
+    "PayPal's tracking data is what the merchant uploaded, not carrier proof (F10)",
+    "if no link at inquiry, see D10 findings for the stage that accepted evidence"
+  ],
+  "observed_at": "2026-10-24T12:15:36.557791Z",
+  "evidence_files": []
+}

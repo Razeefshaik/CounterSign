@@ -1,0 +1,108 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "2061",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "c53e5e09-cf78-11f1-ab13-c16b24993256",
+    "transmission_sig": "XaEj2YRRtW8wKSOjEbY7Rszht0JiuW0lRzywxtYyVrBrZYiB5CZpl9YLp9Ciqqgwf97IoUAvV2L1lkPvq6DU3GwXeYNER+vwsVfWE/Nk613p0Wy9+tHNgqvuYy2D8mqdUhmptOmr1MV0GJu1djA528BvexjAknQOJJcWDU3kEQog4Ncz8Wv2+VFOsUHPZv/RXmMkrcp1gUBAOBPqRFJD9gQINI45zCHBNHNGiJmszBxVHBpBrTlchtnVjB1Zu4l/bYtgIaV4hXlpD12Z3S/6uq/gZf3vEn7F1sh0TV6uzxLk0DKqu+wZ2ev0mb7gVg/EpU0ks/YoAiCW82NVljRxsA==",
+    "transmission_time": "2026-10-24T07:01:43Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-4FV14170E9313325R-6M875457GJ3162214",
+      "event_version": "1.0",
+      "create_time": "2026-10-24T07:01:37.353Z",
+      "resource_type": "payouts_item",
+      "event_type": "PAYMENT.PAYOUTS-ITEM.SUCCEEDED",
+      "summary": "A payout item has succeeded",
+      "resource": {
+        "transaction_id": "6U062479VV564424P",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.25"
+        },
+        "transaction_status": "SUCCESS",
+        "sender_batch_id": "cs-01a16cb6-a879-7bc2-b35b-3f6b4a249545-a1",
+        "time_processed": "2026-10-24T07:01:28Z",
+        "activity_id": "2A283866MP948571L",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "1.00"
+          },
+          "note": "Staged sandbox action: CounterSign check.",
+          "receiver": "maker-b@redacted",
+          "sender_item_id": "cs-01a16cb6-a879-7bc2-b35b-3f6b4a249545-a1",
+          "recipient_wallet": "PAYPAL"
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/6R5WELGMZP5SQ",
+            "rel": "self",
+            "method": "GET",
+            "encType": "application/json"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts/S9TRM576VR36S",
+            "rel": "batch",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ],
+        "payout_item_id": "6R5WELGMZP5SQ",
+        "payout_batch_id": "S9TRM576VR36S"
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-4FV14170E9313325R-6M875457GJ3162214",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-4FV14170E9313325R-6M875457GJ3162214/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-type": "application/json",
+    "paypal-debug-id": "f730902723e1d",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "content-language": "",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f730902723e1d-8492a3f95a77bf73-01\"",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:15:22 GMT",
+    "x-served-by": "cache-sin-wsss1830061-SIN, cache-sin-wsss1830061-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027722.825276,VS0,VE897",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:15:22.695491Z",
+  "t_recv": "2026-10-26T15:15:23.637518Z"
+}

@@ -1,0 +1,117 @@
+{
+  "received_at": "2026-10-26T15:14:30.728848Z",
+  "event_id": "WH-7Y7254563A4550640-11V2185806837105M",
+  "event_type": "PAYMENT.CAPTURE.COMPLETED",
+  "resource_type": "capture",
+  "create_time": "2015-02-17T18:51:33Z",
+  "sha256": "31a953470a12a12f3c5df063f13d3eb11220b2a4ce77fc483a65d6ee3d25e9ce",
+  "size": 1716,
+  "raw_file": "raw/webhooks/20261026T151430728848Z_001_WH-7Y7254563A4550640-11V2185806837105M.body",
+  "headers": {
+    "host": "TUNNEL.ngrok-free.app",
+    "user-agent": "PayPal/AUHD-1.0-1",
+    "content-length": "1716",
+    "accept": "*/*",
+    "content-type": "application/json",
+    "correlation-id": "f6917501b6f02",
+    "paypal-auth-algo": "SHA256withRSA",
+    "paypal-auth-version": "v2",
+    "paypal-cert-url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "paypal-transmission-id": "ef3ba1b1-d14f-11f1-9402-bdf272aea9ab",
+    "paypal-transmission-sig": "C8mv6E7RbvarBNOQXX88l0F/b/C/zV4voFwpmXoF+Gy8OUotsW53Mfbcu4CErNcEB2BSIiMz19VtVCQYAwLJJjDFwKLcG+rBtZ9rs6LCb8LH9IXE8LyFbeLl1yjrm5ViqPxmORRrCD6hS1SLYrcGCl0Wq90qEYWPFRY8ft2M6WjqtR8F0APtgjF9kCXBEY4FJTo5UtjfrmTRG5gwR6T2c3vNSQh9EEFGAzxIOumwXtR5PhDib2lhneJKC49gDuPn6vQYujBRqseOrUxttEpqVmf9ZQGQFv/lVLVM6ykWcdvi6lnA8TZRJ/C5e3ZUerkbV44pBisl09P2xMMhcgKYTA==",
+    "paypal-transmission-time": "2026-10-26T15:14:27Z",
+    "x-forwarded-for": "173.0.80.116",
+    "x-forwarded-host": "TUNNEL.ngrok-free.app",
+    "x-forwarded-proto": "https",
+    "accept-encoding": "gzip"
+  },
+  "body": {
+    "id": "WH-7Y7254563A4550640-11V2185806837105M",
+    "event_version": "1.0",
+    "create_time": "2015-02-17T18:51:33Z",
+    "resource_type": "capture",
+    "resource_version": "2.0",
+    "event_type": "PAYMENT.CAPTURE.COMPLETED",
+    "summary": "Payment completed for $ 57.0 USD",
+    "resource": {
+      "id": "42311647XV020574X",
+      "amount": {
+        "currency_code": "USD",
+        "value": "57.00"
+      },
+      "final_capture": true,
+      "seller_protection": {
+        "status": "ELIGIBLE",
+        "dispute_categories": [
+          "ITEM_NOT_RECEIVED",
+          "UNAUTHORIZED_TRANSACTION"
+        ]
+      },
+      "disbursement_mode": "DELAYED",
+      "seller_receivable_breakdown": {
+        "gross_amount": {
+          "currency_code": "USD",
+          "value": "57.00"
+        },
+        "paypal_fee": {
+          "currency_code": "USD",
+          "value": "2.48"
+        },
+        "platform_fees": [
+          {
+            "amount": {
+              "currency_code": "USD",
+              "value": "5.13"
+            },
+            "payee": {
+              "merchant_id": "CDD7K6247RPCC"
+            }
+          }
+        ],
+        "net_amount": {
+          "currency_code": "USD",
+          "value": "49.39"
+        }
+      },
+      "invoice_id": "3942619:fdv09c49-a3g6-4cbf-1358-f6d241dacea2",
+      "custom_id": "d93e4fcb-d3af-137c-82fe-1a8101f1ad11",
+      "status": "COMPLETED",
+      "supplementary_data": {
+        "related_ids": {
+          "order_id": "8U481631H66031715"
+        }
+      },
+      "create_time": "2022-08-26T18:29:50Z",
+      "update_time": "2022-08-26T18:29:50Z",
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v2/payments/captures/0KG12345VG343800K",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v2/payments/captures/0KG12345VG343880K/refund",
+          "rel": "refund",
+          "method": "POST"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v2/checkout/orders/8U481631H66031715",
+          "rel": "up",
+          "method": "GET"
+        }
+      ]
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-7Y7254563A4550640-11V2185806837105M",
+        "rel": "self",
+        "method": "GET"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-7Y7254563A4550640-11V2185806837105M/resend",
+        "rel": "resend",
+        "method": "POST"
+      }
+    ]
+  }
+}

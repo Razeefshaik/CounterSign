@@ -1,0 +1,163 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "3105",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "a9d7df2a-cf31-11f1-8c96-632b14456303",
+    "transmission_sig": "VMoQMbEK2BSybuw+Dvi6Nl4iIxVHICF3LYucLGBfFrhFYhtViZl76t22iJ84gyRBa4e4nQ592XiYgcaiB8/xMb0WGP2jRW94epOqDbVsV6Jsghum/uA6DkRr9bfFWpZXHA/JabimWYrq+X09jquTjwt/mKeBQ2vaOiPMZSUoDHyE5AbmH/xZaRNVu/woJnjxFWlHbEI19wFpk94EVx6eOf5OFEici5yKAKHsauyfMphINYbgEPzu4WjeFGSWGglUEAJi7w/IEbd4nt7hFQWD+prUnEVnCTpjQ72ObAueP94/DITHeQR1yeV1v02n9gTMyuHC7/i1du2lrwo5ISNSyg==",
+    "transmission_time": "2026-10-23T22:32:43Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-67058378YY687983E-3CK78902BC0703355",
+      "event_version": "1.0",
+      "create_time": "2026-10-23T22:32:42.620Z",
+      "resource_type": "dispute",
+      "event_type": "CUSTOMER.DISPUTE.UPDATED",
+      "summary": "A dispute was updated with case # PP-R-JQM-10194292",
+      "resource": {
+        "dispute_id": "PP-R-JQM-10194292",
+        "create_time": "2026-10-23T22:11:16.275Z",
+        "update_time": "2026-10-23T22:32:33.999Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "728873272J7565128",
+            "seller_transaction_id": "1X031539U0011491U",
+            "transaction_status": "HELD",
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "status": "UNDER_REVIEW",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        },
+        "fund_movements": [
+          {
+            "party": "RECEIVER",
+            "amount": {
+              "currency_code": "USD",
+              "value": "385.55"
+            },
+            "initiated_time": "2026-10-23T22:14:34.000Z",
+            "type": "DEBIT",
+            "reason": "HOLD_PLACED"
+          }
+        ],
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "dispute_channel": "INTERNAL",
+        "offer": {
+          "buyer_requested_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          }
+        },
+        "refund_details": {
+          "allowed_refund_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          }
+        },
+        "allowed_response_options": {
+          "accept_claim": {
+            "accept_claim_types": [
+              "REFUND"
+            ]
+          }
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+            "rel": "self",
+            "method": "GET"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/provide-supporting-info",
+            "rel": "provide_supporting_info",
+            "method": "POST"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/adjudicate",
+            "rel": "adjudicate",
+            "method": "POST"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/accept-claim",
+            "rel": "accept_claim",
+            "method": "POST"
+          },
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292/require-evidence",
+            "rel": "require_evidence",
+            "method": "POST"
+          }
+        ]
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-67058378YY687983E-3CK78902BC0703355",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-67058378YY687983E-3CK78902BC0703355/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "server": "nginx",
+    "access-control-expose-headers": "Server-Timing",
+    "content-language": "",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f76081289eb6a",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f76081289eb6a-e72b9a0f70393cd7-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "content-type": "application/json",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:15:06 GMT",
+    "x-served-by": "cache-sin-wsss1830037-SIN, cache-sin-wsss1830037-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027706.745897,VS0,VE1007",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:15:06.615561Z",
+  "t_recv": "2026-10-26T15:15:07.667751Z"
+}

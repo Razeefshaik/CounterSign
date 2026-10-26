@@ -1,0 +1,71 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts-item/ERRPYO052",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "matched-stub-id": "b02ab19c-f693-4c83-9761-7a2475d556fb",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f370116598c68",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f370116598c68-150a57aab5d5622d-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:18 GMT",
+    "x-served-by": "cache-sin-wsap440021-SIN, cache-sin-wsap440021-SIN, cache-maa10236-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825098.716793,VS0,VE334",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "payout_item_id": "NL34TAVXXT4ZU",
+    "transaction_status": "FAILED",
+    "payout_item_fee": {
+      "currency": "USD",
+      "value": "0.00"
+    },
+    "payout_batch_id": "PQUQGBBRSKM5Y",
+    "payout_item": {
+      "recipient_type": "EMAIL",
+      "amount": {
+        "currency": "USD",
+        "value": "12.00"
+      },
+      "note": "payout to receiver from TEST merchant",
+      "receiver": "email@redacted",
+      "sender_item_id": "30.30"
+    },
+    "errors": {
+      "name": "RISK_DECLINE",
+      "message": "This transaction was declined due to risk concerns",
+      "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+      "details": []
+    },
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/NL34TAVXXT4ZU",
+        "rel": "item",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T06:58:19.711789Z",
+  "t_recv": "2026-10-24T06:58:20.095930Z"
+}

@@ -1,0 +1,124 @@
+{
+  "method": "POST",
+  "path": "/v1/notifications/verify-webhook-signature",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate, zstd",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1",
+    "content-length": "2304",
+    "content-type": "application/json"
+  },
+  "request_body": {
+    "auth_algo": "SHA256withRSA",
+    "cert_url": "https://api.sandbox.paypal.com/v1/notifications/certs/CERT-360caa42-fca2a594-bf9ab596",
+    "transmission_id": "20ff712c-cf2f-11f1-9e4a-9d0b4f2458dc",
+    "transmission_sig": "RoPwgwtqAs4yqsdWjIyJE5mJZgxycM4CrwBIB4/NzwnseZUBUDKq2RUQS9XpsrJqygorIM33sHpX0Jj9Jojv+qzYW8dgud6GSfQQEzppjaWGfj3WZA/rHxdj6dtgNFhXHLb0oGIFjsyoDO+IIbw0iX7ZO0MArSa+Fr9wzvOsEaC1gp8TCVlL14XGqZHgqZj9W1NTCj2D3y3mm/tCwQEZyvG1dlnZ8LlQ4FgcRFEIdxXHfT7AjoK/kCTJCcxwADeqVbxu257kI4goj0UxR+XlRi14P9/NZ9bPUB4Ep1W2P+xTPiSipbPdzL8f3EMbIC94D5L1YkGs42YSel30YVHuBw==",
+    "transmission_time": "2026-10-23T22:14:34Z",
+    "webhook_id": "33T43630L2343754N",
+    "webhook_event": {
+      "id": "WH-2LJ05453DV740643U-3DC22927617099520",
+      "event_version": "1.0",
+      "create_time": "2026-10-23T22:14:34.055Z",
+      "resource_type": "dispute",
+      "event_type": "CUSTOMER.DISPUTE.CREATED",
+      "summary": "A new dispute opened with case # PP-R-JQM-10194292",
+      "resource": {
+        "dispute_id": "PP-R-JQM-10194292",
+        "create_time": "2026-10-23T22:11:16.275Z",
+        "update_time": "2026-10-23T22:14:07.179Z",
+        "disputed_transactions": [
+          {
+            "buyer_transaction_id": "728873272J7565128",
+            "seller_transaction_id": "1X031539U0011491U",
+            "transaction_status": "HELD",
+            "seller": {
+              "merchant_id": "B23JM5BDGPAF8",
+              "name": "Test Store"
+            },
+            "items": [
+              {
+                "item_name": "Staged sandbox action: CounterSign check.",
+                "item_description": "Staged sandbox action: CounterSign check.",
+                "item_quantity": "1",
+                "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+                "item_type": "PRODUCT"
+              }
+            ],
+            "seller_protection_eligible": true,
+            "seller_protection_type": "EXPANDED_SELLER_PROTECTION"
+          }
+        ],
+        "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+        "status": "UNDER_REVIEW",
+        "dispute_amount": {
+          "currency_code": "USD",
+          "value": "400.00"
+        },
+        "dispute_life_cycle_stage": "CHARGEBACK",
+        "dispute_channel": "INTERNAL",
+        "offer": {
+          "buyer_requested_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          }
+        },
+        "refund_details": {
+          "allowed_refund_amount": {
+            "currency_code": "USD",
+            "value": "400.00"
+          }
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/customer/disputes/PP-R-JQM-10194292",
+            "rel": "self",
+            "method": "GET"
+          }
+        ]
+      },
+      "links": [
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-2LJ05453DV740643U-3DC22927617099520",
+          "rel": "self",
+          "method": "GET"
+        },
+        {
+          "href": "https://api.sandbox.paypal.com/v1/notifications/webhooks-events/WH-2LJ05453DV740643U-3DC22927617099520/resend",
+          "rel": "resend",
+          "method": "POST"
+        }
+      ]
+    }
+  },
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "content-language": "",
+    "paypal-debug-id": "f2587122cbd87",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "access-control-expose-headers": "Server-Timing",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f2587122cbd87-54cfaaddd733021c-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Mon, 26 Oct 2026 15:14:54 GMT",
+    "x-served-by": "cache-sin-wsat1880054-SIN, cache-sin-wsat1880054-SIN, cache-maa10230-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1793027694.950668,VS0,VE967",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "verification_status": "SUCCESS"
+  },
+  "t_sent": "2026-10-26T15:14:54.819671Z",
+  "t_recv": "2026-10-26T15:14:55.830538Z"
+}

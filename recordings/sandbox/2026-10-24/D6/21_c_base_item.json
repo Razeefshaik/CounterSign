@@ -1,0 +1,76 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts-item/CT2XSZNX7EQTU",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f203452a5a76b",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f203452a5a76b-f34f0a8228611671-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 07:02:25 GMT",
+    "x-served-by": "cache-sin-wsat1880057-SIN, cache-sin-wsat1880057-SIN, cache-maa10246-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825345.562699,VS0,VE968",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "payout_item_id": "CT2XSZNX7EQTU",
+    "transaction_id": "8YB9511087704412N",
+    "activity_id": "6KS35195Y7878610A",
+    "transaction_status": "SUCCESS",
+    "payout_item_fee": {
+      "currency": "USD",
+      "value": "0.25"
+    },
+    "payout_batch_id": "5H5397MBCBLM8",
+    "sender_batch_id": "cs-01a16cb7-3d82-7609-835f-80ddfb786e58-a1",
+    "payout_item": {
+      "recipient_type": "EMAIL",
+      "amount": {
+        "currency": "USD",
+        "value": "1.00"
+      },
+      "note": "Staged sandbox action: CounterSign check.",
+      "receiver": "maker-b@redacted",
+      "sender_item_id": "cs-01a16cb7-3d82-7609-835f-80ddfb786e58-a1",
+      "recipient_wallet": "PAYPAL",
+      "purpose": "GOODS"
+    },
+    "time_processed": "2026-10-24T07:02:05Z",
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/CT2XSZNX7EQTU",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      },
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/5H5397MBCBLM8",
+        "rel": "batch",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T07:02:26.561665Z",
+  "t_recv": "2026-10-24T07:02:27.579874Z"
+}

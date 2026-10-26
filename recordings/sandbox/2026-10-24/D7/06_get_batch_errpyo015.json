@@ -1,0 +1,101 @@
+{
+  "method": "GET",
+  "path": "/v1/payments/payouts/ERRPYO015",
+  "request_headers": {
+    "host": "api-m.sandbox.paypal.com",
+    "accept": "*/*",
+    "accept-encoding": "gzip, deflate",
+    "connection": "keep-alive",
+    "user-agent": "python-httpx/0.28.1"
+  },
+  "request_body": "",
+  "response_status": 200,
+  "response_headers": {
+    "connection": "keep-alive",
+    "http_x_pp_az_locator": "ccg18.slc",
+    "matched-stub-id": "235583f0-2a90-42dd-8e38-add11c777091",
+    "cache-control": "max-age=0, no-cache, no-store, must-revalidate",
+    "paypal-debug-id": "f500823b73504",
+    "server": "nginx",
+    "server-timing": "traceparent;desc=\"00-0000000000000000000f500823b73504-7742112bfb1ce9a2-01\"",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "content-type": "application/json",
+    "access-control-expose-headers": "Server-Timing",
+    "accept-ranges": "none",
+    "via": "1.1 varnish, 1.1 varnish",
+    "content-encoding": "gzip",
+    "edge-control": "max-age=0",
+    "date": "Sat, 24 Oct 2026 06:58:15 GMT",
+    "x-served-by": "cache-sin-wsss1830093-SIN, cache-sin-wsss1830093-SIN, cache-maa10236-MAA",
+    "x-cache": "MISS, MISS, MISS",
+    "x-cache-hits": "0, 0, 0",
+    "x-timer": "S1792825095.089866,VS0,VE782",
+    "vary": "Accept-Encoding",
+    "transfer-encoding": "chunked"
+  },
+  "response_body": {
+    "batch_header": {
+      "payout_batch_id": "DQCP2UAJCBMNY",
+      "batch_status": "DENIED",
+      "time_created": "2017-08-21T11:22:33Z",
+      "time_completed": "2017-08-21T11:22:54Z",
+      "sender_batch_header": {
+        "email_subject": "user test case"
+      },
+      "amount": {
+        "currency": "USD",
+        "value": "190.00"
+      },
+      "fees": {
+        "currency": "USD",
+        "value": "0.00"
+      }
+    },
+    "items": [
+      {
+        "payout_item_id": "RWD4Y3H9VV8BA",
+        "transaction_status": "FAILED",
+        "payout_item_fee": {
+          "currency": "USD",
+          "value": "0.00"
+        },
+        "payout_batch_id": "DQCP2UAJCBMNY",
+        "payout_item": {
+          "recipient_type": "EMAIL",
+          "amount": {
+            "currency": "USD",
+            "value": "190.00"
+          },
+          "note": "payout to receiver",
+          "receiver": "email@redacted",
+          "sender_item_id": "MSI-2727"
+        },
+        "time_processed": "2017-08-21T11:22:44Z",
+        "errors": {
+          "name": "CLOSED_MARKET",
+          "message": "Market closed and transaction is between 2 different countries",
+          "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+          "details": []
+        },
+        "links": [
+          {
+            "href": "https://api.sandbox.paypal.com/v1/payments/payouts-item/RWD4Y3H9VV8BA",
+            "rel": "item",
+            "method": "GET",
+            "encType": "application/json"
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "href": "https://api.sandbox.paypal.com/v1/payments/payouts/DQCP2UAJCBMNY",
+        "rel": "self",
+        "method": "GET",
+        "encType": "application/json"
+      }
+    ]
+  },
+  "t_sent": "2026-10-24T06:58:17.084067Z",
+  "t_recv": "2026-10-24T06:58:17.916832Z"
+}
