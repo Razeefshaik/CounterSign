@@ -214,7 +214,8 @@ async def settle_spare_25(ctx: CheckContext) -> dict:
     if "spare_25" not in ctx.data["disputes"]:
         return missing("spare_25")
     entry: dict = {"path": []}
-    detail = await reach_under_review(ctx, "spare_25", entry, evidence=False)
+    # D8 found provide_evidence on this dispute at CHARGEBACK, so it carries the demo's evidence path.
+    detail = await reach_under_review(ctx, "spare_25", entry, evidence=True)
     if status(detail) == "UNDER_REVIEW" and has_rel(rels(detail), "require_evidence"):
         entry["require_evidence"] = await act_once(
             ctx, "spare_25", "require-evidence", body={"action": "SELLER_EVIDENCE"}
