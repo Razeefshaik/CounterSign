@@ -309,3 +309,12 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | --- | --- | --- | --- |
 | C25b narrates a dispute freeze confirmed by capture GET PENDING plus our non-cash DISPUTE_EARMARK reserve, never a balance hold; dispute opening and seller-favour resolution leave available unchanged | D8, D12; owner C25b prompt | Accept | The demo must match recorded sandbox behavior rather than invent $400 or $60 withheld cash |
 | C25b compares the protected $1,086 Friday run with a read-only $1,500 naive run against $1,800 available; the naive run pays $414 disputed shares with zero shortfall | C25b | Accept | The real risk is paying disputed obligations from an apparently sufficient balance; funds sufficiency cannot replace the reserve rule |
+
+## Oct 27 C25c configured week
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Configured weeks check ID-matched resource GETs, reserved shares, one settlement per line and GET-confirmed returns before replacement; cash is starting available plus confirmed returns minus confirmed payouts/refunds, with stale snapshots pending reconciliation | C25c real-model rehearsal | Accept | A safe Monday cancellation must not fail Wednesday's staged cash number; scripted runs retain their strict timeline assertions |
+| A completed matching cancel/evidence action is reused with CONFIGURED_MODEL_ACTED_EARLIER and its recorded action time; optional model differences remain logged and the final configured summary names shown and missing safety moments | C25c | Accept | Real reasoning may act early or refuse an unsafe demonstration; the script must neither force a staged proposal nor claim a safety moment it did not observe |
+| Numeric provider HTTP 429 becomes MODEL_QUOTA_EXHAUSTED, separately audited outside the per-incident failure cap and saved as a resumable script stop; no provider error text or automatic model switch | C25c | Accept | A free-tier daily limit is not an incident failure and must not strand the same incident when the owner resumes after quota resets |
+| The walkthrough recommends explicit gemini-3.5-flash-lite for rehearsals, while evidence-prefix guidance is generated from EVIDENCE_PREFIXES | Owner Oct 27 quota observations; C25c | Accept | The owner's Flash free-tier limit was 20 daily requests, below a full week's observed needs, and fixed shape guidance avoids wasting correction turns |

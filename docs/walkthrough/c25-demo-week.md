@@ -289,3 +289,59 @@ testing. Sandbox always uses fresh dispute status and links. If the script stops
 for missing D10 mapping, stale approval, pending confirmation or a mismatched
 amount, preserve the evidence and resolve that condition before resuming with
 the original date. Do not bypass the check or report the week as complete.
+
+### Real-model week
+
+Use the isolated mock setup in [C23's walkthrough](c23-agent.md) first. The
+receiver must have workers disabled; only the week command ticks the engine.
+From `CounterSign-c25c`, reuse the sibling main environment and isolated toolkit
+interpreter. Keep the same migrated `_demo` database, mock state, webhook ID,
+scratch root and original `--date` for every resume.
+
+The owner observed a 20-request daily Flash free-tier limit on Oct 27; the
+rehearsal needed about 30–40 calls. Select Flash-Lite explicitly for rehearsals;
+this is a recommendation, not an automatic fallback or a promise of quota.
+Keep `GOOGLE_API_KEY` private in the existing runtime settings. Do not paste it
+into a command or print it.
+
+```powershell
+$env:PYTHONPATH = 'src'
+$env:COUNTERSIGN_LLM_PROVIDER = 'google_genai'
+$env:COUNTERSIGN_LLM_MODEL = 'gemini-3.5-flash-lite'
+$env:COUNTERSIGN_TOOLKIT_PYTHON = (Resolve-Path '..\CounterSign-db\.venv\toolkit\Scripts\python.exe').Path
+& '..\CounterSign-db\.venv\Scripts\python.exe' -m scripts.demo_week --target mock --model configured --env-file ..\CounterSign\.env --root $rehearsalRoot --date $demoDate
+```
+
+`$rehearsalRoot` and `$demoDate` are the original setup's scratch root and UTC
+run date. Set the shared database/mock/webhook settings in this terminal as in
+the C23 setup. Never use `--reset` when resuming. Configured mode reads only the
+three model-setting names from its runtime file; process settings take precedence.
+
+Configured mode accepts a safe cancellation before Thursday. It confirms the
+old item is `RETURNED` by GET, records `CONFIGURED_MODEL_ACTED_EARLIER` with the
+proposal's time, then skips another cancellation proposal. The owner still
+verifies C's corrected payee, and Friday's exact run still requires approval.
+The log's `CONFIGURED_MODEL_CASH` records starting cash plus confirmed returns
+minus confirmed payouts/refunds. Dispute earmarks never subtract cash, and a
+lagging balance remains pending instead of being mistaken for a new movement.
+Existing checkpoints from the failed Wednesday rehearsal can establish their
+starting cash from the saved Monday freeze event; no historical write is replayed.
+
+`MODEL_QUOTA_EXHAUSTED` is a fixed resumable stop. Preserve all state and resume
+the same command after the provider's quota resets; the script does not guess
+the reset time or switch models. A quota stop does not consume the incident's
+two-failure allowance. The checkpoint fingerprints the chosen model, so changing
+models is a new rehearsal, not a way to alter an existing payment history.
+
+The final `CONFIGURED_MODEL_SUMMARY` reports `COMPLETE` or
+`COMPLETE_WITH_GAPS`, with each observed safety moment marked `shown`. A lost
+response proves executor recovery, not that the model caused that fault. If
+the model declines to propose the injection-bait claim or settled retry, the
+log retains `CONFIGURED_MODEL_DECISION_DIFFERS` and reports the missing proof;
+independent remaining steps continue. If C is never cancelled, the week stops
+honestly before a dependent replacement rather than forcing the proposal.
+Scripted mode retains its existing exact amounts and all three required moments.
+
+Automated configured-week checks use fake models with real core services and
+the local mock. Only the owner and Claude perform a real-model rehearsal; these
+tests make no claims about live Gemini decisions or sandbox execution.
