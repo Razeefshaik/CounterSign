@@ -336,3 +336,15 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | HANDOFF synced with sandbox findings (owner-approved Oct 27); no design change. | Owner C29 prompt | Accept | Describe the recorded D1–D13 outcomes, implemented recovery and evidence gates, and C25b's fixed demo amounts without treating them as a replay of the recorded capture cash flows |
+
+## Oct 27 M13 baseline_llm
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| baseline_llm calls the local mock itself through ten fixed tools (CONTRACTS 6.2 list plus request_owner_approval); no shield, ledger or approval binding, and approvals are only shown to the model | M13, F18 | Accept | A plain agent must be compared on its own judgement, while still using the same M11 owner policies as the other systems |
+| The model is told the owner's business rules (shares, dispute hold, owner approval tiers, untrusted buyer text) in plain words | M13 | Accept | Withholding the rules would make the baseline a strawman; only enforcement in code is absent |
+| create_payout maps a model-chosen reference to one stable sender_batch_id/PayPal-Request-Id and frozen body, follows the duplicate 400 details[].link by GET, and refuses reuse of a reference for a different payment | M13, D6 | Accept | F18 requires PayPal's documented idempotency used correctly so the comparison is fair |
+| The model names maker keys only; tools take emails from owner maker records and never show emails or credentials to the model | M13 | Accept | Keeps PII and mock secrets out of model traffic; payee changes from buyer text still need the model to misuse a maker key |
+| The baseline refuses non-loopback URLs, non-mock ground and credentials not prefixed mock-, and reads only initial_state minus the mock seed | M13, F18 | Accept | It must never receive sandbox credentials or graded answers |
+| A numeric HTTP 429 or MODEL_QUOTA_EXHAUSTED stops the system; the run row error is MODEL_QUOTA_EXHAUSTED and run_suite stops, writing only runs.partial.jsonl | M13 | Accept | A quota stop is not a baseline failure, and a partial comparison must not produce a summary or pass^k |
+| run_one/run_suite accept mock_transport="tcp", serving the same in-process mock app via uvicorn on an ephemeral 127.0.0.1 port; "asgi" stays the default | M13, M16 follow-up | Accept | CounterSign's genuine toolkit child needs a TCP-reachable mock for configured-model runs, while the runner keeps clock and webhook control |
