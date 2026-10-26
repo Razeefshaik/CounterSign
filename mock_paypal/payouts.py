@@ -55,6 +55,8 @@ class PayoutItem:
     synthesised: bool = False
     revision: int = 0
     claim_during_cancel: bool = False
+    errors: dict | None = None
+    fee_minor: int = 0
 
 
 @dataclass
@@ -99,17 +101,13 @@ class PayoutService:
         try:
             return self.store.payouts.batches[batch_id]
         except KeyError:
-            raise PayoutError(
-                404, "RESOURCE_NOT_FOUND", "Payout batch not found"
-            ) from None
+            raise PayoutError(404, "RESOURCE_NOT_FOUND", "Payout batch not found") from None
 
     def get_item(self, item_id: str) -> PayoutItem:
         try:
             return self.store.payouts.items[item_id]
         except KeyError:
-            raise PayoutError(
-                404, "RESOURCE_NOT_FOUND", "Payout item not found"
-            ) from None
+            raise PayoutError(404, "RESOURCE_NOT_FOUND", "Payout item not found") from None
 
     def create(self, body: CreatePayout) -> PayoutBatch:
         state = self.store.payouts
@@ -195,18 +193,25 @@ class PayoutService:
             raise ValueError("Unknown payout item status")
         previous = item.status
         total = minor(item.payload["amount"]["value"])
-        desired_debit = (
-            0 if target in {"FAILED", "RETURNED", "REFUNDED", "REVERSED"} else total
-        )
+        desired_debit = 0 if target in {"FAILED", "RETURNED", "REFUNDED", "REVERSED"} else total
         if target == "UNCLAIMED" and self.store.config.unclaimed_counts_in_available:
             desired_debit = 0
         self.store.payouts.available_minor += item.debited_minor - desired_debit
         if item.debited_minor != desired_debit:
-            self.store.record_transaction(
-                item.debited_minor - desired_debit, item.transaction_id
-            )
+            self.store.record_transaction(item.debited_minor - desired_debit, item.transaction_id)
         item.debited_minor = desired_debit
         item.status = target
+        item.processed_at = self.store.clock.now
+        if target == "UNCLAIMED" and item.errors is None:
+            item.errors = {
+                "name": "RECEIVER_UNREGISTERED",
+                "message": "The recipient for this payout does not have an account. A link to sign up for an account was sent to the recipient. However, if the recipient does not claim this payout within 30 days, the funds will be returned to your account.",
+                "information_link": "https://developer.paypal.com/docs/api/payments.payouts-batch/#errors",
+                "details": [],
+                "links": [],
+            }
+        elif target == "SUCCESS":
+            item.errors = None
         item.synthesised |= synthesised
         if previous == target:
             return
@@ -243,12 +248,10 @@ class PayoutService:
             item.claim_during_cancel = False
             self.transition(item, "SUCCESS")
         if item.cancelled:
-            raise PayoutError(
-                400, "ITEM_ALREADY_CANCELLED", "Item was already cancelled"
-            )
+            raise PayoutError(400, "ITEM_ALREADY_CANCELLED", "Requested item is already cancelled.")
         if item.status != "UNCLAIMED":
             raise PayoutError(
-                400, "ITEM_INCORRECT_STATUS", "Only UNCLAIMED items can be cancelled"
+                400, "ITEM_INCORRECT_STATUS", "Only items in Unclaimed status can be cancelled."
             )
         self.transition(item, "RETURNED", emit_webhook=False)
         for suffix in self.store.config.cancel_emits:
@@ -261,33 +264,41 @@ class PayoutService:
 
     @staticmethod
     def link(base: str, path: str, rel: str) -> dict:
-        return {"href": base.rstrip("/") + path, "rel": rel, "method": "GET"}
+        return {
+            "href": base.rstrip("/") + path,
+            "rel": rel,
+            "method": "GET",
+            "encType": "application/json",
+        }
 
-    def item_doc(
-        self, item: PayoutItem, base: str, *, standalone: bool = False
-    ) -> dict:
+    def item_doc(self, item: PayoutItem, base: str, *, standalone: bool = False) -> dict:
         doc = {
             "payout_item_id": item.id,
-            "transaction_id": item.transaction_id,
-            "activity_id": item.activity_id,
             "transaction_status": item.status,
-            "payout_item_fee": amount(0),
             "payout_batch_id": item.batch_id,
-            "payout_item": deepcopy(item.payload),
-            "time_processed": timestamp(item.processed_at)
-            if item.processed_at
-            else None,
-            "links": [self.link(base, f"/v1/payments/payouts-item/{item.id}", "item")],
+            "payout_item": {
+                "recipient_wallet": "PAYPAL",
+                "purpose": "GOODS",
+                **deepcopy(item.payload),
+            },
+            "links": [
+                self.link(
+                    base, f"/v1/payments/payouts-item/{item.id}", "self" if standalone else "item"
+                )
+            ],
         }
-        if item.status == "UNCLAIMED":
-            doc["errors"] = {
-                "name": "RECEIVER_UNREGISTERED",
-                "message": "Receiver is unregistered",
-            }
+        if item.processed_at is not None and item.status != "PENDING":
+            doc.update(
+                transaction_id=item.transaction_id,
+                activity_id=item.activity_id,
+                payout_item_fee=amount(item.fee_minor),
+                time_processed=timestamp(item.processed_at),
+            )
+        if item.errors:
+            doc["errors"] = deepcopy(item.errors)
         if standalone:
-            doc["sender_batch_id"] = self.get_batch(item.batch_id).sender_header[
-                "sender_batch_id"
-            ]
+            doc["sender_batch_id"] = self.get_batch(item.batch_id).sender_header["sender_batch_id"]
+            doc["links"].append(self.link(base, f"/v1/payments/payouts/{item.batch_id}", "batch"))
         return doc
 
     def create_doc(self, batch: PayoutBatch, base: str) -> dict:
@@ -305,9 +316,7 @@ class PayoutService:
             ],
         }
         if self.behavior.create_includes_items:
-            doc["items"] = [
-                self.item_doc(self.get_item(id), base) for id in batch.item_ids
-            ]
+            doc["items"] = [self.item_doc(self.get_item(id), base) for id in batch.item_ids]
         return doc
 
     def batch_doc(
@@ -322,23 +331,25 @@ class PayoutService:
         header = {
             **self.create_doc(batch, base)["batch_header"],
             "time_created": timestamp(batch.created_at),
-            "time_completed": timestamp(batch.completed_at)
-            if batch.completed_at
-            else None,
+            "funding_source": "BALANCE",
             "amount": amount(
-                sum(
-                    minor(self.get_item(id).payload["amount"]["value"])
-                    for id in batch.item_ids
-                )
+                sum(minor(self.get_item(id).payload["amount"]["value"]) for id in batch.item_ids)
             ),
-            "fees": amount(0),
         }
+        if batch.completed_at is not None:
+            header.update(
+                time_completed=timestamp(batch.completed_at),
+                time_closed=timestamp(batch.completed_at),
+                fees=amount(sum(self.get_item(id).fee_minor for id in batch.item_ids)),
+            )
         start = (page - 1) * page_size
         total = len(batch.item_ids)
         pages = (total + page_size - 1) // page_size
 
         def link(number: int, rel: str):
-            query = f"?page={number}&page_size={page_size}&total_required={str(total_required).lower()}"
+            query = (
+                f"?page={number}&page_size={page_size}&total_required={str(total_required).lower()}"
+            )
             return self.link(base, path + query, rel)
 
         links = [link(page, "self")]

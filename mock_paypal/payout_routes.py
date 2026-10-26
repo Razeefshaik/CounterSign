@@ -6,6 +6,7 @@ from pydantic import ValidationError
 
 from mock_paypal.payout_models import CreatePayout
 from mock_paypal.payouts import PayoutError
+from mock_paypal.recorded import negative_response
 
 router = APIRouter()
 
@@ -29,6 +30,13 @@ async def create(request: Request):
         except (ValueError, UnicodeError, ValidationError):
             raise PayoutError(422, "INVALID_REQUEST", "Invalid payout body") from None
         sender_id = body.sender_batch_header.sender_batch_id
+        test_value = body.items[0].note
+        negative = negative_response(
+            test_value, "POST", "/v1/payments/payouts", base, request.state.debug_id
+        )
+        if negative is not None:
+            code, payload = negative
+            return JSONResponse(payload, status_code=code)
         previous_id = state.sender_keys.get(sender_id)
         if previous_id:
             link_base = (
@@ -89,15 +97,11 @@ async def get_batch(
 async def get_item(item_id: str, request: Request):
     async with request.app.state.control_lock:
         service = request.app.state.payout_service
-        return service.item_doc(
-            service.get_item(item_id), str(request.base_url), standalone=True
-        )
+        return service.item_doc(service.get_item(item_id), str(request.base_url), standalone=True)
 
 
 @router.post("/v1/payments/payouts-item/{item_id}/cancel")
 async def cancel(item_id: str, request: Request):
     async with request.app.state.control_lock:
         service = request.app.state.payout_service
-        return service.item_doc(
-            service.cancel(item_id), str(request.base_url), standalone=True
-        )
+        return service.item_doc(service.cancel(item_id), str(request.base_url), standalone=True)

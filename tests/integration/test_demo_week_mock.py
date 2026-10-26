@@ -206,7 +206,10 @@ async def test_whole_week_pays_exactly_once_and_keeps_each_safety_moment(
         assert maker(planned, "B")["reserved"]["minor"] == 5400
         [run] = [r for r in planned["runs"] if r["week_start"] == "2026-11-02"]
         assert run["total"]["minor"] == 108600 and run["replacement_count"] == 1
-        assert planned["cash"]["unreserved"]["minor"] == 25400
+        assert planned["cash"]["unreserved"]["minor"] == 71400
+        assert planned["cash"]["paypal"]["available"]["minor"] == 180000
+        assert friday["cash"]["paypal"]["available"]["minor"] == 71400
+        assert final["cash"]["paypal"]["available"]["minor"] == 35400
         assert maker(friday, "A")["settled_last_30d"]["minor"] == 0
         assert maker(friday, "A")["reserved"]["minor"] == 36000
         assert maker(friday, "B")["settled_last_30d"]["minor"] == 48600
@@ -215,6 +218,8 @@ async def test_whole_week_pays_exactly_once_and_keeps_each_safety_moment(
         assert maker(final, "A")["reserved"]["minor"] == 0
         assert maker(final, "B")["reserved"]["minor"] == 5400
         released = report["following_release"]
+        # Seller win / buyer close releases an earmark, never a cash hold.
+        assert released["cash"]["paypal"]["available"]["minor"] == 71400
         assert maker(released, "A")["reserved"]["minor"] == 0
         assert maker(released, "A")["settled_last_30d"]["minor"] == 0
         assert any(
@@ -225,12 +230,14 @@ async def test_whole_week_pays_exactly_once_and_keeps_each_safety_moment(
         protected, naive = report["simulation"]["protected"], report["simulation"]["naive"]
         assert (
             protected["payout"]["minor"] == 108600
-            and protected["unreserved_after"]["minor"] == 25400
+            and protected["unreserved_after"]["minor"] == 71400
         )
         assert (
-            naive["payout"]["minor"] == 150000 and naive["effective_available"]["minor"] == 134000
+            naive["payout"]["minor"] == 150000 and naive["effective_available"]["minor"] == 180000
         )
-        assert naive["pays_disputed_shares"] is True and naive["shortfall"]["minor"] == 16000
+        assert naive["pays_disputed_shares"] is True and naive["shortfall"]["minor"] == 0
+        assert naive["disputed_shares"]["minor"] == 41400
+        assert naive["unreserved_after"]["minor"] == 30000
         truth = (await world.control.get("/_mock/ground-truth")).json()
         assert len(truth["payout_items"]) == 5 and truth["refunds"] == []
         assert (
@@ -289,11 +296,40 @@ async def test_whole_week_pays_exactly_once_and_keeps_each_safety_moment(
             assert resend["prepared_at"] >= cancel["completed_at"]
             journals = await repos.ledger_journals.find(limit=1000)
             assert sum(j["memo"].startswith("PAYOUT_SUCCESS:") for j in journals) == 4
+            earmarks = [
+                r
+                for r in await repos.reservations.find(limit=1000)
+                if r["kind"] == "DISPUTE_EARMARK"
+            ]
+            assert sorted(r["amount_minor"] for r in earmarks) == [5400, 36000]
+            assert all(r["affects_cash"] is False for r in earmarks)
         logs = (world.store.directory / "run.jsonl").read_text(encoding="utf-8")
         assert all(email not in logs for email in EMAILS.values())
         assert "FAKE-SECRET" not in logs and "FAKE-TOKEN" not in logs
         events = [json.loads(line) for line in logs.splitlines()]
         names = {event["event"] for event in events}
+        assert not {"MONDAY_HOLD_CONFIRMED", "WEDNESDAY_HOLD_CONFIRMED"} & names
+        for name, key, reserved in (
+            ("MONDAY_DISPUTE_FROZEN", "A400", 36000),
+            ("WEDNESDAY_DISPUTE_FROZEN", "B60", 5400),
+        ):
+            [freeze] = [event for event in events if event["event"] == name]
+            assert freeze["available_minor"] == 150000
+            assert freeze["capture_id"] == ORDERS[key]["capture_id"]
+            assert freeze["capture_status"] == "PENDING"
+            assert freeze["reserved_" + key[0].lower() + "_minor"] == reserved
+            assert freeze["reserve_kind"] == "DISPUTE_EARMARK"
+            assert freeze["affects_cash"] is False
+            assert any(
+                r["method"] == "GET"
+                and r["path"] == "/v2/payments/captures/" + ORDERS[key]["capture_id"]
+                for r in truth["requests"]
+            )
+        [comparison] = [e for e in events if e["event"] == "NAIVE_COMPARISON_READ_ONLY"]
+        assert comparison["available_minor"] == 180000
+        assert comparison["shortfall_minor"] == 0
+        assert comparison["disputed_shares_minor"] == 41400
+        assert comparison["executed"] is False
         assert {
             "SAFETY_MOMENT_1",
             "SAFETY_1_DUPLICATE_LINK",

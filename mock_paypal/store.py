@@ -16,6 +16,7 @@ TOKEN_LIFETIME_SECONDS = 32400
 DEFAULT_SCOPE = (
     "https://uri.paypal.com/services/payments/payouts "
     "https://uri.paypal.com/services/disputes/read-seller "
+    "https://uri.paypal.com/services/disputes/create "
     "https://uri.paypal.com/services/disputes/update-seller "
     "https://uri.paypal.com/services/reporting/search/read"
 )
@@ -38,9 +39,7 @@ class MockStore:
         self.resources = ResourceState()
         self.webhooks = WebhookState()
         self.emit = getattr(self, "emit", lambda *args, **kwargs: None)
-        self.record_transaction = getattr(
-            self, "record_transaction", lambda *args: None
-        )
+        self.record_transaction = getattr(self, "record_transaction", lambda *args: None)
         self._ids = 0
 
     def new_id(self, prefix: str = "MOCK") -> str:

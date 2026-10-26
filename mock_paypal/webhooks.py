@@ -30,9 +30,7 @@ def encoded_message(message):
 def sign(message):
     length = (N.bit_length() + 7) // 8
     return base64.b64encode(
-        pow(int.from_bytes(encoded_message(message), "big"), D, N).to_bytes(
-            length, "big"
-        )
+        pow(int.from_bytes(encoded_message(message), "big"), D, N).to_bytes(length, "big")
     ).decode()
 
 
@@ -84,6 +82,7 @@ class WebhookService:
         event = {
             "id": self.store.new_id("WH-MOCK-EVT-"),
             "event_version": "1.0",
+            "resource_version": "2.0" if type.startswith("PAYMENT.CAPTURE") else "1.0",
             "create_time": timestamp(self.store.clock.now),
             "resource_type": "payouts_batch"
             if type.startswith("PAYMENT.PAYOUTSBATCH")
@@ -97,6 +96,16 @@ class WebhookService:
             "resource": deepcopy(resource),
             "links": [],
         }
+        path = self.base_url.rstrip("/") + "/v1/notifications/webhooks-events/" + event["id"]
+        event["links"] = [
+            {"href": path, "rel": "self", "method": "GET", "encType": "application/json"},
+            {
+                "href": path + "/resend",
+                "rel": "resend",
+                "method": "POST",
+                "encType": "application/json",
+            },
+        ]
         raw = json.dumps(event, separators=(",", ":"), ensure_ascii=False).encode()
         record = {"event": event, "raw": raw, "headers": {}}
         state.events[event["id"]] = record
@@ -105,17 +114,12 @@ class WebhookService:
             match = fault["match"]
             if fnmatch.fnmatchcase(type, match["event_type"]):
                 fault["seen"] += 1
-                if fault["seen"] >= match.get("nth", 1) and fault["used"] < match.get(
-                    "count", 1
-                ):
+                if fault["seen"] >= match.get("nth", 1) and fault["used"] < match.get("count", 1):
                     fault["used"] += 1
                     action = fault["action"]
                     break
         for id, registration in state.registrations.items():
-            if any(
-                fnmatch.fnmatchcase(type, item["name"])
-                for item in registration["event_types"]
-            ):
+            if any(fnmatch.fnmatchcase(type, item["name"]) for item in registration["event_types"]):
                 if action and action["type"] == "reorder_after":
                     state.held.append((record, id, action["event_type"]))
                 else:
@@ -162,9 +166,7 @@ class WebhookService:
                 status = None
                 try:
                     if self.delivery:
-                        status = await self.delivery(
-                            url, delivery_headers, record["raw"]
-                        )
+                        status = await self.delivery(url, delivery_headers, record["raw"])
                     else:
                         async with httpx.AsyncClient(
                             trust_env=False, follow_redirects=False, timeout=5
@@ -229,17 +231,37 @@ async def register(body: dict, request: Request):
         or not body["event_types"]
     ):
         raise PayoutError(422, "INVALID_REQUEST", "URL and event types required")
-    if not all(
-        isinstance(t, dict) and isinstance(t.get("name"), str)
-        for t in body["event_types"]
-    ):
+    if not all(isinstance(t, dict) and isinstance(t.get("name"), str) for t in body["event_types"]):
         raise PayoutError(422, "INVALID_REQUEST", "Invalid event types")
     doc = {
         "id": store.new_id("WH-MOCK-"),
         "url": local_url(body["url"]),
-        "event_types": body["event_types"],
+        "event_types": [
+            {"description": "Mock event subscription", "status": "ENABLED", **item}
+            for item in body["event_types"]
+        ],
+        "links": [],
     }
+    path = str(request.base_url).rstrip("/") + "/v1/notifications/webhooks/" + doc["id"]
+    doc["links"] = [
+        {"href": path, "rel": rel, "method": method}
+        for rel, method in [("self", "GET"), ("update", "PATCH"), ("delete", "DELETE")]
+    ]
     store.webhooks.registrations[doc["id"]] = deepcopy(doc)
+    return doc
+
+
+@router.patch("/v1/notifications/webhooks/{id}")
+async def update_registration(id: str, body: list[dict], request: Request):
+    state = request.app.state.store.webhooks
+    if id not in state.registrations:
+        raise PayoutError(404, "RESOURCE_NOT_FOUND", "Webhook not found")
+    doc = deepcopy(state.registrations[id])
+    for operation in body:
+        if operation.get("op") != "replace" or operation.get("path") != "/url":
+            raise PayoutError(422, "INVALID_REQUEST", "Only URL replacement is supported")
+        doc["url"] = local_url(operation["value"])
+    state.registrations[id] = doc
     return doc
 
 
@@ -251,10 +273,8 @@ async def registrations(request: Request):
 @router.get("/v1/notifications/webhooks-events")
 async def events(request: Request):
     return {
-        "events": [
-            r["event"] for r in request.app.state.store.webhooks.events.values()
-        ],
-        "links": [],
+        "count": len(request.app.state.store.webhooks.events),
+        "events": [r["event"] for r in request.app.state.store.webhooks.events.values()],
     }
 
 
@@ -275,7 +295,17 @@ async def resend(id: str, request: Request):
         raise PayoutError(404, "RESOURCE_NOT_FOUND", "Event not found")
     for webhook_id in record["headers"]:
         service.schedule(record, webhook_id)
-    return {"id": id}
+    return deepcopy(record["event"])
+
+
+@router.post("/v1/notifications/simulate-event", status_code=202)
+async def simulate(body: dict, request: Request):
+    if not isinstance(body.get("event_type"), str):
+        raise PayoutError(422, "INVALID_REQUEST", "Event type required")
+    service = request.app.state.webhook_service
+    # Test-signed simulator events are authentic mock events, not forged deliveries.
+    resource = body.get("resource", {"id": "MOCK-SIMULATED", "status": "COMPLETED"})
+    return service.emit(body["event_type"], resource)
 
 
 @router.post("/_mock/webhook-faults", status_code=201)
@@ -288,9 +318,7 @@ async def webhook_fault(body: dict, request: Request):
         "reorder_after",
     }:
         raise PayoutError(422, "INVALID_REQUEST", "Invalid webhook fault")
-    if action["type"] == "reorder_after" and not isinstance(
-        action.get("event_type"), str
-    ):
+    if action["type"] == "reorder_after" and not isinstance(action.get("event_type"), str):
         raise PayoutError(422, "INVALID_REQUEST", "Target event type required")
     for value in [match.get("nth", 1), match.get("count", 1), action.get("copies", 1)]:
         if type(value) is not int or value < 1:
@@ -299,9 +327,7 @@ async def webhook_fault(body: dict, request: Request):
         raise PayoutError(422, "INVALID_REQUEST", "Invalid delay")
     store = request.app.state.store
     id = store.new_id("WH-FAULT-")
-    store.webhooks.faults.append(
-        {"id": id, "match": match, "action": action, "seen": 0, "used": 0}
-    )
+    store.webhooks.faults.append({"id": id, "match": match, "action": action, "seen": 0, "used": 0})
     return {"id": id}
 
 

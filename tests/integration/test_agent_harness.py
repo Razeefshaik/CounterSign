@@ -14,6 +14,7 @@ from test_harness import world as shared_world
 from countersign import worker
 from countersign.agent.models import ScriptedModel
 from countersign.agent.tools import ALLOWED_TOOLS, ReadTool, ToolRegistry
+from countersign.approvals.service import ApprovalError, load_context
 from countersign.db import Repositories
 from countersign.harness import Engine
 from countersign.paypal.http import canonical_payload_hash
@@ -162,6 +163,91 @@ async def test_invalid_model_output_leaves_no_proposal_approval_or_operation(wor
     await assert_no_money_write(world, rows)
 
 
+@pytest.mark.asyncio
+async def test_two_invalid_action_params_leave_no_proposal_and_incident_retryable(world):
+    row = await incident(world)
+    model = ScriptedModel([proposal(row["id"], "PROVIDE_EVIDENCE") for _ in range(2)])
+    async with agent_engine(world, model) as engine:
+        result = await engine.tick()
+    assert result["errors"] == 1 and len(model.requests) == 2
+    rows = await stored(world)
+    assert rows["proposals"] == [] and rows["incidents"][0]["state"] == "OPEN"
+    await assert_no_money_write(world, rows)
+
+
+@pytest.mark.asyncio
+async def test_unknown_well_formed_agent_target_is_audited_without_failing_tick(world):
+    row = await incident(world)
+    model = ScriptedModel([
+        proposal(row["id"], "ACCEPT_CLAIM", {"paypal_dispute_id": "PP-D-UNKNOWN"}),
+        proposal(row["id"], "WAIT"),
+    ])
+    async with agent_engine(world, model) as engine:
+        assert (await engine.tick())["errors"] == 0
+        rows = await stored(world)
+        assert rows["proposals"] == []
+        assert rows["incidents"][0]["state"] == "OPEN"
+        assert rows["incidents"][0]["version"] == row["version"]
+        [failure] = [a for a in rows["audit_log"]
+                     if a["details"].get("reason") == "AGENT_PROPOSAL_UNBOUND"]
+        assert failure["actor"] == "agent" and failure["kind"] == "RECONCILE_MISMATCH"
+        assert failure["proposal_id"] is None
+        assert failure["details"] == {"reason": "AGENT_PROPOSAL_UNBOUND", "count": 1,
+                                      "incident_id": str(row["id"]),
+                                      "incident_version": row["version"]}
+        assert "PP-D-UNKNOWN" not in json.dumps(failure["details"])
+        await assert_no_money_write(world, rows)
+        # A later step on the same incident can succeed without a version change.
+        assert (await engine.tick())["errors"] == 0
+    rows = await stored(world)
+    [saved] = rows["proposals"]
+    assert saved["action"] == "WAIT" and saved["state"] == "EXECUTED"
+
+
+@pytest.mark.asyncio
+async def test_repeated_agent_failures_skip_that_incident_version_without_starving_others(world):
+    first = await incident(world, note="First resource needs investigation")
+    second = await incident(world, note="Second resource needs investigation")
+    unknown = {"paypal_dispute_id": "PP-D-UNKNOWN"}
+    model = ScriptedModel([
+        proposal(first["id"], "ACCEPT_CLAIM", unknown),
+        proposal(first["id"], "PROVIDE_EVIDENCE"),
+        proposal(first["id"], "PROVIDE_EVIDENCE"),
+        proposal(second["id"], "WAIT"),
+    ])
+    async with agent_engine(world, model) as engine:
+        assert (await engine.tick())["errors"] == 0  # unbound, audited
+        assert (await engine.tick())["errors"] == 1  # two invalid proposals, audited
+        assert len(model.requests) == 3
+        assert (await engine.tick())["errors"] == 0
+        assert len(model.requests) == 4  # the first incident is skipped, not re-asked
+    rows = await stored(world)
+    [saved] = rows["proposals"]
+    assert saved["incident_id"] == second["id"] and saved["action"] == "WAIT"
+    failures = sorted(
+        (a["details"]["reason"], a["details"].get("code"))
+        for a in rows["audit_log"]
+        if a["actor"] == "agent" and a["details"].get("incident_id") == str(first["id"])
+    )
+    assert failures == [
+        ("AGENT_PROPOSAL_UNBOUND", None),
+        ("AGENT_STEP_FAILED", "COMMANDER_PROPOSAL_INVALID"),
+    ]
+    await assert_no_money_write(world, rows)
+
+
+@pytest.mark.asyncio
+async def test_non_agent_binding_still_raises_for_unknown_paypal_target(world):
+    async with world.database.tx() as conn:
+        row = await Repositories(conn).proposals.insert(
+            action="ACCEPT_CLAIM", params={"paypal_dispute_id": "PP-D-UNKNOWN"},
+            evidence_refs=[], expected_effect={}, model="deterministic-fixture",
+            raw_output={}, state="CREATED",
+        )
+        with pytest.raises(ApprovalError, match="^STALE_PROPOSAL$"):
+            await load_context(conn, row, now=world.settings.clock())
+
+
 async def mirrored_dispute_incident(world, message):
     await world.engine.seed(world.state)
     response = await world.controls.post(
@@ -174,7 +260,15 @@ async def mirrored_dispute_incident(world, message):
         },
     )
     assert response.status_code == 200
-    await ready_poll(world.engine)
+    # The dispute arrives through an asynchronous webhook; one clean tick can
+    # precede it, so poll until it is mirrored rather than racing delivery.
+    async with asyncio.timeout(60):
+        while True:
+            await ready_poll(world.engine)
+            async with world.database.tx() as conn:
+                if await Repositories(conn).disputes.find():
+                    break
+            await asyncio.sleep(0.02)
     async with world.database.tx() as conn:
         disputes = await Repositories(conn).disputes.find()
         [dispute] = disputes

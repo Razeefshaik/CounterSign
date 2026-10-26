@@ -4,6 +4,7 @@ import asyncio
 from collections.abc import Mapping
 
 from countersign.agent.models import create_model
+from countersign.agent.params import ProposalParamsError
 from countersign.agent.prompts import SYSTEM_PROMPT
 from countersign.agent.proposal import ProposalError, StructuredProposal, parse_proposal
 from countersign.agent.safety import injection_flags, sanitize
@@ -54,8 +55,14 @@ class Commander:
     async def step(self, incident: Mapping, context: Mapping | None = None) -> StructuredProposal:
         """Return one validated proposal, carrying flags from all observed data."""
         try:
-            async with self._lock, asyncio.timeout(self.timeout):
-                return await self._step(incident, context)
+            async with self._lock:
+                try:
+                    async with asyncio.timeout(self.timeout):
+                        return await self._step(incident, context)
+                finally:
+                    finish = getattr(self.model, "finish_step", None)
+                    if callable(finish):
+                        finish()
         except (CommanderError, ProposalError):
             raise
         except TimeoutError:
@@ -80,6 +87,7 @@ class Commander:
             raise CommanderError("INVALID_INCIDENT")
         observations, seen_calls = [], set()
         failed_calls = 0
+        invalid_proposals = 0
         for _ in range(self.max_rounds):
             request = {
                 "system": SYSTEM_PROMPT,
@@ -91,17 +99,20 @@ class Commander:
             answer = await self.model.complete(sanitize(request, self._secrets))
             if type(answer) is not dict:
                 raise CommanderError("INVALID_MODEL_RESPONSE")
-            if set(answer) == {"proposal_json"}:
-                return parse_proposal(
-                    answer["proposal_json"],
-                    incident_id=identifier,
-                    flags=flags,
-                    secrets=self._secrets,
-                )
-            if "tool_calls" not in answer:
-                return StructuredProposal.parse(
-                    answer, incident_id=identifier, flags=flags, secrets=self._secrets
-                )
+            if set(answer) == {"proposal_json"} or "tool_calls" not in answer:
+                try:
+                    return parse_proposal(
+                        answer["proposal_json"] if set(answer) == {"proposal_json"} else answer,
+                        incident_id=identifier, flags=flags, secrets=self._secrets,
+                    )
+                except ProposalParamsError as error:
+                    invalid_proposals += 1
+                    if invalid_proposals >= 2:
+                        raise CommanderError("COMMANDER_PROPOSAL_INVALID") from None
+                    flags.extend(injection_flags(answer, source="invalid_proposal",
+                                                 secrets=self._secrets))
+                    observations.append({"error": "INVALID_PROPOSAL_PARAMS", "action": error.action})
+                    continue
             calls = answer["tool_calls"]
             if set(answer) != {"tool_calls"} or type(calls) is not list or not 1 <= len(calls) <= 4:
                 raise CommanderError("INVALID_MODEL_TOOL_CALLS")

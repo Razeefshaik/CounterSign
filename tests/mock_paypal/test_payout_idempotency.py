@@ -49,9 +49,7 @@ def duplicate(response, batch_id, base="http://testserver"):
 
 @pytest.mark.parametrize("request_id", [None, "original", "new"])
 @pytest.mark.parametrize("changed", [False, True])
-def test_every_duplicate_links_original_without_changing_payment(
-    client, request_id, changed
-):
+def test_every_duplicate_links_original_without_changing_payment(client, request_id, changed):
     batch_id = create(client, headers={"PayPal-Request-Id": "original"})
     advance(client, 30)
     payload = body(receiver="other@example.com", value="9999.00") if changed else body()
@@ -61,7 +59,11 @@ def test_every_duplicate_links_original_without_changing_payment(
     assert linked.status_code == 200
     assert linked.json()["batch_header"]["payout_batch_id"] == batch_id
     assert linked.json()["batch_header"]["batch_status"] == "SUCCESS"
-    assert item(client, batch_id)["payout_item"] == body()["items"][0]
+    assert item(client, batch_id)["payout_item"] == {
+        "recipient_wallet": "PAYPAL",
+        "purpose": "GOODS",
+        **body()["items"][0],
+    }
     truth = client.get("/_mock/ground-truth").json()
     assert len(truth["payout_items"]) == 1
     assert truth["balances"]["available"]["value"] == "1200.00"
@@ -102,29 +104,13 @@ def test_reused_request_id_does_not_skip_body_validation(client):
 def test_duplicate_link_host_config_and_reset(client):
     batch_id = create(client)
     assert client.get("/_mock/config").json()["duplicate_link_host"] == "mock"
+    assert client.post("/_mock/config", json={"duplicate_link_host": "sandbox"}).status_code == 200
+    duplicate(client.post(PATH, json=body()), batch_id, "https://api.sandbox.paypal.com")
     assert (
-        client.post(
-            "/_mock/config", json={"duplicate_link_host": "sandbox"}
-        ).status_code
-        == 200
+        client.post("/_mock/config", json={"duplicate_link_host": "elsewhere"}).status_code == 422
     )
-    duplicate(
-        client.post(PATH, json=body()), batch_id, "https://api.sandbox.paypal.com"
-    )
-    assert (
-        client.post(
-            "/_mock/config", json={"duplicate_link_host": "elsewhere"}
-        ).status_code
-        == 422
-    )
-    assert (
-        client.post("/_mock/config", json={"duplicate_link_host": "mock"}).status_code
-        == 200
-    )
-    assert (
-        client.get(duplicate(client.post(PATH, json=body()), batch_id)).status_code
-        == 200
-    )
+    assert client.post("/_mock/config", json={"duplicate_link_host": "mock"}).status_code == 200
+    assert client.get(duplicate(client.post(PATH, json=body()), batch_id)).status_code == 200
     client.post("/_mock/config", json={"duplicate_link_host": "sandbox"})
     client.post("/_mock/reset", json={"seed": 17})
     assert client.get("/_mock/config").json()["duplicate_link_host"] == "mock"
@@ -140,9 +126,7 @@ def test_rule_four_new_keys_create_distinct_payouts(client):
 
 
 @pytest.mark.parametrize("use_request_id", [False, True])
-def test_keys_expire_exactly_at_30_days_without_extending_on_replay(
-    client, use_request_id
-):
+def test_keys_expire_exactly_at_30_days_without_extending_on_replay(client, use_request_id):
     headers = {"PayPal-Request-Id": "one"} if use_request_id else {}
     first = create(client, headers=headers)
     advance(client, 30 * 86400 - 1)
@@ -174,9 +158,7 @@ def test_configured_retention_and_reset(client):
 def test_rejected_request_does_not_poison_keys(client):
     payload = body(value="1500.01")
     headers = {"PayPal-Request-Id": "retry"}
-    check_error(
-        client.post(PATH, json=payload, headers=headers), 422, "INSUFFICIENT_FUNDS"
-    )
+    check_error(client.post(PATH, json=payload, headers=headers), 422, "INSUFFICIENT_FUNDS")
     create(client, body(value="1.00"), headers=headers)
     assert len(client.app.state.store.payouts.items) == 1
     assert client.app.state.store.payouts.available_minor == 149900

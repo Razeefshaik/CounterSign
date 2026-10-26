@@ -63,12 +63,8 @@ def test_signature_verified_independently_with_certificate(setup, tmp_path):
         pytest.skip("OpenSSL unavailable for independent certificate verification")
     cert = tmp_path / "cert.pem"
     cert.write_bytes(client.get("/_mock/cert.pem").content)
-    pub, signature, data = (
-        tmp_path / name for name in ["pub.pem", "signature.bin", "data.bin"]
-    )
-    public = subprocess.check_output(
-        [openssl, "x509", "-in", str(cert), "-pubkey", "-noout"]
-    )
+    pub, signature, data = (tmp_path / name for name in ["pub.pem", "signature.bin", "data.bin"])
+    public = subprocess.check_output([openssl, "x509", "-in", str(cert), "-pubkey", "-noout"])
     pub.write_bytes(public)
     signature.write_bytes(base64.b64decode(headers["paypal-transmission-sig"]))
     data.write_bytes(
@@ -124,18 +120,10 @@ def test_webhook_list_resend_and_replay(setup):
     events = client.get("/v1/notifications/webhooks-events").json()["events"]
     assert len(events) == 3
     first = events[0]["id"]
-    assert (
-        client.post(
-            "/v1/notifications/webhooks-events/" + first + "/resend"
-        ).status_code
-        == 202
-    )
+    assert client.post("/v1/notifications/webhooks-events/" + first + "/resend").status_code == 202
     advance(client, 5)
     assert len(delivered) == 4
-    assert (
-        client.post("/_mock/webhooks/forge", json={"replay_of": first}).status_code
-        == 202
-    )
+    assert client.post("/_mock/webhooks/forge", json={"replay_of": first}).status_code == 202
     advance(client, 5)
     assert verification(client, id, delivered[-1][1], delivered[-1][2]) == "SUCCESS"
 
@@ -170,8 +158,24 @@ def test_outgoing_faults(setup, action, expected):
         assert len(matching()) == 1
 
 
+def test_cancel_default_emits_only_returned(setup):
+    client, _, delivered = setup
+    batch = create(client)
+    advance(client, 35)
+    payout = item(client, batch)
+    delivered.clear()
+    response = client.post("/v1/payments/payouts-item/" + payout["payout_item_id"] + "/cancel")
+    assert response.status_code == 200
+    assert response.json()["transaction_status"] == "RETURNED"
+    advance(client, 5)
+    assert [json.loads(raw)["event_type"] for _, _, raw in delivered] == [
+        "PAYMENT.PAYOUTS-ITEM.RETURNED"
+    ]
+
+
 def test_cancel_order_reordering_and_reset(setup):
     client, _, delivered = setup
+    client.post("/_mock/config", json={"cancel_emits": ["CANCELED", "RETURNED"]})
     batch = create(client)
     advance(client, 35)
     id = item(client, batch)["payout_item_id"]
@@ -188,9 +192,10 @@ def test_cancel_order_reordering_and_reset(setup):
     )
     client.post("/v1/payments/payouts-item/" + id + "/cancel")
     advance(client, 5)
-    assert [
-        json.loads(raw)["event_type"].rsplit(".", 1)[-1] for _, _, raw in delivered
-    ] == ["RETURNED", "CANCELED"]
+    assert [json.loads(raw)["event_type"].rsplit(".", 1)[-1] for _, _, raw in delivered] == [
+        "RETURNED",
+        "CANCELED",
+    ]
     client.post("/_mock/reset", json={"seed": 17})
     assert client.app.state.store.webhooks.events == {}
     assert client.app.state.store.webhooks.registrations == {}
@@ -209,10 +214,7 @@ def test_local_callbacks_only_and_type_filter(setup):
         ).status_code
         == 422
     )
-    assert (
-        client.post("/v1/notifications/webhooks-events/missing/resend").status_code
-        == 404
-    )
+    assert client.post("/v1/notifications/webhooks-events/missing/resend").status_code == 404
     assert (
         client.post(
             "/_mock/webhook-faults",
