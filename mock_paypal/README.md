@@ -1,4 +1,4 @@
-# Mock PayPal - M01 through M09a
+# Mock PayPal - M01 through M09
 
 Local, in-memory test server implementing CONTRACTS v1.0.3. It does not
 connect to PayPal, load .env, or need sandbox credentials.
@@ -16,7 +16,7 @@ unless MOCK_CONTROL=1; tests can use create_app(control_enabled=True).
 Implemented: OAuth client_credentials, bearer checks, PayPal error envelopes
 and debug IDs, reset, clock GET/advance/set, and config GET/POST.
 Payout creation, batch/item lookup, cancellation and idempotency are implemented.
-Seed, faults, dispute and webhook endpoints belong to subsequent cards.
+Seed, faults, dispute resources and test-signed webhook endpoints are implemented.
 
 OAuth accepts any nonempty mock client ID and secret via Basic auth.
 Use dummy values only. Tokens expire after 32400 seconds of mock time;
@@ -29,9 +29,13 @@ events scheduled by callbacks. Equal-time events keep insertion order.
 Callbacks may be synchronous or async. All timer deadlines use mock time.
 Clock controls are serialized; backward moves and naive times are rejected.
 
-Config flags follow CONTRACTS section 5.7, plus duplicate_link_host. Pending D4, D8c,
-D9, D11 and D12 behaviors remain flags. The pending D1 OAuth scope may be
-overridden with create_app(oauth_scope=...). No sandbox claims are made.
+Config flags start from CONTRACTS section 5.7, plus duplicate_link_host, with
+observed defaults updated from C09's published recordings and owner instructions:
+dispute_hold=false, evidence_allowed_stages=null (status and actual action link
+decide permission), cancel_emits=["RETURNED"]. Legacy synthetic alternatives
+remain explicit options. OAuth includes the observed disputes/create scope;
+this scope does not authorize dispute creation, which returns the recorded 400.
+The scope string can be overridden with create_app(oauth_scope=...).
 
 Tests (also require pytest and httpx):
 ```powershell
@@ -39,18 +43,18 @@ python -m pytest -p no:cacheprovider tests/mock_paypal
 python -m ruff check --no-cache mock_paypal tests/mock_paypal
 ```
 
-Dependencies are the libraries already planned in C01: fastapi, uvicorn,
-httpx and pytest; pydantic is supplied by FastAPI. Shared pyproject.toml,
-import-linter contracts and the countersign package have not landed yet.
+Dependencies are the approved dev libraries: fastapi, uvicorn, httpx and pytest;
+pydantic is supplied by FastAPI. No additional dependency is required.
 
 ## M02 payout behavior
 
 The payout routes implement CONTRACTS section 5.2. Internally, balances and
 payout amounts are integer USD minor units; API amounts are decimal strings.
-Fees are zero, matching the contract examples. A reset starts with zero
-available/withheld funds and no registered receivers. Until the broader seed
-API is implemented, tests fund app.state.store.payouts.available_minor and
-populate registered_receivers directly.
+Generated payout fees remain zero, matching the contract examples. Recorded
+historical item fees are preserved when seeded. The observed $0.25 fee on a
+$1 payout does not establish a general pricing formula; generated fees are a
+simulation assumption, not sandbox-equivalent accounting. A reset starts with
+zero available/withheld funds and no registered receivers; /_mock/seed funds it.
 
 Creation debits available funds atomically. Processing uses
 payout_processing_seconds: registered receivers reach SUCCESS; other
@@ -83,7 +87,7 @@ GET batch defaults to page 1, page_size 1000; pages accept up to 15000 items.
 total_required=true includes total_items/total_pages. HATEOAS links use
 the local request base URL. No outbound API request is made.
 
-Pending D3 and D7 response defaults remain configurable through
+Response alternatives remain configurable through
 `create_app(payout_behavior=PayoutBehavior(create_includes_items=False,
 insufficient_funds_status=422))`. Confirmed D5 cancellation always returns
 RETURNED, and D6 duplicates always return 400. No dependencies were added.
@@ -98,11 +102,13 @@ survives; an identical replay returns 400 with a link to that single batch.
 Fault logs retain keys and statuses, never auth headers.
 Transition/claim controls include the claim-during-next-cancel race.
 
-D7 names follow the project fixture codes and the official reference:
-https://developer.paypal.com/api/payouts/test-go-live
-HTTP codes remain configurable via create_app(negative_values=...) pending
-recordings. Legacy ERRPYO015 is supported as the contract's item fixture.
-These are mock fixtures, not observed sandbox responses.
+D7 method/path-specific fixtures in fixtures/d7_responses.json come from the
+published redacted C09 recordings; each stores its source path. Literal negative
+IDs on reads/cancels and payout notes on create select the recorded status/body.
+For example ERRPYO015 returns a CLOSED_MARKET batch on GET batch but 404 on GET
+item, ERRPYO047 is UNCLAIMED, and ERRPYO039 returns 400. Debug IDs and API links
+are localized. Explicit negative_values overrides remain available for injected
+test faults; unmatched combinations retain legacy synthetic fixtures.
 
 
 ## M04 resource fixtures
@@ -110,6 +116,8 @@ These are mock fixtures, not observed sandbox responses.
 The seed endpoint loads balances, receiver registry, orders, captures,
 trackers, raw dispute documents and historical payout items. Seed balances
 already include existing holds and payouts; importing them never debits twice.
+Full raw captures retain optional metadata; historical reporting transactions
+can be seeded under transactions and remain subject to the mock reporting lag.
 Invalid seed data is staged before replacement. Resources and transactions
 remain in memory. No deduplication uses transaction ID alone.
 
@@ -117,12 +125,18 @@ Balance snapshots refresh on the mock clock; actual funds change immediately.
 Reporting transactions remain hidden until transactions_lag_seconds elapses.
 Evidence and accept-claim accept JSON or multipart with one input part holding
 JSON, parsed with Python's standard email parser. Malformed or duplicate input
-parts are rejected before mutation. The real sandbox format remains pending
-D10; accepting both locally makes no claim that both work there. No multipart
-dependency is required.
-Only status/stage-allowed actions receive HATEOAS links. Held refunds consume
-withheld funds by default, and seller wins/buyer-close release holds once.
-ResourceBehavior exposes pending D8/D9/D10 choices through create_app.
+parts are rejected before mutation. D10 recorded successful multipart evidence
+and JSON accept-claim; support for both formats on both endpoints remains a
+local compatibility option. No multipart dependency is required.
+Observed dispute links are preserved, with PayPal API hosts localized. Evidence
+needs WAITING_FOR_SELLER_RESPONSE and a provide_evidence link; a lifecycle stage
+never supplies an absent observed permission. Evidence/accept-claim return a
+detail link acknowledgement; adjudicate returns a bare self link. GET reads the
+updated dispute. Sandbox adjudication controls require UNDER_REVIEW.
+Open disputes freeze captures at PENDING without changing withheld_balance.
+Buyer refunds use available funds; seller wins/buyer-close do not credit an
+imaginary hold. Synthetic hold experiments can opt in via dispute_hold and
+ResourceBehavior.refund_uses_withheld. Recorded outcome spellings are retained.
 
 
 ## M05 webhook signing and delivery
@@ -139,3 +153,28 @@ events. Duplicate copies is the total number of deliveries; delay adds to
 the normal delivery delay. Reorder holds an event until its target is emitted.
 The verify API binds event ID, stored raw bytes, webhook ID and transmission
 headers. Authentic replays still verify; inbox deduplication belongs to core.
+
+Registration/PATCH, event listing, resend and simulate-event use the observed
+acknowledgement/event shapes. Simulator events have valid mock signatures but
+do not move funds; generated activity stays labelled as simulated.
+
+## M09 recording comparison
+
+tests/mock_paypal/test_recording_replay.py inventories all 1,041 published HTTP
+exchanges across D1 through D13. It replays 999 supported API requests through
+the in-process FastAPI transport, requiring every recorded response field/type,
+HTTP status and error name. Historical resources are seeded from observations;
+IDs, timestamps, callback URLs and signatures are locally generated. These are
+shape checks, not byte equality or evidence of a live PayPal call. Independent
+transition tests verify balances, refunds, capture states and permissions.
+
+The remaining 42 entries are explicitly counted: 34 transport failures without
+HTTP responses, one non-JSON edge 503, and seven buyer checkout setup writes
+outside CONTRACTS section 5. Connection-loss behavior is covered separately by
+the local TCP lost-response test; no fixture coverage is silently skipped.
+
+Balance refresh remains conservatively three mock hours (observed 1.4–2.4 hour
+lag); transaction visibility and webhook delivery delays remain configurable
+simulation defaults. This work retains approved CONTRACTS 1.0.3: M09's task-card
+reference to 1.1 is stale. Shared docs/contracts are left for their owner to update.
+No Gemini key or model call is required for this mock-only card.
