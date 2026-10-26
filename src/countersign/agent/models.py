@@ -9,6 +9,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Protocol
 
+from countersign.agent.params import ACTION_PARAMS
 from countersign.agent.safety import sanitize
 
 MODEL_ATTEMPTS = 3  # langchain-google-genai treats max_retries as total attempts
@@ -114,6 +115,7 @@ class LangChainModel:
         self._factory = factory or _langchain_factory
         self._client = None
         self._conversation = None
+        self._proposal_turn = None
         self._call_lock = asyncio.Lock()
         self.last_usage_metadata = {}
 
@@ -154,12 +156,18 @@ class LangChainModel:
         async with self._call_lock:
             client, self._client = self._client, None
             self._conversation = None
+            self._proposal_turn = None
             close = getattr(client, "aclose", None)
             if callable(close):
                 try:
                     await close()
                 except Exception:  # noqa: BLE001 - provider cleanup text may contain credentials.
                     raise ModelError("MODEL_CLOSE_FAILED") from None
+
+    def finish_step(self):
+        """Discard signed history after a validated proposal or any step failure."""
+        self._conversation = None
+        self._proposal_turn = None
 
     def _messages(self, clean):
         """Retain original assistant messages, including opaque Gemini signatures.
@@ -172,12 +180,29 @@ class LangChainModel:
             {key: clean[key] for key in ("system", "data", "tools")}, sort_keys=True
         )
         if not observations:
-            self._conversation = None
+            self.finish_step()
             return identity, [
                 ("system", clean["system"]),
                 ("human", json.dumps({"untrusted_data": clean["data"], "observations": []})),
             ]
         previous = self._conversation
+        if previous is None and self._proposal_turn is not None:
+            previous, self._proposal_turn = self._proposal_turn, None
+            seen = previous["observations"]
+            if (previous["identity"] != identity or len(observations) != seen + 1
+                    or observations[:seen] != previous["prior_observations"]
+                    or type(observations[-1]) is not dict
+                    or observations[-1].keys() != {"error", "action"}
+                    or observations[-1]["error"] != "INVALID_PROPOSAL_PARAMS"
+                    or type(observations[-1]["action"]) is not str
+                    or observations[-1]["action"] not in ACTION_PARAMS
+                    or len(previous["messages"]) > 64):
+                raise ModelError("MODEL_CONVERSATION_MISMATCH")
+            # A proposal is an assistant text turn, not a tool call. Keep its
+            # original signed message and append fixed feedback as human data;
+            # never fabricate a ToolMessage/function call to carry this error.
+            return identity, [*previous["messages"],
+                              ("human", json.dumps({"observation": observations[-1]}))]
         if previous is None or previous["identity"] != identity:
             raise ModelError("MODEL_CONVERSATION_MISMATCH")
         seen, pending = previous["observations"], previous["calls"]
@@ -250,14 +275,19 @@ class LangChainModel:
             if type(content) is not str:
                 raise ModelError("INVALID_MODEL_RESPONSE")
             self._conversation = None
+            self._proposal_turn = {
+                "identity": identity, "messages": [*messages, response],
+                "observations": len(clean["observations"]),
+                "prior_observations": copy.deepcopy(clean["observations"]),
+            }
             # Proposal decoding (including duplicate keys) happens at the
             # commander boundary rather than accepting arbitrary provider text.
             return {"proposal_json": content}
         except ModelError:
-            self._conversation = None
+            self.finish_step()
             raise
         except Exception:  # noqa: BLE001 - provider errors may contain credentials or prompt text.
-            self._conversation = None
+            self.finish_step()
             raise ModelError("MODEL_CALL_FAILED") from None
 
 

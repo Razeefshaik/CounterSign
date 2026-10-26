@@ -164,19 +164,25 @@ async def test_configured_engine_reads_order_and_dispute_then_executes_stored_ev
                                 },
                             ],
                         )
-                    assert self.turns == 3
-                    assert isinstance(turns[-1], messages.ToolMessage)
-                    assert isinstance(turns[-2], messages.ToolMessage)
-                    observed_order = json.loads(turns[-2].content)["untrusted_result"]
-                    observed_dispute = json.loads(turns[-1].content)["untrusted_result"]
-                    assert observed_order["raw"]["id"] == order_id
-                    assert observed_dispute["dispute_id"] == dispute_id
+                    if self.turns == 3:
+                        assert isinstance(turns[-1], messages.ToolMessage)
+                        assert isinstance(turns[-2], messages.ToolMessage)
+                        observed_order = json.loads(turns[-2].content)["untrusted_result"]
+                        observed_dispute = json.loads(turns[-1].content)["untrusted_result"]
+                        assert observed_order["raw"]["id"] == order_id
+                        assert observed_dispute["dispute_id"] == dispute_id
+                    else:
+                        assert self.turns == 4
+                        assert turns[-1][0] == "human"
+                        assert json.loads(turns[-1][1]) == {"observation": {
+                            "error": "INVALID_PROPOSAL_PARAMS", "action": "PROVIDE_EVIDENCE"
+                        }}
                     return messages.AIMessage(
                         content=json.dumps(
                             {
                                 "incident_id": str(incidents[0]["id"]),
                                 "action": "PROVIDE_EVIDENCE",
-                                "params": {"paypal_dispute_id": dispute_id},
+                                "params": {} if self.turns == 3 else {"paypal_dispute_id": dispute_id},
                                 "evidence_refs": [
                                     "capture:" + capture,
                                     "tracking:9400100000000000000000",
@@ -205,7 +211,7 @@ async def test_configured_engine_reads_order_and_dispute_then_executes_stored_ev
                 result = await engine.tick()
                 assert result["errors"] == (0 if recover else 1)
                 assert result["operations"] == (1 if recover else 0)
-            assert fake_chat.turns == (3 if recover else 4)
+            assert fake_chat.turns == 4
             async with database.tx() as conn:
                 repos = Repositories(conn)
                 if not recover:
