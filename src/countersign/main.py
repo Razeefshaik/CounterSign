@@ -101,7 +101,10 @@ def create_app(
             app.include_router(owner.build_router(db, runtime), prefix="/api/v1")
             app.include_router(runs.build_router(db, runtime), prefix="/api/v1")
             app.include_router(
-                dashboard.build_router(_DashboardFixtures(runtime)), prefix="/api/v1"
+                dashboard.build_router(
+                    await stack.enter_async_context(dashboard.configured_source(runtime, app.state))
+                ),
+                prefix="/api/v1",
             )
             app.openapi_schema = None
             stop = asyncio.Event()
@@ -153,7 +156,9 @@ def create_app(
         response = await call_next(request)
         # All GET /api/v1 resources mounted by this card are the dashboard router.
         if request.method == "GET" and request.url.path.startswith("/api/v1/"):
-            response.headers["X-CounterSign-Dashboard-Source"] = "fixtures"
+            response.headers["X-CounterSign-Dashboard-Source"] = getattr(
+                request.app.state, "dashboard_source", "fixtures"
+            )
         return response
 
     return result

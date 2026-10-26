@@ -21,36 +21,31 @@
                 "type": "string"
               },
               "proposal_id": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "operation_id": {
                 "type": [
-                  "null",
                   "string",
-                  "object"
+                  "null"
                 ]
               },
               "rule": {
                 "type": [
-                  "null",
                   "string",
-                  "object"
+                  "null"
                 ]
               },
               "verdict": {
-                "type": "string"
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
               "details": {
-                "type": "object",
-                "properties": {
-                  "rules_evaluated": {
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "rules_evaluated"
-                ],
-                "additionalProperties": false
+                "type": "object"
               }
             },
             "required": [

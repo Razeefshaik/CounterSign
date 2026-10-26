@@ -19,6 +19,7 @@ RESOURCES = [
 
 
 @pytest.mark.parametrize("resource", RESOURCES)
+@pytest.mark.parametrize("client", ["fixtures", "database"], indirect=True)
 def test_list_contract_schemas(client, resource):
     response = client.get("/api/v1/" + resource)
     assert response.status_code == 200
@@ -28,6 +29,7 @@ def test_list_contract_schemas(client, resource):
 @pytest.mark.parametrize(
     "resource", ["incidents", "proposals", "payout-runs", "disputes"]
 )
+@pytest.mark.parametrize("client", ["fixtures", "database"], indirect=True)
 def test_detail_contract_schemas(client, resource):
     id = client.get("/api/v1/" + resource).json()["items"][0]["id"]
     response = client.get("/api/v1/" + resource + "/" + id)
@@ -38,11 +40,13 @@ def test_detail_contract_schemas(client, resource):
 
 
 @pytest.mark.parametrize("resource", ["meta", "cash"])
+@pytest.mark.parametrize("client", ["fixtures", "database"], indirect=True)
 def test_singleton_contract_schemas(client, resource):
     response = client.get("/api/v1/" + resource)
     validate(response.json(), json.loads((SCHEMAS / (resource + ".json")).read_text()))
 
 
+@pytest.mark.parametrize("client", ["fixtures", "database"], indirect=True)
 def test_money_graph(client):
     id = client.get("/api/v1/disputes").json()["items"][0]["id"]
     response = client.get("/api/v1/money-graph", params={"dispute_id": id})
