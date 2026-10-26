@@ -138,14 +138,24 @@ async def test_mock_dispute_reads_evidence_controls_and_owner_claim():
                 target=target,
             )
             sent = await writer.provide_evidence(evidence)
-            assert isinstance(sent, Ok) and sent.resp.body["status"] == "UNDER_REVIEW"
+            # D9/D10 recordings: dispute writes acknowledge with a detail link, not the dispute.
+            assert isinstance(sent, Ok)
+            assert [(link["rel"], link["method"]) for link in sent.resp.body["links"]] == [
+                ("detail", "GET")
+            ]
+            assert sent.resp.body["links"][0]["href"].endswith("/v1/customer/disputes/" + id)
+            assert (await reader.get_dispute(id)).body["status"] == "UNDER_REVIEW"
             staged = SandboxControls(http)
             assert (
                 await staged.require_evidence(id, {"action": "SELLER_EVIDENCE"})
             ).status_code == 200
             assert isinstance(await writer.provide_evidence(evidence), Ok)
             won = await staged.adjudicate(id, {"adjudication_outcome": "SELLER_FAVOR"})
-            assert won.body["dispute_outcome"]["outcome_code"] == "RESOLVED_SELLER_FAVOUR"
+            assert won.status_code == 200
+            assert (won.body["rel"], won.body["method"]) == ("self", "GET")
+            assert "dispute_outcome" not in won.body
+            settled = (await reader.get_dispute(id)).body
+            assert settled["dispute_outcome"]["outcome_code"] == "RESOLVED_SELLER_FAVOUR"
             other = (
                 await controls.post(
                     "/_mock/disputes",
@@ -163,7 +173,12 @@ async def test_mock_dispute_reads_evidence_controls_and_owner_claim():
             )
             accepted = await writer.accept_claim(accept)
             assert isinstance(accepted, Ok)
-            assert accepted.resp.body["dispute_outcome"]["amount_refunded"]["value"] == "60.00"
+            assert [(link["rel"], link["method"]) for link in accepted.resp.body["links"]] == [
+                ("detail", "GET")
+            ]
+            refunded = (await reader.get_dispute(other["dispute_id"])).body["dispute_outcome"]
+            assert refunded["outcome_code"] == "RESOLVED_BUYER_FAVOUR"
+            assert refunded["amount_refunded"]["value"] == "60.00"
 
 
 @pytest.mark.asyncio
@@ -244,8 +259,3 @@ async def test_mock_concurrent_duplicate_keeps_uncertainty_and_one_item():
         )
     assert sorted(type(item).__name__ for item in results) == ["Ambiguous", "Ok"]
     assert len(app.state.store.payouts.items) == 1
-
-
-@pytest.mark.skip(reason="C09 has not published today's redacted sandbox recordings and INDEX")
-def test_published_sandbox_recordings_contract():
-    """C09 owner fills the request/response contract cases after publishing fixtures."""
