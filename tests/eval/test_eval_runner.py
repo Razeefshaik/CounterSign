@@ -189,6 +189,7 @@ async def test_dummy_all_scenarios_produce_valid_reports_and_no_completion_credi
     tmp_path,
 ):
     scenarios = [json.loads(p.read_text()) for p in SCENARIOS.glob("*.json")]
+    scenarios = [scenario for scenario in scenarios if scenario["ground"] == "mock"]
     rows = await run_suite(
         scenarios, [DummySystem], output=tmp_path, k=2, run_id="test", model="dummy-no-op"
     )

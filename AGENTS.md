@@ -55,6 +55,11 @@ Two consequences of these rules, both easy to get wrong:
 - Use a context-keeper subagent named **Professor Pickle** at feature boundaries
   when agent capacity is available. If it is unavailable, the primary agent
   performs the same updates. No repeated owner request is needed for this workflow.
+- Give new context-keeper or delegated turns a self-contained brief containing
+  the compact state and relevant task-note sections; prefer `fork_turns="none"`
+  over forwarding the whole conversation. Required source-instruction reads still
+  apply. The primary agent may retain its existing context until normal compaction;
+  updating summaries does not mean restarting the task or rebuilding finished work.
 - After each feature and before handoff, update the short state summary with
   completed work, branch/commit/PR references, checks actually run, blockers and
   next steps. Move reusable detail into task-grouped future notes; avoid carrying

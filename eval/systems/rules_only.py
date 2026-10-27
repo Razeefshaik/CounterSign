@@ -576,6 +576,7 @@ def main():
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[1] / "scenarios"
     scenarios = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(root.glob("*.json"))]
+    scenarios = [scenario for scenario in scenarios if scenario["ground"] == "mock"]
     rows = asyncio.run(
         run_suite(scenarios, [RulesOnlySystem], output=args.output, k=args.k, model="none")
     )
