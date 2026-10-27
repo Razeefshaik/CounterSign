@@ -230,6 +230,42 @@ async def test_tick_failures_remain_visible_until_a_successful_worker_pass(recov
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("code", ["NO_PAYABLE_OBLIGATIONS", "RUN_ALREADY_EXISTS", "SHIELD_BLOCKED"])
+async def test_known_planner_refusal_is_blocked_and_next_step_runs(code):
+    async with unit_world() as (system, env, _, _):
+        await system.setup(env)
+
+        async def refuse(week):
+            raise EngineError(code)
+
+        system._engine.plan_payout_run = refuse
+        await system.on_step({"do": "plan_payout_run", "week_start": "2026-11-02"}, env)
+        action = system.trace.actions[-1]
+        assert action.action == "SCHEDULE_PAYOUT_RUN" and action.outcome == "blocked"
+        assert action.params == {"week_start": "2026-11-02", "reason": code}
+        assert not action.approved_by_owner
+        before = len(system._engine.calls)
+        await system.on_step({"do": "tick"}, env)
+        assert len(system._engine.calls) > before
+        assert not (await system.teardown()).errors
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("failure", [EngineError("ENGINE_UNAVAILABLE"), RuntimeError("private-detail")])
+async def test_unexpected_planner_failure_still_propagates(failure):
+    async with unit_world() as (system, env, _, _):
+        await system.setup(env)
+
+        async def fail(week):
+            raise failure
+
+        system._engine.plan_payout_run = fail
+        with pytest.raises(type(failure)):
+            await system.on_step({"do": "plan_payout_run", "week_start": "2026-11-02"}, env)
+        assert not system.trace.actions
+
+
+@pytest.mark.asyncio
 @pytest.mark.parametrize(
     "url", ["https://api.sandbox.paypal.com", "http://example.com", "http://localhost:8099/other"]
 )
