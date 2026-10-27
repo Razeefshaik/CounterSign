@@ -163,22 +163,18 @@ def test_missing_model_actions_remain_failed_outcomes_not_hidden(engine_database
         "F_onhold_then_failed_replace_once",
     ],
 )
-def test_m21_observed_schedule_and_unfixed_failed_replacement(engine_database, name):
+def test_m21_observed_schedule_and_c33_failed_replacement(engine_database, name):
     async def run():
         scenario = json.loads((SCENARIOS / (name + ".json")).read_text())
         system = CountersignSystem(database_url=engine_database)
         row = await run_one(scenario, system, run_id="m21", k_index=0, model="none")
         assert row["error"] is None and not any(row["invariants"].values())
         assert row["correct_final_action"] is True
+        assert row["passed"] is True
+        assert row["makers_paid_on_time"] == {"paid": 1, "due": 1}
         if name.startswith("F_key_window"):
-            assert row["passed"] is True
-            assert row["makers_paid_on_time"] == {"paid": 1, "due": 1}
             actions = [a for a in system.trace.actions if a.action == "SCHEDULE_PAYOUT_RUN"]
             assert len(actions) == 1 and actions[0].outcome == "ok"
-        else:
-            # Core only plans RETURNED replacements. Preserve the honest failure.
-            assert row["passed"] is False and row["task_completed"] is False
-            assert row["makers_paid_on_time"] == {"paid": 0, "due": 1}
 
     with asyncio.Runner(
         loop_factory=asyncio.SelectorEventLoop

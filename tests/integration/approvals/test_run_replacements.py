@@ -243,6 +243,56 @@ async def test_replacement_requires_identity_matched_returned_get(replacement_wo
         await world.service.plan_run(WEEK)
 
 
+async def mark_old_attempt(world, state, raw_status=None):
+    async with world.database.tx() as conn:
+        raw = deepcopy(world.old_attempt["paypal_raw"])
+        raw["transaction_status"] = raw_status or state
+        await Repositories(conn).payout_attempts.update(
+            world.old_attempt["id"], state=state, paypal_raw=raw
+        )
+
+
+async def test_get_confirmed_failed_line_is_resent_once_after_approval(replacement_world):
+    world = replacement_world
+    await mark_old_attempt(world, "FAILED")
+    run = await world.service.plan_run(WEEK)
+    proposal = await proposal_for(world, run)
+    [entry] = proposal["params"]["replacements"]
+    assert (entry["line_id"], entry["attempt_no"]) == (str(world.old_line["id"]), 2)
+    request = proposal["verdict_details"]["approval_request"]
+    await world.service.approve(proposal["id"], request["payload_hash"])
+    async with world.database.tx() as conn:
+        approved = await Repositories(conn).proposals.get(proposal["id"])
+        p, snap, _ = await load_context(conn, approved, now=NOW)
+        assert evaluate(p, snap).verdict is not Verdict.BLOCK
+    with pytest.raises(ApprovalError, match="NO_PAYABLE_OBLIGATIONS"):
+        await world.service.plan_run(WEEK + timedelta(days=7))
+
+
+@pytest.mark.parametrize(
+    "state,raw_status",
+    [("ONHOLD", None), ("BLOCKED", None), ("FAILED", "ONHOLD"), ("FAILED", "RETURNED")],
+)
+async def test_held_or_mismatched_not_paid_status_never_plans_resend(
+    replacement_world, state, raw_status
+):
+    world = replacement_world
+    await mark_old_attempt(world, state, raw_status)
+    with pytest.raises(ApprovalError, match="NO_PAYABLE_OBLIGATIONS"):
+        await world.service.plan_run(WEEK)
+
+
+async def test_approved_failed_resend_goes_stale_if_status_changes(replacement_world):
+    world = replacement_world
+    await mark_old_attempt(world, "FAILED")
+    run = await world.service.plan_run(WEEK)
+    proposal = await proposal_for(world, run)
+    await mark_old_attempt(world, "ONHOLD")
+    async with world.database.tx() as conn:
+        with pytest.raises(ApprovalError, match="STALE_PROPOSAL"):
+            await load_context(conn, proposal, now=NOW)
+
+
 async def test_negative_adjustment_defers_historical_resend(replacement_world):
     world = replacement_world
     await add_current(world, negative=True)
