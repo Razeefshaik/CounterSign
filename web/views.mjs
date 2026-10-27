@@ -47,6 +47,7 @@ export function auditView(entries) {
 }
 
 export function cashView(cash) {
+  if (!cash?.paypal) return empty("Cash is unavailable until the first PayPal balance check. Run the first staged step in demo mode.");
   const p = cash.paypal;
   return `<div class="view-heading"><div><h2>Cash available for commitments</h2><p>PayPal balances, recent outflows and active reservations.</p></div>${status(p.stale ? "STALE" : "FRESH")}</div>
     ${section("Balance freshness", `<p>Last refresh: ${date(p.last_refresh_time)}</p><p>As of: ${date(p.as_of_time)} · Fetched: ${date(p.fetched_at)}</p><p>Snapshot age: ${esc(p.age_seconds)} seconds. ${p.stale ? "Balance is stale; review before committing funds." : "Within the configured freshness policy."}</p>`)}

@@ -35,10 +35,10 @@ export function modeLabel(meta) {
   throw new Error("Unrecognized workspace mode");
 }
 export async function loadWorkspace(fetcher = fetch) {
-  const read = async url => {const response = await fetcher(url); if (!response.ok) throw new Error("Cannot load " + url); return response.json();};
+  const read = async url => {const response = await fetcher(url, {cache:"no-store"}); if (!response.ok) {const error = new Error("Cannot load " + url); error.status=response.status; throw error;} return response.json();};
   let fixture = false, meta;
   try { meta = await read("/api/v1/meta"); }
-  catch {fixture = true; meta = await read("fixtures/meta.json");}
+  catch (error) {if (error.status !== 404) throw error; fixture = true; meta = await read("fixtures/meta.json");}
   modeLabel(meta);
   const source = name => fixture ? "fixtures/" + name + ".json" : "/api/v1/" + name;
   const all = async name => {

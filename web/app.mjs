@@ -8,7 +8,7 @@ let demoState = null;
 function showClock() {
   // The staged week runs on the mock's clock; show it while the demo bar is present.
   const staged = workspace?.meta.mode === "demo";
-  $("clock-label").textContent = staged ? "STAGED CLOCK · UTC" : "WORKSPACE CLOCK · UTC";
+  $("clock-label").textContent = staged ? "Staged clock · UTC" : "Workspace clock · UTC";
   const value = workspace?.meta.clock;
   if (value) $("clock").textContent = utc(value);
 }
@@ -40,29 +40,31 @@ function update() {
   if (!workspace) return;
   const rows = filterIncidents(workspace.incidents, {state: $("state").value, kind: $("kind").value, query: $("search").value});
   api.setGridOption("rowData", rows);
+  $("grid").style.height = Math.min(420, Math.max(160, 60 + rows.length * 69)) + "px";
   $("result-count").textContent = rows.length;
   $("table-note").textContent = rows.length + " of " + workspace.incidents.length + " incidents";
   if (rows.length) inspect(rows[0]);
-  else {$("detail-title").textContent = "No incidents match these filters"; $("detail-text").textContent = "Clear a filter or try another search."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
+  else {$("detail-title").textContent = workspace.incidents.length ? "No incidents match these filters" : "Your incident desk is clear"; $("detail-text").textContent = workspace.incidents.length ? "Clear a filter or try another search." : workspace.meta.mode === "demo" ? "Run the first staged step above to begin the mock week." : "New incidents appear after confirmed PayPal observations."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
 }
 function setupGrid() {
   api = agGrid.createGrid($("grid"), {
+    overlayNoRowsTemplate: '<span class="grid-empty">No incidents to show. Run a staged step or clear your filters.</span>',
     rowData: [], rowHeight: 69, headerHeight: 40, animateRows: false,
     rowSelection: {mode: "singleRow", checkboxes: false, enableClickSelection: true}, suppressCellFocus: false,
     defaultColDef: {sortable: true, resizable: true},
     getRowId: p => p.data.id,
     columnDefs: [
-      {headerName: "INCIDENT", field: "title", minWidth: 300, flex: 2, cellRenderer: p => {
+      {headerName: "Incident", field: "title", minWidth: 300, flex: 2, cellRenderer: p => {
         const div = document.createElement("div"); div.className = "incident-cell";
         const title = document.createElement("span"); title.className = "incident-title"; title.textContent = p.value;
         const ref = document.createElement("span"); ref.className = "incident-ref"; ref.textContent = label(p.data.kind);
         if (isStaged(p.data, workspace?.disputes || [])) {const staged = document.createElement("span"); staged.className = "staged"; staged.textContent = "staged"; ref.append(staged);}
         div.append(title, ref); return div;
       }},
-      {headerName: "STATE", field: "state", width: 158, cellRenderer: p => badge(label(p.value), p.value === "WAITING_EXTERNAL" ? "wait" : "")},
-      {headerName: "AT RISK", field: "amount_at_risk.minor", width: 113, type: "numericColumn", valueFormatter: p => atRisk(p.data.amount_at_risk)},
-      {headerName: "LATEST CHECK", field: "latest_proposal.verdict", width: 135, cellRenderer: p => p.value ? badge(p.value, p.value === "ALLOW" ? "allow" : p.value === "BLOCK" ? "block" : "") : "—"},
-      {headerName: "RESPONSE DUE", field: "deadline", width: 140, valueFormatter: p => p.value ? new Date(p.value).toLocaleDateString("en-GB", {day:"2-digit",month:"short",timeZone:"UTC"}) : "—"},
+      {headerName: "State", field: "state", width: 158, cellRenderer: p => badge(label(p.value), p.value === "WAITING_EXTERNAL" ? "wait" : "")},
+      {headerName: "At risk", field: "amount_at_risk.minor", width: 113, type: "numericColumn", valueFormatter: p => atRisk(p.data.amount_at_risk)},
+      {headerName: "Latest check", field: "latest_proposal.verdict", width: 135, cellRenderer: p => p.value ? badge(p.value, p.value === "ALLOW" ? "allow" : p.value === "BLOCK" ? "block" : "") : "—"},
+      {headerName: "Response due", field: "deadline", width: 140, valueFormatter: p => p.value ? new Date(p.value).toLocaleDateString("en-GB", {day:"2-digit",month:"short",timeZone:"UTC"}) : "—"},
     ],
     onRowClicked: event => inspect(event.data),
     onCellKeyDown: event => {if (event.event.key === "Enter") inspect(event.data);},

@@ -25,7 +25,7 @@ test("mode never silently claims a live mock", () => {
 });
 test("static preview uses visibly simulated contract fixtures", async () => {
   const fetcher = async url => {
-    if(url.startsWith("/api")) return {ok:false};
+    if(url.startsWith("/api")) return {ok:false,status:404};
     return {ok:true,json:async () => JSON.parse(await readFile(new URL("../"+url, import.meta.url)))};
   };
   const data = await loadWorkspace(fetcher);
@@ -54,4 +54,11 @@ test("the simulation banner text comes only from the server and never appears in
   assert.equal(bannerText(live), "");
   assert.equal(bannerText(live, replaying), "");
   assert.equal(bannerText({...demo, simulation_label:null}), "");
+});
+
+test("an unavailable API never switches to fixture data", async () => {
+  const urls=[];
+  await assert.rejects(loadWorkspace(async url=>{urls.push(url);return {ok:false,status:503};}));
+  assert.deepEqual(urls,["/api/v1/meta"]);
+  await assert.rejects(loadWorkspace(async ()=>{throw Error("offline");}));
 });

@@ -131,6 +131,14 @@ test("cash separates earmarks and withheld from the funding formula and shows fr
   assert.match(cashView({...cash, paypal:{...cash.paypal, stale:true}}), /STALE/);
 });
 
+test("empty financial views explain what is missing and never fabricate money", () => {
+  assert.match(cashView(null), /Cash is unavailable/);
+  assert.match(runView(null), /No payout runs yet/);
+  assert.match(decisionView(null,meta), /Choose an incident or proposal/);
+  assert.ok(!cashView(null).includes("$0.00"));
+  assert.throws(()=>parseRuns(JSON.stringify({...replayRows[0],invariants:{}})));
+});
+
 test("audit and money graph retain relationships and have explicit empty states", async () => {
   assert.match(auditView((await fixture("audit-log")).items), /Shield Verdict/);
   const graph = await fixture("money-graph");
@@ -303,7 +311,7 @@ function barDouble() {
 test("demo bar is never empty on first load and labels every staged step", () => {
   const html = demoBarView(demoState(0));
   assert.match(html, /Step <strong>0<\/strong> of 3/);
-  assert.match(html, /NEXT<\/span> Monday: stage orders <span class="staged">staged<\/span>/);
+  assert.match(html, /Next<\/span> Monday: stage orders <span class="staged">staged<\/span>/);
   assert.match(html, /Nothing yet/);
   assert.equal((html.match(/class="staged">staged/g) || []).length, 1 + 1 + 2);
   assert.match(html, /Scripted model · mock PayPal/);

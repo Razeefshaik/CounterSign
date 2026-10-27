@@ -30,6 +30,42 @@ No model, `.env`, sandbox credentials or real PayPal calls are used. The
 generator wraps teardown to capture the public mock control API and SystemTrace
 without changing `eval/` or `mock_paypal/`.
 
+## M20 validation and media
+
+The app uses its existing layout with the Achromatic ledger direction (seed
+1286248125), Segoe UI, neutral light/dark surfaces and green on status and money
+relationships. Labelled navigation is retained for the seven destinations.
+The small SVG mark combines ledger lines with the second signature. No fonts,
+application dependencies, model calls or sandbox calls were added.
+
+Reasons for the changes, kept here because this task permits only `docs/media/`
+under the shared documentation directory:
+
+- Demo metadata reads the current mock clock and fails closed with 503 if it is unavailable, so a wall clock cannot keep an expired staged proposal approvable.
+- Decision refresh reloads metadata before deciding eligibility, so staged expiry is not pinned to the first page load.
+- Replay evidence is separate from unchanged M11 metrics, so summaries never masquerade as action traces or ground-truth payouts.
+- API failures do not switch a hosted workspace to fixture data, so an unavailable source cannot look like a working marketplace.
+- Neutral surfaces and explicit dark tokens keep amounts, staged labels and status text readable in both themes.
+- Empty grids shrink and explain the next step, so a cold start and a restarted week remain usable.
+
+Validation on Oct 27, 2026: 138 dashboard tests passed against PostgreSQL 16
+with both test environment variables set; 39 Node tests passed; `ruff check .`
+passed and all 3 import-linter contracts were kept. An exploratory full-repo
+pytest run was stopped; these results cover the dashboard task scope.
+Chrome completed the 11 staged UI steps, observed $354.00 unreserved, and
+confirmed that restart clears the marketplace. There were no browser exceptions
+in that run. Light/dark checks cover 1440, 768 and 390px on clean views and
+1440/390px on populated views, with no document-level horizontal overflow.
+The design inspector improved from 4 failures to 0; its remaining 41px blank-band
+warning is the empty incident grid's centered message and preserved column headers.
+
+The PNG-only set in `docs/media/` contains `desk`, `decision`, `runs`, `cash`,
+`graph` and `replay`, each at desktop and phone width in both themes (24 files),
+plus `clean-start.png` and `restart-week-dark.png`. All capture the local mock;
+the persistent simulation banner is visible. Published screenshot state is
+Friday's pending run, before the staged owner approval. No screenshot uses
+sandbox credentials or real emails.
+
 Run from the repository root with the approved FastAPI/Uvicorn dependencies:
 
     python web/serve.py

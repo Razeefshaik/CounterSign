@@ -29,18 +29,18 @@ export function demoBarView(state) {
   const done = steps.filter(s => s.done);
   const last = done.at(-1), next = steps.find(s => !s.done);
   const busy = Boolean(state.running);
-  return `<div class="demo-head"><span class="small-label">STAGED DEMO WEEK${staged(true)}</span>
+  return `<div class="demo-head"><span class="small-label">Staged demo week${staged(true)}</span>
       <span>Step <strong>${esc(state.step)}</strong> of ${esc(state.total)}</span>
       <span>Staged clock: <strong>${esc(state.clock ? when(state.clock) : "not started")}</strong></span>
       <span>${state.model === "scripted" ? "Scripted model · mock PayPal" : "Mock PayPal"}</span></div>
     <div class="demo-steps">
-      <p><span class="small-label">LAST</span> ${last ? esc(last.label) + staged(last.staged) : "Nothing yet"}</p>
-      <p><span class="small-label">NEXT</span> ${next ? esc(next.label) + staged(next.staged) : "Week complete"}</p>
+      <p><span class="small-label">Last</span> ${last ? esc(last.label) + staged(last.staged) : "Nothing yet"}</p>
+      <p><span class="small-label">Next</span> ${next ? esc(next.label) + staged(next.staged) : "Week complete"}</p>
     </div>
     <div class="demo-actions"><button type="button" id="demo-step" class="primary" ${busy || state.complete ? "disabled" : ""}>${busy ? "Running…" : "Run next staged step"}</button>
       <button type="button" id="demo-reset" class="secondary" ${busy ? "disabled" : ""}>Restart week</button></div>
     <p id="demo-status" class="demo-status" role="status" aria-live="polite">${esc(resultText(state))}</p>
-    <details class="demo-list"><summary>All ${esc(steps.length)} steps · ${esc(state.staged_note || "")}</summary><ol>${steps.map(s => `<li class="${s.done ? "done" : ""}">${s.done ? "✓ " : ""}${esc(s.label)}${staged(s.staged)}${s.interrupted ? ' <span class="badge block">stopped</span>' : ""}</li>`).join("")}</ol></details>`;
+    <details class="demo-list"><summary>All ${esc(steps.length)} steps · ${esc(state.staged_note || "")}</summary><ol>${steps.map(s => `<li class="${s.done ? "done" : ""}">${s.done ? "Done: " : ""}${esc(s.label)}${staged(s.staged)}${s.interrupted ? ' <span class="badge block">stopped</span>' : ""}</li>`).join("")}</ol></details>`;
 }
 
 export function createDemoBar(document, {fetcher = fetch, onChange = async () => {}, onState = () => {}, confirm = globalThis.confirm, wait = ms => new Promise(resolve => setTimeout(resolve, ms))} = {}) {

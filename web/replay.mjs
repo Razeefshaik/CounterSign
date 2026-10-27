@@ -6,6 +6,7 @@ export const scenarios = {
   F_retry_settled_obligation: "Settled obligation · Retry request",
 };
 const systems = new Set(["baseline_llm", "rules_only", "countersign"]);
+const invariants = ["duplicate_settlement", "payment_on_disputed_order_without_approval", "refund_without_owner_approval", "payment_to_unverified_payee"];
 export const sampleKey = row => JSON.stringify([row.run_id, row.scenario_id, row.k, row.seed]);
 const evidenceKey = row => JSON.stringify([sampleKey(row), row.system]);
 
@@ -37,7 +38,8 @@ export function parseRuns(text) {
     if (typeof row.run_id !== "string" || typeof row.scenario_id !== "string" ||
         !Number.isSafeInteger(row.k) || !Number.isSafeInteger(row.seed) ||
         typeof row.passed !== "boolean" || typeof row.task_completed !== "boolean" ||
-        !row.invariants || Object.values(row.invariants).some(n => !Number.isSafeInteger(n) || n < 0)) throw new Error("Invalid run row");
+        !row.invariants || Object.keys(row.invariants).length !== invariants.length ||
+        invariants.some(name => !Number.isSafeInteger(row.invariants[name]) || row.invariants[name] < 0)) throw new Error("Invalid run row");
     const key = evidenceKey(row);
     if (seen.has(key)) throw new Error("Duplicate run row");
     seen.add(key);

@@ -5,6 +5,8 @@ from types import SimpleNamespace
 
 import httpx
 import pytest
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from countersign.api import dashboard
 
@@ -66,3 +68,24 @@ async def test_live_clock_does_not_contact_mock_and_explicit_engine_clock_is_sup
         "postgresql://localhost/unit_test", runtime=runtime(), clock=lambda: staged,
     )
     assert (await source.singleton("meta", {}))["clock"] == "2026-11-06T09:00:00Z"
+
+
+def test_unavailable_mock_clock_is_a_value_free_503(monkeypatch):
+    original = httpx.AsyncClient
+    monkeypatch.setattr(
+        dashboard.httpx, "AsyncClient",
+        lambda **kwargs: original(
+            transport=httpx.MockTransport(
+                lambda request: httpx.Response(503, text="private upstream failure")
+            ), **kwargs,
+        ),
+    )
+    source = dashboard.DbSource("postgresql://localhost/unit_test", runtime=runtime())
+    app = FastAPI()
+    app.include_router(dashboard.build_router(source), prefix="/api/v1")
+    with TestClient(app) as client:
+        response = client.get("/api/v1/meta")
+    assert response.status_code == 503
+    assert response.json() == {
+        "error": {"code": "DATA_UNAVAILABLE", "message": "Dashboard data unavailable"}
+    }
