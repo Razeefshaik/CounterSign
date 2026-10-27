@@ -367,3 +367,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Configured demo goals recheck EXECUTED cancel/evidence proposals on other incidents after each tick and on resume, with matching action/target params and a fresh matching RETURNED GET for cancel | C25d owner rehearsal | Accept | A real model can safely finish the goal on the original incident during the staged step; the artificial duplicate must not turn that success into a different-decision stop |
 | A matching shield-blocked staged duplicate is recorded once as CONFIGURED_MODEL_DUPLICATE_BLOCKED only when an executed match exists elsewhere; ordinary unmatched blocks still stop honestly and scripted behavior is unchanged | C25d | Accept | Reusing completed work must preserve the real shield refusal, never convert a BLOCK into permission or issue a second financial write |
 | Satisfied staged goals enter WAITING_EXTERNAL through IncidentService's existing investigation/wait transitions, including saved-stop recovery; no FSM or reconciler agreement is bypassed | C25d existing lifecycle constraint | Accept | RESOLVED is only available through reconciler agreement, which generic staged subjects cannot satisfy; parking removes these artificial goals from model selection while explicitly reporting that they are not terminal |
+
+## Oct 27 C30 dispute incident identity
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Inbox matches DISPUTE incidents by subject.dispute_id containment, and discovery prefers an existing live case over resolved history; both lookup/insert paths retain the transaction-scoped owner-decision lock, without a schema change | C30 M17 real-data check | Accept | Exact JSON equality treated discovery's extra PayPal/order/maker fields as a new dispute; serialized identity matching prevents duplicates in either arrival order while preserving proposals, approvals and reconciler-owned reopening |

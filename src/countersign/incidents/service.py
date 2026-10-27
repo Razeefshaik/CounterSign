@@ -45,7 +45,7 @@ class IncidentService:
         previous = await rows(
             conn,
             "SELECT * FROM incidents WHERE kind=%s "
-            "AND subject @> %s ORDER BY opened_at DESC,id DESC LIMIT 1",
+            "AND subject @> %s ORDER BY (state='RESOLVED'),opened_at DESC,id DESC LIMIT 1",
             (kind, Jsonb(match)),
         )
         if previous:
