@@ -1,4 +1,17 @@
-# CounterSign dashboard (M06, M10)
+# CounterSign dashboard
+
+## Oct 27 redesign (C32)
+
+The dashboard was rebuilt for a first-time reader who has about a minute:
+
+- **Every page leads with one plain-English sentence** built only from API records (for example "Pay Maker B $486.00 and Maker C $300.00, and resend Maker C's returned $300.00 payout. Total $1,086.00."). Contract codes, hashes and IDs stay on the page, in titles and in "Technical details".
+- **Incident desk:** a quiet four-figure ledger (open incidents, decisions waiting, held back from disputes, unreserved cash), one callout when something waits for the owner (payout runs included), and a keyboard-reachable incident table. AG Grid is no longer loaded; its vendor files remain in `vendor/` and are unused.
+- **Demo bar:** the staged week as a day-grouped stepper.
+- **Decision:** the summary sentence, the shield's checks with plain names (`words.mjs`), the owner's signature and approval, and "How this was decided" (read, proposed, shield, owner, sent).
+- **Try to trick the agent** (`trick.mjs`, demo mode on the mock only): runs the proposal a fooled agent would make through the real shield via `POST /api/v1/playground/attempts`. The server rolls every attempt back.
+- **Design rules:** one accent colour; tinted neutrals; a ring shadow instead of borders; IBM Plex Sans and Mono; tabular numbers; motion under 300 ms on named properties only; hover effects only for precise pointers; reduced motion respected; light and dark themes.
+
+## Earlier notes (M06, M10, M19, M20)
 
 M19 adds **Mock replay** (`#replay`): F01 and the settled-obligation scenario,
 paired by run ID, scenario, repetition and seed. The bundled four runs were

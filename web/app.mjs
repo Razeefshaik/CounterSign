@@ -1,16 +1,19 @@
-import {filterIncidents, summary, atRisk, label, isStaged, modeLabel, loadWorkspace, bannerText} from "./data.mjs";
+import {filterIncidents, summary, money, isStaged, modeLabel, loadWorkspace, bannerText} from "./data.mjs";
+import {createClient} from "./api.mjs";
+import {incidentTable, incidentTitle, ownerCallout, esc} from "./views.mjs";
+import {action as actionWord, state as stateWord, tone, when} from "./words.mjs";
 import {createWorkspaceViews} from "./workspace.mjs";
 import {createDemoBar} from "./demo.mjs";
+
 const $ = id => document.getElementById(id);
 const views = createWorkspaceViews(document, window.location);
-const utc = value => new Date(value).toLocaleString("en-GB", {day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",timeZone:"UTC"});
-let demoState = null;
+let workspace = null, demoState = null, selected = "", firstPaint = true;
+
 function showClock() {
   // The staged week runs on the mock's clock; show it while the demo bar is present.
-  const staged = workspace?.meta.mode === "demo";
-  $("clock-label").textContent = staged ? "Staged clock · UTC" : "Workspace clock · UTC";
+  $("clock-label").textContent = workspace?.meta.mode === "demo" ? "Staged clock" : "Workspace clock";
   const value = workspace?.meta.clock;
-  if (value) $("clock").textContent = utc(value);
+  if (value) $("clock").textContent = when(value);
 }
 function showBanner() {
   // The persistent label comes only from the server's simulation_label.
@@ -22,78 +25,103 @@ const demo = createDemoBar(document, {
   onState: state => {demoState = state; showClock(); showBanner();},
   onChange: () => refresh(),
 });
-window.addEventListener("hashchange", () => views.render());
-let workspace, api;
-function badge(text, kind = "") {
-  const span = document.createElement("span"); span.className = "badge " + kind; span.textContent = text; return span;
-}
+// Every route starts at the top; #incidents also names a section, which would scroll.
+window.addEventListener("hashchange", () => {window.scrollTo({top: 0}); views.render();});
+if (location.hash === "#incidents") requestAnimationFrame(() => window.scrollTo({top: 0}));
+
 function inspect(row) {
-  $("open-decision").hidden = !row.latest_proposal;
-  $("open-decision").href = row.latest_proposal ? "#decision/" + row.latest_proposal.id : "#decision";
-  $("detail-title").textContent = row.title;
-  $("detail-text").textContent = row.latest_proposal ? label(row.latest_proposal.action) + " · " + label(row.latest_proposal.state) + ". Payments and refunds require owner approval." : "Investigation is in progress.";
-  const verdict = $("detail-verdict"); verdict.hidden = !row.latest_proposal;
-  verdict.textContent = row.latest_proposal?.verdict || "";
-  verdict.className = "badge " + (row.latest_proposal?.verdict === "BLOCK" ? "block" : row.latest_proposal?.verdict === "ALLOW" ? "allow" : "");
+  selected = row.id;
+  for (const tr of $("incident-list").querySelectorAll("tr[data-id]")) tr.classList.toggle("selected", tr.dataset.id === row.id);
+  const latest = row.latest_proposal;
+  $("detail-title").textContent = incidentTitle(row).text;
+  $("detail-text").textContent = latest
+    ? `Latest proposal: ${actionWord(latest.action)}, ${stateWord(latest.state).toLowerCase()}. Payments and refunds always wait for your approval.`
+    : "The agent is still investigating. No proposal yet.";
+  const verdict = $("detail-verdict");
+  verdict.hidden = !latest?.verdict;
+  verdict.className = "pill " + tone(latest?.verdict);
+  verdict.textContent = latest?.verdict ? stateWord(latest.verdict) : "";
+  verdict.title = latest?.verdict || "";
+  $("open-decision").hidden = !latest;
+  $("open-decision").href = latest ? "#decision/" + latest.id : "#decision";
 }
+
 function update() {
   if (!workspace) return;
   const rows = filterIncidents(workspace.incidents, {state: $("state").value, kind: $("kind").value, query: $("search").value});
-  api.setGridOption("rowData", rows);
-  $("grid").style.height = Math.min(420, Math.max(160, 60 + rows.length * 69)) + "px";
+  $("incident-list").innerHTML = incidentTable(rows, {staged: row => isStaged(row, workspace.disputes || []), selected});
+  for (const button of $("incident-list").querySelectorAll(".row-title")) {
+    button.onclick = () => inspect(workspace.incidents.find(row => row.id === button.dataset.id));
+  }
   $("result-count").textContent = rows.length;
-  $("table-note").textContent = rows.length + " of " + workspace.incidents.length + " incidents";
-  if (rows.length) inspect(rows[0]);
-  else {$("detail-title").textContent = workspace.incidents.length ? "No incidents match these filters" : "Your incident desk is clear"; $("detail-text").textContent = workspace.incidents.length ? "Clear a filter or try another search." : workspace.meta.mode === "demo" ? "Run the first staged step above to begin the mock week." : "New incidents appear after confirmed PayPal observations."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
+  $("table-note").textContent = `${rows.length} of ${workspace.incidents.length} incidents`;
+  const current = rows.find(row => row.id === selected) || rows[0];
+  if (current) inspect(current);
+  else {
+    $("incident-list").innerHTML = `<p class="empty" style="padding:24px 20px">${esc(workspace.incidents.length ? "No incidents match these filters. Clear a filter or try another search." : workspace.meta.mode === "demo" ? "The desk is clear. Run the first staged step above to start the week." : "The desk is clear. New incidents appear after confirmed PayPal observations.")}</p>`;
+    $("detail-title").textContent = workspace.incidents.length ? "No incidents match these filters" : "Your incident desk is clear";
+    $("detail-text").textContent = workspace.incidents.length ? "Clear a filter or try another search." : "Nothing needs attention yet.";
+    $("detail-verdict").hidden = true; $("open-decision").hidden = true;
+  }
 }
-function setupGrid() {
-  api = agGrid.createGrid($("grid"), {
-    overlayNoRowsTemplate: '<span class="grid-empty">No incidents to show. Run a staged step or clear your filters.</span>',
-    rowData: [], rowHeight: 69, headerHeight: 40, animateRows: false,
-    rowSelection: {mode: "singleRow", checkboxes: false, enableClickSelection: true}, suppressCellFocus: false,
-    defaultColDef: {sortable: true, resizable: true},
-    getRowId: p => p.data.id,
-    columnDefs: [
-      {headerName: "Incident", field: "title", minWidth: 300, flex: 2, cellRenderer: p => {
-        const div = document.createElement("div"); div.className = "incident-cell";
-        const title = document.createElement("span"); title.className = "incident-title"; title.textContent = p.value;
-        const ref = document.createElement("span"); ref.className = "incident-ref"; ref.textContent = label(p.data.kind);
-        if (isStaged(p.data, workspace?.disputes || [])) {const staged = document.createElement("span"); staged.className = "staged"; staged.textContent = "staged"; ref.append(staged);}
-        div.append(title, ref); return div;
-      }},
-      {headerName: "State", field: "state", width: 158, cellRenderer: p => badge(label(p.value), p.value === "WAITING_EXTERNAL" ? "wait" : "")},
-      {headerName: "At risk", field: "amount_at_risk.minor", width: 113, type: "numericColumn", valueFormatter: p => atRisk(p.data.amount_at_risk)},
-      {headerName: "Latest check", field: "latest_proposal.verdict", width: 135, cellRenderer: p => p.value ? badge(p.value, p.value === "ALLOW" ? "allow" : p.value === "BLOCK" ? "block" : "") : "—"},
-      {headerName: "Response due", field: "deadline", width: 140, valueFormatter: p => p.value ? new Date(p.value).toLocaleDateString("en-GB", {day:"2-digit",month:"short",timeZone:"UTC"}) : "—"},
-    ],
-    onRowClicked: event => inspect(event.data),
-    onCellKeyDown: event => {if (event.event.key === "Enter") inspect(event.data);},
-  });
+
+async function overview(client) {
+  // Optional context for the summary strip; a failure here never hides the desk.
+  const [proposals, cash] = await Promise.all([
+    client.list("proposals").catch(() => null),
+    client.singleton("cash").catch(() => null),
+  ]);
+  const stats = summary(workspace.incidents, proposals);
+  $("stat-open").textContent = stats.open;
+  $("stat-owner").textContent = stats.owner;
+  $("stat-owner").classList.toggle("owner-waiting", stats.owner > 0);
+  $("nav-owner").hidden = !stats.owner; $("nav-owner").textContent = stats.owner;
+  $("stat-held").textContent = cash?.earmarks_not_subtracted?.dispute ? money(cash.earmarks_not_subtracted.dispute) : "—";
+  $("stat-cash").textContent = cash?.unreserved ? money(cash.unreserved) : "—";
+  const waiting = proposals?.find(p => p.state === "NEEDS_OWNER");
+  let run = null;
+  if (waiting?.action === "SCHEDULE_PAYOUT_RUN" && waiting.params?.run_id) run = await client.get("payout-runs", waiting.params.run_id).catch(() => null);
+  $("owner-callout").innerHTML = waiting ? ownerCallout(waiting, {run}) : "";
+  $("owner-callout").hidden = !waiting;
 }
+
 async function refresh() {
   $("refresh").disabled = true;
   $("error").hidden = true;
   try {
     workspace = await loadWorkspace();
+    const client = createClient({fixture: workspace.fixture});
     $("mode").textContent = modeLabel(workspace.meta);
-    showBanner();
-    showClock();
-    $("source").textContent = workspace.fixture ? "Contract fixtures · preview" : "Connected to dashboard API";
-    $("view-source-note").textContent = workspace.fixture ? "Contract fixture preview. Owner decisions require the core approval service." : "Records from the dashboard API. Payments and refunds still need an exact owner approval.";
+    showBanner(); showClock();
+    $("source").textContent = workspace.fixture ? "Showing contract fixtures (preview)." : "";
+    $("source").hidden = !workspace.fixture;
+    $("view-source-note").textContent = workspace.fixture ? "Contract fixture preview. Owner decisions require the core approval service." : "Live records from the dashboard API. Payments and refunds still need your exact approval.";
     $("amount-note").textContent = workspace.meta.simulated ? "Amounts in USD · " + workspace.meta.simulation_label : "Amounts in USD";
     $("contract").textContent = "Contract v" + workspace.meta.contract_version;
-    const stats = summary(workspace.incidents);
-    $("stat-open").textContent = stats.open; $("stat-owner").textContent = stats.owner;
-    $("nav-count").textContent = workspace.incidents.length;
-    if (!api) setupGrid();
+    $("nav-count").textContent = workspace.incidents.filter(row => row.state !== "RESOLVED").length;
     update();
-    await views.setWorkspace(workspace);
-  } catch (error) {$("error").textContent = "The incident source could not be loaded. Try Refresh."; $("error").hidden = false; console.error(error);}
-  finally {$("refresh").disabled = false;}
+    if (firstPaint) {for (const id of ["intro", "incident-stats", "incidents"]) $(id).classList.add("enter"); firstPaint = false;}
+    await Promise.all([overview(client), views.setWorkspace(workspace)]);
+  } catch (error) {
+    $("error").textContent = "The incident source could not be loaded. Try Refresh.";
+    $("error").hidden = false;
+    console.error(error);
+  } finally {$("refresh").disabled = false;}
 }
-for (const id of ["state", "kind"]) $(id).addEventListener("change", update);
+
+for (const button of document.querySelectorAll("#kind-group button")) button.addEventListener("click", () => {
+  for (const other of document.querySelectorAll("#kind-group button")) other.setAttribute("aria-pressed", String(other === button));
+  $("kind").value = button.dataset.kind; update();
+});
+$("state").addEventListener("change", update);
 $("search").addEventListener("input", update);
 $("refresh").addEventListener("click", refresh);
-$("clear").addEventListener("click", () => {for (const id of ["state","kind","search"]) $(id).value = ""; update();});
+$("clear").addEventListener("click", () => {
+  $("state").value = ""; $("search").value = ""; $("kind").value = "";
+  for (const button of document.querySelectorAll("#kind-group button")) button.setAttribute("aria-pressed", String(!button.dataset.kind));
+  update();
+});
+// The playground exists only in demo mode on the mock; its nav item follows the server.
+fetch("/api/v1/playground/attacks", {cache: "no-store"}).then(response => {$("nav-trick").hidden = !response.ok;}).catch(() => {});
 refresh();
 demo.load();

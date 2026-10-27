@@ -2,61 +2,97 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="CounterSign marketplace incident desk. AI proposes. Code countersigns.">
+<meta name="description" content="CounterSign: an AI agent proposes marketplace payouts and dispute actions; deterministic code countersigns before PayPal money moves.">
+<meta name="color-scheme" content="light dark">
 <title>CounterSign · Incident desk</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23192d32'/%3E%3Cpath d='M10 20l7 7 14-15' fill='none' stroke='%238ee6b0' stroke-width='4'/%3E%3C/svg%3E">
-<link rel="stylesheet" href="vendor/ag-grid.css"><link rel="stylesheet" href="vendor/ag-theme-quartz.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23173a30'/%3E%3Cpath d='M9 15h9M9 25h9M21 20l4 4 7-9' fill='none' stroke='%23e8f3ec' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
-<script defer src="vendor/ag-grid-community.min.js"></script>
 <script type="module" src="app.mjs"></script>
 </head>
 <body>
+<svg width="0" height="0" class="sprite" aria-hidden="true" focusable="false">
+<symbol id="i-desk" viewBox="0 0 24 24"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/></symbol>
+<symbol id="i-decision" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-runs" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M8 14h3M8 17h6"/></symbol>
+<symbol id="i-audit" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/></symbol>
+<symbol id="i-cash" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+<symbol id="i-graph" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.2 7.3 10.8 16M15.8 7.3 13.2 16M8.5 6h7"/></symbol>
+<symbol id="i-replay" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18M6.5 9h3M14.5 9h3M6.5 13h3M14.5 13h3"/></symbol>
+<symbol id="i-trick" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="M12 8v4M12 16h.01"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-owner" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+<symbol id="i-step" viewBox="0 0 24 24"><path d="m6 4 10 8-10 8z"/><path d="M19 5v14"/></symbol>
+<symbol id="i-restart" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect width="13" height="13" x="8" y="8" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
+<symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.6 18.8A1.5 1.5 0 0 0 5.9 21h12.2a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3M7 15h10"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></symbol>
+</svg>
 <a class="skip" href="#main">Skip to content</a>
 <div id="simulation" class="simulation" role="status" hidden></div>
-<section id="demo-bar" class="demo-bar" aria-label="Staged demo controls" hidden></section>
+<section id="demo-bar" class="demo-bar" aria-label="Staged demo week" hidden></section>
 <div class="layout">
 <aside class="sidebar">
-<a class="brand" href="./"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h9M5 20h9M17 16l4 4 7-9"/></svg>CounterSign</a>
-<p class="workspace">Marketplace workspace</p>
+<a class="brand" href="./"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8"/><path d="M7 12h8M7 20h8M17.5 16l3.5 3.5 6-8"/></svg><span>CounterSign</span></a>
+<p class="tagline">AI proposes.<br>Code countersigns.</p>
 <nav aria-label="Workspace">
-<a href="#incidents" data-view="incidents" class="nav-current" aria-current="page">Incident desk <span class="nav-count" id="nav-count">—</span></a>
-<a href="#decision" data-view="decision">Decision</a><a href="#runs" data-view="runs">Payout runs</a>
-<a href="#audit" data-view="audit">Execution history</a><a href="#cash" data-view="cash">Cash</a><a href="#graph" data-view="graph">Money graph</a>
-<a href="#replay" data-view="replay">Mock replay</a>
+<a href="#incidents" data-view="incidents" class="nav-current" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-desk"/></svg><span>Incident desk</span><span class="nav-count" id="nav-count">—</span></a>
+<a href="#decision" data-view="decision"><svg class="icon" aria-hidden="true"><use href="#i-decision"/></svg><span>Decision</span><span class="nav-count owner" id="nav-owner" hidden></span></a>
+<a href="#runs" data-view="runs"><svg class="icon" aria-hidden="true"><use href="#i-runs"/></svg><span>Payout runs</span></a>
+<a href="#cash" data-view="cash"><svg class="icon" aria-hidden="true"><use href="#i-cash"/></svg><span>Cash</span></a>
+<a href="#graph" data-view="graph"><svg class="icon" aria-hidden="true"><use href="#i-graph"/></svg><span>Money graph</span></a>
+<a href="#audit" data-view="audit"><svg class="icon" aria-hidden="true"><use href="#i-audit"/></svg><span>Execution history</span></a>
+<a href="#trick" data-view="trick" id="nav-trick" hidden><svg class="icon" aria-hidden="true"><use href="#i-trick"/></svg><span>Try to trick the agent</span></a>
+<a href="#replay" data-view="replay"><svg class="icon" aria-hidden="true"><use href="#i-replay"/></svg><span>Evaluation replay</span></a>
 </nav>
-<div class="sidebar-note"><span class="small-label">The second signature</span><p>AI proposes.<br>Code countersigns.</p><span>Every money action follows the rules.</span></div>
-<div class="sidebar-bottom"><span class="connection-dot"></span><span id="mode">Loading mode…</span></div>
+<div class="sidebar-bottom"><span class="mode-dot" aria-hidden="true"></span><span id="mode">Loading mode…</span></div>
 </aside>
 <main id="main" tabindex="-1">
-<header class="topbar"><span>Operations <span class="slash">/</span> <span id="breadcrumb">Incident desk</span></span><span class="operator"><span aria-hidden="true">A</span> Marketplace owner</span></header>
+<header class="topbar"><nav class="crumbs" aria-label="Breadcrumb"><span>Operations</span><span class="slash" aria-hidden="true">/</span><span id="breadcrumb" aria-current="page">Incident desk</span></nav><span class="clock"><span id="clock-label">Workspace clock</span> <strong id="clock">—</strong></span></header>
 <div class="content">
 
-<section class="intro" id="intro" aria-labelledby="title"><div><h1 id="title">Incident desk</h1><p>Disputes, maker payouts and the decisions that connect them.</p></div><div class="clock-card"><span class="small-label" id="clock-label">Workspace clock · UTC</span><strong id="clock">—</strong><span id="source">Loading incident source</span></div></section>
-<section class="stats" id="incident-stats" aria-label="Incident overview">
-<div><span>Open incidents<strong id="stat-open">—</strong></span><span class="stat-note">Across your marketplace</span></div>
-<div><span>Needs your decision<strong id="stat-owner">—</strong></span><span class="stat-note">Exact approvals, once</span></div>
-<div><span>Shield checks<strong>Always on</strong></span><span class="stat-note">Every proposal, every time</span></div>
+<section class="intro" id="intro" aria-labelledby="title"><h1 id="title">Incident desk</h1><p>Disputes, maker payouts and the decisions between them. The agent proposes, the shield checks every proposal before money moves, and payments and refunds wait for you.</p><p class="source-note" id="source">Loading incident source</p></section>
+
+<section class="overview" id="incident-stats" aria-label="This week">
+<dl class="ledger">
+<div><dt>Open incidents</dt><dd id="stat-open">—</dd></div>
+<div><dt>Waiting for your decision</dt><dd id="stat-owner">—</dd></div>
+<div><dt>Held back from disputes</dt><dd id="stat-held">—</dd></div>
+<div><dt>Unreserved cash</dt><dd id="stat-cash">—</dd></div>
+</dl>
+<div id="owner-callout" class="callout" hidden></div>
 </section>
+
 <section class="desk" id="incidents" aria-labelledby="desk-title">
-<div class="desk-heading"><div><h2 id="desk-title">Incident desk <span id="result-count" class="count"></span></h2><p>Choose an incident to see its current decision.</p></div><button id="refresh" class="secondary" type="button">↻ Refresh</button></div>
+<div class="desk-heading"><h2 id="desk-title">Incidents <span id="result-count" class="count"></span></h2><button id="refresh" class="ghost" type="button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Refresh</button></div>
 <div class="filters">
-<label class="search-label"><span class="sr-only">Search incidents</span><input id="search" type="search" placeholder="Search incidents, makers, references…"></label>
-<label>State<select id="state"><option value="">All states</option><option>OPEN</option><option>INVESTIGATING</option><option>AWAITING_OWNER</option><option>EXECUTING</option><option>WAITING_EXTERNAL</option><option>RESOLVED</option></select></label>
-<label>Kind<select id="kind"><option value="">All kinds</option><option value="DISPUTE">Disputes</option><option value="PAYOUT_ITEM">Payout items</option><option value="RUN_AT_RISK">Runs at risk</option><option value="RECONCILIATION">Reconciliation</option></select></label>
-<button id="clear" class="text-button" type="button">Clear filters</button>
+<label class="search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Search incidents</span><input id="search" type="search" placeholder="Search makers, disputes, payouts"></label>
+<div class="segmented" role="group" aria-label="Kind" id="kind-group">
+<button type="button" data-kind="" aria-pressed="true">All</button><button type="button" data-kind="DISPUTE" aria-pressed="false">Disputes</button><button type="button" data-kind="PAYOUT_ITEM" aria-pressed="false">Payouts</button><button type="button" data-kind="RECONCILIATION" aria-pressed="false">Reconciliation</button>
+</div>
+<label class="select">State<select id="state"><option value="">Any state</option><option value="OPEN">Open</option><option value="INVESTIGATING">Investigating</option><option value="AWAITING_OWNER">Awaiting owner</option><option value="EXECUTING">Sending</option><option value="WAITING_EXTERNAL">Waiting on PayPal</option><option value="RESOLVED">Resolved</option></select></label>
+<input type="hidden" id="kind" value="">
+<button id="clear" class="text-button" type="button">Clear</button>
 </div>
 <p id="error" class="error" role="alert" hidden></p>
-<div id="grid" class="ag-theme-quartz" aria-label="Marketplace incidents"></div>
+<div id="incident-list" class="incident-list" aria-live="polite"></div>
 <div class="table-footer"><span id="table-note">Loading…</span><span id="amount-note">Amounts in USD</span></div>
 </section>
-<section class="detail" id="incident-detail" aria-labelledby="detail-title"><div><span class="small-label">SELECTED INCIDENT</span><h2 id="detail-title">Choose a row to inspect the decision</h2><p id="detail-text">The AI recommends. The shield checks. The owner approves payments and refunds.</p><a id="open-decision" class="secondary decision-link" href="#decision" hidden>Review decision →</a></div><span id="detail-verdict" class="badge" hidden></span></section>
-<section id="workspace-view" aria-labelledby="view-title" hidden>
-<div class="view-heading"><h1 id="view-title">Decision</h1><button id="view-refresh" class="secondary" type="button">↻ Refresh</button></div>
-<label id="view-picker" class="record-picker" hidden>Choose a record<select id="record-picker"></select></label>
-<p class="muted" id="view-source-note">Contract fixture preview. Owner decisions require the core approval service.</p>
+
+<section class="detail" id="incident-detail" aria-labelledby="detail-title" aria-live="polite"><div class="detail-body"><h2 id="detail-title">Choose an incident</h2><p id="detail-text">Its latest proposal, the shield's verdict and what happens next appear here.</p></div><div class="detail-side"><span id="detail-verdict" class="pill" hidden></span><a id="open-decision" class="button secondary" href="#decision" hidden>Review decision<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></div></section>
+
+<section id="workspace-view" class="workspace-view" aria-labelledby="view-title" hidden>
+<div class="view-heading"><h1 id="view-title">Decision</h1><button id="view-refresh" class="ghost" type="button"><svg class="icon" aria-hidden="true"><use href="#i-refresh"/></svg>Refresh</button></div>
+<label id="view-picker" class="record-picker" hidden><span>Record</span><select id="record-picker"></select></label>
+<p class="source-note" id="view-source-note">Contract fixture preview. Owner decisions require the core approval service.</p>
 <p id="view-notice" class="view-notice" role="status" aria-live="polite" hidden></p>
 <div id="view-body" aria-live="polite"></div>
 </section>
-<footer class="footer"><span>CounterSign</span><span>One queue. A second signature.</span><span id="contract">Contract v1.0.3</span></footer>
+<footer class="footer"><span>CounterSign</span><span>The AI proposes. The code countersigns.</span><span id="contract">Contract</span></footer>
 </div></main></div>
 </body></html>

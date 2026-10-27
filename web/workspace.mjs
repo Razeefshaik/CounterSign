@@ -1,9 +1,11 @@
 import {createClient, submitDecision} from "./api.mjs";
 import {decisionView, runView, auditView, cashView, graphView, esc, canDecide} from "./views.mjs";
-import {label, isStaged} from "./data.mjs";
+import {isStaged} from "./data.mjs";
 import {createReplay} from "./replay.mjs";
+import {createTrick} from "./trick.mjs";
+import {action as actionWord, state as stateWord, when} from "./words.mjs";
 
-const titles = {incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", replay: "Mock replay"};
+const titles = {incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
 export function route(hash) {
   const [name, id] = hash.replace(/^#/, "").split("/");
   return {name: Object.hasOwn(titles, name) ? name : "incidents", id: id || ""};
@@ -13,6 +15,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
   const $ = id => document.getElementById(id);
   let workspace, client, serial = 0, proposal = null, busy = false;
   const replay = createReplay(document, fetcher);
+  const trick = createTrick(document, fetcher);
   const notice = (message = "") => {$("view-notice").textContent = message; $("view-notice").hidden = !message;};
   const invalidate = () => {
     proposal = null;
@@ -36,10 +39,11 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
     $("view-picker").hidden = true;
     $("view-body").innerHTML = '<p class="empty">Loading records…</p>';
     try {
-      if (current.name === "replay") {
-        await replay.load();
+      if (current.name === "replay" || current.name === "trick") {
+        const page = current.name === "replay" ? replay : trick;
+        await page.load();
         if (ticket !== serial) return;
-        replay.draw();
+        page.draw();
         return true;
       }
       let html;
@@ -51,7 +55,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
         const waiting = current.name === "decision" ? items.find(item => item.state === "NEEDS_OWNER") : null;
         const id = current.id || (waiting || items[0])?.id;
         $("view-picker").hidden = !items.length;
-        $("record-picker").innerHTML = items.map(item => `<option value="${esc(item.id)}" ${item.id === id ? "selected" : ""}>${esc(current.name === "decision" ? `${label(item.action)} · ${label(item.state)}` : `Week of ${item.week_start} · ${label(item.state)}`)}</option>`).join("");
+        $("record-picker").innerHTML = items.map(item => `<option value="${esc(item.id)}" ${item.id === id ? "selected" : ""}>${esc(current.name === "decision" ? `${actionWord(item.action)} · ${stateWord(item.state)}` : `Week of ${when(item.week_start + "T00:00:00Z").replace(/, 00:00 UTC$/, "")} · ${stateWord(item.state)}`)}</option>`).join("");
         $("record-picker").onchange = event => {location.hash = `${current.name}/${event.target.value}`;};
         const doc = id ? await client.get(resource, id) : null;
         if (ticket !== serial) return;
@@ -61,7 +65,13 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
           proposal = doc;
           const incident = workspace.incidents.find(i => i.id === doc?.incident_id);
           const staged = Boolean(incident) && isStaged(incident, workspace.disputes);
-          html = decisionView(doc, workspace.meta, staged);
+          // A payout run's sentence names makers and held-back shares from the run itself.
+          let run = null;
+          if (doc?.action === "SCHEDULE_PAYOUT_RUN" && doc.params?.run_id) {
+            try {run = await client.get("payout-runs", doc.params.run_id);} catch {run = null;}
+            if (ticket !== serial) return;
+          }
+          html = decisionView(doc, workspace.meta, staged, {run});
         } else html = runView(doc);
       } else if (current.name === "audit") html = auditView(await client.list("audit-log"));
       else if (current.name === "cash") html = cashView(await client.singleton("cash"));
@@ -76,6 +86,9 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
       if (ticket !== serial) return;
       $("view-body").innerHTML = html;
       if (current.name === "decision") bindDecision();
+      for (const button of document.querySelectorAll("[data-copy]")) button.onclick = async () => {
+        try {await navigator.clipboard.writeText(button.dataset.copy); notice("Payload hash copied.");} catch {notice("Copy is unavailable in this browser.");}
+      };
       return true;
     } catch (error) {
       if (ticket !== serial) return;
