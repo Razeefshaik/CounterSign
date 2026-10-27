@@ -72,7 +72,8 @@ integer minor units. Mock and sandbox evidence must remain separate.
   with explicit file arguments. Final log/XML: temporary
   `countersign-c31-full-final.log` and matching XML. PostgreSQL WAL settings were
   restored to max 1024/min 80 MB after verification.
-- Pending: final documentation commit and branch push. The current interpreters
+- Branch pushed to `origin/razeef/c31-run-approval-refresh`; validation notes
+  committed in `0fee3ab`. No merge or PR was performed. The current interpreters
   are the original
   CounterSign worktree's `.venv/Scripts/python.exe` and
   `.venv/toolkit/Scripts/python.exe`; earlier temporary/worktree paths were
@@ -81,7 +82,6 @@ integer minor units. Mock and sandbox evidence must remain separate.
 ## Continuation
 
 Preserve task boundaries and existing work; stage explicit files only. Commit
-messages are `C31: lowercase summary`, one line, without attribution. Push the
-task branch when verified; do not merge. Any PR targets main. Refresh this state
+messages are `C31: lowercase summary`, one line, without attribution. The task branch is pushed; do not merge. Any PR targets main. Refresh this state
 with final exact results and commit references before handoff, and consult only
 the relevant C31 section of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).
