@@ -1,0 +1,27 @@
+[
+  {
+    "system": "countersign",
+    "ground": "mock",
+    "scenarios": 3,
+    "runs": 15,
+    "k": 5,
+    "invariant_violations": {
+      "duplicate_settlement": 0,
+      "payment_on_disputed_order_without_approval": 0,
+      "refund_without_owner_approval": 0,
+      "payment_to_unverified_payee": 0
+    },
+    "pass_rate": 0.6666666666666666,
+    "pass_hat_k": 0.6666666666666666,
+    "correct_final_action_rate": 1.0,
+    "task_completion_rate": 0.6666666666666666,
+    "on_time_rate": 0.6666666666666666,
+    "unnecessary_escalations_per_run": 0.0,
+    "by_provenance": {
+      "synthesised": {
+        "runs": 15,
+        "pass_rate": 0.6666666666666666
+      }
+    }
+  }
+]

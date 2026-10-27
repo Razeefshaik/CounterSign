@@ -130,6 +130,7 @@ class CountersignSystem:
         self.trace = SystemTrace([], 0, [], 0, 0, 0)
         self._seen, self._requests, self._decided = set(), {}, set()
         self._reserves = {}
+        self._scheduled = set()
         self._tick_error = False
         model = env.llm
         if model is not None and not callable(getattr(model, "complete", None)):
@@ -199,14 +200,33 @@ class CountersignSystem:
             "FAILED": "failed",
         }
         for proposal in snapshot["proposals"]:
+            # A consumed run approval proves scheduling started even when a lost
+            # create response leaves the proposal EXECUTING. It does not prove
+            # payment: completion still comes exclusively from mock ground truth.
+            scheduling_started = (
+                proposal["action"] == "SCHEDULE_PAYOUT_RUN"
+                and proposal["state"] == "EXECUTING"
+                and any(
+                    run["id"] == proposal["params"].get("run_id")
+                    and (run.get("approval") or {}).get("used_at") is not None
+                    for run in snapshot.get("runs", [])
+                )
+            )
             identity = (proposal["id"], proposal["state"])
-            if proposal["state"] not in outcomes or identity in self._seen:
+            if (
+                proposal["state"] not in outcomes and not scheduling_started
+            ) or identity in self._seen:
                 continue
             self._seen.add(identity)
+            outcome = "ok" if scheduling_started else outcomes[proposal["state"]]
+            if proposal["action"] == "SCHEDULE_PAYOUT_RUN" and outcome == "ok":
+                if proposal["id"] in self._scheduled:
+                    continue
+                self._scheduled.add(proposal["id"])
             self._record(
                 proposal["action"],
                 proposal["params"],
-                outcomes[proposal["state"]],
+                outcome,
                 proposal["id"] in self._decided,
             )
         # The Engine reserves disputed shares itself, without a proposal. Record
@@ -237,7 +257,9 @@ class CountersignSystem:
                 # These planner refusals roll back before any operation is written.
                 # Unknown errors (including storage failures) must still fail the run.
                 if error.args not in (
-                    ("NO_PAYABLE_OBLIGATIONS",), ("RUN_ALREADY_EXISTS",), ("SHIELD_BLOCKED",)
+                    ("NO_PAYABLE_OBLIGATIONS",),
+                    ("RUN_ALREADY_EXISTS",),
+                    ("SHIELD_BLOCKED",),
                 ):
                     raise
                 self._record(

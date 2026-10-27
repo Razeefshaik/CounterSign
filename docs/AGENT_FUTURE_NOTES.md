@@ -18,7 +18,8 @@ persistent instruction is in AGENTS.md; no new user request is needed each time.
 M14/M18/C26 integrated in main `0d47f64`; PR #11 is merged, and formerly
 stacked #12/#13 are closed with `Merged into main in 0d47f64`. Every new PR
 must target **main** and start from updated main; do not reuse the old stack.
-Current fix branch is `mate/M18-eval-fix` from `2e51d41`.
+The historical fix branch `mate/M18-eval-fix` was merged and removed locally.
+Current M21 branch references are in the M21 section below.
 
 ## Local verification
 
@@ -294,3 +295,53 @@ Completed prompt07: PR #14 (https://github.com/Razeefshaik/CounterSign/pull/14) 
 base main; code c24783a, results45272b0, final validation b9d2a04.
 The earlier pending/progress notes above are historical; full validation passed.
 No merge performed. Next: owner review, then configured-model comparison.
+
+## M21 evaluation gaps and hosted readiness (prompt 09)
+
+Branch `mate/M21-eval-gaps` starts at upstream/main `f330b3f`; commits `41ff10f`
+(code), `d7d4ad9` (HTTP smoke/docs), `057a595` (results), `04f6fe0` (validation),
+`dee7c90` (context). [PR #15](https://github.com/Razeefshaik/CounterSign/pull/15)
+is open, non-draft, base main f330b3f. Branch pushed to origin and upstream;
+no merge. The owner
+permits independently ready future tasks with separate task branches and PRs to
+main. Inspection found M19 replay already exists and no new prompt 10; no
+further independently ready task was found. Current scope
+forbids web edits; core FAILED repair is reserved for Razeef/Claude, and actual
+deployment/configured-model runs remain owner work. No `.env` reads.
+
+The two key-window-expired cases need observed scheduling in the eval trace:
+a lost response keeps the proposal EXECUTING while its matching run approval
+has used_at. Record SCHEDULE_PAYOUT_RUN once per proposal on that evidence,
+and deduplicate a later EXECUTED observation. Do not infer a completed payment,
+change grading, or treat another run's consumed approval as evidence.
+ONHOLD -> FAILED remains a core completion gap: `_plan_replacements` selects
+only latest `_returned` attempts, while the FAILED allocation remains scheduled
+and the fresh planner reports NO_PAYABLE_OBLIGATIONS. Report it to core.
+
+The 15-cell three-scenario k=5 rerun is complete: each key-window case now 5/5
+passes (was 0/5), FAILED case stays 0/5. Zero errors, measured invariant counts,
+model calls and tokens. `eval/results/2026-10-27-m21-three-gaps/` includes original
+15 before rows and redacted original-adapter grader inputs. Manifest hashes
+match the same three scenarios in the prior C31 report. This is targeted mock,
+model-disabled evidence, not a full comparison or actual-model/sandbox result.
+
+`python scripts/hosted_smoke.py <disposable-demo-url>` resets the week and uses
+public HTTP only; run only against a disposable demo. It checks all 11 steps,
+Friday 108600 once, cash 35400, B's non-cash earmark 5400, and four playground
+attacks returning BLOCK/written=false. Final rebuilt `countersign-m21:verified`
+passed locally; manifest SHA256 is
+`e893efd754f342c160617e5d8f326f5eae68d1a98695d110edfae728156ee53c`.
+At one CPU/512 MB, cold first meta 200 took 4.181 s including Docker start;
+post-week Docker stats 137.8 MiB, cgroup current 196636672/peak 244563968 bytes.
+Docker displays 860 MB total image usage while image-inspect Size reports
+204439669 bytes; do not conflate the two. All three fake-credential probes exit
+64 with names only. No deployment or real PayPal calls.
+
+Focused 52, hosted guard/smoke 19, adapter unit 26 and web 47 tests pass; Ruff
+and three import contracts pass (zero broken). Selections may overlap. Final
+full pytest: **4004 passed, 5 skipped in 986.70 s**, exit 0, with explicit
+test DB/toolkit settings; temporary log `countersign-m21-full.log`. Final JSON
+privacy scan, 15-cell code identity and all three original scenario hashes pass.
+No web/src/mock changes relative to base; upstream/main remains f330b3f.
+Validation is complete; PR #15 is ready for owner review. Core FAILED replacement
+repair remains reserved for Razeef/Claude.

@@ -235,8 +235,13 @@ async def test_tick_failures_remain_visible_until_a_successful_worker_pass(recov
 
 
 def earmark(state, kind="DISPUTE_EARMARK"):
-    return {"id": "res-1", "kind": kind, "state": state, "dispute_id": "d-1",
-            "amount": {"minor": 5400, "currency": "USD"}}
+    return {
+        "id": "res-1",
+        "kind": kind,
+        "state": state,
+        "dispute_id": "d-1",
+        "amount": {"minor": 5400, "currency": "USD"},
+    }
 
 
 @pytest.mark.asyncio
@@ -297,7 +302,9 @@ async def test_known_planner_refusal_is_blocked_and_next_step_runs(code):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("failure", [EngineError("ENGINE_UNAVAILABLE"), RuntimeError("private-detail")])
+@pytest.mark.parametrize(
+    "failure", [EngineError("ENGINE_UNAVAILABLE"), RuntimeError("private-detail")]
+)
 async def test_unexpected_planner_failure_still_propagates(failure):
     async with unit_world() as (system, env, _, _):
         await system.setup(env)
@@ -485,3 +492,40 @@ def test_f01_real_engine_over_the_loopback_tcp_mock(engine_database):
         else asyncio.new_event_loop
     ) as runner:
         runner.run(run())
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("used", [False, True])
+async def test_scheduling_requires_consumed_matching_run_and_is_recorded_once(used):
+    async with unit_world() as (system, env, _, _):
+        await system.setup(env)
+        engine = system._engine
+        item = proposal("EXECUTING")
+        engine.proposals = [item]
+        original_snapshot = engine.snapshot
+
+        async def snapshot():
+            data = await original_snapshot()
+            data["runs"] = [
+                {"id": "run-1", "approval": {"used_at": env.mock.now if used else None}}
+            ]
+            return data
+
+        engine.snapshot = snapshot
+        system._decided.add(item["id"])
+        await system._observe()
+        await system._observe()
+        assert len(system.trace.actions) == int(used)
+        if used:
+            action = system.trace.actions[0]
+            assert action.action == "SCHEDULE_PAYOUT_RUN"
+            assert action.outcome == "ok" and action.approved_by_owner
+            # Later payment confirmation must not duplicate the scheduling action.
+            engine.proposals[0]["state"] = "EXECUTED"
+            await system._observe()
+            assert len(system.trace.actions) == 1
+        else:
+            # Consumption on another run must not establish this schedule.
+            item["params"]["run_id"] = "other-run"
+            await system._observe()
+            assert not system.trace.actions

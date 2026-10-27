@@ -1,6 +1,6 @@
 # C27: hosting the demo
 
-**Status:** prepared, not deployed. The deploy files are shared, so they need the human owner's approval. The owner chooses the host and deploys. Nothing in this branch creates an account, pushes or deploys.
+**Status:** M21 local image and public-HTTP smoke verified; not deployed. Cloud Run is the owner's selected host. The owner deploys using the command below; no cloud resources or credentials were used for these checks.
 
 ## What gets hosted
 
@@ -30,7 +30,7 @@ Sources (all read Oct 27, 2026): [Render free](https://render.com/docs/free), [R
 
 ## Recommendation
 
-**Render, free Docker web service, with PostgreSQL embedded in the container.** Runner-up: **Google Cloud Run** with the same image.
+**The owner selected Google Cloud Run on Oct 27.** The original Render comparison below is retained as historical research, not the current deployment recommendation.
 
 Why Render:
 
@@ -92,7 +92,7 @@ The same image runs unchanged. It has about 130 MB of memory in use once the wee
    ```
 3. **[OWNER]** Deploy from the repository root:
    ```powershell
-   gcloud run deploy countersign-demo --source . --region us-central1 --port 8080 --memory 1Gi --cpu 1 --max-instances 1 --allow-unauthenticated --set-env-vars COUNTERSIGN_HOSTED_SEED=none
+   gcloud run deploy countersign-demo --source . --region us-central1 --port 8080 --memory 1Gi --cpu 1 --min-instances 0 --max-instances 1 --no-cpu-throttling --timeout 300 --allow-unauthenticated --set-env-vars COUNTERSIGN_HOSTED_SEED=none
    ```
    - **Seed `none`:** the presenter plays the week with the M17 demo bar.
    - **Seed `week`:** use this instead to open on the finished week.
@@ -131,10 +131,87 @@ docker run --rm --cpus=0.1 --memory=512m -p 127.0.0.1:8080:8080 countersign-demo
 | `PAYPAL_CLIENT_ID` set | Refused, exit 64 |
 | `COUNTERSIGN_MODE=live` plus the sandbox URL set | Still served demo mode on the mock (forced) |
 
-## Known limits and follow-ups
+## M21 local readiness measurements (Oct 27)
 
-- **Demo week seed is off by default.** `scripts.demo_week` seeds the mock with `balance_refresh_seconds: 1`, and the mock appends one balance snapshot per mock second (`mock_paypal/resources.py`, `snapshots.append`). Over one staged week that is about 600,000 snapshots: about 800 MB, and too much CPU for a 0.1 CPU host. Either fix allows `COUNTERSIGN_HOSTED_SEED=week` on 512 MB:
-  - mock owner: keep only the latest snapshot, or a small bounded number (only the latest is read);
-  - demo week owner: seed a coarser refresh, if the demo does not depend on one-second refreshes.
-- **Dashboard data are contract fixtures until M15** (`DbSource`). The app already serves the dashboard's API on the same origin, so the page shows "Connected to dashboard API". When M15 and the M17 demo bar land, the hosted instance picks them up with no deploy change.
-- **Everything is reset on every wake-up.** This is deliberate: the mock is in-memory, and a clean start always matches it.
+Built from `f330b3f` plus M21 adapter changes; Linux amd64 on Docker Desktop.
+No real model, PayPal, cloud account, or environment file was used.
+
+| Check | Result |
+| --- | --- |
+| Cold start: `--cpus=1 --memory=512m`, seed `none`, new disposable container | **4.181 s** from immediately before `docker run -d` to first HTTP 200 on `/api/v1/meta`; polled every 100 ms, includes Docker launch, excludes image download/build |
+| Full public HTTP smoke | **PASS**: reset, all 11 staged steps, one DONE Friday run totalling 108600 minor USD, each Friday line one successful item, cash available 35400, B's active non-cash reserve 5400, four playground attacks, refund-to-other-account BLOCK with written=false |
+| Memory after the week | `docker stats`: **137.8 MiB / 512 MiB**; cgroup memory.current **196636672 bytes**, peak **244563968 bytes** (cgroup includes file cache; Docker's display subtracts inactive cache) |
+| Image size | `docker images` / `docker system df -v`: **860 MB** total; image-inspect Size **204439669 bytes** (a different size reported by this Docker backend; the larger displayed disk usage was used for the threshold) |
+| Image exclusions | `/app/tests`, `/app/recordings`, `/app/eval` and `/app/.env` absent (existence checks only) |
+| Credential refusal | Each of PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET and GOOGLE_API_KEY, separately set to an invented value: exit **64**, variable name only, value absent |
+
+Image: `countersign-m21:verified`, manifest
+`sha256:e893efd754f342c160617e5d8f326f5eae68d1a98695d110edfae728156ee53c`.
+Both thresholds pass (under 1 GB and under 20 s), so no Dockerfile or dependency
+change was needed. This is a local warm-image boot, not a measured Cloud Run cold
+start. The HTTP script runs outside the container and never reads its database,
+checkpoint, private mock controls, environment, or filesystem.
+
+Reproduce locally from the reviewed branch (normal Docker build context excludes
+`.env*`, recordings, tests, eval results and docs):
+
+```powershell
+docker build -t countersign-demo .
+docker run --rm --name countersign-demo-check --cpus=1 --memory=512m -p 127.0.0.1:8080:8080 countersign-demo
+# In another terminal, with project dependencies installed:
+python scripts/hosted_smoke.py http://127.0.0.1:8080
+```
+
+The smoke command **resets the shared staged week**, then advances all 11 steps.
+Run it on a disposable demo when nobody is presenting. It checks mode before any
+POST, refuses redirects, waits for each background command, and exits non-zero
+with a fixed diagnostic on a mismatch or timeout. It prints no response bodies
+or credentials. Existing `tests/unit/test_hosted.py` covers all three credential
+variables; M21 also verified the actual image's entrypoint with each fake value.
+
+## Cloud Run smoke and rollback
+
+Use the exact deploy command in the Cloud Run owner steps above. In particular,
+`--no-cpu-throttling` keeps CPU available for the demo subprocess after the step
+endpoint's immediate 202 response, including gaps between state polls. This uses
+**instance-based billing**, not the request-based assumptions in the historical
+pricing table. Keep min instances zero, max instances one, and the budget alert;
+a budget alert is not a spending cap. No cloud cost or deployment is incurred by
+these local checks. See Google's [billing settings](https://docs.cloud.google.com/run/docs/configuring/billing-settings)
+and [`gcloud run deploy`](https://docs.cloud.google.com/sdk/gcloud/reference/run/deploy).
+
+After the owner deploys:
+
+```powershell
+$demoUrl = gcloud run services describe countersign-demo --region us-central1 --format="value(status.url)"
+python scripts/hosted_smoke.py $demoUrl
+```
+
+Before a later deploy, save the currently serving revision:
+
+```powershell
+$previousRevision = gcloud run services describe countersign-demo --region us-central1 --format="value(status.latestReadyRevisionName)"
+# Deploy the new version, then run the smoke command above.
+# If the new version fails, route all traffic to the saved known-good revision:
+gcloud run services update-traffic countersign-demo --region us-central1 --to-revisions "$previousRevision=100"
+python scripts/hosted_smoke.py $demoUrl
+```
+
+The saved revision must be the currently serving known-good revision; the simple
+latestReadyRevisionName command assumes this service's usual 100%-to-latest
+traffic policy. For a split rollout, select the known-good revision from
+`status.traffic` instead. Rollback changes traffic, not data recovery: every
+container boot intentionally creates a fresh mock and disposable database.
+First deployment has no prior revision to roll back to. Google's [rollback guide](https://docs.cloud.google.com/run/docs/rollouts-rollbacks-traffic-migration)
+documents `--to-revisions`.
+
+## Current limits
+
+- M15 already bounds mock balance history at 256 snapshots; the earlier 813 MB
+  result above is historical. The full M21 week fits within 512 MB locally.
+- M15 database dashboard and M17 demo bar are implemented and exercised by the
+  HTTP smoke. The hosted source is database, not contract fixtures.
+- Seed `none` stays the default so visitors can play the week. Everything resets
+  on restart; the shared presenter demo is not a production multi-user service.
+- Cloud Run deploy, cloud cold start and deployed-URL smoke remain owner steps;
+  local success is not claimed as a cloud deployment.

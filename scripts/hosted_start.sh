@@ -11,7 +11,7 @@
 # 2. Start the PayPal mock on loopback and register its webhook.
 # 3. Serve the app and dashboard on $PORT (no background workers).
 # 4. Optionally (COUNTERSIGN_HOSTED_SEED=week) play the scripted demo week once
-#    against the mock (no LLM, no PayPal). Off by default: see c27-hosting.md.
+#    against the mock (no LLM, no PayPal). Off by default so visitors can step it.
 #
 # Nothing here reads .env. The database password is random per boot and never
 # printed. Sandbox or model credentials in the environment stop the boot.
@@ -123,11 +123,10 @@ APP_PID=$!
 wait_for_port "$PORT" 600 || { log "app did not start"; exit 1; }
 log "dashboard ready"
 
-# 4. Optional scripted demo week, so the database is not empty. Off by default:
-#    with balance_refresh_seconds=1 the mock keeps one balance snapshot per mock
-#    second (about 800 MB for the week), which a 512 MB host cannot hold. Its
-#    checkpoint resumes after a transient stop. A final failure leaves the
-#    dashboard serving; only the fixed error code is printed.
+# 4. Optional scripted demo week, off by default so visitors can step it. M15
+#    bounds the mock's balance history at 256 snapshots. The checkpoint resumes
+#    after a transient stop. A final failure leaves the dashboard serving;
+#    only the fixed error code is printed.
 if [ "$SEED" = week ]; then
   log "playing the scripted demo week against the mock"
   for attempt in 1 2 3; do
