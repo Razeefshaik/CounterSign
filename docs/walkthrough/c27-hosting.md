@@ -76,7 +76,35 @@ Why Cloud Run is the runner-up: it starts about ten times faster (1 vCPU) and it
 6. Optional: add an uptime pinger for `https://<service>.onrender.com/api/v1/meta` every 10 minutes during judging.
 7. Auto deploy is off. After later merges, use **Manual Deploy > Deploy latest commit**.
 
-For Cloud Run instead: build the same `Dockerfile` and deploy it with `--port 8080 --memory 1Gi --max-instances 1`, allowing unauthenticated access. Set no environment variables.
+### Google Cloud Run (the owner's choice, Oct 27)
+
+The same image runs unchanged. It has about 130 MB of memory in use once the week is played, after M15's bounded mock snapshots, and it is ready in about 12 s.
+
+1. **[OWNER]** In the Google Cloud console:
+   - create a project;
+   - link the billing account that has the free credits;
+   - add a budget alert, for example $5.
+2. **[OWNER]** Install the gcloud CLI, then run:
+   ```powershell
+   gcloud auth login
+   gcloud config set project YOUR_PROJECT_ID
+   gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com
+   ```
+3. **[OWNER]** Deploy from the repository root:
+   ```powershell
+   gcloud run deploy countersign-demo --source . --region us-central1 --port 8080 --memory 1Gi --cpu 1 --max-instances 1 --allow-unauthenticated --set-env-vars COUNTERSIGN_HOSTED_SEED=none
+   ```
+   - **Seed `none`:** the presenter plays the week with the M17 demo bar.
+   - **Seed `week`:** use this instead to open on the finished week.
+   - **No other variables:** the container refuses PayPal and Gemini credentials.
+   - **`.env` stays local:** `--source .` uploads files not ignored by `.gitignore`, and `.env` is ignored.
+4. **Check the deploy:**
+   - open the printed URL and look for the "Simulated: mock PayPal" banner;
+   - `URL/api/v1/meta` shows mode `demo`;
+   - the bar's "Run next staged step" works.
+5. **After later merges:** run the same deploy command again.
+
+`--max-instances 1` caps cost, and the service scales to zero when idle. Every wake-up starts from a clean database and mock.
 
 ## How to verify
 
