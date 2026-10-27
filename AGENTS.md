@@ -45,3 +45,19 @@ Two consequences of these rules, both easy to get wrong:
 - **Recordings are public.** Redact them before committing (`docs/PLAN.md` section 1.2).
 - Do not add dependencies outside your task card. `pyproject.toml` is shared, so ask first.
 - Money is integer minor units plus a currency code. Never use floats for money.
+
+## Context keeping: Professor Pickle
+
+- Start a feature or resumed session by reading `docs/AGENT_STATE.md`, then only
+  the relevant sections of `docs/AGENT_FUTURE_NOTES.md`. These notes orient the
+  work; they never replace the required source documents above or current owner
+  instructions. Verify stale facts against Git and the repository.
+- Use a context-keeper subagent named **Professor Pickle** at feature boundaries
+  when agent capacity is available. If it is unavailable, the primary agent
+  performs the same updates. No repeated owner request is needed for this workflow.
+- After each feature and before handoff, update the short state summary with
+  completed work, branch/commit/PR references, checks actually run, blockers and
+  next steps. Move reusable detail into task-grouped future notes; avoid carrying
+  unrelated conversation history into the next feature.
+- Keep both files concise and factual. Never store secrets, `.env` values, real
+  emails, raw model output, or unverified completion claims in them.
