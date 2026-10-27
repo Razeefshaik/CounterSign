@@ -381,3 +381,12 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Model-disabled runs compare rules_only and CounterSign without an LLM; configured runs use one explicit model for both agents and include rules_only | M18 owner prompt | Accept | Deterministic paths must not be presented as AI reasoning, and a different provider/model would confound the comparison |
 | Each completed scenario/system/repetition is checkpointed; quota attempts are retained separately and retried without a complete summary until all cells finish | M18 | Accept | Free-tier quota stops must not become scored safety failures or force rerunning completed work |
 | Resume binds k, model, scenario contents and benchmark/core/mock/migration source hashes; no database credentials or API keys enter results | M18 | Accept | Prevents mixing changed experiments while retaining reproducible public evidence |
+
+## Oct 27 C26 integration evaluation
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| M11 exposes a separate GET-confirmed integration entry point; mock-only baselines and ground-truth grading retain their guards | C26 owner prompt | Accept | Sandbox has no mock ground-truth endpoint, so its unavailable global invariant metrics must be null rather than fabricated zeroes |
+| Five observations share one durable Engine run with owner-provided captures and one exact $5.40 approval; financial writes remain shield/executor-only | C26 owner prompt | Accept | Reuses the confirmed D3/D4/D5/D6/D8 paths without an extra direct payout/capture/refund API path |
+| Resume binds private settings by fingerprint, reuses checkpointed operations and rechecks final GET/shield facts | C26 | Accept | An interrupted approval must not create another payment, and saved success must not hide changed resource state |
+| Sandbox specification files are a reviewed case catalog; live IDs and emails come from a private owner manifest, never the fake fixture identifiers | C26 | Accept | Scenario metadata must not seed fictional PayPal resources or silently turn mock observations into sandbox evidence |

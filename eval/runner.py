@@ -305,6 +305,17 @@ async def run_one(
         }
 
 
+async def run_sandbox_integration(*args, **kwargs):
+    """C26 companion: GET-confirmed integration grading, never mock truth relabelled.
+
+    Baselines and run_one remain mock-only. Sandbox observations have explicit
+    unavailable invariant counters and their own integration report writer.
+    """
+    from eval.sandbox import run_integration
+
+    return await run_integration(*args, **kwargs)
+
+
 async def run_suite(
     scenarios: list[dict],
     factories: list,
@@ -368,6 +379,8 @@ def main(argv=None):
     )
     try:
         scenarios = [json.loads(path.read_text(encoding="utf-8")) for path in paths]
+        if not args.paths:
+            scenarios = [scenario for scenario in scenarios if scenario["ground"] == "mock"]
         rows = asyncio.run(
             run_suite(scenarios, [DummySystem], output=args.output, k=args.k, model="dummy-no-op")
         )
