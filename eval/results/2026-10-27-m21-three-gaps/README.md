@@ -2,6 +2,7 @@
 
 This is a targeted **mock, model-disabled** follow-up to
 `../2026-10-27-model-none-c31/`, not a replacement full benchmark.
+Evaluated adapter/test commit: `41ff10f` (source hash in manifest.json).
 Only the three requested scenarios were rerun with CounterSign, k=5 (15 cells).
 No scenarios, expected answers, grader, core code, model, or mock behavior changed.
 All three scenario content hashes are preserved in manifest.json.
@@ -63,3 +64,11 @@ Evidence:
 The original 480-cell report is untouched. No combined 180/240 score is claimed:
 the full 480-cell experiment was deliberately not rerun. No real PayPal/LLM calls
 or environment-file reads were made.
+
+Validation: full pytest **4004 passed, 5 skipped in 986.70 seconds** with the
+PostgreSQL test database and isolated toolkit settings. Focused eval selection
+52 passed; hosted smoke/existing guard selection 19 passed; adapter unit selection
+26 passed (these overlap the full suite). Ruff clean, import-linter 3 kept,
+47 web tests passed. Final Docker image completed the public HTTP smoke and all
+three actual entrypoint credential-refusal probes. Hosting measurements and exact
+owner deploy/smoke/rollback commands are in docs/walkthrough/c27-hosting.md.
