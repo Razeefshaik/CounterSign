@@ -13,14 +13,22 @@ reads and proposes; the deterministic shield and executor authorize and perform
 financial writes. PostgreSQL holds state, reservations and the inbox. Money is
 integer minor units. Mock and sandbox evidence must remain separate.
 
-## Current work: C31 payout-run approval refresh
+## Current work: M18 reserve observation (prompt 08)
 
-- Branch: `razeef/c31-run-approval-refresh`, isolated worktree
-  `CounterSign-c31`, based on fresh `origin/main` `4a42bce` (merged M18 fix).
-  Commits: `5b10c13` migration/schema, `29e7186` service/harness/regressions/decisions,
-  `0b7cb62` contract 1.0.4 and owner-approved dashboard metadata alignment.
-  Downgrade fix commit: `2ac9015`. Final full-suite validation passed;
-  branch push is verified against origin. No PR or merge was performed.
+- C31 merged into main as `bb77df0`; its branch and worktree were deleted (GitHub
+  keeps only `main`). Prompt 08 branch: `mate/M18-reserve-observation`.
+- The CounterSign eval adapter records Engine `DISPUTE_EARMARK` reservations as
+  RESERVE_EARNINGS / RELEASE_RESERVE, once each. Model-disabled rerun:
+  `eval/results/2026-10-27-model-none-c31/`: countersign 170/240 (34/48 pass^5),
+  rules_only 215/240, 0 errors, 0 invariant violations. 11 of the 14 remaining
+  failures need agent actions. The 3 open follow-ups are both key-window-expired
+  scenarios and on-hold-then-failed.
+
+## Previous work: C31 payout-run approval refresh (merged)
+
+- Commits: `5b10c13` migration/schema, `29e7186` service/harness/regressions/decisions,
+  `0b7cb62` contract 1.0.4 and owner-approved dashboard metadata alignment,
+  `2ac9015` downgrade fix.
 - Migration 0006 permits CANCELLED history plus one live run per week through a
   partial unique index. `v_dash_runs` shows the live run instead of superseded
   cancelled history, preserving view grants/detail. Downgrade refuses conflicting

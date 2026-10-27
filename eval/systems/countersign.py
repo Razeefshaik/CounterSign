@@ -129,6 +129,7 @@ class CountersignSystem:
         self._env = env
         self.trace = SystemTrace([], 0, [], 0, 0, 0)
         self._seen, self._requests, self._decided = set(), {}, set()
+        self._reserves = {}
         self._tick_error = False
         model = env.llm
         if model is not None and not callable(getattr(model, "complete", None)):
@@ -208,6 +209,23 @@ class CountersignSystem:
                 outcomes[proposal["state"]],
                 proposal["id"] in self._decided,
             )
+        # The Engine reserves disputed shares itself, without a proposal. Record
+        # only what its reservations show, as rules_only records its own reserves.
+        disputes = {d["id"]: d.get("paypal_dispute_id") for d in snapshot.get("disputes", [])}
+        for reservation in snapshot.get("reservations", []):
+            if reservation["kind"] != "DISPUTE_EARMARK":
+                continue
+            recorded = self._reserves.setdefault(reservation["id"], set())
+            params = {
+                "paypal_dispute_id": disputes.get(reservation["dispute_id"]),
+                "amount": reservation["amount"],
+            }
+            if "RESERVE_EARNINGS" not in recorded:
+                recorded.add("RESERVE_EARNINGS")
+                self._record("RESERVE_EARNINGS", params)
+            if reservation["state"] == "RELEASED" and "RELEASE_RESERVE" not in recorded:
+                recorded.add("RELEASE_RESERVE")
+                self._record("RELEASE_RESERVE", params)
 
     async def on_step(self, step, env):
         if step["do"] == "plan_payout_run":
