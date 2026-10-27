@@ -21,7 +21,7 @@ from psycopg.conninfo import conninfo_to_dict
 from countersign.agent.models import ChatModel, ChatModelConfig, ModelError, create_model
 from countersign.agent.session import AgentSession, AgentSessionError
 from countersign.approvals import ApprovalError, ApprovalService
-from countersign.approvals.service import load_context
+from countersign.approvals.service import RUN_REQUEST_LIFETIME, load_context
 from countersign.config import PayPalBehavior, PayPalSettings
 from countersign.db import Database, Repositories, cas_transition
 from countersign.db.ids import uuid7
@@ -301,9 +301,16 @@ class Engine:
 
     async def tick(self) -> dict:
         async with self._public():
+            async def prepare_proposals():
+                # Reconciliation first supplies current dispute/version facts.
+                # Refresh commits before any model step or executor dispatch.
+                await self._approvals.refresh_run_requests()
+                if self._agent is not None:
+                    await self._agent_once()
+
             return await worker_once(
                 self._database, self._inbox, self._reconciler, self._executor,
-                commander=self._agent_once if self._agent is not None else None,
+                commander=prepare_proposals,
             )
 
     async def _agent_once(self):
@@ -476,7 +483,10 @@ class Engine:
                 binding = {
                     "payload_hash": proposal.payload_hash,
                     "record_versions": snap.record_versions(),
-                    "expires_at": (snap.now + self._approvals.lifetime).isoformat(),
+                    "expires_at": (snap.now + (
+                        RUN_REQUEST_LIFETIME if proposal.action is Action.SCHEDULE_PAYOUT_RUN
+                        else self._approvals.lifetime
+                    )).isoformat(),
                 }
                 details["approval_request"] = binding
                 raw["approval_request"] = binding

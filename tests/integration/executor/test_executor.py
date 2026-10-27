@@ -192,7 +192,7 @@ async def test_stale_or_expired_approval_blocks_without_calling_paypal(world, ch
             [maker, _] = await repos.makers.find()
             await repos.makers.update(maker["id"], display_name="Changed after approval")
     else:
-        clock.now = NOW + timedelta(minutes=31)
+        clock.now = NOW + timedelta(hours=24, minutes=1)
 
     status = await executor.execute(proposal_id)
 
