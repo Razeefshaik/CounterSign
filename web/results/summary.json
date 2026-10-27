@@ -1,0 +1,242 @@
+{
+  "model_off": {
+    "ground": "mock",
+    "model": "none",
+    "staged": true,
+    "label": "Model-disabled mock evaluation; not a real-model or sandbox run",
+    "scoreboard": [
+      {
+        "system": "countersign",
+        "ground": "mock",
+        "model": "none",
+        "passing": 170,
+        "runs": 240,
+        "scenarios": 48,
+        "k": 5,
+        "pass_5_scenarios": 34,
+        "error_rows": 0,
+        "invariants": {
+          "duplicate_settlement": 0,
+          "payment_on_disputed_order_without_approval": 0,
+          "refund_without_owner_approval": 0,
+          "payment_to_unverified_payee": 0
+        },
+        "source": "eval/results/2026-10-27-model-none-c31/summary.json"
+      },
+      {
+        "system": "rules_only",
+        "ground": "mock",
+        "model": "none",
+        "passing": 215,
+        "runs": 240,
+        "scenarios": 48,
+        "k": 5,
+        "pass_5_scenarios": 43,
+        "error_rows": 0,
+        "invariants": {
+          "duplicate_settlement": 0,
+          "payment_on_disputed_order_without_approval": 0,
+          "refund_without_owner_approval": 0,
+          "payment_to_unverified_payee": 0
+        },
+        "source": "eval/results/2026-10-27-model-none-c31/summary.json"
+      }
+    ]
+  },
+  "history": [
+    {
+      "system": "rules_only",
+      "experiment": "original",
+      "passing": 215,
+      "runs": 240,
+      "ground": "mock",
+      "model": "none",
+      "source": "eval/results/2026-10-27-model-none-c31/README.md"
+    },
+    {
+      "system": "rules_only",
+      "experiment": "after_pr_07",
+      "passing": 215,
+      "runs": 240,
+      "ground": "mock",
+      "model": "none",
+      "source": "eval/results/2026-10-27-model-none-c31/README.md"
+    },
+    {
+      "system": "rules_only",
+      "experiment": "after_c31_and_reserves",
+      "passing": 215,
+      "runs": 240,
+      "ground": "mock",
+      "model": "none",
+      "source": "eval/results/2026-10-27-model-none-c31/README.md"
+    },
+    {
+      "system": "countersign",
+      "experiment": "original",
+      "passing": 80,
+      "runs": 240,
+      "ground": "mock",
+      "model": "none",
+      "source": "eval/results/2026-10-27-model-none-c31/README.md"
+    },
+    {
+      "system": "countersign",
+      "experiment": "after_pr_07",
+      "passing": 115,
+      "runs": 240,
+      "ground": "mock",
+      "model": "none",
+      "source": "eval/results/2026-10-27-model-none-c31/README.md"
+    },
+    {
+      "system": "countersign",
+      "experiment": "after_c31_and_reserves",
+      "passing": 170,
+      "runs": 240,
+      "ground": "mock",
+      "model": "none",
+      "source": "eval/results/2026-10-27-model-none-c31/README.md"
+    }
+  ],
+  "real_model": null,
+  "sandbox_findings": [
+    {
+      "id": "D1",
+      "claim": "App token has payouts, disputes and reporting scopes",
+      "observed": "The token carries payouts, disputes read, disputes update-seller, **disputes create** and reporting scopes. None was missing.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-23/D1/"
+      ]
+    },
+    {
+      "id": "D2",
+      "claim": "Buyer can pay; tracking can be added and read back",
+      "observed": "Three orders were captured ($400, $60, $25). The $400 capture: fee $14.45, net $385.55. `PAYMENT.CAPTURE.COMPLETED` arrived about 9 s after capture. Orders v2 `track` returned 201. `GET /v1/shipping/trackers` returned USPS, `SHIPPED`, `CARRIER_PROVIDED`.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-23/D2/",
+        "recordings/sandbox/webhooks/"
+      ]
+    },
+    {
+      "id": "D3",
+      "claim": "Single-item payout to a registered maker reaches SUCCESS",
+      "observed": "The 201 create response carried **no item IDs** (F1). The batch went PENDING to SUCCESS in about 32 s. Webhooks were PROCESSING, then SUCCESS, each about 10 s after the change.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-23/D3/",
+        "recordings/sandbox/2026-10-24/D3/"
+      ]
+    },
+    {
+      "id": "D4",
+      "claim": "Unregistered email gives UNCLAIMED reliably; unclaimed money is excluded from available",
+      "observed": "All three items reached UNCLAIMED (`RECEIVER_UNREGISTERED`). Available dropped by $3.75 (3 × $1 plus a $0.25 fee each). Withheld did not change.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-23/D4/",
+        "recordings/sandbox/2026-10-24/D4/"
+      ]
+    },
+    {
+      "id": "D5",
+      "claim": "Cancel works and GET shows RETURNED",
+      "observed": "The cancel response (200) already shows `transaction_status: RETURNED`, and GET agrees. Cancelling again gives 400 `ITEM_ALREADY_CANCELLED`. Cancelling a SUCCESS item gives 400 `ITEM_INCORRECT_STATUS`. A `PAYMENT.PAYOUTS-ITEM.RETURNED` webhook arrived. The returned dollar showed in available within about 1.7 h.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-24/D5/",
+        "recordings/sandbox/2026-10-26/D5/"
+      ]
+    },
+    {
+      "id": "D6",
+      "claim": "An identical replay is safe and resolves UNKNOWN; a duplicate `sender_batch_id` links to the original",
+      "observed": "**Every** duplicate (exact replay, new request ID, changed body, losing concurrent POST) returned **400 `USER_BUSINESS_ERROR`** \"Batch with given sender_batch_id already exists\". The link to the original batch is in **`details[].link`** on host `api.sandbox.paypal.com`. A 50 ms-timeout lost response was resolved by following that link: one item, SUCCESS, $1, the same receiver. The harness recorded BLOCKED only because its link parser missed the nested link; batch `53YFFR9A9YFEA` was confirmed by hand.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-24/D6/"
+      ]
+    },
+    {
+      "id": "D7",
+      "claim": "Payout negative-test values produce the documented errors",
+      "observed": "All 14 values matched (batch PENDING, PROCESSING and DENIED; item CLOSED_MARKET, RECEIVER_UNREGISTERED, RISK_DECLINE; create and cancel errors).",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-24/D7/"
+      ]
+    },
+    {
+      "id": "D8",
+      "claim": "Disputes can be created (API or Resolution Center); PayPal holds the funds",
+      "observed": "**API creation is BLOCKED**: 400 \"No permissions to set target_client_id\", even with the scope present. The Resolution Center route works. Disputes appeared in `GET /v1/customer/disputes` 190 to 256 s after the buyer submitted them, and `CUSTOMER.DISPUTE.CREATED` arrived about 4 s after creation. Disputes match captures through `disputed_transactions[].seller_transaction_id`. The $400 item-not-received dispute went **straight to UNDER_REVIEW / CHARGEBACK**; the $60 one to WAITING / INQUIRY, and the $25 one to WAITING / CHARGEBACK. **Hold:** `withheld_balance` never rose (0 of the expected $485 over 37 readings), but all three captures turned **PENDING**.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-23/D8/",
+        "recordings/sandbox/2026-10-24/D8/"
+      ]
+    },
+    {
+      "id": "D9",
+      "claim": "Evidence can be submitted on an item-not-received dispute",
+      "observed": "The $400 dispute (UNDER_REVIEW / CHARGEBACK) had only `provide_supporting_info` and `self` links: **no `provide_evidence`**. Evidence is possible only while WAITING_FOR_SELLER_RESPONSE **with** the link. On the $25 dispute, a multipart submission at that stage returned 200 (D10).",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-24/D9/",
+        "recordings/sandbox/2026-10-24/D10/"
+      ]
+    },
+    {
+      "id": "D10",
+      "claim": "Settlement works from UNDER_REVIEW; buyer close is a fallback",
+      "observed": "**Adjudicate** SELLER_FAVOR (sandbox control, 200) gave `RESOLVED_SELLER_FAVOUR` / `INELIGIBLE_BUYER_PROTECTION_POLICY`. **Accept-claim** as JSON (200) gave `RESOLVED_BUYER_FAVOUR` / `SELLER_ISSUED_REFUND`, `amount_refunded` $60, plus a `PAYMENT.CAPTURE.REFUNDED` webhook. **Evidence** as multipart (200) at WAITING / CHARGEBACK moved the dispute to UNDER_REVIEW. **Buyer close** gave `CANCELED_BY_BUYER` / `BUYER_CANCELLED_CASE`.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-24/D10/",
+        "recordings/sandbox/2026-10-26/D10/",
+        "recordings/sandbox/outcome_codes.json"
+      ]
+    },
+    {
+      "id": "D11",
+      "claim": "Webhooks verify through the API; deliveries can be late, duplicated or missing",
+      "observed": "All 46 real deliveries verified `SUCCESS`. Median delay was 10.5 s (dispute events about 4 s). One outlier of about 2.7 days arrived while the catcher was offline. There was 1 duplicate, 1 out of order and 1 missing. `GET /v1/notifications/webhooks-events` works (47 listed, 2 never delivered to us), and resend works. **The simulator event also verified `SUCCESS`.**",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-26/D11/",
+        "recordings/sandbox/webhooks/"
+      ]
+    },
+    {
+      "id": "D12",
+      "claim": "Balances can lag up to 3 h",
+      "observed": "`last_refresh_time` and `as_of_time` lag by 1.4 to 2.4 h (median about 1.7 h), never over 3 h. available + withheld = total in all 585 readings. Payouts and returns appear in available within about 1.5 h. **No dispute event ever moved `withheld`**, and resolutions did not either. Transaction Search lag: BLOCKED (recorded, not chased).",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-23/D12/",
+        "recordings/sandbox/2026-10-24/D12/",
+        "recordings/sandbox/2026-10-26/D12/",
+        "recordings/sandbox/balances.jsonl"
+      ]
+    },
+    {
+      "id": "D13",
+      "claim": "Agent Toolkit exposes only the allowlisted read tools",
+      "observed": "With `paypal-agent-toolkit` 1.11.0 and langchain 0.3.23, the tool set is exactly `get_dispute`, `get_order_details`, `get_shipment_tracking`, `list_disputes`, `list_transactions`. Nothing unexpected, nothing missing.",
+      "evidence_path": [
+        "recordings/sandbox/2026-10-24/D13/"
+      ]
+    },
+    {
+      "id": "D8-D12-resolved-1",
+      "claim": "Disputed captures stay out of available.",
+      "observed": "The three captures (Oct 23, 22:02 UTC) were disputed between 22:14 and 22:18. From then until the 07:29 refresh on Oct 24 (9.5 h, well past the 2.4 h maximum lag), available moved only by our payouts (5,000.00 to 4,988.75), and withheld stayed 0.00. The disputed money was frozen in the PENDING captures, not moved into withheld (D8, D12).",
+      "evidence_path": [
+        "recordings/sandbox/balances.jsonl"
+      ]
+    },
+    {
+      "id": "D8-D12-resolved-2",
+      "claim": "The $383.07 rise is attributed.",
+      "observed": "The rulings came at 12:19 on Oct 24, and available rose $383.07 at the 12:29 refresh. That is +$385.55 (the $400 capture's net, released by the seller-favour ruling) − $2.48 (the net effect of the $60 capture refunded in full through accept-claim). The $25 capture's dispute was still open, so it stayed out of available.",
+      "evidence_path": [
+        "recordings/sandbox/balances.jsonl"
+      ]
+    }
+  ],
+  "limitations": [
+    "Mock and sandbox evidence are separate.",
+    "Zero measured invariant counts do not establish universal safety.",
+    "Disputes opened on captures already settled into available remain untested."
+  ]
+}

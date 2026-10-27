@@ -400,6 +400,63 @@
                       "expires_at"
                     ],
                     "additionalProperties": false
+                  },
+                  "agent_trace": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "model": {
+                            "type": "string"
+                          },
+                          "rounds": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 32
+                          },
+                          "calls": {
+                            "type": "array",
+                            "maxItems": 16,
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "tool": {
+                                  "type": "string"
+                                },
+                                "arguments": {
+                                  "type": "object"
+                                },
+                                "ok": {
+                                  "type": "boolean"
+                                },
+                                "error_code": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "tool",
+                                "arguments",
+                                "ok",
+                                "error_code"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "model",
+                          "rounds",
+                          "calls"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
                   }
                 },
                 "required": [
@@ -785,6 +842,63 @@
                       "expires_at"
                     ],
                     "additionalProperties": false
+                  },
+                  "agent_trace": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "model": {
+                            "type": "string"
+                          },
+                          "rounds": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 32
+                          },
+                          "calls": {
+                            "type": "array",
+                            "maxItems": 16,
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "tool": {
+                                  "type": "string"
+                                },
+                                "arguments": {
+                                  "type": "object"
+                                },
+                                "ok": {
+                                  "type": "boolean"
+                                },
+                                "error_code": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "tool",
+                                "arguments",
+                                "ok",
+                                "error_code"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "model",
+                          "rounds",
+                          "calls"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
                   }
                 },
                 "required": [
@@ -1173,6 +1287,63 @@
                       "expires_at"
                     ],
                     "additionalProperties": false
+                  },
+                  "agent_trace": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "model": {
+                            "type": "string"
+                          },
+                          "rounds": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 32
+                          },
+                          "calls": {
+                            "type": "array",
+                            "maxItems": 16,
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "tool": {
+                                  "type": "string"
+                                },
+                                "arguments": {
+                                  "type": "object"
+                                },
+                                "ok": {
+                                  "type": "boolean"
+                                },
+                                "error_code": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "tool",
+                                "arguments",
+                                "ok",
+                                "error_code"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "model",
+                          "rounds",
+                          "calls"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
                   }
                 },
                 "required": [
@@ -1590,6 +1761,63 @@
                       "expires_at"
                     ],
                     "additionalProperties": false
+                  },
+                  "agent_trace": {
+                    "anyOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "properties": {
+                          "model": {
+                            "type": "string"
+                          },
+                          "rounds": {
+                            "type": "integer",
+                            "minimum": 1,
+                            "maximum": 32
+                          },
+                          "calls": {
+                            "type": "array",
+                            "maxItems": 16,
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "tool": {
+                                  "type": "string"
+                                },
+                                "arguments": {
+                                  "type": "object"
+                                },
+                                "ok": {
+                                  "type": "boolean"
+                                },
+                                "error_code": {
+                                  "type": [
+                                    "string",
+                                    "null"
+                                  ]
+                                }
+                              },
+                              "required": [
+                                "tool",
+                                "arguments",
+                                "ok",
+                                "error_code"
+                              ],
+                              "additionalProperties": false
+                            }
+                          }
+                        },
+                        "required": [
+                          "model",
+                          "rounds",
+                          "calls"
+                        ],
+                        "additionalProperties": false
+                      }
+                    ]
                   }
                 },
                 "required": [

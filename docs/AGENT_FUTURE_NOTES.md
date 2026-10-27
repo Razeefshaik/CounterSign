@@ -34,6 +34,75 @@ Current fix branch is `mate/M18-eval-fix` from `2e51d41`.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## W2 story data
+
+Source: parent PayPalDevPost `prompts/codex/active/CODEX-PROMPT-W2-NAIVE-TRACE-RESULTS.md`.
+Branch `razeef/w2-story-data` starts at `f330b3f` (C32 merged), in CounterSign-w2.
+Commits use `W2: lowercase summary`, one line, no attribution; push, do not merge.
+Commits: `653c2c2` traces, `b278372` comparison/simulator/demo/contracts, `945b1c8`
+results bundle. Full pytest: 4000 passed, 5 skipped in 1434.11 seconds, exit 0;
+XML tests 4005/errors 0/failures 0. Implementation pushed to
+`origin/razeef/w2-story-data` on Razeefshaik/CounterSign; no merge.
+
+Explicit owner scope includes dashboard.py/tests/dashboard, commander.py,
+harness proposal binding, scripted demo rationales, scripts results bundler,
+CONTRACTS 1.0.6/DECISIONS, plus approved simulator per-maker and audit extensions.
+Only generated `web/results/summary.json` may change under web; no redesign edits.
+
+Comparison GET uses the playground guard (demo mode and mock), reads saved Friday
+simulation evidence/bound run/history only, and is unavailable without evidence.
+Do not resimulate a completed run against later cash/reserves. The latest saved
+Friday run stays the root after next week's A-only payment. Mock CLI saves masked
+simulator output in existing audit vocabulary and links duplicate-400 proof to a
+GET-confirmed operation. Moments stay null until their real staged steps occur.
+Friday acceptance is naive 150000/protected 108600/disputed 41400 minor USD; do not
+invent a naive duplicate payment, refund or shortfall the simulator did not show.
+
+Commander traces record actual attempted tools, sanitized identifier/query args,
+fixed success/error outcomes and at most 16 calls; never tool output or raw model
+text. Harness stores the bound trace, and dashboard projects it or null for
+deterministic planners/older rows. Scripted rationales must remain labelled.
+
+Reuse tests/integration/test_demo_week_mock.py::demo_world for the real staged
+week: migrated isolated schema, ASGI mock/webhooks, checkpoint/PayoutTrace,
+DemoModel, Engine, owner client and staged clock. Dashboard's db_support seed is
+for static view contracts; FakeWeek in test_demo_bar is control-only.
+Results bundler reads current summary/runs/README and SANDBOX_FINDINGS, with
+deterministic source-drift tests. Label scoreboard model-disabled/mock and keep
+real_model null until a complete configured result folder exists.
+
+Ruff clean, three import contracts kept/zero broken, requested web files 47 passed.
+Docker image `countersign-demo:w2` rebuilt; separate check on 18080 ran all 11 steps.
+Curl step 0 is unavailable (friday_plan); step 6 has 150000/108600/41400
+naive/protected/disputed, A36000+B5400 reserves, all moments null. Step 11 retains
+saved Friday root/timestamp, only B5400 reserved, one payment/duplicate400 linked
+true, injection blocks PAYEE_INTEGRITY and INJECTION_GUARD, retry blocks SETTLEMENT,
+PAYOUT_STATE_MACHINE and CANCEL_BEFORE_REPLACE. Docker also verifies scripted
+evidence trace (model scripted, rounds 2, tools get_dispute/get_shipment_tracking),
+Scripted rationale, meta 1.0.6. These are staged/mock checks.
+The preliminary focused run's stale contract assertion is not final-suite
+evidence; its corrected targeted retest passed (1 passed). Final full pytest
+passes: 4000 passed, 5 skipped in 1434.11 seconds. Explicit DB 55433 and isolated
+toolkit test settings were enabled; isolated toolkit checks ran. Five optional
+skips require toolkit in the main interpreter. Temporary full evidence:
+`countersign-w2-full.log`/XML. PostgreSQL WAL restored max 1024/min 80 MB and
+checkpoint completed.
+The separate Docker check container was removed after success; the owner's
+existing countersign-demo on 8080 was untouched. No real LLM/PayPal calls or .env reads.
+Implementation push was verified before the final context commit; push these
+notes with the handoff. Do not merge.
+
+## M18 reserve observation after C31 (historical source for W2)
+
+C31 merged as bb77df0; its branch/worktree were later deleted. Prompt08 adapter
+records Engine DISPUTE_EARMARK reserve/release actions once each. Current checked-in
+results folder `eval/results/2026-10-27-model-none-c31/` has CounterSign 170/240
+(34/48 pass^5), rules_only 215/240 (43/48), zero error rows/four measured invariant
+counters. Eleven of 14 remaining scenario failures require disabled agent actions;
+open non-agent follow-ups are two key-window-expired cases and onhold-then-failed.
+README history: CounterSign 80->115->170, rules_only 215->215->215, all of 240 runs.
+These are mock/model-disabled results, not real-model/sandbox evidence.
+
 ## C31 payout-run approval refresh
 
 Source: `prompts/codex/active/CODEX-PROMPT-C31-RUN-APPROVAL-REFRESH.md` in the

@@ -119,6 +119,7 @@ async def simulate_run(conn, run_id, *, respect_reserves=True):
     protected_orders = {r["order_id"] for r in disputes}
     protected_ids = {r["obligation_id"] for r in reservations if r["kind"] == "DISPUTE_EARMARK"}
     grouped = defaultdict(int)
+    disputed_by_maker = defaultdict(int)
     withheld = 0
     for obligation in obligations:
         protected = (
@@ -128,6 +129,7 @@ async def simulate_run(conn, run_id, *, respect_reserves=True):
         )
         if protected:
             withheld += obligation["amount_minor"]
+            disputed_by_maker[obligation["maker_id"]] += obligation["amount_minor"]
         if not respect_reserves or not protected:
             grouped[obligation["maker_id"]] += obligation["amount_minor"]
     payout = sum(max(0, amount) for amount in grouped.values())
@@ -155,6 +157,9 @@ async def simulate_run(conn, run_id, *, respect_reserves=True):
     other = position.cash_reserved.minor - own
     before = position.effective_available.minor - other
     after = before - payout
+    makers = {row["id"]: row["display_name"] for row in await rows(
+        conn, "SELECT id,display_name FROM makers ORDER BY id"
+    )}
     return {
         "run_id": str(run_id),
         "respect_reserves": respect_reserves,
@@ -169,6 +174,12 @@ async def simulate_run(conn, run_id, *, respect_reserves=True):
         "dispute_earmarks_not_subtracted": money(position.earmarked.minor, currency),
         "disputed_shares": money(withheld, currency),
         "payout": money(payout, currency),
+        "makers": [
+            {"maker_id": str(maker_id), "display_name": makers[maker_id],
+             "amount": money(max(0, amount), currency),
+             "disputed_shares": money(disputed_by_maker[maker_id], currency)}
+            for maker_id, amount in sorted(grouped.items())
+        ],
         "available_change": money(-payout, currency),
         "unreserved_before": money(before, currency),
         "unreserved_after": money(after, currency),

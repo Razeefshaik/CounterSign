@@ -1,7 +1,9 @@
 """Bounded read/investigate/propose loop; never writes or evaluates permission."""
 
 import asyncio
+import re
 from collections.abc import Mapping
+from dataclasses import replace
 
 from countersign.agent.models import ModelError, create_model
 from countersign.agent.params import ProposalParamsError
@@ -9,6 +11,24 @@ from countersign.agent.prompts import SYSTEM_PROMPT
 from countersign.agent.proposal import ProposalError, StructuredProposal, parse_proposal
 from countersign.agent.safety import injection_flags, sanitize
 from countersign.agent.tools import RECOVERABLE_TOOL_ERRORS, ToolError
+
+TRACE_KEYS = frozenset({
+    "id", "dispute_id", "order_id", "transaction_id", "payout_item_id", "run_id",
+    "maker_id", "query", "limit", "page", "page_size", "start_date", "end_date",
+    "start_time", "end_time", "dispute_state", "respect_reserves", "currency_code",
+})
+
+
+def trace_arguments(arguments, secrets=()):
+    """Keep only bounded query identifiers/options, never free-form read text."""
+    safe = sanitize(arguments, secrets)
+    return {key: value for key, value in safe.items() if key in TRACE_KEYS and (
+        type(value) in (bool, int) or (isinstance(value, str) and len(value) <= 128 and (
+            re.fullmatch(r"[A-Za-z0-9_:.-]+", value)
+            or re.fullmatch(r"[A-Za-z0-9]\*\*\*@[A-Za-z0-9.-]+", value)
+            or value == "<REDACTED>"
+        ))
+    )}
 
 
 class CommanderError(RuntimeError):
@@ -92,7 +112,8 @@ class Commander:
         observations, seen_calls = [], set()
         failed_calls = 0
         invalid_proposals = 0
-        for _ in range(self.max_rounds):
+        trace = []
+        for round_no in range(1, self.max_rounds + 1):
             request = {
                 "system": SYSTEM_PROMPT,
                 "data": data,
@@ -105,10 +126,13 @@ class Commander:
                 raise CommanderError("INVALID_MODEL_RESPONSE")
             if set(answer) == {"proposal_json"} or "tool_calls" not in answer:
                 try:
-                    return parse_proposal(
+                    proposal = parse_proposal(
                         answer["proposal_json"] if set(answer) == {"proposal_json"} else answer,
                         incident_id=identifier, flags=flags, secrets=self._secrets,
                     )
+                    return replace(proposal, raw_output={**proposal.raw_output, "agent_trace": {
+                        "model": self.model_id, "rounds": round_no, "calls": trace[:16],
+                    }})
                 except ProposalParamsError as error:
                     invalid_proposals += 1
                     if invalid_proposals >= 2:
@@ -138,6 +162,7 @@ class Commander:
                     raise CommanderError("COMMANDER_TOOL_BUDGET_EXCEEDED")
                 pending.append(sanitize(call, self._secrets))
             for call in pending:
+                error_code = None
                 try:
                     result = await self.tools.invoke(call["name"], call["args"])
                 except ToolError as error:
@@ -148,8 +173,12 @@ class Commander:
                     if failed_calls > self.max_failed_tool_calls:
                         raise CommanderError("COMMANDER_TOOL_BUDGET_EXCEEDED") from None
                     result = {"error": code, "tool": call["name"]}
+                    error_code = code
                 except Exception:  # noqa: BLE001 - tool errors may contain credentials or buyer text.
                     raise CommanderError("COMMANDER_TOOL_FAILED") from None
+                trace.append({"tool": call["name"],
+                              "arguments": trace_arguments(call["args"], self._secrets),
+                              "ok": error_code is None, "error_code": error_code})
                 flags.extend(
                     injection_flags(result, source=f"tool:{call['name']}", secrets=self._secrets)
                 )

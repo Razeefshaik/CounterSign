@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.5 (Oct 27, 2026).** 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.6 (Oct 27, 2026).** 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -78,7 +78,7 @@ All examples below use the demo week from HANDOFF section 10.
 
 ```json
 {"mode": "demo", "paypal_env": "mock", "simulated": true, "simulation_label": "Simulated: mock PayPal",
- "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.5"}
+ "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.6"}
 ```
 
 - `mode` is `demo` (runs against the local mock) or `live` (runs against the sandbox).
@@ -126,6 +126,19 @@ All examples below use the demo week from HANDOFF section 10.
 `GET /api/v1/proposals?incident_id=...` returns `{"items": [Proposal], "next_cursor": null}`.
 
 `rule_results` lists **every** rule the shield evaluated, including the ones that passed. Core stores this list in `proposals.verdict_details`.
+
+Every dashboard Proposal (including incident-detail proposals) also has
+`agent_trace`: null for deterministic planning or older rows, otherwise
+`{"model": "scripted", "rounds": 2, "calls": [{"tool": "get_dispute",
+"arguments": {"dispute_id": "PP-D-1"}, "ok": true, "error_code": null}]}`.
+The commander records actual completed read attempts, at most 16 calls per step;
+rounds is an integer from 1 to 32. Arguments contain only sanitized, bounded
+identifier/query-option keys; full emails are masked. Recoverable read failures
+use their fixed error code and `ok: false`. There is no tool output, raw model
+conversation, credential, or invented call. Scripted rationales explicitly say
+"Scripted" and describe the facts/context used; an empty calls list means no read
+tool was called, even when incident context was available.
+
 
 **Example: autonomous action, allowed and executed**
 
@@ -914,3 +927,71 @@ class System(Protocol):
 - the model name;
 - the provenance split;
 - one line stating that the baseline ran only against the mock with documented idempotency handling.
+
+
+## 7. Story data (1.0.6)
+
+### `GET /api/v1/demo/comparison`
+
+Read-only, exposed only under the playground guard: runtime `mode=demo` and a
+validated loopback mock (`paypal.is_mock=true`); otherwise HTTP 404. The endpoint
+performs no simulator, model or provider calls and writes nothing. It reads only
+saved comparison evidence plus the bound run, reservations and execution history.
+A database without CLI-saved evidence returns
+`{"available": false, "needs": "friday_plan"}` even if a run exists.
+
+The latest CLI-saved Friday run is the root, including after the following-week
+A-only run. Successful responses have:
+
+- `available: true`, `simulated: true`, `simulation_label: "Simulated: mock PayPal"`,
+  `run_id`, and `week_start`.
+- `naive`: `source: "simulated"`, `recorded_at` (RFC3339), `payout`,
+  `disputed_shares`, `shortfall`, `unreserved_after`, and `makers` with
+  `maker_id`, `display_name`, `amount`, `disputed_shares`. All figures are the
+  saved simulator result with `respect_reserves=false`, never an invented
+  counterfactual double payment or refund. The staged Friday values are 150000,
+  41400, 0 and 30000 minor USD respectively.
+- `countersign`: `source: "recorded"`, `total`, `lines` (`line_id`, `maker`,
+  `amount`), `resends` (the run-detail replacement shape), and current `held_back`
+  reserves grouped by maker/currency (`maker_id`, `display_name`, `amount`,
+  `dispute_ids`, `paypal_dispute_ids`). Friday's run total is 108600 minor USD;
+  after A's release, only B's 5400 remains held back. This is current reserve
+  state, while `naive` remains the original Friday simulation.
+- `moments`: `lost_response`, `injection`, `settled_retry`, each null until the
+  corresponding evidence exists. Every populated moment has `source: "recorded"`.
+  Lost response includes `line_id`, `payout_batch_id`, `payment_count`,
+  `exactly_one`, `duplicate_400_linked`, requiring a confirmed replay and settled
+  attempt; the 400/link fact is true only with its CLI-captured, operation-bound
+  audit evidence. Injection and settled retry include `proposal_id` and
+  `block_rules`, taken from real shield-blocked proposals. Injection requires
+  PROMPT_INJECTION plus both INJECTION_GUARD and PAYEE_INTEGRITY; settled retry
+  requires SETTLEMENT and a line belonging to this comparison run.
+
+All monetary values remain `{minor: integer, currency: string}`. Names and IDs
+are masked before response. Unknown storage/read failures return HTTP 503 with
+fixed `DATA_UNAVAILABLE`, never fabricated numbers.
+
+### Additive simulator fields
+
+The existing read-only simulator retains every field and refusal condition.
+Its successful result additionally contains `makers`, each with `maker_id`,
+`display_name`, `amount` (nonnegative simulated payment) and `disputed_shares`.
+The demo CLI saves only safe IDs, masked display names and these amounts in one
+existing STATE_TRANSITION audit row per run. This does not authorize execution.
+
+### `web/results/summary.json`
+
+Generated exclusively by `python -m scripts.bundle_results` from published local
+sources. `model_off` contains labelled mock/model-none scoreboard rows:
+`system`, `ground`, `model`, `passing`, `runs`, `scenarios`, `k`,
+`pass_5_scenarios`, `error_rows`, four `invariants`, and `source`.
+The current source is `eval/results/2026-10-27-model-none-c31/summary.json`,
+checked against its `runs.jsonl`. `history` has six system/experiment rows from
+that folder's three-run README table, with `passing`, `runs`, `ground`, `model`
+and `source`. `real_model` is null until published non-model-none/non-scripted
+rows exist, then a source-folder/model/run-count catalog. `sandbox_findings`
+contains `{id, claim, observed, evidence_path: [relative paths]}` for DIFFERENT
+or confirmed/resolved findings, kept separate from mock scores. `limitations`
+retains honest scope caveats. The bundle includes no keys, emails or provider
+output and does not rerun experiments. Zero measured invariant counts are not
+a universal safety claim.

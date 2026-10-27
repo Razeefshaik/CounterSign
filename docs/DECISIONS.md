@@ -433,3 +433,13 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | A demo-only playground evaluates the proposal a fooled agent would make against every shield rule in a transaction that always rolls back, and reports pattern-filter flags separately from the verdict | Owner review: judges need an interactive safety moment | Accept | The pattern filter is only a hint, so the honest demonstration is that the shield blocks the resulting proposal even when the filter misses; rollback keeps the shared hosted database free of judges' attempts |
+
+## Oct 27 W2 story data
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Add per-maker amounts and disputed shares to successful simulator results, preserving all existing fields/refusals | W2 owner scope approval | Accept | A truthful naive comparison needs the simulator's actual allocation, without inventing double payments or refunds |
+| The mock-only demo CLI saves one masked Friday simulation in an existing STATE_TRANSITION audit row; comparison GETs only read that evidence, its timestamp and the bound run/history | W2 owner scope approval | Accept | Finished runs cannot be resimulated against changed cash/reserves; databases without saved evidence must report unavailable |
+| Commander records at most 16 actual read attempts with sanitized identifier/query arguments and fixed outcomes; dashboard exposes only this projection and planners/older rows have null | W2 owner prompt | Accept | Explain which tools actually ran without persisting tool output, raw model text, credentials or fabricated reasoning |
+| Scripted demo rationales name their staged facts and say Scripted; recorded duplicate-400 proof binds the captured response to a GET-confirmed recovered operation in an existing audit kind | W2 owner prompt | Accept | The presentation must distinguish staged reasoning and observed recovery from claims about a real model |
+| CONTRACTS 1.0.6 adds the demo comparison endpoint, additive traces and generated results bundle; only web/results/summary.json is generated under web | W2 owner prompt | Accept | Future UI work gets stable, honestly labelled backend data while the active redesign stays untouched |
