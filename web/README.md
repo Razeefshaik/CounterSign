@@ -1,5 +1,35 @@
 # CounterSign dashboard (M06, M10)
 
+M19 adds **Mock replay** (`#replay`): F01 and the settled-obligation scenario,
+paired by run ID, scenario, repetition and seed. The bundled four runs were
+executed with M11's `run_one`, `rules_only` and CounterSign, `model=none`.
+They are mock checks, not real-model benchmark results. The settled CounterSign
+run reports `EVALUATION_FAILED` despite zero invariant violations and completed
+payouts; that runner outcome is preserved visibly, not rewritten as a pass.
+Neither rules-only nor CounterSign duplicates a payout in these observations.
+
+Use **Next action** or **Show all actions** to inspect recorded traces alongside
+final mock ground-truth payout items. Final payouts are a separately labelled
+observation, not a reconstructed intermediate balance. Select **Baseline LLM**
+and load M18's `runs.jsonl` later; absent runs remain unavailable. Summary-only
+files show metrics, with traces and payouts explicitly unavailable.
+
+`web/replays/evidence.json` is a separate optional, public replay artifact keyed
+by the same sample fields plus system and `ground: mock`. It holds sanitized
+`actions` (at/action/outcome/approved_by_owner) and final `payout_items`
+(id/amount/status/money_left_account/created_at); no receiver, request payload,
+credentials or untrusted notes are saved. It does not change CONTRACTS 6.3.
+The browser accepts both files locally without uploading them. Sandbox files,
+invalid data, duplicate samples and files over 10 MB are refused.
+
+Reproduce the bundled evidence using a migrated disposable `_eval` database:
+
+    python web/tests/build_replay.py --database-url postgresql://.../web_replay_eval
+
+No model, `.env`, sandbox credentials or real PayPal calls are used. The
+generator wraps teardown to capture the public mock control API and SystemTrace
+without changing `eval/` or `mock_paypal/`.
+
 Run from the repository root with the approved FastAPI/Uvicorn dependencies:
 
     python web/serve.py

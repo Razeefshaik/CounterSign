@@ -1,0 +1,106 @@
+[
+  {
+    "run_id": "m19-model-none",
+    "system": "rules_only",
+    "scenario_id": "F01_timeout_after_payout_created",
+    "k": 0,
+    "seed": 17,
+    "ground": "mock",
+    "payout_items": [
+      {
+        "id": "MOCKI00000007473DA950666D",
+        "amount": {
+          "value": "486.00",
+          "currency": "USD"
+        },
+        "status": "SUCCESS",
+        "money_left_account": true,
+        "created_at": "2026-11-02T09:00:00Z"
+      }
+    ],
+    "actions": [
+      {
+        "at": "2026-11-02T09:00:00Z",
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "outcome": "ok",
+        "approved_by_owner": true
+      },
+      {
+        "at": "2026-11-02T09:00:00Z",
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "outcome": "unknown",
+        "approved_by_owner": true
+      }
+    ]
+  },
+  {
+    "run_id": "m19-model-none",
+    "system": "countersign",
+    "scenario_id": "F01_timeout_after_payout_created",
+    "k": 0,
+    "seed": 17,
+    "ground": "mock",
+    "payout_items": [
+      {
+        "id": "MOCKI00000007473DA950666D",
+        "amount": {
+          "value": "486.00",
+          "currency": "USD"
+        },
+        "status": "SUCCESS",
+        "money_left_account": true,
+        "created_at": "2026-11-02T09:00:00Z"
+      }
+    ],
+    "actions": [
+      {
+        "at": "2026-11-02T09:00:00Z",
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "outcome": "ok",
+        "approved_by_owner": true
+      }
+    ]
+  },
+  {
+    "run_id": "m19-model-none",
+    "system": "rules_only",
+    "scenario_id": "F_retry_settled_obligation",
+    "k": 0,
+    "seed": 17,
+    "ground": "mock",
+    "payout_items": [
+      {
+        "id": "MOCKI-B-settled",
+        "amount": {
+          "value": "486.00",
+          "currency": "USD"
+        },
+        "status": "SUCCESS",
+        "money_left_account": true,
+        "created_at": "2026-10-30T09:00:00Z"
+      }
+    ],
+    "actions": []
+  },
+  {
+    "run_id": "m19-model-none",
+    "system": "countersign",
+    "scenario_id": "F_retry_settled_obligation",
+    "k": 0,
+    "seed": 17,
+    "ground": "mock",
+    "payout_items": [
+      {
+        "id": "MOCKI-B-settled",
+        "amount": {
+          "value": "486.00",
+          "currency": "USD"
+        },
+        "status": "SUCCESS",
+        "money_left_account": true,
+        "created_at": "2026-10-30T09:00:00Z"
+      }
+    ],
+    "actions": []
+  }
+]
