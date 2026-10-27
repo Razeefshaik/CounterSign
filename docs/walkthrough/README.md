@@ -68,6 +68,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | [c27-hosting.md](c27-hosting.md) | Free hosting options compared, the single-container demo image, owner deploy steps and what stays off |
 | [c28-submission-checklist.md](c28-submission-checklist.md) | README placeholders, claims check, video shot list, GitHub About, hosting and the Devpost form |
 | [c28-devpost.md](c28-devpost.md) | The Devpost form text, ready to paste, with results left as named placeholders |
+| [c28-video-script.md](c28-video-script.md) | The under-3-minute video: narration and clicks mapped to the demo bar's steps |
 | [m17-demo-bar.md](m17-demo-bar.md) | The dashboard's staged-week control bar, why it cannot bypass the shield, and the step-by-step video recording flow |
 
 ## Words used everywhere
