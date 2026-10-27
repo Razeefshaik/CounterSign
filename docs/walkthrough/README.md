@@ -65,6 +65,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | [c25-demo-week.md](c25-demo-week.md) | The staged marketplace week, three safety moments, exact Friday approval and owner-operated sandbox runbook |
 | [m09a-mock-sandbox-facts.md](m09a-mock-sandbox-facts.md) | Duplicate payout recovery, confirmed cancellation responses and both dispute request formats in the local mock |
 | [m13-baseline-llm.md](m13-baseline-llm.md) | The plain LLM baseline: mock-only tools, PayPal's own idempotency used correctly, quota stop and the TCP mock option |
+| [m14-fault-library.md](m14-fault-library.md) | The 48-scenario fault library: what each fault tests, real versus synthesised, rules_only scores and the forced payout-outcome mock control |
 | [c27-hosting.md](c27-hosting.md) | Free hosting options compared, the single-container demo image, owner deploy steps and what stays off |
 | [c28-submission-checklist.md](c28-submission-checklist.md) | README placeholders, claims check, video shot list, GitHub About, hosting and the Devpost form |
 | [c28-devpost.md](c28-devpost.md) | The Devpost form text, ready to paste, with results left as named placeholders |

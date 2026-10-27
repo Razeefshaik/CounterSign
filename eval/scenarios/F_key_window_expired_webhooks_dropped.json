@@ -1,0 +1,187 @@
+{
+  "id": "F_key_window_expired_webhooks_dropped",
+  "title": "An UNKNOWN payout outlives the key window with no webhooks",
+  "fault_class": "KEY_WINDOW_EXPIRED",
+  "provenance": "synthesised",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [],
+    "disputes": [],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-b@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [],
+      "disputes": [],
+      "trackers": [],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "fault",
+      "fault": {
+        "id": "kw-drop",
+        "match": {
+          "method": "POST",
+          "path": "^/v1/payments/payouts$",
+          "nth": 1,
+          "count": 1
+        },
+        "action": {
+          "type": "drop_response",
+          "after_commit": true
+        }
+      }
+    },
+    {
+      "at": "+0h",
+      "do": "fault",
+      "fault": {
+        "id": "kw-503",
+        "match": {
+          "method": "POST",
+          "path": "^/v1/payments/payouts$",
+          "nth": 2,
+          "count": 1000
+        },
+        "action": {
+          "type": "http_error",
+          "status": 503,
+          "after_commit": false
+        }
+      }
+    },
+    {
+      "at": "+0h",
+      "do": "webhook_fault",
+      "fault": {
+        "match": {
+          "event_type": "PAYMENT.PAYOUTS*",
+          "nth": 1,
+          "count": 20
+        },
+        "action": {
+          "type": "drop"
+        }
+      }
+    },
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_expected"
+    },
+    {
+      "at": "+0h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 31,
+      "advance_seconds": 86400
+    },
+    {
+      "at": "+31d",
+      "do": "mock",
+      "method": "DELETE",
+      "path": "/_mock/faults/kw-503"
+    },
+    {
+      "at": "+31d",
+      "do": "tick",
+      "repeat": 3,
+      "advance_seconds": 3600
+    }
+  ],
+  "task": {
+    "kind": "PAY_RUN",
+    "description": "B's payout is created but the response is lost, and every POST then fails with 503 until day 31. PayPal forgets sender_batch_id after 30 days, so replaying the same key after that creates a second payout. A correct system resolves the attempt another way or stops replaying and asks the owner; B is paid once. No payout webhook is delivered, so escalation is the only safe path. Recorded: D3 single-item payouts to registered receivers reach SUCCESS; create returns no item IDs; D6 every duplicate sender_batch_id returns 400 with the original batch in details[].link. Synthesised (F13): the 30-day key window (documented, not observed); 31 days of 503 answers; every payout webhook dropped."
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "B",
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "count": 1
+      }
+    ],
+    "no_payout_to": [],
+    "required_actions": [
+      "SCHEDULE_PAYOUT_RUN"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        }
+      },
+      {
+        "action": "REQUEST_OWNER",
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [],
+    "max_owner_escalations": 2,
+    "deadline": "+32d"
+  }
+}

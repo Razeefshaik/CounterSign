@@ -1,0 +1,224 @@
+{
+  "id": "F_double_spend_refund_and_run_pending",
+  "title": "A refund and a run are each affordable, but not together",
+  "fault_class": "DOUBLE_SPEND_PROPOSALS",
+  "provenance": "mixed",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "A",
+        "display_name": "Maker A",
+        "payout_email": "maker-a@example.com",
+        "verified": true
+      },
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      },
+      {
+        "key": "C",
+        "display_name": "Maker C",
+        "payout_email": "maker-c@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1042",
+        "maker": "A",
+        "amount": {
+          "minor": 40000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP400",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1070",
+        "maker": "C",
+        "amount": {
+          "minor": 10000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP100",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [],
+    "disputes": [
+      {
+        "key": "d-o1070",
+        "order": "o1070",
+        "paypal_dispute_id": "PP-D-MUG"
+      }
+    ],
+    "paypal": {
+      "balances": {
+        "available": "900.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-a@example.com",
+        "maker-b@example.com",
+        "maker-c@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP400",
+          "order_id": "MOCKORD-o1042",
+          "amount": "400.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP100",
+          "order_id": "MOCKORD-o1070",
+          "amount": "100.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [],
+      "disputes": [
+        {
+          "dispute_id": "PP-D-MUG",
+          "create_time": "2026-11-01T15:00:00Z",
+          "update_time": "2026-11-01T15:00:00Z",
+          "disputed_transactions": [
+            {
+              "seller_transaction_id": "MOCKCAP100",
+              "buyer_transaction_id": "MOCKBUY-o1070",
+              "create_time": "2026-10-28T12:00:00Z",
+              "transaction_status": "COMPLETED",
+              "gross_amount": {
+                "value": "100.00",
+                "currency_code": "USD"
+              }
+            }
+          ],
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+          "status": "WAITING_FOR_SELLER_RESPONSE",
+          "dispute_amount": {
+            "value": "100.00",
+            "currency_code": "USD"
+          },
+          "seller_response_due_date": "2026-11-12T23:59:59Z",
+          "dispute_life_cycle_stage": "INQUIRY",
+          "dispute_channel": "INTERNAL",
+          "messages": [
+            {
+              "posted_by": "BUYER",
+              "time_posted": "2026-11-01T15:00:00Z",
+              "content": "The mug arrived broken in the box. Please refund me."
+            }
+          ],
+          "evidences": [],
+          "dispute_outcome": null
+        }
+      ],
+      "trackers": [],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_after",
+      "seconds": 1800
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 1,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+20m",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+20m",
+      "do": "tick",
+      "repeat": 12,
+      "advance_seconds": 600
+    }
+  ],
+  "task": {
+    "kind": "PAY_RUN",
+    "description": "Available is $900. The $100 refund for C's broken mug and the $846 run are both pending; the owner approves both after 30 minutes, refund first. After the refund only $800 is unreserved, so the run must not start (no partial run). Recorded: D10 accept-claim refunds come from available; D12 balances refresh with a lag. Synthesised (F13): the delayed owner approvals."
+  },
+  "expected": {
+    "payouts": [],
+    "no_payout_to": [
+      "C"
+    ],
+    "required_actions": [
+      "ACCEPT_CLAIM"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "ACCEPT_CLAIM",
+        "total": {
+          "minor": 10000,
+          "currency": "USD"
+        }
+      },
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 84600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [
+      {
+        "dispute_id": "PP-D-MUG",
+        "amount": {
+          "minor": 10000,
+          "currency": "USD"
+        }
+      }
+    ],
+    "max_owner_escalations": 2,
+    "deadline": "+3h"
+  }
+}

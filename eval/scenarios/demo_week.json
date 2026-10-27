@@ -232,7 +232,7 @@
   ],
   "task": {
     "kind": "PAY_RUN",
-    "description": "Demo week: reserve disputed shares and pay $1,086 once. The prior C receiver is already owner verified; tracking is merchant uploaded, not carrier proof."
+    "description": "Demo week: reserve disputed shares and pay $1,086 once. The prior C receiver is already owner verified; tracking is merchant uploaded, not carrier proof. Synthesised (F13): M08 label; the seeded prior C item is a hand-built fixture flagged synthesised and disputes are staged controls. Recorded: D3 payouts, D4 UNCLAIMED, D5 cancel and D8 dispute freeze are the behaviours the mock replays."
   },
   "expected": {
     "payouts": [

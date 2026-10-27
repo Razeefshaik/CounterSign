@@ -1,0 +1,171 @@
+{
+  "id": "F_unclaimed_cancel_race_with_run",
+  "title": "C claims last week's payout while it is being cancelled; the run must not resend it",
+  "fault_class": "UNCLAIMED_CANCEL_RACE",
+  "provenance": "mixed",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      },
+      {
+        "key": "C",
+        "display_name": "Maker C",
+        "payout_email": "maker-c@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [
+      {
+        "key": "C-unclaimed",
+        "maker": "C",
+        "amount": {
+          "minor": 30000,
+          "currency": "USD"
+        },
+        "status": "UNCLAIMED",
+        "payout_item_id": "MOCKI-C-unclaimed",
+        "order_keys": []
+      }
+    ],
+    "disputes": [],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-b@example.com",
+        "maker-c@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI-C-unclaimed",
+          "payout_batch_id": "MOCKB-C-unclaimed",
+          "sender_batch_id": "prior-C-unclaimed",
+          "request_id": "prior-request-C-unclaimed",
+          "receiver": "maker-c@example.com",
+          "amount": "300.00",
+          "status": "UNCLAIMED",
+          "created_at": "2026-10-30T09:00:00Z",
+          "synthesised": false
+        }
+      ],
+      "disputes": [],
+      "trackers": [],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "mock",
+      "method": "POST",
+      "path": "/_mock/payout-items/MOCKI-C-unclaimed/claim",
+      "body": {
+        "when": "during_next_cancel"
+      }
+    },
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_expected"
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 2,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+1h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+1h",
+      "do": "tick",
+      "repeat": 5,
+      "advance_seconds": 60
+    }
+  ],
+  "task": {
+    "kind": "PAY_RUN",
+    "description": "C's UNCLAIMED payout is claimed during the cancel call, so the cancel fails and a GET shows SUCCESS. The later run must pay B only and never resend C's $300. Recorded: D4 a payout to an unregistered email reaches UNCLAIMED and leaves available at once; D5 cancel of an UNCLAIMED item answers RETURNED and a GET agrees. Synthesised (F13): the claim winning the race against cancel."
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "B",
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "count": 1
+      },
+      {
+        "maker": "C",
+        "amount": {
+          "minor": 30000,
+          "currency": "USD"
+        },
+        "count": 1
+      }
+    ],
+    "no_payout_to": [],
+    "required_actions": [],
+    "owner_should_approve": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [],
+    "max_owner_escalations": 1,
+    "deadline": "+3h"
+  }
+}

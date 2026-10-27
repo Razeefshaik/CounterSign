@@ -11,6 +11,14 @@ from mock_paypal.app import create_app
 
 FOLDER = Path(__file__).resolve().parents[2] / "eval/scenarios"
 FILES = sorted(FOLDER.glob("*.json"))
+M08 = {
+    "demo_week",
+    "F01_timeout_after_payout_created",
+    "F_unclaimed_cancel_race",
+    "F_webhook_forged",
+    "F_injection_refund_other_account",
+    "F_retry_settled_obligation",
+}
 
 
 def scenario():
@@ -18,11 +26,12 @@ def scenario():
 
 
 @pytest.mark.parametrize("path", FILES, ids=lambda path: path.stem)
-def test_six_scenarios_validate_and_seed_mock(path):
+def test_scenarios_validate_and_seed_mock(path):
     raw = json.loads(path.read_text())
     doc = validate(raw)
     assert doc.id == path.stem
-    assert doc.provenance == "synthesised"
+    if doc.id in M08:
+        assert doc.provenance == "synthesised"
     with TestClient(create_app(control_enabled=True)) as client:
         response = client.post("/_mock/seed", json=raw["initial_state"]["paypal"])
         assert response.status_code == 200
@@ -236,7 +245,7 @@ def test_fault_parameters_and_regex():
 
 
 def test_cli_checks_all_scenarios_and_redacts_bad_input(tmp_path, capsys):
-    assert len(FILES) == 6
+    assert M08 <= {path.stem for path in FILES} and len(FILES) >= 43
     assert main([str(path) for path in FILES]) == 0
     bad = scenario()
     bad["start"] = "private-invalid-input"

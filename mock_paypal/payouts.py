@@ -151,15 +151,26 @@ class PayoutService:
                 "PAYMENT.PAYOUTSBATCH.PROCESSING",
                 self.create_doc(batch, "http://localhost:8099"),
             )
+            stuck = False
             for item_id in batch.item_ids:
                 item = state.items[item_id]
                 if item.status == "PENDING":
-                    target = (
-                        "SUCCESS"
-                        if item.payload["receiver"] in state.registered_receivers
-                        else "UNCLAIMED"
-                    )
-                    self.transition(item, target)
+                    rule = self.forced_outcome(item)
+                    if rule is None:
+                        target = (
+                            "SUCCESS"
+                            if item.payload["receiver"] in state.registered_receivers
+                            else "UNCLAIMED"
+                        )
+                        self.transition(item, target)
+                    elif rule["to"] == "PENDING":
+                        item.synthesised, stuck = True, True
+                    else:
+                        if rule.get("errors") is not None:
+                            item.errors = deepcopy(rule["errors"])
+                        self.transition(item, rule["to"], synthesised=True)
+            if stuck:
+                return  # A stuck item keeps its batch PROCESSING; no completion event.
             batch.status = "SUCCESS"  # Batch processed; individual outcomes can differ.
             batch.completed_at = self.store.clock.now
             self.store.emit(
@@ -169,6 +180,18 @@ class PayoutService:
 
         self.store.clock.schedule(self.store.config.payout_processing_seconds, process)
         return batch
+
+    def forced_outcome(self, item: PayoutItem) -> dict | None:
+        """First /_mock/payout-outcomes rule due for this receiver, or None (M14)."""
+        chosen = None
+        for rule in self.store.faults.outcomes:
+            if rule["receiver"] != item.payload["receiver"]:
+                continue
+            rule["seen"] += 1
+            if chosen is None and rule["seen"] >= rule["nth"] and rule["used"] < rule["count"]:
+                rule["used"] += 1
+                chosen = rule
+        return chosen
 
     def transition(
         self,

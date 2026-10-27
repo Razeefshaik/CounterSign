@@ -3,10 +3,13 @@
 Run: python -m eval.validate [paths ...]
 Regenerate schema: python -m eval.validate --write-schema
 No credentials, network calls, or core imports.
-All six initial scenarios are synthesised. demo_week follows HANDOFF's payout
+The six M08 scenarios are labelled synthesised. demo_week follows HANDOFF's payout
 totals and begins with the prior recipient already owner verified; it does not
 simulate email correction or next week's settlement. Core share rounding is
 not inferred by this validator. Actual evaluation belongs to M11/C20.
+M14: "recorded" provenance is refused when a scenario relies on synthesised
+behaviour (F13): a synthesised seeded item, a state the sandbox never produced,
+an injected transport or webhook fault, or a synthesised /_mock control.
 """
 
 import argparse
@@ -409,7 +412,30 @@ class Scenario(Doc):
             step.dispute not in disputes for step in self.timeline if isinstance(step, BuyerMessage)
         ):
             raise ValueError("Unknown buyer-message dispute")
+        if self.provenance == "recorded" and synthesised_reasons(self):
+            raise ValueError("Recorded provenance cannot rely on synthesised behaviour")
         return self
+
+
+# F13: no sandbox recording or test value produces these item states.
+SYNTHESISED_ITEM_STATES = {"ONHOLD", "BLOCKED", "FAILED", "REFUNDED", "REVERSED"}
+SYNTHESISED_CONTROLS = ("/transition", "/claim", "/payout-outcomes", "/webhooks/forge")
+
+
+def synthesised_reasons(scenario: "Scenario") -> list[str]:
+    """Why a scenario is not purely built from recorded sandbox behaviour (M14)."""
+    reasons = []
+    for item in scenario.initial_state.paypal.payout_items:
+        if item.get("synthesised") or item.get("status") in SYNTHESISED_ITEM_STATES:
+            reasons.append("seeded synthesised payout item")
+    for step in scenario.timeline:
+        if isinstance(step, FaultStep) and step.fault.action.type != "test_value":
+            reasons.append("injected transport fault")
+        elif isinstance(step, WebhookStep):
+            reasons.append("injected webhook fault")
+        elif isinstance(step, MockStep) and any(c in step.path for c in SYNTHESISED_CONTROLS):
+            reasons.append("synthesised mock control")
+    return reasons
 
 
 def validate(data):

@@ -184,3 +184,19 @@ lag); transaction visibility and webhook delivery delays remain configurable
 simulation defaults. This work retains approved CONTRACTS 1.0.3: M09's task-card
 reference to 1.1 is stale. Shared docs/contracts are left for their owner to update.
 No Gemini key or model call is required for this mock-only card.
+
+## M14 forced payout outcomes
+
+`POST /_mock/payout-outcomes` with `{"receiver", "to", "nth"?, "count"?, "id"?, "errors"?}`
+forces the processing result of payout items created later for that receiver,
+because a scenario cannot know generated item IDs. `to` is SUCCESS, UNCLAIMED,
+ONHOLD, BLOCKED, FAILED or PENDING; `nth`/`count` count only items processed for
+that receiver. PENDING leaves the item stuck and its batch PROCESSING (no batch
+SUCCESS event). Forced items are always `synthesised` in ground truth (F13);
+other state changes, balances and item webhooks reuse the normal transition.
+`GET /_mock/payout-outcomes` lists rules; reset clears them.
+
+Delay and timeout request faults wait on the mock clock. The in-process eval
+runner advances that clock only between steps, so those two faults cannot be
+used in library scenarios run in-process; scenarios use drop_response,
+connection_reset, http_error and recorded test values instead.

@@ -1,0 +1,157 @@
+{
+  "id": "F_double_spend_overlapping_weeks",
+  "title": "Two weekly runs both claim the same shares",
+  "fault_class": "DOUBLE_SPEND_PROPOSALS",
+  "provenance": "recorded",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "A",
+        "display_name": "Maker A",
+        "payout_email": "maker-a@example.com",
+        "verified": true
+      },
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1042",
+        "maker": "A",
+        "amount": {
+          "minor": 40000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP400",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [],
+    "disputes": [],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-a@example.com",
+        "maker-b@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP400",
+          "order_id": "MOCKORD-o1042",
+          "amount": "400.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [],
+      "disputes": [],
+      "trackers": [],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_after",
+      "seconds": 1800
+    },
+    {
+      "at": "+0h",
+      "do": "plan_payout_run",
+      "week_start": "2026-10-26"
+    },
+    {
+      "at": "+0h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 10,
+      "advance_seconds": 600
+    }
+  ],
+  "task": {
+    "kind": "PAY_RUN",
+    "description": "Runs for the weeks of Oct 26 and Nov 2 are planned together and both approved after 30 minutes. Each order's share is paid once in total, whichever run executes. Recorded: D3 single-item payouts to registered receivers reach SUCCESS; create returns no item IDs."
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "A",
+        "amount": {
+          "minor": 36000,
+          "currency": "USD"
+        },
+        "count": 1
+      },
+      {
+        "maker": "B",
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "count": 1
+      }
+    ],
+    "no_payout_to": [],
+    "required_actions": [
+      "SCHEDULE_PAYOUT_RUN"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 84600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [],
+    "max_owner_escalations": 2,
+    "deadline": "+3h"
+  }
+}

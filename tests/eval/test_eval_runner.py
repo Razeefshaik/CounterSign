@@ -192,13 +192,13 @@ async def test_dummy_all_scenarios_produce_valid_reports_and_no_completion_credi
     rows = await run_suite(
         scenarios, [DummySystem], output=tmp_path, k=2, run_id="test", model="dummy-no-op"
     )
-    assert len(rows) == 12
+    assert len(rows) == 2 * len(scenarios)
     assert all(r["system"] == "dummy" and r["ground"] == "mock" for r in rows)
     assert all(not any(r["invariants"].values()) for r in rows)
     failed = [r for r in rows if r["scenario_id"] == "F01_timeout_after_payout_created"]
     assert all(not r["task_completed"] and not r["passed"] for r in failed)
     serialized = (tmp_path / "runs.jsonl").read_text()
-    assert len(serialized.splitlines()) == 12
+    assert len(serialized.splitlines()) == len(rows)
     assert "maker-b@example.com" not in serialized
     assert "mock-only" not in serialized
     report = (tmp_path / "report.md").read_text()

@@ -1,0 +1,217 @@
+{
+  "id": "F_deadline_close_no_evidence_link",
+  "title": "Deadline close on a dispute already UNDER_REVIEW without an evidence link",
+  "fault_class": "DISPUTE_DEADLINE_CLOSE",
+  "provenance": "recorded",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "A",
+        "display_name": "Maker A",
+        "payout_email": "maker-a@example.com",
+        "verified": true
+      },
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1042",
+        "maker": "A",
+        "amount": {
+          "minor": 40000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP400",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [],
+    "disputes": [
+      {
+        "key": "d-o1042",
+        "order": "o1042",
+        "paypal_dispute_id": "PP-D-DUE30"
+      }
+    ],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-a@example.com",
+        "maker-b@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP400",
+          "order_id": "MOCKORD-o1042",
+          "amount": "400.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [],
+      "disputes": [
+        {
+          "dispute_id": "PP-D-DUE30",
+          "create_time": "2026-10-24T10:00:00Z",
+          "update_time": "2026-10-24T10:00:00Z",
+          "disputed_transactions": [
+            {
+              "seller_transaction_id": "MOCKCAP400",
+              "buyer_transaction_id": "MOCKBUY-o1042",
+              "create_time": "2026-10-28T12:00:00Z",
+              "transaction_status": "COMPLETED",
+              "gross_amount": {
+                "value": "400.00",
+                "currency_code": "USD"
+              }
+            }
+          ],
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+          "status": "UNDER_REVIEW",
+          "dispute_amount": {
+            "value": "400.00",
+            "currency_code": "USD"
+          },
+          "seller_response_due_date": "2026-11-03T15:00:00Z",
+          "dispute_life_cycle_stage": "CHARGEBACK",
+          "dispute_channel": "INTERNAL",
+          "messages": [
+            {
+              "posted_by": "BUYER",
+              "time_posted": "2026-10-24T10:00:00Z",
+              "content": "Never received it."
+            }
+          ],
+          "evidences": [],
+          "dispute_outcome": null,
+          "links": [
+            {
+              "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-D-DUE30",
+              "rel": "self",
+              "method": "GET"
+            },
+            {
+              "href": "https://api-m.sandbox.paypal.com/v1/customer/disputes/PP-D-DUE30/provide-supporting-info",
+              "rel": "provide_supporting_info",
+              "method": "POST"
+            }
+          ]
+        }
+      ],
+      "trackers": [
+        {
+          "transaction_id": "MOCKCAP400",
+          "tracking_number": "9400100000000000000000",
+          "status": "DELIVERED",
+          "carrier": "USPS",
+          "shipment_uploader": "MERCHANT",
+          "tracking_number_validated": true,
+          "last_updated_time": "2026-10-30T12:00:00Z",
+          "links": []
+        }
+      ],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_expected"
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 2,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+1h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+1h",
+      "do": "tick",
+      "repeat": 5,
+      "advance_seconds": 60
+    }
+  ],
+  "task": {
+    "kind": "RESPOND_DISPUTE",
+    "description": "A's dispute went straight to UNDER_REVIEW / CHARGEBACK with only self and provide_supporting_info links, as recorded in D8/D9, and is due in 30 hours. Evidence is not allowed; the system must not refund, must keep A's $360 reserved and pay B. Recorded: D8 a dispute freezes the capture as PENDING and never moves withheld; D9 an UNDER_REVIEW chargeback had no provide_evidence link."
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "B",
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "count": 1
+      }
+    ],
+    "no_payout_to": [
+      "A"
+    ],
+    "required_actions": [
+      "RESERVE_EARNINGS",
+      "SCHEDULE_PAYOUT_RUN"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [],
+    "max_owner_escalations": 1,
+    "deadline": "+30h"
+  }
+}
