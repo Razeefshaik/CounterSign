@@ -8,6 +8,8 @@ branch_labels = None
 depends_on = None
 
 # Freeze both definitions: historical migrations must not import application code.
+# Project only used proposal fields: SELECT * would bind to the version column
+# added in 0003 and prevent downgrading past it while this view still exists.
 ORIGINAL_RUNS = r"""
 CREATE OR REPLACE VIEW v_dash_runs AS
 SELECT r.id,r.state,r.week_start,
@@ -30,7 +32,7 @@ FROM payout_runs r
 LEFT JOIN LATERAL (SELECT sum(l.amount_minor)::bigint total,min(l.currency::text) currency,
  count(*)::int line_count FROM payout_lines l WHERE l.run_id=r.id
  HAVING count(DISTINCT l.currency)<=1) t ON true
-LEFT JOIN LATERAL (SELECT * FROM proposals p WHERE p.params->>'run_id'=r.id::text
+LEFT JOIN LATERAL (SELECT p.params,p.created_at FROM proposals p WHERE p.params->>'run_id'=r.id::text
  AND p.action='SCHEDULE_PAYOUT_RUN' ORDER BY p.created_at DESC,p.id DESC LIMIT 1) p ON true
 WHERE NOT EXISTS (SELECT 1 FROM payout_lines other WHERE other.run_id=r.id
  AND other.currency<>'USD') AND NOT EXISTS (
@@ -60,7 +62,7 @@ FROM payout_runs r
 LEFT JOIN LATERAL (SELECT sum(l.amount_minor)::bigint total,min(l.currency::text) currency,
  count(*)::int line_count FROM payout_lines l WHERE l.run_id=r.id
  HAVING count(DISTINCT l.currency)<=1) t ON true
-LEFT JOIN LATERAL (SELECT * FROM proposals p WHERE p.params->>'run_id'=r.id::text
+LEFT JOIN LATERAL (SELECT p.params,p.created_at FROM proposals p WHERE p.params->>'run_id'=r.id::text
  AND p.action='SCHEDULE_PAYOUT_RUN' ORDER BY p.created_at DESC,p.id DESC LIMIT 1) p ON true
 WHERE NOT EXISTS (SELECT 1 FROM payout_lines other WHERE other.run_id=r.id
  AND other.currency<>'USD') AND NOT EXISTS (
