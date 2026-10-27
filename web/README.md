@@ -52,6 +52,13 @@ Validation on Oct 27, 2026: 138 dashboard tests passed against PostgreSQL 16
 with both test environment variables set; 39 Node tests passed; `ruff check .`
 passed and all 3 import-linter contracts were kept. An exploratory full-repo
 pytest run was stopped; these results cover the dashboard task scope.
+Lighthouse 13.5.0 measured accessibility at 100/100 on the incident desk.
+The rebuilt final Docker image passed 28 additional checks across all seven
+views, desktop/phone widths and light/dark themes, with no console errors or
+JavaScript exceptions. The restart screenshot was verified against both the
+API's empty incident list and the refreshed UI after clicking Restart week.
+The compact validation record and PNG hashes are in `web/tests/verification.json`;
+raw inspector and test output remain local under ignored `web/tests/artifacts/`.
 Chrome completed the 11 staged UI steps, observed $354.00 unreserved, and
 confirmed that restart clears the marketplace. There were no browser exceptions
 in that run. Light/dark checks cover 1440, 768 and 390px on clean views and
@@ -65,6 +72,15 @@ plus `clean-start.png` and `restart-week-dark.png`. All capture the local mock;
 the persistent simulation banner is visible. Published screenshot state is
 Friday's pending run, before the staged owner approval. No screenshot uses
 sandbox credentials or real emails.
+
+| View | Desktop | Phone | Dark desktop | Dark phone |
+| --- | --- | --- | --- | --- |
+| Incident desk | [PNG](../docs/media/desk.png) | [PNG](../docs/media/desk-phone.png) | [PNG](../docs/media/desk-dark.png) | [PNG](../docs/media/desk-phone-dark.png) |
+| Decision | [PNG](../docs/media/decision.png) | [PNG](../docs/media/decision-phone.png) | [PNG](../docs/media/decision-dark.png) | [PNG](../docs/media/decision-phone-dark.png) |
+| Payout runs | [PNG](../docs/media/runs.png) | [PNG](../docs/media/runs-phone.png) | [PNG](../docs/media/runs-dark.png) | [PNG](../docs/media/runs-phone-dark.png) |
+| Cash | [PNG](../docs/media/cash.png) | [PNG](../docs/media/cash-phone.png) | [PNG](../docs/media/cash-dark.png) | [PNG](../docs/media/cash-phone-dark.png) |
+| Money graph | [PNG](../docs/media/graph.png) | [PNG](../docs/media/graph-phone.png) | [PNG](../docs/media/graph-dark.png) | [PNG](../docs/media/graph-phone-dark.png) |
+| Mock replay | [PNG](../docs/media/replay.png) | [PNG](../docs/media/replay-phone.png) | [PNG](../docs/media/replay-dark.png) | [PNG](../docs/media/replay-phone-dark.png) |
 
 Run from the repository root with the approved FastAPI/Uvicorn dependencies:
 
