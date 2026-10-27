@@ -1,0 +1,246 @@
+{
+  "date": "2026-10-27",
+  "ground": "mock",
+  "scope": "staged clock, M19 replay, M20 dashboard polish",
+  "dashboard_tests": {
+    "tests": 138,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "web_tests": {
+    "tests": 39,
+    "passed": 39,
+    "failed": 0,
+    "skipped": 0
+  },
+  "ruff": "passed",
+  "import_linter": {
+    "kept": 3,
+    "broken": 0
+  },
+  "lighthouse": {
+    "version": "13.5.0",
+    "accessibility_score": 100,
+    "url": "http://127.0.0.1:8080/",
+    "fetch_time": "2026-10-27T07:36:39.717Z"
+  },
+  "design_inspector": {
+    "failures": 0,
+    "warnings": [
+      "Empty incident grid retains 41px around its message and column headers."
+    ],
+    "style": "achromatic-ledger",
+    "seed": 1286248125,
+    "kept": "existing palette, system typography and labelled navigation"
+  },
+  "browser": {
+    "distinct_state_view_checks": 67,
+    "phases": {
+      "clean": 42,
+      "friday-plan": 24,
+      "restart": 1
+    },
+    "full_week_steps": 11,
+    "final_unreserved": {
+      "minor": 35400,
+      "currency": "USD"
+    },
+    "document_overflow": false,
+    "persistent_simulation_banner": true,
+    "final_image_checks": 28,
+    "final_image_console_errors": 0,
+    "final_image_exceptions": 0,
+    "restart": {
+      "action": "Restart week button, confirmed",
+      "step": 0,
+      "apiIncidents": 0,
+      "dom": {
+        "count": "0",
+        "status": "Week restarted from an empty marketplace. Nothing has run yet.",
+        "details": "Your incident desk is clear",
+        "banner": "Simulated: mock PayPal"
+      },
+      "consoleExceptions": []
+    }
+  },
+  "replay": {
+    "model": "none",
+    "runs": 4,
+    "systems": [
+      "rules_only",
+      "countersign"
+    ],
+    "real_model_baseline": "unavailable until M18",
+    "known_failed_run": {
+      "system": "countersign",
+      "scenario": "F_retry_settled_obligation",
+      "error": "EVALUATION_FAILED",
+      "invariant_violations": 0,
+      "task_completed": true
+    }
+  },
+  "limitations": [
+    "Full-repository pytest was interrupted; only task-scoped suites are reported as passed.",
+    "Shared docs/DECISIONS.md is outside the authorized edit paths; reasons are recorded in web/README.md.",
+    "Bundled replay checks do not measure real-model performance."
+  ],
+  "screenshots": [
+    {
+      "path": "docs/media/cash-dark.png",
+      "width": 1440,
+      "height": 1994,
+      "sha256": "244ce7860dc1fb1adddcc49012db2d469d6231f0c92bea61b4ea1fa241977870"
+    },
+    {
+      "path": "docs/media/cash-phone-dark.png",
+      "width": 390,
+      "height": 2393,
+      "sha256": "698e764815256371f271c257654a1a24d0c951fcef8fe9f4e6711acac55d4689"
+    },
+    {
+      "path": "docs/media/cash-phone.png",
+      "width": 390,
+      "height": 2393,
+      "sha256": "adf73b2639d21911a8b23f5ac937f07d1762eabc8ddfe430ca8231be1a973019"
+    },
+    {
+      "path": "docs/media/cash.png",
+      "width": 1440,
+      "height": 1994,
+      "sha256": "2a0c27e7831c7bfc1bb323934a007615961f71244bd5521f89dc8f0794253fcc"
+    },
+    {
+      "path": "docs/media/clean-start.png",
+      "width": 1440,
+      "height": 1158,
+      "sha256": "8a9a70a3abadd7d40b5096b973fde11b0e91ea31722586bb3c8b6c014071c2a1"
+    },
+    {
+      "path": "docs/media/decision-dark.png",
+      "width": 1440,
+      "height": 3522,
+      "sha256": "2a9d9af06abc4062be68632a032b7ccd8d789b62140b2b478f4d7303cc01896b"
+    },
+    {
+      "path": "docs/media/decision-phone-dark.png",
+      "width": 390,
+      "height": 4732,
+      "sha256": "17dfd9891281426223f502e1e206c0fd36e5ec3aeca2dbd11ed6a86a50cd9666"
+    },
+    {
+      "path": "docs/media/decision-phone.png",
+      "width": 390,
+      "height": 4732,
+      "sha256": "f20e09d919e8c9fac056cef5daa07c168ac9bdc398fda8f20ac1c18a6aa12f66"
+    },
+    {
+      "path": "docs/media/decision.png",
+      "width": 1440,
+      "height": 3522,
+      "sha256": "54a94f5cdd400f5c6757b4daf26859fb7e7986b3c074e626ec785c2e6339fc17"
+    },
+    {
+      "path": "docs/media/desk-dark.png",
+      "width": 1440,
+      "height": 1446,
+      "sha256": "9e3d2a4bdfc5f6b198455a0265feb1fb90e371b98c9c03082cd4e2ade5e03b72"
+    },
+    {
+      "path": "docs/media/desk-phone-dark.png",
+      "width": 390,
+      "height": 2161,
+      "sha256": "787f6471e629983d36ee4714acf1f395c8b984b4d13bf005ad974aad8e854d44"
+    },
+    {
+      "path": "docs/media/desk-phone.png",
+      "width": 390,
+      "height": 2161,
+      "sha256": "e1bd23038f09c6c777648ffdcfaa8d5be49bd8df7f34b148dc73fc9464c4addc"
+    },
+    {
+      "path": "docs/media/desk.png",
+      "width": 1440,
+      "height": 1446,
+      "sha256": "04caae32c755e2b66ee5851190252320e686d4477faf21baf1cf1d8212f10d2b"
+    },
+    {
+      "path": "docs/media/graph-dark.png",
+      "width": 1440,
+      "height": 1552,
+      "sha256": "49f9d82921b31e14dd2241559de3ecf1a145cb78794987c5764bde5e0df82a7f"
+    },
+    {
+      "path": "docs/media/graph-phone-dark.png",
+      "width": 390,
+      "height": 1769,
+      "sha256": "42e3b96040619e8508c6f630d0208af120070ac73978886c1ed8dde9b02e9a48"
+    },
+    {
+      "path": "docs/media/graph-phone.png",
+      "width": 390,
+      "height": 1769,
+      "sha256": "ae149b3ce29da9adeb307631c306d904854c0d64fd9af31e50b3a04cbfab6721"
+    },
+    {
+      "path": "docs/media/graph.png",
+      "width": 1440,
+      "height": 1552,
+      "sha256": "e132a95449d203242ac443df9661ddd2d5b8cd2bf97959d838e5e4da4566e92a"
+    },
+    {
+      "path": "docs/media/replay-dark.png",
+      "width": 1440,
+      "height": 1434,
+      "sha256": "2d03fa80dc31c3110ed6d881e087358a2c2fddd68c633a216c2b242190e78991"
+    },
+    {
+      "path": "docs/media/replay-phone-dark.png",
+      "width": 390,
+      "height": 2740,
+      "sha256": "fadccdcf298714bed879f113d6c230d47101044b3db39e5c9d81e4c476055ed8"
+    },
+    {
+      "path": "docs/media/replay-phone.png",
+      "width": 390,
+      "height": 2740,
+      "sha256": "54c61866da25ad6b4ddf68bec34304a463435168a5719adbef3380e67f9e5f88"
+    },
+    {
+      "path": "docs/media/replay.png",
+      "width": 1440,
+      "height": 1434,
+      "sha256": "26cdb9980caa3ebedb73b970e96f8fdae938edbbdc2a3c27f7c560d487e9dc2c"
+    },
+    {
+      "path": "docs/media/restart-week-dark.png",
+      "width": 1440,
+      "height": 1158,
+      "sha256": "784a617cb582454d14248aa497c1c8ecbc0b2fca8a1cf8128392a1a1b179533e"
+    },
+    {
+      "path": "docs/media/runs-dark.png",
+      "width": 1440,
+      "height": 1995,
+      "sha256": "fb23563c80b411f7664a21e3ca23753973a3c186a48b15d9f37a63c73d5daf46"
+    },
+    {
+      "path": "docs/media/runs-phone-dark.png",
+      "width": 390,
+      "height": 2605,
+      "sha256": "36da4f9fae458dd7f1993e4ba5f27e5ffccfc4c993a546051069a6ce783d6732"
+    },
+    {
+      "path": "docs/media/runs-phone.png",
+      "width": 390,
+      "height": 2605,
+      "sha256": "e428368d8c5217c3db75bfd943828823e13dd280065237f6fe1d5e9f15b3917b"
+    },
+    {
+      "path": "docs/media/runs.png",
+      "width": 1440,
+      "height": 1995,
+      "sha256": "3dcc797c988a2097e7f4efc8fdc725c396989dd27491bee3786ec5955527ae2d"
+    }
+  ]
+}

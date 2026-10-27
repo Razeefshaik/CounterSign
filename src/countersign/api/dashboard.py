@@ -20,6 +20,7 @@ from typing import ClassVar, Protocol
 from urllib.parse import urlsplit
 from uuid import UUID
 
+import httpx
 import psycopg
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
@@ -310,6 +311,19 @@ def _mode_metadata(runtime):
     }
 
 
+async def _demo_clock(runtime):
+    try:
+        async with httpx.AsyncClient(timeout=3, follow_redirects=False, trust_env=False) as client:
+            response = await client.get(runtime.paypal.base_url.rstrip("/") + "/_mock/clock")
+            response.raise_for_status()
+            now = datetime.fromisoformat(response.json()["now"])
+            if now.tzinfo is None:
+                raise ValueError("Timezone required")
+            return now
+    except (httpx.HTTPError, ValueError, KeyError, TypeError):
+        raise DashboardUnavailable("Demo clock unavailable") from None
+
+
 class DbSource:
     """Read only C11's allowlisted views; cursors bind source/resource/filters.
 
@@ -338,7 +352,7 @@ class DbSource:
 
     def __init__(self, database_url, *, runtime, clock=None):
         self.runtime = runtime
-        self.clock = clock or (lambda: datetime.now(UTC))
+        self.clock = clock
         self.pool = AsyncConnectionPool(
             database_url,
             open=False,
@@ -531,9 +545,14 @@ class DbSource:
         if params:
             raise ValueError("Unexpected query parameters")
         if resource == "meta":
+            now = datetime.now(UTC)
+            if self.clock is not None:
+                now = self.clock()
+            elif self.runtime.mode == "demo" and self.runtime.paypal.is_mock:
+                now = await _demo_clock(self.runtime)
             return {
                 **_mode_metadata(self.runtime),
-                "clock": self.clock().astimezone(UTC).isoformat().replace("+00:00", "Z"),
+                "clock": now.astimezone(UTC).isoformat().replace("+00:00", "Z"),
                 "version": "0.1.0",
                 "contract_version": "1.0.3",
             }

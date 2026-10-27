@@ -5,12 +5,57 @@ import {createClient, submitDecision} from "../api.mjs";
 import {decisionView, runView, cashView, auditView, graphView, canDecide, esc} from "../views.mjs";
 import {route, createWorkspaceViews} from "../workspace.mjs";
 import {demoBarView, createDemoBar, resultText} from "../demo.mjs";
+import {parseRuns, parseEvidence, pairRuns, replayEvents, replayView, scenarios} from "../replay.mjs";
 
 const fixture = async name => JSON.parse(await readFile(new URL(`../fixtures/${name}.json`, import.meta.url)));
 const proposals = (await fixture("proposals")).items;
 const owner = proposals.find(p => p.state === "NEEDS_OWNER");
 const meta = await fixture("meta");
 const response = (body, status = 200) => ({ok: status >= 200 && status < 300, status, json: async () => body});
+
+const replayRows = parseRuns(await readFile(new URL("../replays/runs.jsonl",import.meta.url),"utf8"));
+const replayProof = parseEvidence(await readFile(new URL("../replays/evidence.json",import.meta.url),"utf8"));
+test("bundled mock replay preserves actual model-none outcomes and ground truth for both scenarios", () => {
+  assert.equal(replayRows.length,4);
+  for (const scenario of Object.keys(scenarios)) {
+    const pair=pairRuns(replayRows,scenario,"rules_only");
+    assert.ok(pair.left && pair.right);
+    const html=replayView({rows:replayRows,evidence:replayProof,scenario,position:1000});
+    assert.match(html,/Rules-only comparison/); assert.match(html,/Model: <strong>none/);
+    assert.match(html,/\$486.00/); assert.match(html,/Final mock ground-truth payouts/);
+    assert.match(html,/do not establish real-model performance/);
+  }
+  const failed=replayRows.find(row=>row.error);
+  assert.ok(failed);
+  assert.match(replayView({rows:replayRows,evidence:replayProof,scenario:failed.scenario_id}), /EVALUATION_FAILED/);
+});
+test("replay never pairs repetitions, seeds or runs that differ and exposes missing baselines", () => {
+  const row=replayRows[0], altered={...replayRows[1],k:9};
+  const pair=pairRuns([row,altered],row.scenario_id,"rules_only");
+  assert.ok(pair.left); assert.equal(pair.right,undefined);
+  assert.match(replayView({rows:replayRows,baseline:"baseline_llm"}),/No matching mock run/);
+  assert.match(replayView({rows:replayRows}),/Action trace unavailable/);
+  assert.match(replayView({rows:replayRows}),/Ground-truth payouts unavailable/);
+  assert.match(replayView(),/0 of 0 recorded actions/);
+});
+test("replay imports reject sandbox, duplicate and malformed metrics or evidence", () => {
+  for (const text of ["invalid", "", JSON.stringify({...replayRows[0],ground:"sandbox"}),
+    JSON.stringify({...replayRows[0],invariants:{duplicate_settlement:-1}}),
+    [replayRows[0],replayRows[0]].map(JSON.stringify).join("\n")]) assert.throws(()=>parseRuns(text));
+  for (const value of [{},[{...replayProof[0],ground:"sandbox"}],[{...replayProof[0],actions:{}}],
+    [{...replayProof[0],payout_items:[{...replayProof[0].payout_items[0],amount:{value:486,currency:"USD"}}]}]]) assert.throws(()=>parseEvidence(JSON.stringify(value)));
+});
+test("replay steps show recorded action order, escape imported text and never invent payouts", () => {
+  const pair=pairRuns(replayRows,Object.keys(scenarios)[0],"rules_only");
+  const events=replayEvents(pair.left,pair.right,replayProof);
+  assert.ok(events.length>0);
+  assert.ok(events.every((event,i)=>i===0 || Date.parse(event.at)>=Date.parse(events[i-1].at)));
+  assert.match(replayView({rows:replayRows,evidence:replayProof,position:0}),/No actions at this replay position/);
+  const attack=replayProof.map(row=>({...row,actions:row.actions.map(a=>({...a,action:'<img src=x> secret@example.com'}))}));
+  const html=replayView({rows:replayRows,evidence:attack,position:100});
+  assert.ok(!html.includes('<img') && !html.includes('secret@example.com'));
+  assert.match(html,/&lt;img/i);
+});
 
 test("contract 1.0.3 injection guard renders as a blocked rule without renaming the flag", () => {
   assert.equal(meta.contract_version, "1.0.3");
@@ -46,6 +91,18 @@ test("approval controls fail closed for expired, terminal, blocked or incomplete
   assert.equal(canDecide(owner, "not a clock"), false);
 });
 
+test("decision expiry follows staged meta clock independently of browser wall time", () => {
+  const original = Date.now;
+  try {
+    Date.now = () => Date.parse("2020-01-01T00:00:00Z");
+    const expired = {...meta, clock:owner.approval_request.expires_at};
+    assert.match(decisionView(owner, expired), /id="approve"[^>]*disabled/);
+    Date.now = () => Date.parse("2040-01-01T00:00:00Z");
+    assert.doesNotMatch(decisionView(owner, meta), /id="approve"[^>]*disabled/);
+    assert.match(decisionView(owner, {...meta, clock:null}), /id="approve"[^>]*disabled/);
+  } finally {Date.now = original;}
+});
+
 test("untrusted text is inert in proposals, flags, audit and SVG; full emails are masked", () => {
   const attack = '<img src=x onerror="alert(1)"> secret@example.com';
   const changed = {...owner, rationale:attack, params:{note:attack}, flags:[{type:"PROMPT_INJECTION", excerpt:attack, source:attack}]};
@@ -72,6 +129,14 @@ test("cash separates earmarks and withheld from the funding formula and shows fr
   for (const text of ["$1,340.00", "$1,086.00", "$254.00", "$414.00", "not subtracted", "10500", "FRESH", cash.formula]) assert.ok(html.includes(text), text);
   assert.equal(cash.paypal.available.minor - cash.outflows_after_refresh.total.minor - cash.cash_reservations.total.minor, cash.unreserved.minor);
   assert.match(cashView({...cash, paypal:{...cash.paypal, stale:true}}), /STALE/);
+});
+
+test("empty financial views explain what is missing and never fabricate money", () => {
+  assert.match(cashView(null), /Cash is unavailable/);
+  assert.match(runView(null), /No payout runs yet/);
+  assert.match(decisionView(null,meta), /Choose an incident or proposal/);
+  assert.ok(!cashView(null).includes("$0.00"));
+  assert.throws(()=>parseRuns(JSON.stringify({...replayRows[0],invariants:{}})));
 });
 
 test("audit and money graph retain relationships and have explicit empty states", async () => {
@@ -151,12 +216,26 @@ function documentDouble() {
   });
   return {elements, getElementById:id => elements.get(id) || null, querySelectorAll:() => []};
 }
+test("refreshing a decision reloads staged metadata and disables an expired approval", async () => {
+  const doc = documentDouble();
+  let clock = meta.clock;
+  const views = createWorkspaceViews(doc, {hash:`#decision/${owner.id}`}, async url =>
+    response(url.endsWith("/meta") ? {...meta, clock} :
+      url.endsWith("/proposals") ? {items:[owner],next_cursor:null} : owner));
+  await views.setWorkspace({meta:{...meta},fixture:false,incidents:[],disputes:[]});
+  assert.equal(doc.getElementById("approve").disabled, false);
+  clock = owner.approval_request.expires_at;
+  await doc.getElementById("view-refresh").onclick();
+  assert.equal(doc.getElementById("approve").disabled, true);
+});
 test("controller prevents duplicate decisions, clears live owner token and reloads after success", async () => {
   const doc = documentDouble(), location={hash:`#decision/${owner.id}`};
   let postCount=0, finish, state=owner;
   const post = new Promise(resolve => {finish=resolve;});
   const views = createWorkspaceViews(doc,location,async (url, options) => {
+    if (url.endsWith("/meta")) return response({...meta,mode:"live",simulated:false,paypal_env:"sandbox"});
     if (options.method === "POST") {postCount++; assert.equal(options.headers["X-Owner-Token"],"fake-test-only"); return post;}
+    if (url.endsWith("/meta")) return response(meta);
     return response(url.endsWith("/proposals") ? {items:[state],next_cursor:null} : state);
   });
   await views.setWorkspace({meta:{...meta,mode:"live",simulated:false,paypal_env:"sandbox"},fixture:false,incidents:[],disputes:[]});
@@ -176,9 +255,11 @@ test("controller disables expired approval after 409 and reports unavailable pre
     const doc = documentDouble(), location={hash:`#decision/${owner.id}`};
     let changed = false;
     const views = createWorkspaceViews(doc,location,async (url, options) => {
+      if (url.endsWith("/meta")) return response(meta);
       if (options.method === "POST") {changed=true; return response({},code);}
       const data=changed && code === 409 ? {...owner,state:"EXPIRED"} : owner;
-      return response(url.endsWith("/proposals") ? {items:[data],next_cursor:null} : data);
+      if (url.endsWith("/meta")) return response(meta);
+    return response(url.endsWith("/proposals") ? {items:[data],next_cursor:null} : data);
     });
     await views.setWorkspace({meta,fixture:false,incidents:[],disputes:[]});
     await doc.getElementById("approve").onclick();
@@ -230,7 +311,7 @@ function barDouble() {
 test("demo bar is never empty on first load and labels every staged step", () => {
   const html = demoBarView(demoState(0));
   assert.match(html, /Step <strong>0<\/strong> of 3/);
-  assert.match(html, /NEXT<\/span> Monday: stage orders <span class="staged">staged<\/span>/);
+  assert.match(html, /Next<\/span> Monday: stage orders <span class="staged">staged<\/span>/);
   assert.match(html, /Nothing yet/);
   assert.equal((html.match(/class="staged">staged/g) || []).length, 1 + 1 + 2);
   assert.match(html, /Scripted model · mock PayPal/);

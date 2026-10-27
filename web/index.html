@@ -16,25 +16,26 @@
 <section id="demo-bar" class="demo-bar" aria-label="Staged demo controls" hidden></section>
 <div class="layout">
 <aside class="sidebar">
-<a class="brand" href="./"><span class="brand-mark" aria-hidden="true">✓</span>CounterSign</a>
-<p class="workspace">MARKETPLACE WORKSPACE</p>
+<a class="brand" href="./"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M5 12h9M5 20h9M17 16l4 4 7-9"/></svg>CounterSign</a>
+<p class="workspace">Marketplace workspace</p>
 <nav aria-label="Workspace">
 <a href="#incidents" data-view="incidents" class="nav-current" aria-current="page">Incident desk <span class="nav-count" id="nav-count">—</span></a>
 <a href="#decision" data-view="decision">Decision</a><a href="#runs" data-view="runs">Payout runs</a>
 <a href="#audit" data-view="audit">Execution history</a><a href="#cash" data-view="cash">Cash</a><a href="#graph" data-view="graph">Money graph</a>
+<a href="#replay" data-view="replay">Mock replay</a>
 </nav>
-<div class="sidebar-note"><span class="small-label">THE SECOND SIGNATURE</span><p>AI proposes.<br>Code countersigns.</p><span>Every money action follows the rules.</span></div>
+<div class="sidebar-note"><span class="small-label">The second signature</span><p>AI proposes.<br>Code countersigns.</p><span>Every money action follows the rules.</span></div>
 <div class="sidebar-bottom"><span class="connection-dot"></span><span id="mode">Loading mode…</span></div>
 </aside>
-<main id="main">
+<main id="main" tabindex="-1">
 <header class="topbar"><span>Operations <span class="slash">/</span> <span id="breadcrumb">Incident desk</span></span><span class="operator"><span aria-hidden="true">A</span> Marketplace owner</span></header>
 <div class="content">
-<div class="eyebrow"><span class="connection-dot"></span> YOUR MARKETPLACE, IN VIEW</div>
-<section class="intro" id="intro" aria-labelledby="title"><div><h1 id="title">A clear next step.<br>For every incident.</h1><p>Disputes, stuck payouts, and Friday’s run.<br class="desktop-break"> Connected in one place, checked before money moves.</p></div><div class="clock-card"><span class="small-label" id="clock-label">WORKSPACE CLOCK · UTC</span><strong id="clock">—</strong><span id="source">Loading incident source</span></div></section>
+
+<section class="intro" id="intro" aria-labelledby="title"><div><h1 id="title">Incident desk</h1><p>Disputes, maker payouts and the decisions that connect them.</p></div><div class="clock-card"><span class="small-label" id="clock-label">Workspace clock · UTC</span><strong id="clock">—</strong><span id="source">Loading incident source</span></div></section>
 <section class="stats" id="incident-stats" aria-label="Incident overview">
-<div><span class="stat-icon" aria-hidden="true">▤</span><span>Open incidents<strong id="stat-open">—</strong></span><span class="stat-note">Across your marketplace</span></div>
-<div><span class="stat-icon amber" aria-hidden="true">◷</span><span>Needs your decision<strong id="stat-owner">—</strong></span><span class="stat-note">Exact approvals, once</span></div>
-<div><span class="stat-icon mint" aria-hidden="true">✓</span><span>Shield checks<strong>Always on</strong></span><span class="stat-note">Every proposal, every time</span></div>
+<div><span>Open incidents<strong id="stat-open">—</strong></span><span class="stat-note">Across your marketplace</span></div>
+<div><span>Needs your decision<strong id="stat-owner">—</strong></span><span class="stat-note">Exact approvals, once</span></div>
+<div><span>Shield checks<strong>Always on</strong></span><span class="stat-note">Every proposal, every time</span></div>
 </section>
 <section class="desk" id="incidents" aria-labelledby="desk-title">
 <div class="desk-heading"><div><h2 id="desk-title">Incident desk <span id="result-count" class="count"></span></h2><p>Choose an incident to see its current decision.</p></div><button id="refresh" class="secondary" type="button">↻ Refresh</button></div>
@@ -56,6 +57,6 @@
 <p id="view-notice" class="view-notice" role="status" aria-live="polite" hidden></p>
 <div id="view-body" aria-live="polite"></div>
 </section>
-<footer class="footer"><span>COUNTERSIGN</span><span>One queue. A second signature.</span><span id="contract">Contract v1.0.3</span></footer>
+<footer class="footer"><span>CounterSign</span><span>One queue. A second signature.</span><span id="contract">Contract v1.0.3</span></footer>
 </div></main></div>
 </body></html>

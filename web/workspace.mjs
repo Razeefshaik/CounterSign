@@ -1,8 +1,9 @@
 import {createClient, submitDecision} from "./api.mjs";
 import {decisionView, runView, auditView, cashView, graphView, esc, canDecide} from "./views.mjs";
 import {label, isStaged} from "./data.mjs";
+import {createReplay} from "./replay.mjs";
 
-const titles = {incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph"};
+const titles = {incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", replay: "Mock replay"};
 export function route(hash) {
   const [name, id] = hash.replace(/^#/, "").split("/");
   return {name: Object.hasOwn(titles, name) ? name : "incidents", id: id || ""};
@@ -11,6 +12,7 @@ export function route(hash) {
 export function createWorkspaceViews(document, location, fetcher = fetch) {
   const $ = id => document.getElementById(id);
   let workspace, client, serial = 0, proposal = null, busy = false;
+  const replay = createReplay(document, fetcher);
   const notice = (message = "") => {$("view-notice").textContent = message; $("view-notice").hidden = !message;};
   const invalidate = () => {
     proposal = null;
@@ -34,6 +36,12 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
     $("view-picker").hidden = true;
     $("view-body").innerHTML = '<p class="empty">Loading records…</p>';
     try {
+      if (current.name === "replay") {
+        await replay.load();
+        if (ticket !== serial) return;
+        replay.draw();
+        return true;
+      }
       let html;
       if (current.name === "decision" || current.name === "runs") {
         const resource = current.name === "decision" ? "proposals" : "payout-runs";
@@ -48,6 +56,8 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
         const doc = id ? await client.get(resource, id) : null;
         if (ticket !== serial) return;
         if (current.name === "decision") {
+          workspace.meta = await client.singleton("meta");
+          if (ticket !== serial) return;
           proposal = doc;
           const incident = workspace.incidents.find(i => i.id === doc?.incident_id);
           const staged = Boolean(incident) && isStaged(incident, workspace.disputes);

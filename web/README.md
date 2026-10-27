@@ -1,5 +1,87 @@
 # CounterSign dashboard (M06, M10)
 
+M19 adds **Mock replay** (`#replay`): F01 and the settled-obligation scenario,
+paired by run ID, scenario, repetition and seed. The bundled four runs were
+executed with M11's `run_one`, `rules_only` and CounterSign, `model=none`.
+They are mock checks, not real-model benchmark results. The settled CounterSign
+run reports `EVALUATION_FAILED` despite zero invariant violations and completed
+payouts; that runner outcome is preserved visibly, not rewritten as a pass.
+Neither rules-only nor CounterSign duplicates a payout in these observations.
+
+Use **Next action** or **Show all actions** to inspect recorded traces alongside
+final mock ground-truth payout items. Final payouts are a separately labelled
+observation, not a reconstructed intermediate balance. Select **Baseline LLM**
+and load M18's `runs.jsonl` later; absent runs remain unavailable. Summary-only
+files show metrics, with traces and payouts explicitly unavailable.
+
+`web/replays/evidence.json` is a separate optional, public replay artifact keyed
+by the same sample fields plus system and `ground: mock`. It holds sanitized
+`actions` (at/action/outcome/approved_by_owner) and final `payout_items`
+(id/amount/status/money_left_account/created_at); no receiver, request payload,
+credentials or untrusted notes are saved. It does not change CONTRACTS 6.3.
+The browser accepts both files locally without uploading them. Sandbox files,
+invalid data, duplicate samples and files over 10 MB are refused.
+
+Reproduce the bundled evidence using a migrated disposable `_eval` database:
+
+    python web/tests/build_replay.py --database-url postgresql://.../web_replay_eval
+
+No model, `.env`, sandbox credentials or real PayPal calls are used. The
+generator wraps teardown to capture the public mock control API and SystemTrace
+without changing `eval/` or `mock_paypal/`.
+
+## M20 validation and media
+
+The app uses its existing layout with the Achromatic ledger direction (seed
+1286248125), Segoe UI, neutral light/dark surfaces and green on status and money
+relationships. Labelled navigation is retained for the seven destinations.
+The small SVG mark combines ledger lines with the second signature. No fonts,
+application dependencies, model calls or sandbox calls were added.
+
+Reasons for the changes, kept here because this task permits only `docs/media/`
+under the shared documentation directory:
+
+- Demo metadata reads the current mock clock and fails closed with 503 if it is unavailable, so a wall clock cannot keep an expired staged proposal approvable.
+- Decision refresh reloads metadata before deciding eligibility, so staged expiry is not pinned to the first page load.
+- Replay evidence is separate from unchanged M11 metrics, so summaries never masquerade as action traces or ground-truth payouts.
+- API failures do not switch a hosted workspace to fixture data, so an unavailable source cannot look like a working marketplace.
+- Neutral surfaces and explicit dark tokens keep amounts, staged labels and status text readable in both themes.
+- Empty grids shrink and explain the next step, so a cold start and a restarted week remain usable.
+
+Validation on Oct 27, 2026: 138 dashboard tests passed against PostgreSQL 16
+with both test environment variables set; 39 Node tests passed; `ruff check .`
+passed and all 3 import-linter contracts were kept. An exploratory full-repo
+pytest run was stopped; these results cover the dashboard task scope.
+Lighthouse 13.5.0 measured accessibility at 100/100 on the incident desk.
+The rebuilt final Docker image passed 28 additional checks across all seven
+views, desktop/phone widths and light/dark themes, with no console errors or
+JavaScript exceptions. The restart screenshot was verified against both the
+API's empty incident list and the refreshed UI after clicking Restart week.
+The compact validation record and PNG hashes are in `web/tests/verification.json`;
+raw inspector and test output remain local under ignored `web/tests/artifacts/`.
+Chrome completed the 11 staged UI steps, observed $354.00 unreserved, and
+confirmed that restart clears the marketplace. There were no browser exceptions
+in that run. Light/dark checks cover 1440, 768 and 390px on clean views and
+1440/390px on populated views, with no document-level horizontal overflow.
+The design inspector improved from 4 failures to 0; its remaining 41px blank-band
+warning is the empty incident grid's centered message and preserved column headers.
+
+The PNG-only set in `docs/media/` contains `desk`, `decision`, `runs`, `cash`,
+`graph` and `replay`, each at desktop and phone width in both themes (24 files),
+plus `clean-start.png` and `restart-week-dark.png`. All capture the local mock;
+the persistent simulation banner is visible. Published screenshot state is
+Friday's pending run, before the staged owner approval. No screenshot uses
+sandbox credentials or real emails.
+
+| View | Desktop | Phone | Dark desktop | Dark phone |
+| --- | --- | --- | --- | --- |
+| Incident desk | [PNG](../docs/media/desk.png) | [PNG](../docs/media/desk-phone.png) | [PNG](../docs/media/desk-dark.png) | [PNG](../docs/media/desk-phone-dark.png) |
+| Decision | [PNG](../docs/media/decision.png) | [PNG](../docs/media/decision-phone.png) | [PNG](../docs/media/decision-dark.png) | [PNG](../docs/media/decision-phone-dark.png) |
+| Payout runs | [PNG](../docs/media/runs.png) | [PNG](../docs/media/runs-phone.png) | [PNG](../docs/media/runs-dark.png) | [PNG](../docs/media/runs-phone-dark.png) |
+| Cash | [PNG](../docs/media/cash.png) | [PNG](../docs/media/cash-phone.png) | [PNG](../docs/media/cash-dark.png) | [PNG](../docs/media/cash-phone-dark.png) |
+| Money graph | [PNG](../docs/media/graph.png) | [PNG](../docs/media/graph-phone.png) | [PNG](../docs/media/graph-dark.png) | [PNG](../docs/media/graph-phone-dark.png) |
+| Mock replay | [PNG](../docs/media/replay.png) | [PNG](../docs/media/replay-phone.png) | [PNG](../docs/media/replay-dark.png) | [PNG](../docs/media/replay-phone-dark.png) |
+
 Run from the repository root with the approved FastAPI/Uvicorn dependencies:
 
     python web/serve.py
