@@ -53,6 +53,7 @@ class FakeEngine:
     def __init__(self, settings, *, transport):
         self.settings, self.transport = settings, transport
         self.calls, self.proposals, self.closed = [], [], False
+        self.reservations, self.disputes = [], []
         self.failure = None
         self.tick_errors = 0
 
@@ -64,7 +65,11 @@ class FakeEngine:
 
     async def snapshot(self):
         self.calls.append(("snapshot",))
-        return {"proposals": deepcopy(self.proposals)}
+        return {
+            "proposals": deepcopy(self.proposals),
+            "reservations": deepcopy(self.reservations),
+            "disputes": deepcopy(self.disputes),
+        }
 
     async def tick(self):
         self.calls.append(("tick",))
@@ -227,6 +232,47 @@ async def test_tick_failures_remain_visible_until_a_successful_worker_pass(recov
         trace = await system.teardown()
         assert trace.actions[0].action == "ENGINE_TICK" and trace.actions[0].outcome == "unknown"
         assert trace.errors == ([] if recovers else ["ENGINE_TICK_ERRORS_UNRESOLVED"])
+
+
+def earmark(state, kind="DISPUTE_EARMARK"):
+    return {"id": "res-1", "kind": kind, "state": state, "dispute_id": "d-1",
+            "amount": {"minor": 5400, "currency": "USD"}}
+
+
+@pytest.mark.asyncio
+async def test_engine_dispute_reserve_and_release_are_recorded_once():
+    async with unit_world() as (system, env, _, _):
+        await system.setup(env)
+        engine = system._engine
+        engine.disputes = [{"id": "d-1", "paypal_dispute_id": "PP-D-1"}]
+        engine.reservations = [earmark("ACTIVE")]
+        await system.on_step({"do": "tick"}, env)
+        await system.on_step({"do": "tick"}, env)
+        engine.reservations = [earmark("RELEASED")]
+        await system.on_step({"do": "tick"}, env)
+        await system.on_step({"do": "tick"}, env)
+        recorded = [(a.action, a.params, a.outcome) for a in system.trace.actions]
+        params = {"paypal_dispute_id": "PP-D-1", "amount": {"minor": 5400, "currency": "USD"}}
+        assert recorded == [("RESERVE_EARNINGS", params, "ok"), ("RELEASE_RESERVE", params, "ok")]
+
+
+@pytest.mark.asyncio
+async def test_reserve_released_between_observations_records_both_facts():
+    async with unit_world() as (system, env, _, _):
+        await system.setup(env)
+        system._engine.reservations = [earmark("RELEASED")]
+        await system.on_step({"do": "tick"}, env)
+        assert [a.action for a in system.trace.actions] == ["RESERVE_EARNINGS", "RELEASE_RESERVE"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("kind", ["PROPOSAL_CASH", "RUN_CASH"])
+async def test_cash_reservations_and_no_disputes_record_nothing(kind):
+    async with unit_world() as (system, env, _, _):
+        await system.setup(env)
+        system._engine.reservations = [earmark("ACTIVE", kind), earmark("CONSUMED", kind)]
+        await system.on_step({"do": "tick"}, env)
+        assert not system.trace.actions
 
 
 @pytest.mark.asyncio
