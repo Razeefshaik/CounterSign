@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
 
-from countersign.api import dashboard, owner, runs, webhooks
+from countersign.api import dashboard, owner, playground, runs, webhooks
 from countersign.config import (
     Settings,
     load_hosted_settings,
@@ -140,6 +140,9 @@ def create_app(
             demo_bar = dashboard.configured_demo_bar(runtime)
             if demo_bar is not None:
                 app.include_router(dashboard.build_demo_router(demo_bar), prefix="/api/v1")
+            # C32: read-only shield playground, demo mode on the mock only.
+            if playground.playground_allowed(runtime):
+                app.include_router(playground.build_router(db, runtime), prefix="/api/v1")
             if static_dir is not None:
                 # Mounted last so every API and webhook route above keeps priority.
                 app.mount(

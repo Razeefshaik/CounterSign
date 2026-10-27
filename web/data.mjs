@@ -4,9 +4,12 @@ export function filterIncidents(rows, {state = "", kind = "", query = ""} = {}) 
   return rows.filter(row => (!state || row.state === state) && (!kind || row.kind === kind) &&
     (!term || [row.title, row.subject?.paypal_dispute_id, row.subject?.payout_item_id, row.kind].some(value => String(value ?? "").toLowerCase().includes(term))));
 }
-export function summary(rows) {
+// Decisions waiting for the owner include payout runs, which belong to no incident.
+// With the proposal list, count NEEDS_OWNER proposals; without it, fall back to incidents.
+export function summary(rows, proposals = null) {
   return {open: rows.filter(row => row.state !== "RESOLVED").length,
-    owner: rows.filter(row => row.state === "AWAITING_OWNER").length};
+    owner: proposals ? proposals.filter(p => p.state === "NEEDS_OWNER").length
+      : rows.filter(row => row.state === "AWAITING_OWNER").length};
 }
 export function money(value) {
   if (!value || !Number.isSafeInteger(value.minor)) throw new Error("Invalid money");

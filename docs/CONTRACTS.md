@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.4 (Oct 27, 2026).** 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.5 (Oct 27, 2026).** 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -78,7 +78,7 @@ All examples below use the demo week from HANDOFF section 10.
 
 ```json
 {"mode": "demo", "paypal_env": "mock", "simulated": true, "simulation_label": "Simulated: mock PayPal",
- "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.4"}
+ "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.5"}
 ```
 
 - `mode` is `demo` (runs against the local mock) or `live` (runs against the sandbox).
@@ -369,6 +369,15 @@ In live mode these endpoints require the header `X-Owner-Token` (the value comes
 
 - `POST /api/v1/demo/step` runs the next timeline step of `eval/scenarios/demo_week.json`. It uses the same runner as eval, calling `mock_paypal`'s `/_mock/*` and `Engine.tick()`.
 - `POST /api/v1/demo/reset` starts the scenario again.
+
+**Shield playground (C32, core, `src/countersign/api/playground.py`).** Mounted only when `mode = "demo"` on the mock. It shows what the shield does with the proposal an agent fooled by a buyer message would make. Each attempt runs every shield rule on an unsaved proposal inside a transaction that always rolls back: nothing is stored, and no PayPal call is reachable.
+
+- `GET /api/v1/playground/attacks` returns `{"items": [{"id", "title", "message", "available", "needs"}]}`. The ids are `refund_to_other_account`, `retry_settled_payout`, `refund_without_owner` and `custom`. When `available` is false, `needs` says which part of the week to run first.
+- `POST /api/v1/playground/attempts` takes `{"attack": "<id>", "message": "<optional, at most 500 characters; required for custom>"}`.
+  - **200:** `{"attack", "message", "message_flags": [{"type", "excerpt"}], "proposal": {"action", "params"}, "verdict", "rule_results", "written": false}`. Emails are masked. `rule_results` has the section 2.3 shape. `message_flags` come from the pattern filter, which is only an early warning: the verdict comes from the shield, including when the filter flags nothing.
+  - **409:** `ATTACK_NOT_AVAILABLE_YET`, or the shield's own refusal code when the proposal no longer matches current records.
+  - **422:** `INVALID_REQUEST`.
+  - **503:** `DEMO_CLOCK_UNAVAILABLE`.
 
 ---
 

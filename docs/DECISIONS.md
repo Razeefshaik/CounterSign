@@ -427,3 +427,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | The CounterSign evaluation adapter records RESERVE_EARNINGS and RELEASE_RESERVE once per Engine DISPUTE_EARMARK reservation it observes, with the PayPal dispute ID and reserved amount | Prompt 08 review of C31 results | Accept | The Engine reserves disputed shares deterministically without a proposal, so the trace hid reserves that rules_only gets credit for; only observed Engine facts are recorded and grading is unchanged |
+
+## Oct 27 C32 shield playground
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| A demo-only playground evaluates the proposal a fooled agent would make against every shield rule in a transaction that always rolls back, and reports pattern-filter flags separately from the verdict | Owner review: judges need an interactive safety moment | Accept | The pattern filter is only a hint, so the honest demonstration is that the shield blocks the resulting proposal even when the filter misses; rollback keeps the shared hosted database free of judges' attempts |

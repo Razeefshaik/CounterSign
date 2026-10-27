@@ -31,6 +31,10 @@ from countersign.shield.rules.idempotency import derive_keys
 RUN_REQUEST_LIFETIME = timedelta(hours=24)
 
 
+class _PreviewRollback(Exception):
+    """Internal signal that ends a shield preview without committing."""
+
+
 class ApprovalError(RuntimeError):
     """A public, value-free error suitable for an HTTP response."""
 
@@ -737,6 +741,29 @@ class ApprovalService:
                 )
                 refreshed += 1
         return refreshed
+
+    async def preview(self, action: str, params: dict, flags=()) -> dict:
+        """Run the shield on an unsaved proposal; the transaction always rolls back.
+
+        Nothing is inserted, no reservation or audit row is written and no PayPal
+        call is reachable from here. Used by the demo playground only.
+        """
+        result = {}
+        try:
+            async with self.database.tx() as conn:
+                await self._lock(conn)
+                row = {"id": "preview", "action": action, "params": params,
+                       "state": "CREATED", "raw_output": {"flags": list(flags)}}
+                proposal, snap, _ = await load_context(
+                    conn, row, now=self.clock(), behavior=self.behavior
+                )
+                decision = evaluate(proposal, snap)
+                result = {"verdict": str(decision.verdict),
+                          "rule_results": decision.rule_results()}
+                raise _PreviewRollback
+        except _PreviewRollback:
+            pass
+        return result
 
     async def approve(self, proposal_id: UUID, payload_hash: str, approved_by="owner") -> dict:
         hash_bytes(payload_hash)
