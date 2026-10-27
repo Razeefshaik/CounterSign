@@ -293,3 +293,7 @@ CounterSign scenarios still failing outcomes (five repetitions each):
 - `F_webhook_reordered_dispute_update_after_resolution`
 - `F_webhook_reordered_unclaimed_after_returned`
 - `demo_week`
+
+Final prompt07 validation: **3,963 passed, five skipped** in full pytest with
+test PostgreSQL and isolated toolkit settings; Ruff clean; three import contracts
+kept; all 39 web tests pass. The skips are legacy optional toolkit checks.

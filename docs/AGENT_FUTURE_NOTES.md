@@ -167,3 +167,7 @@ belongs in dashboard_support.py, never `from conftest import dashboard`.
 The cash view versus Engine.snapshot availability guards were handed to core.
 Mock snapshot history is bounded at 256 entries; evicted historical reads return
 404. Neither note permits rebuilding completed M15/M17 work.
+
+Final verification: full pytest **3,963 passed, five legacy toolkit skips**;
+Ruff clean, all three import contracts kept, all 39 web tests pass.
+All 480 corrected cells completed with zero errors. PR targets main.

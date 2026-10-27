@@ -68,3 +68,7 @@ the next verified PR/feature boundary without assuming pending checks passed.
 See [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md) only for the related task's
 details. Update this summary after each feature instead of carrying the whole
 conversation into subsequent work.
+
+Final verification: full pytest **3,963 passed, five legacy toolkit skips**;
+Ruff clean, all three import contracts kept, all 39 web tests pass.
+All 480 corrected cells completed with zero errors. PR targets main.
