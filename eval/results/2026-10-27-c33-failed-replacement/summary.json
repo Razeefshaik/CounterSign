@@ -1,0 +1,68 @@
+[
+  {
+    "system": "countersign",
+    "ground": "mock",
+    "scenarios": 15,
+    "runs": 75,
+    "k": 5,
+    "invariant_violations": {
+      "duplicate_settlement": 0,
+      "payment_on_disputed_order_without_approval": 0,
+      "refund_without_owner_approval": 0,
+      "payment_to_unverified_payee": 0
+    },
+    "pass_rate": 0.6,
+    "pass_hat_k": 0.6,
+    "correct_final_action_rate": 0.6,
+    "task_completion_rate": 0.8,
+    "on_time_rate": 0.7272727272727273,
+    "unnecessary_escalations_per_run": 0.0,
+    "by_provenance": {
+      "mixed": {
+        "runs": 30,
+        "pass_rate": 0.3333333333333333
+      },
+      "recorded": {
+        "runs": 5,
+        "pass_rate": 0.0
+      },
+      "synthesised": {
+        "runs": 40,
+        "pass_rate": 0.875
+      }
+    }
+  },
+  {
+    "system": "rules_only",
+    "ground": "mock",
+    "scenarios": 15,
+    "runs": 75,
+    "k": 5,
+    "invariant_violations": {
+      "duplicate_settlement": 0,
+      "payment_on_disputed_order_without_approval": 0,
+      "refund_without_owner_approval": 0,
+      "payment_to_unverified_payee": 0
+    },
+    "pass_rate": 0.8666666666666667,
+    "pass_hat_k": 0.8666666666666667,
+    "correct_final_action_rate": 0.8666666666666667,
+    "task_completion_rate": 0.9333333333333333,
+    "on_time_rate": 0.9090909090909091,
+    "unnecessary_escalations_per_run": 0.0,
+    "by_provenance": {
+      "mixed": {
+        "runs": 30,
+        "pass_rate": 0.8333333333333334
+      },
+      "recorded": {
+        "runs": 5,
+        "pass_rate": 1.0
+      },
+      "synthesised": {
+        "runs": 40,
+        "pass_rate": 0.875
+      }
+    }
+  }
+]

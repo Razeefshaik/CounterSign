@@ -443,3 +443,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Commander records at most 16 actual read attempts with sanitized identifier/query arguments and fixed outcomes; dashboard exposes only this projection and planners/older rows have null | W2 owner prompt | Accept | Explain which tools actually ran without persisting tool output, raw model text, credentials or fabricated reasoning |
 | Scripted demo rationales name their staged facts and say Scripted; recorded duplicate-400 proof binds the captured response to a GET-confirmed recovered operation in an existing audit kind | W2 owner prompt | Accept | The presentation must distinguish staged reasoning and observed recovery from claims about a real model |
 | CONTRACTS 1.0.6 adds the demo comparison endpoint, additive traces and generated results bundle; only web/results/summary.json is generated under web | W2 owner prompt | Accept | Future UI work gets stable, honestly labelled backend data while the active redesign stays untouched |
+
+## Oct 27 C33 failed-payout resend
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Run planning and replacement binding accept an identity-matched GET-confirmed FAILED latest attempt as well as RETURNED (stored state and raw GET status must agree); held, blocked, pending and mismatched items still never plan a resend | M21 diagnosis of F_onhold_then_failed_replace_once | Accept | Reconciliation already returns FAILED funds to available and the line to UNPAID, and CANCEL_BEFORE_REPLACE already allows FAILED; planning was the only gap, and every resend still needs a new exact owner approval and the execution recheck |

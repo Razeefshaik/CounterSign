@@ -65,14 +65,18 @@ async def _rows(conn, table):
     return await cursor.fetchall()
 
 
-def _returned(attempt):
-    """Only an identity-matched item GET establishes the returned funds."""
+# Same set as the CANCEL_BEFORE_REPLACE shield rule: PayPal says the item did not pay.
+NOT_PAID = frozenset({"RETURNED", "FAILED"})
+
+
+def _not_paid(attempt):
+    """Only an identity-matched item GET establishes that the funds came back."""
     return (
         attempt is not None
-        and attempt["state"] == "RETURNED"
+        and attempt["state"] in NOT_PAID
         and attempt["last_checked_at"] is not None
         and isinstance(attempt["paypal_raw"], dict)
-        and attempt["paypal_raw"].get("transaction_status") == "RETURNED"
+        and attempt["paypal_raw"].get("transaction_status") == attempt["state"]
         and bool(attempt["paypal_item_id"])
         and _matches(attempt, attempt["paypal_raw"], item_id=attempt["paypal_item_id"])
     )
@@ -108,7 +112,7 @@ def _replacement_ids(params, data, run_id):
             or entry["maker_id"] != str(line["maker_id"])
             or entry["amount"] != {"minor": line["amount_minor"], "currency": line["currency"].strip()}
             or type(entry["attempt_no"]) is not int
-            or not _returned(latest)
+            or not _not_paid(latest)
             or entry["attempt_no"] != latest["attempt_no"] + 1
         ):
             raise ApprovalError("STALE_PROPOSAL")
@@ -462,7 +466,7 @@ class ApprovalService:
         await serialize_on(conn, "countersign:owner-decisions")
 
     async def _plan_replacements(self, conn, week_start, open_obligations):
-        """Reuse returned historical lines; never fabricate another obligation."""
+        """Reuse returned or failed historical lines; never fabricate another obligation."""
         data = {
             table: await _rows(conn, table)
             for table in ("payout_lines", "payout_attempts", "obligations", "proposals")
@@ -498,7 +502,7 @@ class ApprovalService:
             attempts = [a for a in data["payout_attempts"] if a["line_id"] == line["id"]]
             latest = max(attempts, key=lambda a: a["attempt_no"], default=None)
             allocation = [link for link in links if link["line_id"] == line["id"]]
-            if not _returned(latest) or not allocation:
+            if not _not_paid(latest) or not allocation:
                 continue
             shares = [obligations[link["obligation_id"]] for link in allocation]
             if (
