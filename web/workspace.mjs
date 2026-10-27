@@ -48,6 +48,8 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
         const doc = id ? await client.get(resource, id) : null;
         if (ticket !== serial) return;
         if (current.name === "decision") {
+          workspace.meta = await client.singleton("meta");
+          if (ticket !== serial) return;
           proposal = doc;
           const incident = workspace.incidents.find(i => i.id === doc?.incident_id);
           const staged = Boolean(incident) && isStaged(incident, workspace.disputes);

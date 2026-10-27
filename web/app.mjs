@@ -7,9 +7,9 @@ const utc = value => new Date(value).toLocaleString("en-GB", {day:"2-digit",mont
 let demoState = null;
 function showClock() {
   // The staged week runs on the mock's clock; show it while the demo bar is present.
-  const staged = Boolean(demoState?.clock);
+  const staged = workspace?.meta.mode === "demo";
   $("clock-label").textContent = staged ? "STAGED CLOCK · UTC" : "WORKSPACE CLOCK · UTC";
-  const value = staged ? demoState.clock : workspace?.meta.clock;
+  const value = workspace?.meta.clock;
   if (value) $("clock").textContent = utc(value);
 }
 function showBanner() {

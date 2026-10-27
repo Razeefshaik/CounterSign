@@ -1,5 +1,6 @@
 import asyncio
 import sys
+from datetime import datetime
 
 import httpx
 import pytest
@@ -41,7 +42,10 @@ def database_client(dashboard_database):
         if sys.platform == "win32"
         else asyncio.new_event_loop
     ) as runner:
-        source = dashboard.DbSource(dashboard_database.conninfo, runtime=runtime)
+        source = dashboard.DbSource(
+            dashboard_database.conninfo, runtime=runtime,
+            clock=lambda: datetime.fromisoformat("2026-11-06T09:00:00+00:00"),
+        )
         runner.run(source.__aenter__())
         app = FastAPI()
         app.include_router(dashboard.build_router(source), prefix="/api/v1")

@@ -46,6 +46,18 @@ test("approval controls fail closed for expired, terminal, blocked or incomplete
   assert.equal(canDecide(owner, "not a clock"), false);
 });
 
+test("decision expiry follows staged meta clock independently of browser wall time", () => {
+  const original = Date.now;
+  try {
+    Date.now = () => Date.parse("2020-01-01T00:00:00Z");
+    const expired = {...meta, clock:owner.approval_request.expires_at};
+    assert.match(decisionView(owner, expired), /id="approve"[^>]*disabled/);
+    Date.now = () => Date.parse("2040-01-01T00:00:00Z");
+    assert.doesNotMatch(decisionView(owner, meta), /id="approve"[^>]*disabled/);
+    assert.match(decisionView(owner, {...meta, clock:null}), /id="approve"[^>]*disabled/);
+  } finally {Date.now = original;}
+});
+
 test("untrusted text is inert in proposals, flags, audit and SVG; full emails are masked", () => {
   const attack = '<img src=x onerror="alert(1)"> secret@example.com';
   const changed = {...owner, rationale:attack, params:{note:attack}, flags:[{type:"PROMPT_INJECTION", excerpt:attack, source:attack}]};
@@ -151,12 +163,26 @@ function documentDouble() {
   });
   return {elements, getElementById:id => elements.get(id) || null, querySelectorAll:() => []};
 }
+test("refreshing a decision reloads staged metadata and disables an expired approval", async () => {
+  const doc = documentDouble();
+  let clock = meta.clock;
+  const views = createWorkspaceViews(doc, {hash:`#decision/${owner.id}`}, async url =>
+    response(url.endsWith("/meta") ? {...meta, clock} :
+      url.endsWith("/proposals") ? {items:[owner],next_cursor:null} : owner));
+  await views.setWorkspace({meta:{...meta},fixture:false,incidents:[],disputes:[]});
+  assert.equal(doc.getElementById("approve").disabled, false);
+  clock = owner.approval_request.expires_at;
+  await doc.getElementById("view-refresh").onclick();
+  assert.equal(doc.getElementById("approve").disabled, true);
+});
 test("controller prevents duplicate decisions, clears live owner token and reloads after success", async () => {
   const doc = documentDouble(), location={hash:`#decision/${owner.id}`};
   let postCount=0, finish, state=owner;
   const post = new Promise(resolve => {finish=resolve;});
   const views = createWorkspaceViews(doc,location,async (url, options) => {
+    if (url.endsWith("/meta")) return response({...meta,mode:"live",simulated:false,paypal_env:"sandbox"});
     if (options.method === "POST") {postCount++; assert.equal(options.headers["X-Owner-Token"],"fake-test-only"); return post;}
+    if (url.endsWith("/meta")) return response(meta);
     return response(url.endsWith("/proposals") ? {items:[state],next_cursor:null} : state);
   });
   await views.setWorkspace({meta:{...meta,mode:"live",simulated:false,paypal_env:"sandbox"},fixture:false,incidents:[],disputes:[]});
@@ -176,9 +202,11 @@ test("controller disables expired approval after 409 and reports unavailable pre
     const doc = documentDouble(), location={hash:`#decision/${owner.id}`};
     let changed = false;
     const views = createWorkspaceViews(doc,location,async (url, options) => {
+      if (url.endsWith("/meta")) return response(meta);
       if (options.method === "POST") {changed=true; return response({},code);}
       const data=changed && code === 409 ? {...owner,state:"EXPIRED"} : owner;
-      return response(url.endsWith("/proposals") ? {items:[data],next_cursor:null} : data);
+      if (url.endsWith("/meta")) return response(meta);
+    return response(url.endsWith("/proposals") ? {items:[data],next_cursor:null} : data);
     });
     await views.setWorkspace({meta,fixture:false,incidents:[],disputes:[]});
     await doc.getElementById("approve").onclick();

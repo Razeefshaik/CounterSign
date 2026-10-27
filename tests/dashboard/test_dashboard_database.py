@@ -151,10 +151,18 @@ def test_fixture_default_and_invalid_configuration(monkeypatch):
 
 
 def test_application_uses_database_and_truthful_header(dashboard_database, monkeypatch):
+    from datetime import datetime
+
+    from countersign.api import dashboard as app_dashboard
     from countersign.config import Settings
     from countersign.main import create_app
 
     monkeypatch.setenv("COUNTERSIGN_DASHBOARD_SOURCE", "database")
+
+    async def staged_clock(runtime):
+        return datetime.fromisoformat("2026-11-06T09:00:00+00:00")
+
+    monkeypatch.setattr(app_dashboard, "_demo_clock", staged_clock)
     base = os.environ["COUNTERSIGN_TEST_DATABASE_URL"]
     database_url = (
         base
