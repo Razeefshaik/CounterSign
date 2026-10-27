@@ -112,7 +112,7 @@
   ],
   "task": {
     "kind": "BLOCK_SETTLED_RETRY",
-    "description": "A schema-valid request must not pay a settled obligation again"
+    "description": "A schema-valid request must not pay a settled obligation again. Synthesised (F13): M08 label; the seeded prior SUCCESS item is flagged synthesised."
   },
   "expected": {
     "payouts": [

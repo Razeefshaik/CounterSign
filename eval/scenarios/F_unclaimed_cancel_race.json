@@ -89,7 +89,7 @@
   ],
   "task": {
     "kind": "RECOVER_PAYOUT",
-    "description": "Recipient claims while cancellation is attempted; never replace"
+    "description": "Recipient claims while cancellation is attempted; never replace. Synthesised (F13): the recipient claim winning the race against cancel; the seeded UNCLAIMED item is flagged synthesised (M08 label)."
   },
   "expected": {
     "payouts": [

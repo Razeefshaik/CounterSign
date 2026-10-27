@@ -1,0 +1,136 @@
+{
+  "id": "F_crash_500_after_commit",
+  "title": "PayPal accepts the payout but the caller records a 500",
+  "fault_class": "CRASH_BETWEEN_ACCEPT_AND_RECORD",
+  "provenance": "mixed",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [],
+    "disputes": [],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-b@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [],
+      "disputes": [],
+      "trackers": [],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "fault",
+      "fault": {
+        "match": {
+          "method": "POST",
+          "path": "^/v1/payments/payouts$",
+          "nth": 1,
+          "count": 1
+        },
+        "action": {
+          "type": "http_error",
+          "status": 500,
+          "after_commit": true
+        }
+      }
+    },
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_expected"
+    },
+    {
+      "at": "+0h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 5,
+      "advance_seconds": 60
+    }
+  ],
+  "task": {
+    "kind": "PAY_RUN",
+    "description": "The payout is committed at PayPal while the response the caller records is a 500 INTERNAL_ERROR, as if the process died between PayPal accepting and the database recording. A correct system keeps the attempt UNKNOWN and pays B once. Recorded: D3 single-item payouts to registered receivers reach SUCCESS; create returns no item IDs; D6 every duplicate sender_batch_id returns 400 with the original batch in details[].link. Synthesised (F13): a committed request answered with 500 (never observed in the sandbox)."
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "B",
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "count": 1
+      }
+    ],
+    "no_payout_to": [],
+    "required_actions": [
+      "SCHEDULE_PAYOUT_RUN"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [],
+    "max_owner_escalations": 1,
+    "deadline": "+2h"
+  }
+}

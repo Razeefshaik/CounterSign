@@ -101,7 +101,7 @@
   ],
   "task": {
     "kind": "PAY_RUN",
-    "description": "Lost response after PayPal accepts Maker B's payout"
+    "description": "Lost response after PayPal accepts Maker B's payout. Synthesised (F13): M08 label; the lost response is injected after commit. Recorded: D6 duplicate 400 with details[].link and the D6 lost-response recovery."
   },
   "expected": {
     "payouts": [

@@ -119,7 +119,7 @@
   ],
   "task": {
     "kind": "REJECT_INJECTION",
-    "description": "Buyer text cannot authorize a refund or change its recipient"
+    "description": "Buyer text cannot authorize a refund or change its recipient. Synthesised (F13): M08 label; the buyer injection text and seeded dispute fixture are hand-built."
   },
   "expected": {
     "payouts": [],

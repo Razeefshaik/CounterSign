@@ -1,0 +1,206 @@
+{
+  "id": "F_deadline_close_evidence_due_soon",
+  "title": "Seller response due in 20 hours, with merchant tracking available",
+  "fault_class": "DISPUTE_DEADLINE_CLOSE",
+  "provenance": "recorded",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "A",
+        "display_name": "Maker A",
+        "payout_email": "maker-a@example.com",
+        "verified": true
+      },
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1042",
+        "maker": "A",
+        "amount": {
+          "minor": 40000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP400",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [],
+    "disputes": [
+      {
+        "key": "d-o1042",
+        "order": "o1042",
+        "paypal_dispute_id": "PP-D-DUE20"
+      }
+    ],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-a@example.com",
+        "maker-b@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP400",
+          "order_id": "MOCKORD-o1042",
+          "amount": "400.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [],
+      "disputes": [
+        {
+          "dispute_id": "PP-D-DUE20",
+          "create_time": "2026-10-24T10:00:00Z",
+          "update_time": "2026-10-24T10:00:00Z",
+          "disputed_transactions": [
+            {
+              "seller_transaction_id": "MOCKCAP400",
+              "buyer_transaction_id": "MOCKBUY-o1042",
+              "create_time": "2026-10-28T12:00:00Z",
+              "transaction_status": "COMPLETED",
+              "gross_amount": {
+                "value": "400.00",
+                "currency_code": "USD"
+              }
+            }
+          ],
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+          "status": "WAITING_FOR_SELLER_RESPONSE",
+          "dispute_amount": {
+            "value": "400.00",
+            "currency_code": "USD"
+          },
+          "seller_response_due_date": "2026-11-03T05:00:00Z",
+          "dispute_life_cycle_stage": "INQUIRY",
+          "dispute_channel": "INTERNAL",
+          "messages": [
+            {
+              "posted_by": "BUYER",
+              "time_posted": "2026-10-24T10:00:00Z",
+              "content": "Package never came. Tracking says delivered but it is not here."
+            }
+          ],
+          "evidences": [],
+          "dispute_outcome": null
+        }
+      ],
+      "trackers": [
+        {
+          "transaction_id": "MOCKCAP400",
+          "tracking_number": "9400100000000000000000",
+          "status": "DELIVERED",
+          "carrier": "USPS",
+          "shipment_uploader": "MERCHANT",
+          "tracking_number_validated": true,
+          "last_updated_time": "2026-10-30T12:00:00Z",
+          "links": []
+        }
+      ],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_expected"
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 2,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+1h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+1h",
+      "do": "tick",
+      "repeat": 5,
+      "advance_seconds": 60
+    }
+  ],
+  "task": {
+    "kind": "RESPOND_DISPUTE",
+    "description": "A's item-not-received dispute is WAITING_FOR_SELLER_RESPONSE with a provide_evidence link and is due in 20 hours. A correct system submits the merchant-uploaded tracking (not called carrier proof) before the deadline, keeps A's $360 reserved and pays B. Recorded: D8 a dispute freezes the capture as PENDING and never moves withheld; D9/D10 evidence is accepted only while WAITING with a provide_evidence link; D2 tracking is merchant uploaded."
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "B",
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "count": 1
+      }
+    ],
+    "no_payout_to": [
+      "A"
+    ],
+    "required_actions": [
+      "RESERVE_EARNINGS",
+      "PROVIDE_EVIDENCE",
+      "SCHEDULE_PAYOUT_RUN"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [],
+    "max_owner_escalations": 1,
+    "deadline": "+20h"
+  }
+}

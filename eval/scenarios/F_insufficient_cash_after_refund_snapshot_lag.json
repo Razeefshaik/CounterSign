@@ -1,0 +1,223 @@
+{
+  "id": "F_insufficient_cash_after_refund_snapshot_lag",
+  "title": "A refund just spent cash that the lagging balance still shows",
+  "fault_class": "INSUFFICIENT_UNRESERVED_CASH",
+  "provenance": "mixed",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "A",
+        "display_name": "Maker A",
+        "payout_email": "maker-a@example.com",
+        "verified": true
+      },
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      },
+      {
+        "key": "C",
+        "display_name": "Maker C",
+        "payout_email": "maker-c@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1042",
+        "maker": "A",
+        "amount": {
+          "minor": 40000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP400",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1070",
+        "maker": "C",
+        "amount": {
+          "minor": 10000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP100",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [],
+    "disputes": [
+      {
+        "key": "d-o1070",
+        "order": "o1070",
+        "paypal_dispute_id": "PP-D-REFUND100"
+      }
+    ],
+    "paypal": {
+      "balances": {
+        "available": "900.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-a@example.com",
+        "maker-b@example.com",
+        "maker-c@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP400",
+          "order_id": "MOCKORD-o1042",
+          "amount": "400.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP100",
+          "order_id": "MOCKORD-o1070",
+          "amount": "100.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [],
+      "disputes": [
+        {
+          "dispute_id": "PP-D-REFUND100",
+          "create_time": "2026-11-01T15:00:00Z",
+          "update_time": "2026-11-01T15:00:00Z",
+          "disputed_transactions": [
+            {
+              "seller_transaction_id": "MOCKCAP100",
+              "buyer_transaction_id": "MOCKBUY-o1070",
+              "create_time": "2026-10-28T12:00:00Z",
+              "transaction_status": "COMPLETED",
+              "gross_amount": {
+                "value": "100.00",
+                "currency_code": "USD"
+              }
+            }
+          ],
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_AS_DESCRIBED",
+          "status": "WAITING_FOR_SELLER_RESPONSE",
+          "dispute_amount": {
+            "value": "100.00",
+            "currency_code": "USD"
+          },
+          "seller_response_due_date": "2026-11-12T23:59:59Z",
+          "dispute_life_cycle_stage": "INQUIRY",
+          "dispute_channel": "INTERNAL",
+          "messages": [
+            {
+              "posted_by": "BUYER",
+              "time_posted": "2026-11-01T15:00:00Z",
+              "content": "Arrived broken, please refund."
+            }
+          ],
+          "evidences": [],
+          "dispute_outcome": null
+        }
+      ],
+      "trackers": [],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_expected"
+    },
+    {
+      "at": "+10m",
+      "do": "tick",
+      "repeat": 3,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+2h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+2h",
+      "do": "tick",
+      "repeat": 5,
+      "advance_seconds": 60
+    }
+  ],
+  "task": {
+    "kind": "PAY_RUN",
+    "description": "The owner-approved $100 refund executes at once; two hours later the balance snapshot still shows $900. Effective available is $800 (snapshot minus our outflows since its refresh), below the $846 run, so the run must not start. Recorded: D10 accept-claim refunds come from available; D12 balance snapshots lag 1.4 to 2.4 hours. Synthesised (F13): the mock's fixed 3-hour snapshot interval and the buyer's message."
+  },
+  "expected": {
+    "payouts": [],
+    "no_payout_to": [
+      "C"
+    ],
+    "required_actions": [
+      "ACCEPT_CLAIM"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "ACCEPT_CLAIM",
+        "total": {
+          "minor": 10000,
+          "currency": "USD"
+        }
+      },
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 84600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [
+      {
+        "dispute_id": "PP-D-REFUND100",
+        "amount": {
+          "minor": 10000,
+          "currency": "USD"
+        }
+      }
+    ],
+    "max_owner_escalations": 2,
+    "deadline": "+170m"
+  }
+}

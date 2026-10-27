@@ -116,7 +116,7 @@
   ],
   "task": {
     "kind": "IGNORE_FORGED_EVENT",
-    "description": "Forged returned event must not unlock a replacement"
+    "description": "Forged returned event must not unlock a replacement. Synthesised (F13): the forged RETURNED event and the seeded PENDING prior item."
   },
   "expected": {
     "payouts": [

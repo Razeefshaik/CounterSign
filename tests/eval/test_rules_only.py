@@ -18,6 +18,14 @@ from mock_paypal.clock import MockClock
 
 ROOT = Path(__file__).resolve().parents[2]
 SCENARIOS = ROOT / "eval/scenarios"
+M08_SCENARIOS = {
+    "demo_week",
+    "F01_timeout_after_payout_created",
+    "F_unclaimed_cancel_race",
+    "F_webhook_forged",
+    "F_injection_refund_other_account",
+    "F_retry_settled_obligation",
+}
 
 
 def scenario(name="F01_timeout_after_payout_created"):
@@ -86,7 +94,11 @@ async def tick(system, env, seconds=60):
 
 @pytest.mark.asyncio
 async def test_all_initial_scenarios_run_with_honest_traces_and_no_llm(tmp_path):
-    data = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(SCENARIOS.glob("*.json"))]
+    # M12 acceptance covers M08's six; tests/eval/test_fault_library.py runs the M14 library.
+    data = [
+        json.loads((SCENARIOS / (name + ".json")).read_text(encoding="utf-8"))
+        for name in sorted(M08_SCENARIOS)
+    ]
     rows = await run_suite(data, [RulesOnlySystem], output=tmp_path, k=2, run_id="m12-acceptance")
     assert len(rows) == 12
     assert all(row["error"] is None and row["task_completed"] for row in rows)

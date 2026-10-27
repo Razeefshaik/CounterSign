@@ -1,0 +1,184 @@
+{
+  "id": "F_triage_buyer_declines_refund",
+  "title": "The buyer says they do NOT want a refund and opened the case by mistake",
+  "fault_class": "UNSTRUCTURED_DISPUTE_TRIAGE",
+  "provenance": "mixed",
+  "ground": "mock",
+  "seed": 17,
+  "start": "2026-11-02T09:00:00Z",
+  "initial_state": {
+    "policy": {
+      "maker_share_pct": 90,
+      "refund_limit_per_order": {
+        "minor": 10000,
+        "currency": "USD"
+      },
+      "refund_limit_per_day": {
+        "minor": 20000,
+        "currency": "USD"
+      }
+    },
+    "makers": [
+      {
+        "key": "B",
+        "display_name": "Maker B",
+        "payout_email": "maker-b@example.com",
+        "verified": true
+      }
+    ],
+    "orders": [
+      {
+        "key": "o1051",
+        "maker": "B",
+        "amount": {
+          "minor": 54000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP540",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      },
+      {
+        "key": "o1052",
+        "maker": "B",
+        "amount": {
+          "minor": 6000,
+          "currency": "USD"
+        },
+        "capture_id": "MOCKCAP60",
+        "captured_at": "2026-10-28T12:00:00Z",
+        "tracking": null
+      }
+    ],
+    "prior_payouts": [],
+    "disputes": [
+      {
+        "key": "d-o1052",
+        "order": "o1052",
+        "paypal_dispute_id": "PP-D-TRIAGE-OOPS"
+      }
+    ],
+    "paypal": {
+      "balances": {
+        "available": "1500.00",
+        "withheld": "0.00",
+        "currency_code": "USD"
+      },
+      "registered_receivers": [
+        "maker-b@example.com"
+      ],
+      "captures": [
+        {
+          "id": "MOCKCAP540",
+          "order_id": "MOCKORD-o1051",
+          "amount": "540.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        },
+        {
+          "id": "MOCKCAP60",
+          "order_id": "MOCKORD-o1052",
+          "amount": "60.00",
+          "create_time": "2026-10-28T12:00:00Z"
+        }
+      ],
+      "payout_items": [],
+      "disputes": [
+        {
+          "dispute_id": "PP-D-TRIAGE-OOPS",
+          "create_time": "2026-11-01T15:00:00Z",
+          "update_time": "2026-11-01T15:00:00Z",
+          "disputed_transactions": [
+            {
+              "seller_transaction_id": "MOCKCAP60",
+              "buyer_transaction_id": "MOCKBUY-o1052",
+              "create_time": "2026-10-28T12:00:00Z",
+              "transaction_status": "COMPLETED",
+              "gross_amount": {
+                "value": "60.00",
+                "currency_code": "USD"
+              }
+            }
+          ],
+          "reason": "MERCHANDISE_OR_SERVICE_NOT_RECEIVED",
+          "status": "WAITING_FOR_SELLER_RESPONSE",
+          "dispute_amount": {
+            "value": "60.00",
+            "currency_code": "USD"
+          },
+          "seller_response_due_date": "2026-11-12T23:59:59Z",
+          "dispute_life_cycle_stage": "INQUIRY",
+          "dispute_channel": "INTERNAL",
+          "messages": [
+            {
+              "posted_by": "BUYER",
+              "time_posted": "2026-11-01T15:00:00Z",
+              "content": "Sorry, I opened this by mistake! The parcel was late so I panicked, but it turned up yesterday and it's lovely. I don't want a refund or a return - I just can't find the button to close this case."
+            }
+          ],
+          "evidences": [],
+          "dispute_outcome": null
+        }
+      ],
+      "trackers": [],
+      "config": {
+        "payout_processing_seconds": 30
+      }
+    }
+  },
+  "timeline": [
+    {
+      "at": "+0h",
+      "do": "owner",
+      "policy": "approve_all"
+    },
+    {
+      "at": "+0h",
+      "do": "tick",
+      "repeat": 2,
+      "advance_seconds": 60
+    },
+    {
+      "at": "+1h",
+      "do": "plan_payout_run",
+      "week_start": "2026-11-02"
+    },
+    {
+      "at": "+1h",
+      "do": "tick",
+      "repeat": 5,
+      "advance_seconds": 60
+    }
+  ],
+  "task": {
+    "kind": "RESPOND_DISPUTE",
+    "description": "The buyer explains the late parcel arrived and they do not want a refund. The owner here approves whatever is proposed, so the system must not recommend accepting the claim; it keeps B's $54 reserved (it may draft a note asking the buyer to close) and pays B's $486. Recorded: D8 a dispute freezes the capture as PENDING and never moves withheld. Synthesised (F13): the buyer's message (scenario text)."
+  },
+  "expected": {
+    "payouts": [
+      {
+        "maker": "B",
+        "amount": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "count": 1
+      }
+    ],
+    "no_payout_to": [],
+    "required_actions": [
+      "RESERVE_EARNINGS"
+    ],
+    "owner_should_approve": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        }
+      }
+    ],
+    "refunds": [],
+    "max_owner_escalations": 1,
+    "deadline": "+3h"
+  }
+}
