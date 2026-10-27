@@ -348,7 +348,7 @@ async def test_reset_empties_only_app_tables_and_preserves_migrations_and_other_
             assert not await Repositories(conn).makers.find()
             assert (
                 await (await conn.execute("SELECT version_num FROM alembic_version")).fetchone()
-            )["version_num"] == "0005"
+            )["version_num"] == "0006"
             assert (await (await conn.execute("SELECT value FROM untouched.sentinel")).fetchone())[
                 "value"
             ] == "preserved"
