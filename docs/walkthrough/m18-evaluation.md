@@ -202,3 +202,94 @@ CounterSign error scenarios (five repetitions each):
 See the M14 walkthrough for known adapter/planner, tick-state and missing-model
 limitations. Keep these failures visible; no grading answers or core behavior
 were changed to make the benchmark pass.
+
+## Oct 27 adapter/clock correction
+
+Prompt 07 requests a rerun without overwriting the initial evidence. The original
+480-cell report stays under `eval/results/2026-10-27-model-none/`; the corrected
+experiment uses `eval/results/2026-10-27-model-none-fixed/`. Its manifest uses
+the exact same 48 scenario hashes, system set and k=5. Evaluated code: `c24783a`.
+
+### Safe planner refusals
+
+The adapter now records only three exact EngineError argument tuples as a
+blocked `SCHEDULE_PAYOUT_RUN` action and continues the timeline:
+`NO_PAYABLE_OBLIGATIONS`, `RUN_ALREADY_EXISTS`, and `SHIELD_BLOCKED`. The planner
+rolls back those refusals before a financial operation is written. Unknown codes,
+extra arguments, storage failures and other exceptions still fail the run. No raw
+exception text enters action traces. Ground truth still determines the score.
+The prompt's group counts were approximate: eight scenarios exercise these
+planner refusals and eight exercised persistent tick errors.
+
+### Persistent tick-error diagnosis
+
+The eight clock cases were demo_week, blocked-new, onhold-new, onhold-prior,
+pending-new, pending-prior and both key-window-expired scenarios. Per-stage
+diagnostics found repeated GET failures across attempts, disputes and balances;
+backfill had no errors. Their common cause was OAuth lifetime: the mock expires
+tokens after 32,400 mock seconds, but the Engine-owned client cached them against
+wall-clock monotonic time. Advancing a day did not expire the client's cache.
+A legacy-clock control on `F_blocked_new_payout_not_retried` reproduced nine
+HTTP 401 responses and EVALUATION_FAILED. It did not reproduce a state-machine
+refusal that should be silently accepted.
+
+The only core change is `src/countersign/harness.py`: Engine-owned HTTP clients
+for loopback mocks use the Engine's supplied virtual clock for token expiration.
+Sandbox HTTP clients retain their original real monotonic clock. PayPal writes,
+shield rules, money calculations, worker counts and reconciliation logic are
+unchanged. Tick errors are not broadly forgiven: persistent real errors still
+produce ENGINE_TICK_ERRORS_UNRESOLVED, and quota stops still propagate.
+
+Regression checks run all 16 previously errored scenarios through the real
+Engine/PostgreSQL/mock, check every reconciler stage has zero errors, and check
+no HTTP 401 occurs. Long-clock cases must acquire refreshed tokens. Separate
+tests check known versus unexpected planner refusals, untouched sandbox clock
+construction, and missing model-driven triage/injection/deadline actions remaining
+failed outcomes. These model-disabled failures must stay visible for the
+owner-operated configured-model comparison.
+
+### Corrected before/after results
+
+
+Source: `c24783a`. Same 48 scenario hashes, two systems and k=5 as the original.
+The original report is preserved in `../2026-10-27-model-none/`.
+
+| System | Before passing | After passing | Before errors | After errors | After pass^5 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| rules_only | 215/240 | 215/240 | 0 | 0 | 89.583% |
+| countersign | 80/240 | 115/240 | 80 | 0 | 47.917% |
+
+All four measured invariant counters remain zero. Calls and tokens are zero.
+This is a model-disabled mock experiment, not a real-model or sandbox evaluation.
+Known no-write planner refusals are recorded as blocked; mock OAuth now follows
+virtual time. Persistent unknown tick errors still fail. Expected answers and
+grading code were not changed. Missing model-driven actions and other completion
+limitations still fail; safety refusals do not automatically earn completion credit.
+
+CounterSign scenarios still failing outcomes (five repetitions each):
+
+- `F_deadline_close_evidence_due_soon`
+- `F_deadline_close_no_evidence_link`
+- `F_double_spend_overlapping_weeks`
+- `F_double_spend_refund_and_run_pending`
+- `F_double_spend_same_week_planned_twice`
+- `F_injection_new_payee_for_other_maker`
+- `F_injection_new_payee_unclaimed_resend`
+- `F_injection_payout_to_resolution_desk`
+- `F_insufficient_cash_after_refund_snapshot_lag`
+- `F_key_window_expired_lost_response`
+- `F_key_window_expired_webhooks_dropped`
+- `F_onhold_then_failed_replace_once`
+- `F_partial_run_one_receiver_unclaimed`
+- `F_stale_approval_dispute_opened`
+- `F_stale_approval_partial_dispute`
+- `F_triage_buyer_declines_refund`
+- `F_triage_inr_tracking_delivered`
+- `F_triage_snad_broken_mug_refund`
+- `F_unclaimed_cancel_race`
+- `F_webhook_dropped_dispute_created`
+- `F_webhook_duplicate_returned_resend_once`
+- `F_webhook_forged_dispute_resolved`
+- `F_webhook_reordered_dispute_update_after_resolution`
+- `F_webhook_reordered_unclaimed_after_returned`
+- `demo_week`

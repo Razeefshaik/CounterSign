@@ -40,6 +40,7 @@ Two consequences of these rules, both easy to get wrong:
 
 - **One branch per task**, named `<owner>/<task-id>-<slug>`, for example `core/C03-runner-d1` or `mate/M02-payouts`. Branch from `main`.
 - **Small commits.** Each commit message starts with the task id, for example `C03: add D1 token scope check`.
+- **PR base is always `main`.** Do not target a previous feature branch; list dependencies in the PR description.
 - **Tests come with every change.** A task is done only when its acceptance criteria in `docs/TASKS.md` pass, together with `pytest`, `ruff check` and the import-linter contracts.
 - **Never read or print `.env`.** Code loads it at runtime with `python-dotenv`. Logs, recordings, test output and error messages must never contain tokens, client IDs, secrets or real emails.
 - **Recordings are public.** Redact them before committing (`docs/PLAN.md` section 1.2).

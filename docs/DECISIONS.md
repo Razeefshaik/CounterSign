@@ -403,3 +403,12 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Five observations share one durable Engine run with owner-provided captures and one exact $5.40 approval; financial writes remain shield/executor-only | C26 owner prompt | Accept | Reuses the confirmed D3/D4/D5/D6/D8 paths without an extra direct payout/capture/refund API path |
 | Resume binds private settings by fingerprint, reuses checkpointed operations and rechecks final GET/shield facts | C26 | Accept | An interrupted approval must not create another payment, and saved success must not hide changed resource state |
 | Sandbox specification files are a reviewed case catalog; live IDs and emails come from a private owner manifest, never the fake fixture identifiers | C26 | Accept | Scenario metadata must not seed fictional PayPal resources or silently turn mock observations into sandbox evidence |
+
+## Oct 27 M18 evaluation correction
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| The evaluation adapter records the exact planner refusals NO_PAYABLE_OBLIGATIONS, RUN_ALREADY_EXISTS and SHIELD_BLOCKED as blocked actions; unknown errors still fail | Owner prompt 07 | Accept | Correct no-write refusals must be graded against outcomes rather than misclassified as crashes |
+| Engine-owned HTTP clients use the supplied virtual clock for OAuth expiry only against loopback mocks | M18 per-stage diagnostics; owner-authorized minimal core fix | Accept | Advancing mock time expired server tokens while wall-clock client caches stayed valid, causing repeated 401 failures across reconciliation stages |
+| Keep the original 480-cell report and rerun unchanged scenario hashes/systems/k into a new folder, with model-disabled failures visible | Owner prompt 07 | Accept | Before/after evidence must isolate the adapter/clock corrections without changing expected answers or claiming missing agent behavior succeeded |
+| Every new pull request targets main; previous stacked PRs12/13 were closed after their contents merged in0d47f64 | Aman direct instruction and prompt07 | Accept | Review branches must not remain open against deleted feature branches after integration |
