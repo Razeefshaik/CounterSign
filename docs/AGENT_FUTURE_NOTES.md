@@ -42,7 +42,7 @@ parent PayPalDevPost folder. Branch `razeef/c31-run-approval-refresh` starts fro
 attribution. Commits: `5b10c13` migration/schema, `29e7186` core implementation,
 `0b7cb62` contract 1.0.4 and owner-approved dashboard metadata, `2ac9015` downgrade
 fix. Final full pytest: 3981 passed, 5 skipped in 1428.88 seconds; Ruff clean,
-three import contracts kept and all 39 web tests pass. Branch push pending.
+three import contracts kept and all 39 web tests pass. Branch push verified; no merge.
 
 Migration 0006 replaces week-wide uniqueness with a unique non-CANCELLED run per
 week. The dashboard run view must hide superseded cancelled history while keeping

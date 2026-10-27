@@ -20,7 +20,7 @@ integer minor units. Mock and sandbox evidence must remain separate.
   Commits: `5b10c13` migration/schema, `29e7186` service/harness/regressions/decisions,
   `0b7cb62` contract 1.0.4 and owner-approved dashboard metadata alignment.
   Downgrade fix commit: `2ac9015`. Final full-suite validation passed;
-  push is pending final verification. No PR or merge is requested.
+  branch push is verified against origin. No PR or merge was performed.
 - Migration 0006 permits CANCELLED history plus one live run per week through a
   partial unique index. `v_dash_runs` shows the live run instead of superseded
   cancelled history, preserving view grants/detail. Downgrade refuses conflicting
