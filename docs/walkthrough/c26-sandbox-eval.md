@@ -230,3 +230,22 @@ They check explicit target guards, dedicated database names, small integer
 amounts, redaction and unavailable metrics. Actual test commands, final counts,
 commit references and the PR link belong in the task handoff. No sandbox run or
 real-model evaluation is claimed by this implementation walkthrough.
+
+## Verified development handoff (Oct 27)
+
+Implementation commit: `b7c715c`. Full suite with the documented PostgreSQL
+and isolated toolkit settings: **3,922 passed, five skipped**. The skips are
+legacy optional toolkit tests expecting the SDK in the parent environment.
+All 17 focused C26 tests, all 31 web tests, Ruff and all three import contracts
+pass. All 53 scenario documents validate: 48 mock and five sandbox templates.
+
+The exact `--dry-run --target mock` CLI completed all five GET/shield checks
+using real PostgreSQL and Engine, with no provider calls. Output is labelled
+mock; global invariants remain unavailable. This is preparation for the owner's
+sandbox run, not a completed sandbox experiment.
+
+The only core-owned file changed for this card is `scripts/sandbox_eval.py`;
+there are no `src/` or `web/` edits. The M11 wrapper and mock-discovery changes
+are in mate-owned `eval/`. Merge M14, then M18, then C26; later PRs use their
+dependency branches for a focused review and should be retargeted to main as
+those dependencies merge. No PR is merged by this agent.
