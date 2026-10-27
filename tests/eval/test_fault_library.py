@@ -8,6 +8,7 @@ uses the real Engine on PostgreSQL with the model disabled.
 import asyncio
 import json
 import os
+import re
 import sys
 from collections import Counter
 from pathlib import Path
@@ -31,7 +32,11 @@ from eval.validate import FAULT_CLASSES, synthesised_reasons, validate
 ROOT = Path(__file__).resolve().parents[2]
 FOLDER = ROOT / "eval/scenarios"
 FILES = sorted(FOLDER.glob("*.json"))
-LIBRARY = {path.stem: json.loads(path.read_text(encoding="utf-8")) for path in FILES}
+LIBRARY = {
+    path.stem: doc
+    for path in FILES
+    if (doc := json.loads(path.read_text(encoding="utf-8")))["ground"] == "mock"
+}
 # Delay and timeout faults wait on the mock clock, which the in-process runner
 # advances only between steps; a system awaiting such a request would never return.
 BLOCKING_FAULTS = {"timeout", "delay"}
@@ -42,6 +47,12 @@ def test_every_fault_class_has_two_scenarios_and_triage_has_three():
     assert set(counts) == set(get_args(FAULT_CLASSES))
     assert all(count >= 2 for count in counts.values()), counts
     assert counts["UNSTRUCTURED_DISPUTE_TRIAGE"] >= 3
+
+
+def test_walkthrough_lists_every_mock_scenario_once():
+    walkthrough = (ROOT / "docs/walkthrough/m14-fault-library.md").read_text(encoding="utf-8")
+    names = re.findall(r"^\| `([^`]+)`", walkthrough, flags=re.MULTILINE)
+    assert Counter(names) == Counter(LIBRARY.keys())
 
 
 @pytest.mark.parametrize("name", sorted(LIBRARY))
@@ -130,6 +141,21 @@ def test_recorded_provenance_allows_replayed_recorded_test_values():
         )
     )
     assert validate(data).provenance == "recorded"
+
+
+def test_seeded_failed_item_is_not_a_recorded_d7_rejection():
+    data = mutated(
+        lambda d: d["initial_state"]["paypal"]["payout_items"].append(
+            {
+                "payout_item_id": "MOCKI-failed",
+                "receiver": "maker-b@example.com",
+                "amount": "1.00",
+                "status": "FAILED",
+            }
+        )
+    )
+    with pytest.raises(ValidationError, match="Recorded provenance"):
+        validate(data)
 
 
 @pytest.mark.parametrize("name", sorted(LIBRARY))

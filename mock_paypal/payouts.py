@@ -166,9 +166,9 @@ class PayoutService:
                     elif rule["to"] == "PENDING":
                         item.synthesised, stuck = True, True
                     else:
-                        self.transition(item, rule["to"], synthesised=True)
                         if rule.get("errors") is not None:
                             item.errors = deepcopy(rule["errors"])
+                        self.transition(item, rule["to"], synthesised=True)
             if stuck:
                 return  # A stuck item keeps its batch PROCESSING; no completion event.
             batch.status = "SUCCESS"  # Batch processed; individual outcomes can differ.

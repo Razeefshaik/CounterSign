@@ -102,6 +102,11 @@ re-plans a week after a stale approval, keyword triage misses plain-language dam
 and misreads a negated "refund", and its failed cancel in the M08 race is traced as
 a missing action.
 
+This table was independently rerun on Oct 27 with `run_one` and `RulesOnlySystem`,
+model `none`, k = 1: all 48 runs completed without runner errors; the five failures
+and the 8 recorded / 23 mixed / 17 synthesised split matched the table. These are
+local mock observations, not sandbox integration results or model evaluations.
+
 The model-disabled `countersign` system runs in-process on PostgreSQL. A smoke test
 (`tests/eval/test_fault_library.py`) runs five scenarios it completes today
 (`clean_run_three_makers`, the reset, 503-after-commit and recorded-500 scenarios,
@@ -117,6 +122,8 @@ the next item for that receiver (`to`: SUCCESS, UNCLAIMED, ONHOLD, BLOCKED, FAIL
 PENDING; optional `nth`, `count`, `errors`). Forced items are always marked
 `synthesised` in ground truth; balances and item webhooks reuse the normal
 transition. PENDING leaves the item stuck and its batch PROCESSING.
+Custom outcome errors are set before the transition emits its item event, so
+FAILED webhook evidence agrees with the item's subsequent GET response.
 
 ## Gaps found (not fixed here)
 

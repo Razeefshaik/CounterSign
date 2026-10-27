@@ -418,7 +418,7 @@ class Scenario(Doc):
 
 
 # F13: no sandbox recording or test value produces these item states.
-SYNTHESISED_ITEM_STATES = {"ONHOLD", "BLOCKED", "REFUNDED", "REVERSED"}
+SYNTHESISED_ITEM_STATES = {"ONHOLD", "BLOCKED", "FAILED", "REFUNDED", "REVERSED"}
 SYNTHESISED_CONTROLS = ("/transition", "/claim", "/payout-outcomes", "/webhooks/forge")
 
 

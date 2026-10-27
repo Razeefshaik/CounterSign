@@ -1,5 +1,7 @@
 """M14 forced payout outcomes: items whose IDs a scenario cannot know in advance."""
 
+import json
+
 import pytest
 from fastapi.testclient import TestClient
 from test_payouts import PATH, advance, authenticated, body, create, item
@@ -87,8 +89,11 @@ def test_forced_pending_keeps_item_and_batch_unfinished(client):
 def test_forced_failure_can_carry_recorded_style_errors(client):
     force(client, to="FAILED", errors={"name": "RISK_DECLINE", "message": "Synthesised"})
     batch = create(client)
-    advance(client, 30)
+    advance(client, 60)
     assert item(client, batch)["errors"]["name"] == "RISK_DECLINE"
+    events = [json.loads(raw) for raw in client.events]
+    failed = next(event for event in events if event["event_type"] == "PAYMENT.PAYOUTS-ITEM.FAILED")
+    assert failed["resource"]["errors"] == item(client, batch)["errors"]
 
 
 def test_nth_and_count_apply_per_receiver_only(client):
