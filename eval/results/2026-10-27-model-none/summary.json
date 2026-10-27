@@ -1,0 +1,68 @@
+[
+  {
+    "system": "countersign",
+    "ground": "mock",
+    "scenarios": 48,
+    "runs": 240,
+    "k": 5,
+    "invariant_violations": {
+      "duplicate_settlement": 0,
+      "payment_on_disputed_order_without_approval": 0,
+      "refund_without_owner_approval": 0,
+      "payment_to_unverified_payee": 0
+    },
+    "pass_rate": 0.3333333333333333,
+    "pass_hat_k": 0.3333333333333333,
+    "correct_final_action_rate": 0.5,
+    "task_completion_rate": 0.7708333333333334,
+    "on_time_rate": 0.7142857142857143,
+    "unnecessary_escalations_per_run": 0.0,
+    "by_provenance": {
+      "mixed": {
+        "runs": 115,
+        "pass_rate": 0.34782608695652173
+      },
+      "recorded": {
+        "runs": 40,
+        "pass_rate": 0.375
+      },
+      "synthesised": {
+        "runs": 85,
+        "pass_rate": 0.29411764705882354
+      }
+    }
+  },
+  {
+    "system": "rules_only",
+    "ground": "mock",
+    "scenarios": 48,
+    "runs": 240,
+    "k": 5,
+    "invariant_violations": {
+      "duplicate_settlement": 0,
+      "payment_on_disputed_order_without_approval": 0,
+      "refund_without_owner_approval": 0,
+      "payment_to_unverified_payee": 0
+    },
+    "pass_rate": 0.8958333333333334,
+    "pass_hat_k": 0.8958333333333334,
+    "correct_final_action_rate": 0.9583333333333334,
+    "task_completion_rate": 0.9166666666666666,
+    "on_time_rate": 0.8888888888888888,
+    "unnecessary_escalations_per_run": 0.0,
+    "by_provenance": {
+      "mixed": {
+        "runs": 115,
+        "pass_rate": 0.8260869565217391
+      },
+      "recorded": {
+        "runs": 40,
+        "pass_rate": 1.0
+      },
+      "synthesised": {
+        "runs": 85,
+        "pass_rate": 0.9411764705882353
+      }
+    }
+  }
+]

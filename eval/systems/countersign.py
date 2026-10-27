@@ -92,7 +92,7 @@ class _MeasuredModel:
         self._trace.llm_calls += 1
         try:
             response = await self._original(request)
-        except Exception as error:  # noqa: BLE001 -- preserve only the fixed quota code.
+        except Exception as error:
             if _quota_exhausted(error):
                 self._trace.errors.append("MODEL_QUOTA_EXHAUSTED")
             raise

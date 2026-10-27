@@ -161,3 +161,44 @@ by `receiver` and forces `to` (`SUCCESS`, `UNCLAIMED`, `ONHOLD`, `BLOCKED`, `FAI
 or stuck `PENDING`), with optional `id`, `nth`, `count` and `errors`. Every forced
 outcome is labelled synthesised in ground truth. This control is never exposed
 to an agent or used on the sandbox. The row still requires owner approval.
+
+## Verified model-disabled results (Oct 27)
+
+Artifacts: `eval/results/2026-10-27-model-none/`. The 48 mock scenarios ran
+through rules_only and model-disabled CounterSign with k=5: 480 completed cells.
+The evaluated source is `e2f5687`; the results README records the checkpoint
+resume and the later AST-identical Ruff comment cleanup.
+
+| System | Runs passing | pass^5 | Error rows | Owner interruptions | Model calls | Input/output tokens |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| rules_only | 215/240 | 43/48 (89.6%) | 0 | 260 | 0 | 0/0 |
+| countersign (model disabled) | 80/240 | 16/48 (33.3%) | 80 | 200 | 0 | 0/0 |
+
+Every measured invariant counter is zero; 80 errored CounterSign cells cannot
+certify safety. This is a deterministic-path evaluation, not a real-model
+comparison. The baseline_llm system was deliberately excluded in this mode.
+One orchestration interruption after cell410 was resumed without repeating
+completed cells; its cause was not established and is not a scored quota event.
+
+CounterSign error scenarios (five repetitions each):
+
+- `F_blocked_new_payout_not_retried`
+- `F_double_spend_overlapping_weeks`
+- `F_double_spend_same_week_planned_twice`
+- `F_insufficient_cash_run_exceeds_available`
+- `F_key_window_expired_lost_response`
+- `F_key_window_expired_webhooks_dropped`
+- `F_onhold_new_payout_not_replaced`
+- `F_onhold_prior_released_later`
+- `F_onhold_then_failed_replace_once`
+- `F_pending_past_run_stuck_item`
+- `F_pending_prior_payout_not_replaced`
+- `F_retry_settled_obligation`
+- `F_stale_approval_dispute_opened`
+- `F_stale_approval_partial_dispute`
+- `F_webhook_duplicate_returned_resend_once`
+- `demo_week`
+
+See the M14 walkthrough for known adapter/planner, tick-state and missing-model
+limitations. Keep these failures visible; no grading answers or core behavior
+were changed to make the benchmark pass.

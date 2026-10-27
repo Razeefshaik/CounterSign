@@ -373,3 +373,11 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Two triage and one injection scenario use a rubber-stamp owner (approve_all) | M14 | Accept | Those cases test whether the system itself proposes a wrong refund or payee, which an owner who approves only the expected request would hide |
 | M12's all-scenarios acceptance test is pinned to M08's six; the library runs through a separate parametrised rules_only test without requiring passes | M14 | Accept | rules_only is a baseline that is expected to fail some library cases; its scores are recorded in docs/walkthrough/m14-fault-library.md |
 | Forced payout errors are set before transition webhooks, and seeded FAILED items cannot claim recorded provenance | M14 completion review | Accept | A delivered FAILED event must agree with GET; D7 request rejections are not recorded FAILED payout items |
+
+## Oct 27 M18 evaluation
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Model-disabled runs compare rules_only and CounterSign without an LLM; configured runs use one explicit model for both agents and include rules_only | M18 owner prompt | Accept | Deterministic paths must not be presented as AI reasoning, and a different provider/model would confound the comparison |
+| Each completed scenario/system/repetition is checkpointed; quota attempts are retained separately and retried without a complete summary until all cells finish | M18 | Accept | Free-tier quota stops must not become scored safety failures or force rerunning completed work |
+| Resume binds k, model, scenario contents and benchmark/core/mock/migration source hashes; no database credentials or API keys enter results | M18 | Accept | Prevents mixing changed experiments while retaining reproducible public evidence |
