@@ -198,8 +198,13 @@ class Engine:
                         self.settings.paypal_client_secret,
                         self.settings.webhook_id, behavior=self.settings.paypal_behavior,
                     )
+                    # Mock OAuth expires on virtual time; sandbox retains real monotonic time.
                     self._http = await self._stack.enter_async_context(
-                        PayPalHTTP(paypal, transport=self._transport)
+                        PayPalHTTP(
+                            paypal, transport=self._transport,
+                            **({"monotonic": lambda: self.settings.clock().timestamp()}
+                               if paypal.is_mock else {}),
+                        )
                     )
                 self._reader = self._reader if self._reader is not None else PayPalRead(self._http)
                 self._verifier = (

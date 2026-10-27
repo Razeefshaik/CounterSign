@@ -13,6 +13,13 @@ against Git, then read only relevant sections; do not load the whole conversatio
 If no agent slot is available, the primary agent keeps the same workflow. The
 persistent instruction is in AGENTS.md; no new user request is needed each time.
 
+## PR workflow (owner prompt 07)
+
+M14/M18/C26 integrated in main `0d47f64`; PR #11 is merged, and formerly
+stacked #12/#13 are closed with `Merged into main in 0d47f64`. Every new PR
+must target **main** and start from updated main; do not reuse the old stack.
+Current fix branch is `mate/M18-eval-fix` from `2e51d41`.
+
 ## Local verification
 
 - Windows main Python: `%TEMP%/countersign-m01-venv/Scripts/python.exe`.
@@ -38,7 +45,8 @@ responses use drop/reset/after-commit HTTP errors instead of blocking a tick.
 The new /_mock/payout-outcomes control is proposed for CONTRACTS section 5.7;
 do not edit CONTRACTS without owner approval.
 Completed M14 is PR #11; commits `4449c99`, `c2c4fca`, `fc65de0`, plus integration
-documentation sync `8402932` (current mergeable PR head). Validation:
+documentation sync `8402932` (historical review head). Integrated in main
+`0d47f64`. Validation:
 3,883 passed, five legacy optional-toolkit skips; Ruff and three import contracts
 pass. The 43/48 rules_only score is a benchmark result, not a failing test suite.
 
@@ -75,9 +83,47 @@ tokens and measured invariant counts. Error-row zeros are not safety evidence.
 M18 full pytest: 3,900 passed, five legacy optional-toolkit skips (712 seconds);
 Ruff and three import contracts pass. Context is committed in `23d0e11`, current
 integration documentation in `ef00286`, handoff in `489add7`.
-[PR #12](https://github.com/Razeefshaik/CounterSign/pull/12) is open/ready with base
-`mate/M14-fault-library`, head `489add7`. Merge PR #11, retarget #12 to main,
-then merge M18 before C26; the stack is for review, not permission to merge.
+[PR #12](https://github.com/Razeefshaik/CounterSign/pull/12) was formerly based on
+M14; it is now closed because the work is integrated in main `0d47f64`. All
+future PRs target main. The former review stack is obsolete.
+
+## M18 error-row repair (prompt 07; active)
+
+Source prompt: Downloads/AMAN-PROMPT-07-EVAL-FIX.md. Diagnose, then narrow the
+adapter classification: only fixed, proven no-write planner refusals such as
+NO_PAYABLE_OBLIGATIONS, RUN_ALREADY_EXISTS or SHIELD_BLOCKED may be recorded as
+blocked actions. Unknown EngineError codes must remain failures. Never store raw
+exception text. Match expected tick conditions by fixed codes/states per stage;
+do not suppress an arbitrary error count. Fix real core/mock mismatches instead,
+with a regression test and an explicit list of core files in the PR.
+The prompt's group counts are approximate; verify actual cases rather than
+assuming its seven/nine headings equal the listed scenarios. Keep model-disabled
+failures without errors visible; no model means agent actions are not proposed.
+Code commit `c24783a` implements exactly the three planner codes above; all
+unknown Engine/runtime errors still raise. The only core file touched is
+`src/countersign/harness.py`: loopback mock HTTP token expiry uses the supplied
+mock clock, while sandbox retains real monotonic time. No blanket tick-error
+suppression was added; the persistent-tick-error regression remains.
+Before: all eight group-B cases had attempt/dispute/balance GET failures; the
+legacy-clock control for F_blocked_new_payout_not_retried reproduced nine 401s
+and EVALUATION_FAILED. After: all 16 former-error scenario regressions pass
+(66 seconds), with error=None, zero reconciliation-stage errors and no 401s;
+all eight long cases refresh OAuth at least twice. Eighteen adapter checks and
+two mock/sandbox clock-construction tests pass. Safe diagnostics are in the
+temporary `countersign-m18-diagnose.log`; no private exception arguments.
+The corrected 480-cell run is complete on source `c24783a`, with artifacts in
+`45272b0` under `eval/results/2026-10-27-model-none-fixed/`. Its exact 48 scenario
+hashes, two systems and k=5 match the old run; the old folder is unchanged.
+CounterSign improves from 80/240 pass (33.3%) with 80 errors to 115/240 (47.9%)
+with zero errors, pass^5 23/48. rules_only stays 215/240 (89.6%) with zero errors.
+Both have zero measured four-invariant counts, calls and tokens. All 25 remaining
+model-disabled CounterSign completion failures stay visible and are listed in
+the new README/walkthrough; no agent actions or expected outcomes were invented.
+Privacy, experiment identity and unique-cell count checks pass. Ruff, three
+import contracts and 39 web tests pass. Full pytest is still running in
+`countersign-m18fix-full.log`; no full-suite completion or PR number is claimed.
+Next: record full checks, push and open one main-based PR listing the core change.
+No real LLM/PayPal calls; no .env reads.
 
 ## C26 sandbox preparation
 
@@ -106,10 +152,9 @@ The only core-owned file touched is `scripts/sandbox_eval.py`; no src/ changes.
 Full C26 pytest: 3,922 passed, five legacy toolkit skips (709 seconds); all
 17 focused and 31 web tests pass. Ruff, three import contracts and diff checks
 pass. `cfa862f` records validation/runbook completion.
-[PR #13](https://github.com/Razeefshaik/CounterSign/pull/13) is open/ready, based on
-`mate/M18-eval`, head `cfa862f` before the final context-only handoff commit.
-Its branch is based on integration `a9a186d` with M18/M14 dependencies. Owner
-merges #11, retargets #12 to main and merges, then retargets #13 to main and merges.
+[PR #13](https://github.com/Razeefshaik/CounterSign/pull/13) is closed because
+the work is integrated in main `0d47f64`. Its former base was M18; all future
+PRs target main, and the old review-stack instructions no longer apply.
 No agent merge or real sandbox/model evaluation occurred. Razeef's configured
 Gemini and actual sandbox runs use the exact owner commands in the M18/C26
 walkthroughs; those future runs are not blockers to completed preparation.
@@ -122,3 +167,12 @@ belongs in dashboard_support.py, never `from conftest import dashboard`.
 The cash view versus Engine.snapshot availability guards were handed to core.
 Mock snapshot history is bounded at 256 entries; evicted historical reads return
 404. Neither note permits rebuilding completed M15/M17 work.
+
+Final verification: full pytest **3,963 passed, five legacy toolkit skips**;
+Ruff clean, all three import contracts kept, all 39 web tests pass.
+All 480 corrected cells completed with zero errors. PR targets main.
+
+Completed prompt07: PR #14 (https://github.com/Razeefshaik/CounterSign/pull/14) is open and ready,
+base main; code c24783a, results45272b0, final validation b9d2a04.
+The earlier pending/progress notes above are historical; full validation passed.
+No merge performed. Next: owner review, then configured-model comparison.

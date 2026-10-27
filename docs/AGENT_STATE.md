@@ -17,41 +17,42 @@ remain separate. Money is integer minor units, with decimal strings in API paylo
 
 ## Current work
 
-M14 fault library, M18 evaluation preparation/model-disabled run, and C26 sandbox
-evaluation preparation are complete for the authorized scope. Each has its own
-branch and open, ready PR. No PR was merged and no real PayPal/LLM call was made.
-Configured Gemini and actual sandbox execution remain owner-operated by Razeef;
-they are next steps, not blockers to this preparation handoff.
-
-- Latest integration base: `a9a186d`; M13, M15 and M17 are already integrated.
-- Current branch: `mate/C26-sandbox-eval`, stacked on M18/M14 dependencies.
-  Owner review order: merge #11, retarget #12 to main and merge, then retarget
-  #13 to main and merge. The agent does not merge them.
-- M14 has 48 mock scenarios: at least two per fault class and three realistic
-  dispute-triage cases. Independent rules_only run: 43 pass, five fail, zero
-  runner errors and zero measured invariant violations. Provenance: 8 recorded,
-  23 mixed, 17 synthesised. Walkthrough lists every case and known limitations.
-- M14 completion fixes: FAILED webhook errors agree with subsequent GET; seeded
-  FAILED items cannot claim recorded provenance; walkthrough completeness test.
-  Complete: [PR #11](https://github.com/Razeefshaik/CounterSign/pull/11) is open,
-  ready for review, not merged. Full suite: 3,883 passed, five legacy toolkit
-  skips. Ruff and three import contracts pass. Current PR head: `8402932`
-  (integration documentation sync); GitHub reports it mergeable.
-- M18: `e2f5687` orchestration; `f9e8dfd` persists all 480 model-disabled cells
-  (48 scenarios x two systems x k=5), evaluated on `e2f5687`. rules_only: 215/240
-  pass, pass^5 43/48, zero errors, 260 owner interruptions. CounterSign: 80/240
-  pass, pass^5 16/48, 80 EVALUATION_FAILED rows, 200 owner interruptions. Both
-  have zero measured four-invariant counts, calls and tokens; error-row zeros do
-  not establish safety. M18 full suite: 3,900 passed, five legacy toolkit skips;
-  Ruff and three import contracts pass. Additional commits: `23d0e11` (context),
-  `ef00286` (integration docs), `489add7` (handoff). [PR #12](https://github.com/Razeefshaik/CounterSign/pull/12)
-  is open and ready against `mate/M14-fault-library` for stacked review.
-- C26: `b7c715c` implementation, `cfa862f` validation/runbook. [PR #13](https://github.com/Razeefshaik/CounterSign/pull/13)
-  is open/ready against `mate/M18-eval`, not merged. Full suite: 3,922 passed,
-  five legacy toolkit skips; 17 focused and 31 web tests pass. All 53 scenarios
-  validate (48 mock, five sandbox); exact CLI mock dry-run passed five checks
-  twice. Ruff, three import contracts and diff checks pass. Only final context
-  notes await their handoff commit; do not guess that commit's hash.
+- Active task: prompt 07, repair M18's 80 model-disabled CounterSign error rows,
+  then rerun the same 48 scenarios x two systems x k=5 into a **new** results
+  folder. Preserve the existing experiment and report honest before/after scores.
+- Current branch: `mate/M18-eval-fix`, created from updated main `2e51d41`.
+  Future PRs must target **main**, never a task branch. No new PR yet.
+- M14, M18 and C26 are integrated into main in `0d47f64`. PR #11 is merged;
+  formerly stacked PRs [#12](https://github.com/Razeefshaik/CounterSign/pull/12)
+  and [#13](https://github.com/Razeefshaik/CounterSign/pull/13) were closed with
+  the exact comment `Merged into main in 0d47f64`. Old stack instructions are obsolete.
+- Code commit: `c24783a`. Only NO_PAYABLE_OBLIGATIONS, RUN_ALREADY_EXISTS and
+  SHIELD_BLOCKED planner refusals become blocked actions; unknown errors still fail.
+  The sole core change is `src/countersign/harness.py`: loopback mock OAuth expiry
+  uses the supplied mock clock. Sandbox's real monotonic clock is unchanged.
+- Eight group-B diagnostics found GET failures from expired mock tokens; the
+  legacy clock control reproduced nine HTTP 401s and EVALUATION_FAILED. After
+  the fix, all 16 former-error scenario regressions pass with error=None,
+  zero reconciliation-stage errors and no 401s. The eight long cases refresh
+  OAuth at least twice. Eighteen adapter and two clock-construction checks pass.
+  Persistent tick errors still fail; no blanket suppression was added.
+- All 480 corrected-run cells are complete on `c24783a`, persisted in `45272b0`
+  under `eval/results/2026-10-27-model-none-fixed/`. The old report is untouched;
+  all 48 scenario hashes, two systems and k=5 match exactly.
+- CounterSign: 80/240 pass (33.3%), 80 errors before; 115/240 pass (47.9%),
+  zero errors after (pass^5 23/48). rules_only remains 215/240 (89.6%), zero
+  errors. Both have zero measured four-invariant counts, model calls and tokens.
+  CounterSign's 25 model-disabled completion failures remain visible; this is
+  not real-model evidence or proof of safety.
+- Privacy, identity and 480 unique cells are checked. Ruff, three import contracts
+  and 39 web tests pass. Full pytest (`countersign-m18fix-full.log`) is still
+  running without reported failures so far; no new PR or full-suite claim yet.
+- Model-disabled triage/injection/deadline/cancellation gaps remain visible;
+  do not invent agent actions or change expected outcomes to improve scores.
+- Previous validation: M14 3,883 passed, M18 3,900 passed, C26 3,922 passed,
+  each with five legacy toolkit skips. These counts do not validate the new fix.
+  C26 mock dry-run completed five checks; actual sandbox/model runs are not part
+  of this task. Never read .env or call real model/PayPal APIs.
 
 ## Working rules for continuation
 
@@ -59,11 +60,20 @@ Keep staged changes and commits scoped to the current task: future-task files
 may be untracked while parallel agents prepare them. Never use `git add .`.
 Before each PR, run required tests, Ruff and all three import contracts. Record
 exact checks, commit hashes, limitations and PR links here after completion.
-Next: owner reviews the PR stack, then runs the exact configured-model and
-sandbox commands in the M18/C26 walkthroughs. Do not edit web/ for this batch.
+Next: finish full pytest, record its exact result, then push and open one PR into
+main with before/after results and the sole core change. No unrelated web edits.
 The context workflow and prior summaries are committed; refresh these notes at
 the next verified PR/feature boundary without assuming pending checks passed.
 
 See [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md) only for the related task's
 details. Update this summary after each feature instead of carrying the whole
 conversation into subsequent work.
+
+Final verification: full pytest **3,963 passed, five legacy toolkit skips**;
+Ruff clean, all three import contracts kept, all 39 web tests pass.
+All 480 corrected cells completed with zero errors. PR targets main.
+
+Completed prompt07: PR #14 (https://github.com/Razeefshaik/CounterSign/pull/14) is open and ready,
+base main; code c24783a, results45272b0, final validation b9d2a04.
+The earlier pending/progress notes above are historical; full validation passed.
+No merge performed. Next: owner review, then configured-model comparison.

@@ -213,7 +213,20 @@ class CountersignSystem:
         if step["do"] == "plan_payout_run":
             # Synchronize GET-confirmed states/cash before the Engine planner runs.
             await self._tick()
-            await self._engine.plan_payout_run(date.fromisoformat(step["week_start"]))
+            try:
+                await self._engine.plan_payout_run(date.fromisoformat(step["week_start"]))
+            except EngineError as error:
+                # These planner refusals roll back before any operation is written.
+                # Unknown errors (including storage failures) must still fail the run.
+                if error.args not in (
+                    ("NO_PAYABLE_OBLIGATIONS",), ("RUN_ALREADY_EXISTS",), ("SHIELD_BLOCKED",)
+                ):
+                    raise
+                self._record(
+                    "SCHEDULE_PAYOUT_RUN",
+                    {"week_start": step["week_start"], "reason": error.args[0]},
+                    "blocked",
+                )
         elif step["do"] == "tick":
             await self._tick()
         else:
