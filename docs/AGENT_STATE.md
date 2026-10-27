@@ -17,15 +17,16 @@ remain separate. Money is integer minor units, with decimal strings in API paylo
 
 ## Current work
 
-The owner requested three tasks in order using the downloaded prompt 05 and 06:
-M14 fault library, M18 full evaluation, then C26 sandbox evaluation preparation.
-One branch and PR per task. Never merge. No real PayPal or LLM calls for these tasks.
-Task reviews and implementation were delegated in batches; Professor Pickle
-maintains these context files while the primary agent owns feature completion.
+M14 fault library, M18 evaluation preparation/model-disabled run, and C26 sandbox
+evaluation preparation are complete for the authorized scope. Each has its own
+branch and open, ready PR. No PR was merged and no real PayPal/LLM call was made.
+Configured Gemini and actual sandbox execution remain owner-operated by Razeef;
+they are next steps, not blockers to this preparation handoff.
 
 - Latest integration base: `a9a186d`; M13, M15 and M17 are already integrated.
 - Current branch: `mate/C26-sandbox-eval`, stacked on M18/M14 dependencies.
-  PR merge order must be M14, then M18, then C26; none are merged by this agent.
+  Owner review order: merge #11, retarget #12 to main and merge, then retarget
+  #13 to main and merge. The agent does not merge them.
 - M14 has 48 mock scenarios: at least two per fault class and three realistic
   dispute-triage cases. Independent rules_only run: 43 pass, five fail, zero
   runner errors and zero measured invariant violations. Provenance: 8 recorded,
@@ -43,10 +44,14 @@ maintains these context files while the primary agent owns feature completion.
   have zero measured four-invariant counts, calls and tokens; error-row zeros do
   not establish safety. M18 full suite: 3,900 passed, five legacy toolkit skips;
   Ruff and three import contracts pass. Additional commits: `23d0e11` (context),
-  `ef00286` (integration docs). M18 is ready for PR creation; no PR number yet.
-- C26 is uncommitted preparation; 17 focused tests pass. All 53 scenario files
-  validate (48 mock, five sandbox). CLI mock dry-run passed all five checks.
-  Full C26 suite is running. No real model/sandbox calls were made for this batch.
+  `ef00286` (integration docs), `489add7` (handoff). [PR #12](https://github.com/Razeefshaik/CounterSign/pull/12)
+  is open and ready against `mate/M14-fault-library` for stacked review.
+- C26: `b7c715c` implementation, `cfa862f` validation/runbook. [PR #13](https://github.com/Razeefshaik/CounterSign/pull/13)
+  is open/ready against `mate/M18-eval`, not merged. Full suite: 3,922 passed,
+  five legacy toolkit skips; 17 focused and 31 web tests pass. All 53 scenarios
+  validate (48 mock, five sandbox); exact CLI mock dry-run passed five checks
+  twice. Ruff, three import contracts and diff checks pass. Only final context
+  notes await their handoff commit; do not guess that commit's hash.
 
 ## Working rules for continuation
 
@@ -54,7 +59,8 @@ Keep staged changes and commits scoped to the current task: future-task files
 may be untracked while parallel agents prepare them. Never use `git add .`.
 Before each PR, run required tests, Ruff and all three import contracts. Record
 exact checks, commit hashes, limitations and PR links here after completion.
-Do not edit web/ for this batch; the other owner is working there.
+Next: owner reviews the PR stack, then runs the exact configured-model and
+sandbox commands in the M18/C26 walkthroughs. Do not edit web/ for this batch.
 The context workflow and prior summaries are committed; refresh these notes at
 the next verified PR/feature boundary without assuming pending checks passed.
 

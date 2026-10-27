@@ -74,8 +74,10 @@ EVALUATION_FAILED rows, 200 owner interruptions. Both have zero model calls,
 tokens and measured invariant counts. Error-row zeros are not safety evidence.
 M18 full pytest: 3,900 passed, five legacy optional-toolkit skips (712 seconds);
 Ruff and three import contracts pass. Context is committed in `23d0e11`, current
-integration documentation in `ef00286`. PR creation is next; do not guess its
-number. Branch dependencies must merge M14, then M18, then C26.
+integration documentation in `ef00286`, handoff in `489add7`.
+[PR #12](https://github.com/Razeefshaik/CounterSign/pull/12) is open/ready with base
+`mate/M14-fault-library`, head `489add7`. Merge PR #11, retarget #12 to main,
+then merge M18 before C26; the stack is for review, not permission to merge.
 
 ## C26 sandbox preparation
 
@@ -95,12 +97,22 @@ Required cases: registered payout, unregistered cancel confirmed RETURNED,
 lost-response duplicate-link recovery, capture PENDING with maker-share reserve,
 and an actual SETTLEMENT/BLOCK proposal after settlement (not just duplicate-week
 RUN_ALREADY_EXISTS). Mock dry-run exercises the same integration path.
-The prepared CLI mock dry-run completed all five checks with ground mock; output
-is under `%TEMP%/countersign-c26-dry-run-20261027`. Seventeen focused tests pass;
-all 53 scenario JSON files validate (48 mock, five sandbox). Implementation is
-uncommitted and the full C26 suite is running; do not report real sandbox
-evaluation or a completed C26 handoff yet. Its branch is based on integration
-`a9a186d` with M18/M14 dependencies fast-forwarded for ordered PR review.
+The exact CLI mock dry-run completed all five checks twice with ground mock;
+output is under `%TEMP%/countersign-c26-dry-run-20261027`. Seventeen focused
+tests pass; all 53 scenario JSON files validate (48 mock, five sandbox). First
+commit `b7c715c` includes eval/sandbox.py, the M11 integration wrapper, script,
+five scenario catalogue files, mock CLI filtering, tests, runbook and decisions.
+The only core-owned file touched is `scripts/sandbox_eval.py`; no src/ changes.
+Full C26 pytest: 3,922 passed, five legacy toolkit skips (709 seconds); all
+17 focused and 31 web tests pass. Ruff, three import contracts and diff checks
+pass. `cfa862f` records validation/runbook completion.
+[PR #13](https://github.com/Razeefshaik/CounterSign/pull/13) is open/ready, based on
+`mate/M18-eval`, head `cfa862f` before the final context-only handoff commit.
+Its branch is based on integration `a9a186d` with M18/M14 dependencies. Owner
+merges #11, retargets #12 to main and merges, then retargets #13 to main and merges.
+No agent merge or real sandbox/model evaluation occurred. Razeef's configured
+Gemini and actual sandbox runs use the exact owner commands in the M18/C26
+walkthroughs; those future runs are not blockers to completed preparation.
 
 ## Hosting/dashboard follow-ups
 
