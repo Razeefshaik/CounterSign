@@ -289,5 +289,14 @@ class Inbox:
         # Every known dispute has an investigation record, including paid-before-dispute
         # and unknown resolution. No incident is closed by a webhook.
         subject = {"dispute_id": str(dispute["id"])}
-        if not await repos.incidents.find({"kind": "DISPUTE", "subject": subject}):
+        # Discovery enriches subjects with order/maker/PayPal IDs. Identity is the
+        # dispute ID, never equality of the entire JSON document. process_one()
+        # holds the same owner-decision lock as discovery across lookup + insert.
+        # Leave resolved history alone: discovery decides whether changed GET
+        # facts justify opening a new investigation.
+        cursor = await conn.execute(
+            "SELECT id FROM incidents WHERE kind='DISPUTE' AND subject @> %s LIMIT 1",
+            (Jsonb(subject),),
+        )
+        if await cursor.fetchone() is None:
             await repos.incidents.insert(kind="DISPUTE", subject=subject, state="OPEN")

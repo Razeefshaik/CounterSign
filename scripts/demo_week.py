@@ -17,6 +17,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from uuid import UUID
 
 import httpx
 from psycopg.conninfo import conninfo_to_dict
@@ -25,8 +26,10 @@ from countersign.agent.models import ChatModelConfig, ModelError, ScriptedModel
 from countersign.agent.reads import MoneyGraphQueries, custom_tools
 from countersign.agent.tools import ReadTool, ToolRegistry
 from countersign.config import load_settings
+from countersign.db import Repositories
 from countersign.db.ids import uuid7
 from countersign.fsm.dispute import OUTCOME_MAP, Phase
+from countersign.fsm.incident import IncidentEvent
 from countersign.harness import Engine, EngineSettings
 from countersign.incidents import IncidentService
 from countersign.money import Money
@@ -578,24 +581,85 @@ async def _run_week(
         store.checkpoint(**{name + "_done": True, name + "_result": saved})
         return saved
 
+    async def completed_elsewhere(label, action_name, params, snapshot, *, same_step, case=None):
+        if scripted or action_name not in {"CANCEL_UNCLAIMED_PAYOUT", "PROVIDE_EVIDENCE"}:
+            return None
+        name = "agent_" + label
+        # Resume must find the old staged goal without opening another incident.
+        if case is None and store.data.get(name + "_subject"):
+            async with engine.database.tx() as conn:
+                cases = await Repositories(conn).incidents.find({"kind": "RECONCILIATION"})
+            case = next((c for c in cases
+                         if c["subject"].get("id") == store.data[name + "_subject"]), None)
+        case_id = str(case["id"]) if case else None
+
+        def matches(proposal):
+            return proposal["action"] == action_name and all(
+                proposal["params"].get(key) == value for key, value in params.items()
+            )
+
+        earlier = [p for p in snapshot["proposals"] if p["state"] == "EXECUTED"
+                   and p["incident_id"] is not None
+                   and p["incident_id"] != case_id and matches(p)]
+        if not earlier:
+            return None
+        saved = earlier[0]
+        if action_name == "CANCEL_UNCLAIMED_PAYOUT":
+            detail = await http.request("GET", "/v1/payments/payouts-item/" + params["payout_item_id"])
+            require(detail.status_code == 200
+                    and detail.body.get("payout_item_id") == params["payout_item_id"]
+                    and detail.body.get("transaction_status") == "RETURNED", "C_CANCEL_GET_PENDING")
+        if case:
+            duplicates = [p for p in snapshot["proposals"] if p["incident_id"] == case_id
+                          and p["state"] == "BLOCKED" and matches(p)]
+            recorded = set(store.data.get(name + "_duplicates", []))
+            for duplicate in duplicates:
+                if duplicate["id"] not in recorded:
+                    store.record("CONFIGURED_MODEL_DUPLICATE_BLOCKED", step=label,
+                                 proposal_id=duplicate["id"], executed_proposal_id=saved["id"],
+                                 rules=sorted(_rules(duplicate)))
+                    recorded.add(duplicate["id"])
+                    store.checkpoint(**{name + "_duplicates": sorted(recorded)})
+            # Only the artificial goal is parked. Real financial incidents still
+            # require reconciler agreement; the public service forbids manual RESOLVED.
+            async with engine.database.tx() as conn:
+                current = await Repositories(conn).incidents.get(UUID(case_id))
+                pending = await conn.execute(
+                    "SELECT 1 FROM proposals WHERE incident_id=%s AND state IN "
+                    "('CREATED','ALLOWED','NEEDS_OWNER','APPROVED','EXECUTING') LIMIT 1",
+                    (current["id"],),
+                )
+                require(not await pending.fetchone(), "STAGED_GOAL_HAS_PENDING_PROPOSAL")
+            if current["state"] == "OPEN":
+                await incidents.transition(current["id"], IncidentEvent.INVESTIGATION_STARTED,
+                                           expected_state=current["state"],
+                                           expected_version=current["version"])
+                async with engine.database.tx() as conn:
+                    current = await Repositories(conn).incidents.get(UUID(case_id))
+            if current["state"] == "INVESTIGATING":
+                await incidents.transition(current["id"], IncidentEvent.WAIT_STARTED,
+                                           expected_state=current["state"],
+                                           expected_version=current["version"])
+            require(current["state"] in {"INVESTIGATING", "WAITING_EXTERNAL", "RESOLVED"},
+                    "STAGED_GOAL_RETIREMENT_UNAVAILABLE")
+            if not store.data.get(name + "_parked"):
+                store.record("CONFIGURED_MODEL_STAGED_GOAL_PARKED", step=label,
+                             incident_id=case_id, terminal=False,
+                             reason="TERMINAL_REQUIRES_RECONCILIATION")
+                store.checkpoint(**{name + "_parked": True})
+        if not store.data.get(name + "_earlier"):
+            store.record("CONFIGURED_MODEL_ACTED_EARLIER", action=action_name,
+                         action_at=saved["created_at"], proposal_id=saved["id"], step=label,
+                         same_step=same_step)
+            store.checkpoint(**{name + "_earlier": True})
+        return saved
+
     async def action(label, action_name, params, *, dispute_id=None, refs=()):
         name = "agent_" + label
-        if not scripted and action_name in {"CANCEL_UNCLAIMED_PAYOUT", "PROVIDE_EVIDENCE"}:
-            snapshot = await engine.snapshot()
-            earlier = [p for p in snapshot["proposals"] if p["action"] == action_name
-                       and p["state"] == "EXECUTED"
-                       and all(p["params"].get(k) == v for k, v in params.items())]
-            if earlier:
-                saved = earlier[0]
-                if action_name == "CANCEL_UNCLAIMED_PAYOUT":
-                    detail = await http.request("GET", "/v1/payments/payouts-item/" + params["payout_item_id"])
-                    require(detail.status_code == 200
-                            and detail.body.get("payout_item_id") == params["payout_item_id"]
-                            and detail.body.get("transaction_status") == "RETURNED", "C_CANCEL_GET_PENDING")
-                if not store.data.get(name + "_earlier"):
-                    store.record("CONFIGURED_MODEL_ACTED_EARLIER", action=action_name,
-                                 action_at=saved["created_at"], proposal_id=saved["id"], step=label)
-                    store.checkpoint(**{name + "_earlier": True})
+        if not scripted:
+            saved = await completed_elsewhere(label, action_name, params,
+                                              await engine.snapshot(), same_step=False)
+            if saved:
                 return saved
         if not store.data.get(name + "_subject"):
             store.checkpoint(**{name + "_subject": str(uuid7())})
@@ -616,6 +680,11 @@ async def _run_week(
             model.arm(case["id"], action_name, params, refs)
         for _ in range(options.poll_limit):
             snapshot = await tick()
+            if not scripted:
+                saved = await completed_elsewhere(label, action_name, params, snapshot,
+                                                  same_step=True, case=case)
+                if saved:
+                    return saved
             proposals = [p for p in snapshot["proposals"] if p["incident_id"] == str(case["id"])]
             if proposals and not scripted:
                 actual = proposals[0]
