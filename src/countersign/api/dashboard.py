@@ -67,6 +67,27 @@ def masked(value):
     return value
 
 
+def public_trace(value):
+    """Project only recorder-owned metadata, never stored tool/model output."""
+    from countersign.agent.commander import trace_arguments
+    from countersign.agent.safety import sanitize
+    from countersign.agent.tools import ALLOWED_TOOLS, RECOVERABLE_TOOL_ERRORS
+
+    if (not isinstance(value, dict) or type(value.get("rounds")) is not int
+            or not 1 <= value["rounds"] <= 32 or not isinstance(value.get("model"), str)
+            or not isinstance(value.get("calls"), list)):
+        return None
+    calls = []
+    for call in value["calls"][:16]:
+        if (not isinstance(call, dict) or call.get("tool") not in ALLOWED_TOOLS
+                or type(call.get("ok")) is not bool or not isinstance(call.get("arguments"), dict)
+                or call.get("error_code") not in (None, *RECOVERABLE_TOOL_ERRORS)):
+            return None
+        calls.append({"tool": call["tool"], "arguments": trace_arguments(call["arguments"]),
+                      "ok": call["ok"], "error_code": call["error_code"]})
+    return sanitize({"model": value["model"][:200], "rounds": value["rounds"], "calls": calls})
+
+
 class FixtureSource:
     """Contract fixtures. Cursors bind resource, filters, and fixture revision."""
 
@@ -79,6 +100,10 @@ class FixtureSource:
             for path in directory.glob("*.json")
         }
         self.docs = masked(self.docs)
+        # Fixture/older proposals do not invent a history of AI reads.
+        for proposal in self.docs["proposals"]["items"]:
+            proposal["agent_trace"] = None
+        self.docs["meta"]["contract_version"] = "1.0.6"
         # Contract's run detail example abbreviates its second new-payment line.
         for run in self.docs["run-details"]:
             if len(run["lines"]) < run["line_count"]:
@@ -493,7 +518,31 @@ class DbSource:
             rows = await (await conn.execute(query, [*values, limit + 1])).fetchall()
         page = rows[:limit]
         next_cursor = self._cursor(resource, filters, page[-1]) if len(rows) > limit else None
-        return [self._present(resource, masked(row["doc"])) for row in page], next_cursor
+        documents = [self._present(resource, masked(row["doc"])) for row in page]
+        await self._add_traces(resource, documents)
+        return documents, next_cursor
+
+    async def _add_traces(self, resource, documents):
+        proposals = documents if resource == "proposals" else [
+            p for doc in documents for p in doc.get("proposals", [])
+        ] if resource == "incidents" else []
+        if not proposals:
+            return
+        # The masked views retain their SELECT-only role. This fixed backend
+        # projection reads only the new metadata column in a read-only txn;
+        # no agent role grant or broad raw_output access reaches the client.
+        try:
+            async with self.pool.connection() as conn, conn.transaction():
+                cursor = await conn.execute(
+                    "SELECT id,raw_output->'agent_trace' AS trace FROM proposals WHERE id=ANY(%s)",
+                    ([UUID(p["id"]) for p in proposals],),
+                )
+                traces = {str(row["id"]): public_trace(row["trace"])
+                          for row in await cursor.fetchall()}
+        except psycopg.Error:
+            raise DashboardUnavailable("Proposal trace unavailable") from None
+        for proposal in proposals:
+            proposal["agent_trace"] = traces.get(proposal["id"])
 
     def _present(self, resource, doc):
         """Every dispute on the local mock was opened through its staged control.
@@ -521,7 +570,10 @@ class DbSource:
                     (identifier,),
                 )
             ).fetchone()
-        return self._present(resource, masked(row["doc"])) if row else None
+        document = self._present(resource, masked(row["doc"])) if row else None
+        if document is not None:
+            await self._add_traces(resource, [document])
+        return document
 
     async def singleton(self, resource, params):
         if resource == "money-graph":
@@ -554,7 +606,7 @@ class DbSource:
                 **_mode_metadata(self.runtime),
                 "clock": now.astimezone(UTC).isoformat().replace("+00:00", "Z"),
                 "version": "0.1.0",
-                "contract_version": "1.0.5",
+                "contract_version": "1.0.6",
             }
         if resource != "cash":
             raise ValueError("Invalid singleton resource")
@@ -584,9 +636,109 @@ def error(status, code, message):
     return JSONResponse(status_code=status, content={"error": {"code": code, "message": message}})
 
 
+async def recorded_comparison(database):
+    """Fixed read-only queries over CLI-saved simulation and actual run history.
+
+    Never execute a simulator or PayPal call here. The latest saved Friday run
+    stays the comparison root even after the following week's A-only run.
+    """
+    async with database.tx() as conn:
+        await conn.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
+        cursor = await conn.execute(
+            "SELECT a.at,a.details,r.doc FROM audit_log a JOIN v_dash_run_detail r "
+            "ON r.id::text=a.details->>'run_id' "
+            "WHERE a.actor='system' AND a.kind='STATE_TRANSITION' "
+            "AND a.details->>'event'='DEMO_NAIVE_COMPARISON' AND r.doc->>'state'<>'CANCELLED' "
+            "ORDER BY a.id DESC LIMIT 1"
+        )
+        evidence = await cursor.fetchone()
+        if evidence is None:
+            return {"available": False, "needs": "friday_plan"}
+        run = evidence["doc"]
+        line_ids = [line["id"] for line in run["lines"]] + [
+            line["line_id"] for line in run["replacements"]]
+        reserves = await (await conn.execute(
+            "SELECT r.id,r.dispute_id,r.state,r.amount_minor,r.currency,m.id AS maker_id, "
+            "m.display_name,d.paypal_dispute_id FROM reservations r "
+            "JOIN obligations o ON o.id=r.obligation_id JOIN makers m ON m.id=o.maker_id "
+            "JOIN disputes d ON d.id=r.dispute_id WHERE r.kind='DISPUTE_EARMARK' "
+            "AND r.state='ACTIVE' AND o.due_date>=%s::date AND o.due_date<%s::date+7 "
+            "ORDER BY m.id,r.id", (run["week_start"], run["week_start"]),
+        )).fetchall()
+        held = {}
+        for reserve in reserves:
+            key = (str(reserve["maker_id"]), reserve["currency"].strip())
+            item = held.setdefault(key, {"maker_id": key[0], "display_name": reserve["display_name"],
+                "amount": {"minor": 0, "currency": key[1]}, "dispute_ids": [],
+                "paypal_dispute_ids": []})
+            item["amount"]["minor"] += reserve["amount_minor"]
+            item["dispute_ids"].append(str(reserve["dispute_id"]))
+            item["paypal_dispute_ids"].append(reserve["paypal_dispute_id"])
+        candidates = await (await conn.execute(
+            "SELECT p.id,p.action,p.params,p.verdict_details,p.raw_output->'flags' AS flags "
+            "FROM proposals p WHERE p.verdict='BLOCK' AND p.state IN ('BLOCKED','BLOCKED_AT_EXECUTION') "
+            "AND p.created_at>=%s::timestamptz ORDER BY p.created_at,p.id", (run["created_at"],),
+        )).fetchall()
+        moments = {"lost_response": None, "injection": None, "settled_retry": None}
+        for proposal in candidates:
+            rules = [r["rule"] for r in (proposal["verdict_details"] or {}).get("rule_results", [])
+                     if r.get("outcome") == "BLOCK"]
+            item = {"source": "recorded", "proposal_id": str(proposal["id"]), "block_rules": rules}
+            if (proposal["action"] == "ACCEPT_CLAIM"
+                    and {"INJECTION_GUARD", "PAYEE_INTEGRITY"} <= set(rules)
+                    and any(f.get("type") == "PROMPT_INJECTION" for f in proposal["flags"] or [])):
+                moments["injection"] = item
+            if (proposal["action"] == "CREATE_REPLACEMENT_PAYOUT" and "SETTLEMENT" in rules
+                    and proposal["params"].get("line_id") in line_ids):
+                moments["settled_retry"] = item
+        recovery = await (await conn.execute(
+            "SELECT a.line_id,a.operation_id,a.paypal_batch_id FROM payout_attempts a "
+            "JOIN audit_log x ON x.operation_id=a.operation_id AND x.kind='REPLAY_RESOLVED' "
+            "AND x.details->>'confirmed'='true' WHERE a.line_id=ANY(%s::uuid[]) "
+            "AND a.state='SUCCESS' ORDER BY x.id LIMIT 1", (line_ids,),
+        )).fetchone()
+        if recovery:
+            payments = await (await conn.execute(
+                "SELECT count(DISTINCT paypal_item_id) AS n FROM payout_attempts "
+                "WHERE line_id=%s AND state='SUCCESS'", (recovery["line_id"],),
+            )).fetchone()
+            linked = await (await conn.execute(
+                "SELECT 1 FROM audit_log WHERE operation_id=%s AND kind='PAYPAL_RESPONSE' "
+                "AND details->>'event'='DEMO_DUPLICATE_400_CONFIRMED' "
+                "AND details->>'status'='400' AND details->>'original_batch_link_confirmed'='true'",
+                (recovery["operation_id"],),
+            )).fetchone()
+            moments["lost_response"] = {"source": "recorded", "line_id": str(recovery["line_id"]),
+                "payment_count": payments["n"], "exactly_one": payments["n"] == 1,
+                "duplicate_400_linked": bool(linked), "payout_batch_id": recovery["paypal_batch_id"]}
+        return masked({"available": True, "simulated": True, "simulation_label": "Simulated: mock PayPal",
+            "run_id": run["id"], "week_start": run["week_start"],
+            "naive": {"source": "simulated", "recorded_at": evidence["at"].isoformat(),
+                      **evidence["details"]["naive"]},
+            "countersign": {"source": "recorded", "total": run["total"],
+                "lines": [{"line_id": line["id"], "maker": line["maker"], "amount": line["amount"]}
+                          for line in run["lines"]], "resends": run["replacements"],
+                "held_back": list(held.values())}, "moments": moments})
+
+
 def build_router(source: DashboardSource | None = None):
     source = source or FixtureSource()
     result = APIRouter()
+
+    @result.get("/demo/comparison")
+    async def comparison(request: Request):
+        from countersign.api.playground import playground_allowed
+
+        runtime = getattr(request.app.state, "settings", None) or getattr(source, "runtime", None)
+        if runtime is None or not playground_allowed(runtime):
+            return error(404, "NOT_FOUND", "Resource not found")
+        database = getattr(request.app.state, "database", None)
+        if database is None:
+            return {"available": False, "needs": "friday_plan"}
+        try:
+            return await recorded_comparison(database)
+        except (psycopg.Error, KeyError, TypeError, ValueError):
+            return error(503, "DATA_UNAVAILABLE", "Comparison evidence unavailable")
 
     def list_endpoint(resource):
         async def endpoint(request: Request):

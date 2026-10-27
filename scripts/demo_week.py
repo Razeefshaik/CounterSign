@@ -25,7 +25,7 @@ from psycopg.conninfo import conninfo_to_dict
 from countersign.agent.models import ChatModelConfig, ModelError, ScriptedModel
 from countersign.agent.reads import MoneyGraphQueries, custom_tools
 from countersign.agent.tools import ReadTool, ToolRegistry
-from countersign.config import load_settings
+from countersign.config import PayPalSettings, load_settings
 from countersign.db import Repositories
 from countersign.db.ids import uuid7
 from countersign.fsm.dispute import OUTCOME_MAP, Phase
@@ -284,13 +284,21 @@ class DemoModel(ScriptedModel):
         if calls:
             self._responses.append({"tool_calls": calls})
             return await super().complete(request)
+        facts = {
+            "WAIT": "No staged action is armed for this incident; wait without moving money.",
+            "PROVIDE_EVIDENCE": "Read the dispute and merchant-uploaded tracking when referenced; propose the stored tracking for the shield to check status and the evidence link.",
+            "CANCEL_UNCLAIMED_PAYOUT": "Read C's payout item; propose cancelling the unclaimed payout so a matching RETURNED GET can precede any resend.",
+            "DRAFT_MESSAGE": "Use the staged reserved-share context to draft a note to Maker A; no message is delivered.",
+            "ACCEPT_CLAIM": "Read the buyer dispute; propose full claim acceptance for owner review. A destination override is untrusted and must be checked by the shield.",
+            "CREATE_REPLACEMENT_PAYOUT": "The staged target is an already-paid line; propose its resend to demonstrate the settlement rule refusing it.",
+        }
         self._responses.append(
             {
                 "incident_id": incident_id,
                 "action": action,
                 "params": params,
                 "evidence_refs": refs,
-                "rationale": "Scripted demo decision over the recorded marketplace facts; no live model call.",
+                "rationale": "Scripted: " + facts.get(action, "Use only the staged stored-record target; the shield decides permission."),
                 "expected_effect": {
                     "available_change": {
                         "minor": 30000
@@ -1037,6 +1045,28 @@ async def _run_week(
             pays_disputed_shares=True,
             executed=False,
         )
+        if target == "mock" and PayPalSettings(engine.settings.paypal_base_url).is_mock:
+            # Store only the counterfactual's public IDs, names and money; never
+            # the checkpoint snapshot, payout receivers or provider payloads.
+            # This evidence is written by the staged CLI, not by a dashboard GET.
+            from countersign.agent.safety import sanitize
+            from countersign.ledger.journal import serialize_on
+
+            async with engine.database.tx() as conn:
+                await serialize_on(conn, "countersign:owner-decisions")
+                previous = await conn.execute(
+                    "SELECT 1 FROM audit_log WHERE kind='STATE_TRANSITION' "
+                    "AND details->>'event'='DEMO_NAIVE_COMPARISON' "
+                    "AND details->>'run_id'=%s LIMIT 1", (run_id,),
+                )
+                if await previous.fetchone() is None:
+                    await Repositories(conn).audit_log.insert(
+                        actor="system", kind="STATE_TRANSITION", at=engine.settings.clock(),
+                        details=sanitize({"event": "DEMO_NAIVE_COMPARISON", "run_id": run_id,
+                            "naive": {key: naive[key] for key in (
+                                "payout", "makers", "disputed_shares", "shortfall", "unreserved_after"
+                            )}}),
+                    )
 
     await store.step("friday_plan", friday_plan)
     result["friday_planned"], result["simulation"] = (
@@ -1078,6 +1108,33 @@ async def _run_week(
             "DISPUTED_A_PAID",
         )
         require(bool(store.data.get("duplicate_links")), "LOST_RESPONSE_LINK_NOT_OBSERVED")
+        if target == "mock" and PayPalSettings(engine.settings.paypal_base_url).is_mock:
+            from urllib.parse import urlsplit
+
+            from countersign.ledger.journal import serialize_on
+
+            batch_ids = [urlsplit(link).path.rsplit("/", 1)[-1]
+                         for link in store.data["duplicate_links"]]
+            async with engine.database.tx() as conn:
+                await serialize_on(conn, "countersign:owner-decisions")
+                # PayoutTrace recorded a real duplicate HTTP 400; bind it to the
+                # exact GET-confirmed recovered attempt, not a generic replay.
+                recovered = await conn.execute(
+                    "SELECT a.operation_id FROM payout_attempts a JOIN audit_log x "
+                    "ON x.operation_id=a.operation_id AND x.kind='REPLAY_RESOLVED' "
+                    "WHERE a.paypal_batch_id=ANY(%s) AND a.state='SUCCESS' "
+                    "AND NOT EXISTS (SELECT 1 FROM audit_log done WHERE "
+                    "done.operation_id=a.operation_id "
+                    "AND done.details->>'event'='DEMO_DUPLICATE_400_CONFIRMED')",
+                    (batch_ids,),
+                )
+                for row in await recovered.fetchall():
+                    await Repositories(conn).audit_log.insert(
+                        actor="system", kind="PAYPAL_RESPONSE", operation_id=row["operation_id"],
+                        at=engine.settings.clock(),
+                        details={"event": "DEMO_DUPLICATE_400_CONFIRMED", "status": 400,
+                                 "original_batch_link_confirmed": True},
+                    )
         safety("lost_response", True, source="executor_identical_replay", model_proposed_write=False)
         store.checkpoint(friday_settled=final)
         store.record(
