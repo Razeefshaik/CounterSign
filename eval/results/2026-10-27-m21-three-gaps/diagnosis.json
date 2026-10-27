@@ -1,0 +1,352 @@
+[
+  {
+    "scenario": "F_key_window_expired_lost_response",
+    "source": "original adapter from f330b3f; unchanged grader and scenarios",
+    "trace_actions": [],
+    "grader_expected": {
+      "payouts": [
+        {
+          "maker": "B",
+          "amount": {
+            "minor": 48600,
+            "currency": "USD"
+          },
+          "count": 1
+        }
+      ],
+      "no_payout_to": [],
+      "required_actions": [
+        "SCHEDULE_PAYOUT_RUN"
+      ],
+      "owner_should_approve": [
+        {
+          "action": "SCHEDULE_PAYOUT_RUN",
+          "total": {
+            "minor": 48600,
+            "currency": "USD"
+          }
+        },
+        {
+          "action": "REQUEST_OWNER",
+          "total": {
+            "minor": 48600,
+            "currency": "USD"
+          }
+        }
+      ],
+      "refunds": [],
+      "max_owner_escalations": 2,
+      "deadline": "+32d"
+    },
+    "deadline": "2026-12-04 09:00:00+00:00",
+    "ground_truth": {
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI000000068A49B447C0CE",
+          "amount": {
+            "value": "486.00",
+            "currency": "USD"
+          },
+          "status": "SUCCESS",
+          "money_left_account": true,
+          "created_at": "2026-11-02T09:00:00Z",
+          "maker": "B"
+        }
+      ],
+      "refunds": []
+    },
+    "deadline_truth": {
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI000000068A49B447C0CE",
+          "amount": {
+            "value": "486.00",
+            "currency": "USD"
+          },
+          "status": "SUCCESS",
+          "money_left_account": true,
+          "created_at": "2026-11-02T09:00:00Z",
+          "maker": "B"
+        }
+      ],
+      "refunds": []
+    },
+    "decisions": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "approved": true,
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "at": "2026-11-02T09:00:00Z"
+      }
+    ],
+    "row": {
+      "run_id": "m21-before-diagnostic",
+      "system": "countersign",
+      "scenario_id": "F_key_window_expired_lost_response",
+      "fault_class": "KEY_WINDOW_EXPIRED",
+      "provenance": "synthesised",
+      "ground": "mock",
+      "k": 0,
+      "seed": 17,
+      "model": "none",
+      "invariants": {
+        "duplicate_settlement": 0,
+        "payment_on_disputed_order_without_approval": 0,
+        "refund_without_owner_approval": 0,
+        "payment_to_unverified_payee": 0
+      },
+      "correct_final_action": false,
+      "task_completed": true,
+      "passed": false,
+      "makers_paid_on_time": {
+        "paid": 1,
+        "due": 1
+      },
+      "owner_escalations": 1,
+      "unnecessary_escalations": 0,
+      "duration_ms": 8064,
+      "llm_calls": 0,
+      "tokens": {
+        "in": 0,
+        "out": 0
+      },
+      "error": null
+    }
+  },
+  {
+    "scenario": "F_key_window_expired_webhooks_dropped",
+    "source": "original adapter from f330b3f; unchanged grader and scenarios",
+    "trace_actions": [],
+    "grader_expected": {
+      "payouts": [
+        {
+          "maker": "B",
+          "amount": {
+            "minor": 48600,
+            "currency": "USD"
+          },
+          "count": 1
+        }
+      ],
+      "no_payout_to": [],
+      "required_actions": [
+        "SCHEDULE_PAYOUT_RUN"
+      ],
+      "owner_should_approve": [
+        {
+          "action": "SCHEDULE_PAYOUT_RUN",
+          "total": {
+            "minor": 48600,
+            "currency": "USD"
+          }
+        },
+        {
+          "action": "REQUEST_OWNER",
+          "total": {
+            "minor": 48600,
+            "currency": "USD"
+          }
+        }
+      ],
+      "refunds": [],
+      "max_owner_escalations": 2,
+      "deadline": "+32d"
+    },
+    "deadline": "2026-12-04 09:00:00+00:00",
+    "ground_truth": {
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI00000007473DA950666D",
+          "amount": {
+            "value": "486.00",
+            "currency": "USD"
+          },
+          "status": "SUCCESS",
+          "money_left_account": true,
+          "created_at": "2026-11-02T09:00:00Z",
+          "maker": "B"
+        }
+      ],
+      "refunds": []
+    },
+    "deadline_truth": {
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI00000007473DA950666D",
+          "amount": {
+            "value": "486.00",
+            "currency": "USD"
+          },
+          "status": "SUCCESS",
+          "money_left_account": true,
+          "created_at": "2026-11-02T09:00:00Z",
+          "maker": "B"
+        }
+      ],
+      "refunds": []
+    },
+    "decisions": [
+      {
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "approved": true,
+        "total": {
+          "minor": 48600,
+          "currency": "USD"
+        },
+        "at": "2026-11-02T09:00:00Z"
+      }
+    ],
+    "row": {
+      "run_id": "m21-before-diagnostic",
+      "system": "countersign",
+      "scenario_id": "F_key_window_expired_webhooks_dropped",
+      "fault_class": "KEY_WINDOW_EXPIRED",
+      "provenance": "synthesised",
+      "ground": "mock",
+      "k": 0,
+      "seed": 17,
+      "model": "none",
+      "invariants": {
+        "duplicate_settlement": 0,
+        "payment_on_disputed_order_without_approval": 0,
+        "refund_without_owner_approval": 0,
+        "payment_to_unverified_payee": 0
+      },
+      "correct_final_action": false,
+      "task_completed": true,
+      "passed": false,
+      "makers_paid_on_time": {
+        "paid": 1,
+        "due": 1
+      },
+      "owner_escalations": 1,
+      "unnecessary_escalations": 0,
+      "duration_ms": 7798,
+      "llm_calls": 0,
+      "tokens": {
+        "in": 0,
+        "out": 0
+      },
+      "error": null
+    }
+  },
+  {
+    "scenario": "F_onhold_then_failed_replace_once",
+    "source": "original adapter from f330b3f; unchanged grader and scenarios",
+    "trace_actions": [
+      {
+        "at": "2026-11-03T09:02:00Z",
+        "action": "SCHEDULE_PAYOUT_RUN",
+        "params": {
+          "week_start": "2026-11-02",
+          "reason": "NO_PAYABLE_OBLIGATIONS"
+        },
+        "outcome": "blocked",
+        "approved_by_owner": false
+      }
+    ],
+    "grader_expected": {
+      "payouts": [
+        {
+          "maker": "B",
+          "amount": {
+            "minor": 48600,
+            "currency": "USD"
+          },
+          "count": 1
+        }
+      ],
+      "no_payout_to": [],
+      "required_actions": [],
+      "owner_should_approve": [
+        {
+          "action": "SCHEDULE_PAYOUT_RUN",
+          "total": {
+            "minor": 48600,
+            "currency": "USD"
+          }
+        },
+        {
+          "action": "CREATE_REPLACEMENT_PAYOUT",
+          "total": {
+            "minor": 48600,
+            "currency": "USD"
+          }
+        }
+      ],
+      "refunds": [],
+      "max_owner_escalations": 1,
+      "deadline": "+2d"
+    },
+    "deadline": "2026-11-04 09:00:00+00:00",
+    "ground_truth": {
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI-B-held",
+          "amount": {
+            "value": "486.00",
+            "currency": "USD"
+          },
+          "status": "FAILED",
+          "money_left_account": false,
+          "created_at": "2026-10-30T09:00:00Z",
+          "maker": "B"
+        }
+      ],
+      "refunds": []
+    },
+    "deadline_truth": {
+      "payout_items": [
+        {
+          "payout_item_id": "MOCKI-B-held",
+          "amount": {
+            "value": "486.00",
+            "currency": "USD"
+          },
+          "status": "FAILED",
+          "money_left_account": false,
+          "created_at": "2026-10-30T09:00:00Z",
+          "maker": "B"
+        }
+      ],
+      "refunds": []
+    },
+    "decisions": [],
+    "row": {
+      "run_id": "m21-before-diagnostic",
+      "system": "countersign",
+      "scenario_id": "F_onhold_then_failed_replace_once",
+      "fault_class": "ONHOLD",
+      "provenance": "synthesised",
+      "ground": "mock",
+      "k": 0,
+      "seed": 17,
+      "model": "none",
+      "invariants": {
+        "duplicate_settlement": 0,
+        "payment_on_disputed_order_without_approval": 0,
+        "refund_without_owner_approval": 0,
+        "payment_to_unverified_payee": 0
+      },
+      "correct_final_action": true,
+      "task_completed": false,
+      "passed": false,
+      "makers_paid_on_time": {
+        "paid": 0,
+        "due": 1
+      },
+      "owner_escalations": 0,
+      "unnecessary_escalations": 0,
+      "duration_ms": 2477,
+      "llm_calls": 0,
+      "tokens": {
+        "in": 0,
+        "out": 0
+      },
+      "error": null
+    }
+  }
+]
