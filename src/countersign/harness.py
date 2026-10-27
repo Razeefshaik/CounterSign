@@ -469,6 +469,14 @@ class Engine:
                 incident = await repos.incidents.get(incident["id"])
             document = proposed.to_dict()
             raw = {**proposed.raw_output, "flags": list(proposed.flags)}
+            # Commander supplies the bounded trace, independently of model JSON.
+            # No tool results or private provider conversation are persisted here.
+            trace = raw.get("agent_trace")
+            if isinstance(trace, dict):
+                raw["agent_trace"] = {
+                    "model": self._agent.model_id, "rounds": trace["rounds"],
+                    "calls": trace["calls"][:16],
+                }
             row = await repos.proposals.insert(
                 incident_id=incident["id"], action=document["action"], params=document["params"],
                 evidence_refs=document["evidence_refs"], rationale=document["rationale"],
