@@ -1,95 +1,55 @@
-﻿# CounterSign agent state
+# CounterSign agent state
 
-Updated: Oct 27, 2026. This concise working summary does not replace AGENTS.md,
-CLAUDE.md, HANDOFF.md, DECISIONS.md, PLAN.md, CONTRACTS.md or TASKS.md. Read the
-required source documents and relevant future notes before changes. Context
-keeper: **Professor Pickle**. Never store secrets, environment values, real emails
-or raw model output here.
+Updated: Oct 27, 2026. Context keeper: **Professor Pickle**. This summary does
+not replace AGENTS.md, CLAUDE.md or the required source documents. Read those
+and only the relevant future notes before changes. Never store secrets,
+environment values, real emails or raw model output here.
 
 ## Project
 
-CounterSign coordinates marketplace maker payouts and buyer disputes. The model
-reads and proposes; the deterministic shield and executor authorize and perform
-financial writes. PostgreSQL holds state, reservations and the inbox. Money is
-integer minor units. Mock and sandbox evidence must remain separate.
+The model reads and proposes; the deterministic shield and executor authorize
+and perform financial writes. PostgreSQL owns state, reservations and the inbox.
+Money is integer minor units. Keep mock and sandbox evidence separate.
 
-## Current work: M18 reserve observation (prompt 08)
+## Current work: M21 evaluation gaps and hosted readiness (prompt 09)
 
-- C31 merged into main as `bb77df0`; its branch and worktree were deleted (GitHub
-  keeps only `main`). Prompt 08 branch: `mate/M18-reserve-observation`.
-- The CounterSign eval adapter records Engine `DISPUTE_EARMARK` reservations as
-  RESERVE_EARNINGS / RELEASE_RESERVE, once each. Model-disabled rerun:
-  `eval/results/2026-10-27-model-none-c31/`: countersign 170/240 (34/48 pass^5),
-  rules_only 215/240, 0 errors, 0 invariant violations. 11 of the 14 remaining
-  failures need agent actions. The 3 open follow-ups are both key-window-expired
-  scenarios and on-hold-then-failed.
-
-## Previous work: C31 payout-run approval refresh (merged)
-
-- Commits: `5b10c13` migration/schema, `29e7186` service/harness/regressions/decisions,
-  `0b7cb62` contract 1.0.4 and owner-approved dashboard metadata alignment,
-  `2ac9015` downgrade fix.
-- Migration 0006 permits CANCELLED history plus one live run per week through a
-  partial unique index. `v_dash_runs` shows the live run instead of superseded
-  cancelled history, preserving view grants/detail. Downgrade refuses conflicting
-  historical duplicates without deleting records.
-- Pending payout-run owner requests last 24 hours; other requests retain their
-  existing 30-minute lifetime. After reconciliation, Engine tick refreshes stale
-  or expired NEEDS_OWNER run requests under the owner-decision lock: expire the
-  old proposal, release cash/allocations, cancel the run and replan the same week
-  in one transaction. Known no-payable/shield refusals preserve the release and
-  are audited. Approved and owner-rejected runs are untouched; manual planning
-  can reuse a cancelled week. Shield/executor rules and eval grading are unchanged.
-- CONTRACTS is 1.0.4 with the owner-authorized approve-409 refresh note and audit
-  wording. Dashboard metadata reports 1.0.4; its one-line mate-owned edit was
-  explicitly approved by the owner.
-- Focused validation: service/schema/refresh selection 47 passed;
-  executor/replacement/Engine selection 24 passed (overlapping selections; do not
-  add these counts). Ruff clean, three import contracts kept, 39 web tests pass.
-  `node --test web/tests` fails Node 24 directory resolution; the equivalent
-  invocation with explicit test files passes.
-- Five targeted model-disabled `run_one` probes on disposable migrated `_eval`
-  databases completed with no errors and zero measured four-invariant counts.
-  Before C31 all five failed and paid nobody. After C31:
-
-  | Scenario | Result | Makers paid (USD) | Remaining completion gap |
-  | --- | --- | --- | --- |
-  | F_double_spend_overlapping_weeks | PASS | A 360, B 486 | None |
-  | F_double_spend_same_week_planned_twice | PASS | A 360, B 486 | None |
-  | F_double_spend_refund_and_run_pending | FAIL | A 360, B 486 | Expected no payments; missing refund/ACCEPT_CLAIM with model disabled |
-  | F_stale_approval_dispute_opened | FAIL | B 486 only | Missing required RESERVE_EARNINGS |
-  | F_stale_approval_partial_dispute | FAIL | A 360, B 486 | Missing required RESERVE_EARNINGS |
-
-- Corrected probe evidence is temporary `countersign-c31-before.json` and
-  `countersign-c31-after.json`; an earlier probe had a teardown error and is not
-  the reported evidence. No full 480-cell rerun was performed. Passing payout
-  behavior and zero invariant counts do not turn the three completion failures
-  into passes or provide real-model/sandbox evidence.
-- C25 real CLI mock run exited 0 with `python -m scripts.demo_week --target mock
-  --model scripted`, loopback TCP mock/receiver and a fresh migrated `_test` DB.
-  Database/ground-truth checks confirm Friday paid 108600 minor units, final
-  available 354.00 USD and B's reserve 5400 minor units. Successful payout item
-  amounts are 300, 300, 360 and 486 USD. Temporary CLI JSON/log evidence remains;
-  the disposable database was cleaned up.
-- Exact changed source/migration files: `src/countersign/approvals/service.py`,
-  `src/countersign/harness.py`, `src/countersign/api/dashboard.py` (version only),
-  `migrations/versions/0006_run_request_refresh.py`.
-- Final full pytest: **3981 passed, 5 skipped in 1428.88 seconds**, exit 0.
-  All 31 schema/new-migration checks also pass, including downgrade coverage.
-  Ruff clean, three import contracts kept (zero broken), all 39 web tests pass
-  with explicit file arguments. Final log/XML: temporary
-  `countersign-c31-full-final.log` and matching XML. PostgreSQL WAL settings were
-  restored to max 1024/min 80 MB after verification.
-- Branch pushed to `origin/razeef/c31-run-approval-refresh`; validation notes
-  committed in `0fee3ab`. No merge or PR was performed. The current interpreters
-  are the original
-  CounterSign worktree's `.venv/Scripts/python.exe` and
-  `.venv/toolkit/Scripts/python.exe`; earlier temporary/worktree paths were
-  superseded by owner cleanup. No real LLM/PayPal calls or `.env` reads.
+- Branch `mate/M21-eval-gaps` from `upstream/main` `f330b3f`; code `41ff10f`,
+  HTTP smoke/docs `d7d4ad9`, results `057a595`. No PR yet. C31 is merged
+  (`bb77df0`); old merged local `mate/M18-eval-fix` was deleted.
+- Both key-window scenarios omitted SCHEDULE_PAYOUT_RUN because a lost response
+  leaves the proposal EXECUTING although the matching run approval was consumed.
+  The adapter now records scheduling once per proposal when that run's snapshot
+  approval has non-null used_at; later EXECUTED observations deduplicate. This
+  records observed scheduling, not completed payment. Grading is unchanged.
+- Targeted three-scenario k=5 rerun: both key-window cases pass 5/5 (each was
+  0/5); ONHOLD -> FAILED remains 0/5. All 15 cells have zero errors, measured
+  invariant counts, model calls and tokens. Evidence, original 15 before rows,
+  redacted original-adapter grader inputs and verified manifest hashes are in
+  `eval/results/2026-10-27-m21-three-gaps/`.
+- ONHOLD -> FAILED is a real core gap: `_plan_replacements` in
+  `approvals/service.py` selects only `_returned` latest attempts, leaving the
+  failed allocation scheduled and planning at NO_PAYABLE_OBLIGATIONS. Core is
+  untouched; its fix is reserved for Razeef/Claude.
+- `scripts/hosted_smoke.py` uses public HTTP only: reset, 11 week steps, Friday
+  108600 minor units once, final cash 35400, B's non-cash reserve 5400 and four
+  playground attacks returning BLOCK/written=false. The final rebuilt Docker
+  image `countersign-m21:verified` passed the full smoke locally again.
+- One CPU / 512 MB: cold first meta 200 in 4.181 s including Docker start;
+  post-week Docker stats 137.8 MiB; cgroup current 196636672 and peak 244563968
+  bytes. Docker displays 860 MB total image usage; image-inspect Size reports
+  204439669 bytes. All three fake-credential probes exit 64, variable names only.
+- Completed checks: focused 52, hosted guard/smoke 19, adapter unit 26 and web
+  47 tests pass; Ruff clean; three import-linter contracts pass. Selections may
+  overlap. Full pytest: **4004 passed, 5 skipped in 986.70 s**, exit 0, with
+  explicit test DB/toolkit settings. Temporary log: `countersign-m21-full.log`.
+  Final JSON privacy scan, code identity and original scenario hashes pass.
+- No web edits, core fixes, `.env` reads or real model/PayPal calls. No deployment.
 
 ## Continuation
 
-Preserve task boundaries and existing work; stage explicit files only. Commit
-messages are `C31: lowercase summary`, one line, without attribution. The task branch is pushed; do not merge. Any PR targets main. Refresh this state
-with final exact results and commit references before handoff, and consult only
-the relevant C31 section of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).
+Record the PR reference before handoff; final validation is complete. PR base is
+main. The owner authorized independently ready future tasks in separate
+main-based task branches and PRs. Inspection found M19 replay already exists
+and no new prompt 10; no new task is selected. Current prompt forbids web edits;
+core FAILED repair, actual deployment and configured-model runs remain with their
+owners. Consult the M21 section of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).
