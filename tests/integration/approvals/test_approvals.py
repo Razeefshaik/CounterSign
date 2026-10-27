@@ -124,7 +124,7 @@ async def test_changed_versions_or_hash_are_stale_without_approval(world, change
 async def test_expired_request_and_duplicate_approval_fail_closed(world):
     database, service, _, _ = world
     _, proposal, pending = await planned(world)
-    service.clock = lambda: NOW + timedelta(hours=1)
+    service.clock = lambda: NOW + timedelta(hours=24)
     with pytest.raises(ApprovalError, match="APPROVAL_EXPIRED"):
         await service.approve(proposal["id"], pending["payload_hash"])
     service.clock = lambda: NOW

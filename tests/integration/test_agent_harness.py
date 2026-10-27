@@ -348,7 +348,7 @@ async def test_normal_financial_proposal_waits_for_an_exact_unused_owner_approva
         assert saved["raw_output"]["approval_request"] == binding
         assert saved["verdict_details"]["approval_request"] == binding
         expires = datetime.fromisoformat(binding["expires_at"])
-        assert expires > world.settings.clock()
+        assert expires == world.settings.clock() + timedelta(minutes=30)
         async with world.database.tx() as conn:
             current = await Repositories(conn).disputes.get(dispute["id"])
         versions = binding["record_versions"]

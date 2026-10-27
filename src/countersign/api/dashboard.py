@@ -554,7 +554,7 @@ class DbSource:
                 **_mode_metadata(self.runtime),
                 "clock": now.astimezone(UTC).isoformat().replace("+00:00", "Z"),
                 "version": "0.1.0",
-                "contract_version": "1.0.3",
+                "contract_version": "1.0.4",
             }
         if resource != "cash":
             raise ValueError("Invalid singleton resource")

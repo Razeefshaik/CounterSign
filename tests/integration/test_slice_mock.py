@@ -298,7 +298,7 @@ async def slice_world(
             async with database.tx() as conn:
                 assert (
                     await (await conn.execute("SELECT version_num FROM alembic_version")).fetchone()
-                )["version_num"] == "0005"
+                )["version_num"] == "0006"
                 guards = await conn.execute(
                     "SELECT c.relname,t.tgenabled FROM pg_trigger t "
                     "JOIN pg_class c ON c.oid=t.tgrelid "

@@ -28,6 +28,8 @@ from countersign.shield import snapshot as model
 from countersign.shield.engine import Verdict, evaluate
 from countersign.shield.rules.idempotency import derive_keys
 
+RUN_REQUEST_LIFETIME = timedelta(hours=24)
+
 
 class ApprovalError(RuntimeError):
     """A public, value-free error suitable for an HTTP response."""
@@ -516,136 +518,225 @@ class ApprovalService:
     async def plan_run(self, week_start: date) -> dict:
         async with self.database.tx() as conn:
             await self._lock(conn)
-            repos = Repositories(conn)
-            if await repos.payout_runs.find({"week_start": week_start}):
-                raise ApprovalError("RUN_ALREADY_EXISTS")
-            # Row locks plus the unique active-allocation index protect rival planners.
-            cursor = await conn.execute(
-                "SELECT o.* FROM obligations o WHERE o.state='OPEN' AND o.amount_minor<>0 "
-                "AND o.due_date<=%s AND NOT EXISTS (SELECT 1 FROM payout_line_obligations p "
-                "WHERE p.obligation_id=o.id AND p.active) AND NOT EXISTS "
-                "(SELECT 1 FROM reservations r WHERE r.obligation_id=o.id "
-                "AND r.kind='DISPUTE_EARMARK' AND r.state='ACTIVE') AND NOT EXISTS "
-                "(SELECT 1 FROM disputes d WHERE d.order_id=o.order_id AND d.phase IN "
-                "('ACTIVE','UNKNOWN_OUTCOME')) ORDER BY o.id FOR UPDATE",
-                (week_start + timedelta(days=6),),
-            )
-            obligations = await cursor.fetchall()
-            replacements = await self._plan_replacements(conn, week_start, obligations)
-            grouped = defaultdict(list)
-            planned_lines = []
-            for obligation in obligations:
-                grouped[obligation["maker_id"]].append(obligation)
-            # F16 adjustments reduce what we owe; pay only a strictly positive net.
-            # Keep nonpositive maker balances OPEN so future earnings can offset them.
-            grouped = {
-                maker: shares
-                for maker, shares in grouped.items()
-                if sum(share["amount_minor"] for share in shares) > 0
-            }
-            obligations = [share for shares in grouped.values() for share in shares]
-            if not obligations and not replacements:
-                raise ApprovalError("NO_PAYABLE_OBLIGATIONS")
-            currencies = {r["currency"].strip() for r in obligations} | {
-                r["amount"]["currency"] for r in replacements
-            }
-            if len(currencies) != 1:
-                raise ApprovalError("MIXED_CURRENCY_RUN")
-            currency = currencies.pop()
-            total = sum(r["amount_minor"] for r in obligations) + sum(
-                r["amount"]["minor"] for r in replacements
-            )
-            run = await repos.payout_runs.insert(week_start=week_start, state="AWAITING_OWNER")
-            for maker_id, shares in sorted(grouped.items()):
-                line = await repos.payout_lines.insert(
-                    run_id=run["id"],
-                    maker_id=maker_id,
-                    amount_minor=sum(r["amount_minor"] for r in shares),
-                    currency=shares[0]["currency"],
-                    state="APPROVED",
-                )
-                planned_lines.append(
-                    {
-                        "line_id": str(line["id"]),
-                        "maker_id": str(maker_id),
-                        "amount": {
-                            "minor": line["amount_minor"],
-                            "currency": line["currency"].strip(),
-                        },
-                    }
-                )
-                for obligation in shares:
-                    await repos.payout_line_obligations.insert(
-                        line_id=line["id"],
-                        obligation_id=obligation["id"],
-                        amount_minor=obligation["amount_minor"],
-                    )
-                    await cas_transition(
-                        conn,
-                        OBLIGATION,
-                        "obligations",
-                        obligation["id"],
-                        obligation["state"],
-                        obligation["version"],
-                        ObligationEvent.LINE_APPROVED,
-                    )
-            row = await repos.proposals.insert(
-                action="SCHEDULE_PAYOUT_RUN",
-                params={"run_id": str(run["id"]), "lines": planned_lines, "replacements": replacements},
-                evidence_refs=[],
-                model="deterministic-planner",
-                raw_output={},
-                rationale="Pay eligible open obligations once",
-                expected_effect={
-                    "available_change": {
-                        "minor": -total,
-                        "currency": currency,
-                    }
-                },
-                state="CREATED",
-            )
-            proposal, snap, payload = await load_context(conn, row, now=self.clock(), behavior=self.behavior)
-            decision = evaluate(proposal, snap)
-            if decision.verdict is Verdict.BLOCK:
-                raise ApprovalError("SHIELD_BLOCKED")
-            details = {
-                "rule_results": decision.rule_results(),
-                "approval_request": {
-                    "payload_hash": proposal.payload_hash,
-                    "record_versions": snap.record_versions(),
-                    "expires_at": (snap.now + self.lifetime).isoformat(),
-                },
-                "operation_payload": payload,
-            }
-            await repos.proposals.update(
-                row["id"],
-                verdict=str(decision.verdict),
-                verdict_rules=[str(r) for r in decision.rules],
-                verdict_details=details,
-                raw_output={
-                    "approval_request": details["approval_request"],
-                    "operation_payload": payload,
-                },
-            )
-            current = await repos.proposals.get(row["id"])
-            await cas_transition(
-                conn,
-                PROPOSAL,
-                "proposals",
-                row["id"],
-                current["state"],
-                current["version"],
-                VERDICT_EVENT[str(decision.verdict)],
-            )
-            await create_reservation(
-                conn,
-                "PROPOSAL_CASH",
-                sum((i.amount for i in snap.payouts), Money.zero(snap.cash.unreserved.currency)),
-                proposal_id=row["id"],
+            return await self._plan_run(conn, week_start)
+
+    async def _plan_run(self, conn, week_start: date) -> dict:
+        """Caller owns the transaction and owner-decision lock, including refresh."""
+        repos = Repositories(conn)
+        if any(run["state"] != "CANCELLED" for run in
+               await repos.payout_runs.find({"week_start": week_start})):
+            raise ApprovalError("RUN_ALREADY_EXISTS")
+        # Row locks plus the unique active-allocation index protect rival planners.
+        cursor = await conn.execute(
+            "SELECT o.* FROM obligations o WHERE o.state='OPEN' AND o.amount_minor<>0 "
+            "AND o.due_date<=%s AND NOT EXISTS (SELECT 1 FROM payout_line_obligations p "
+            "WHERE p.obligation_id=o.id AND p.active) AND NOT EXISTS "
+            "(SELECT 1 FROM reservations r WHERE r.obligation_id=o.id "
+            "AND r.kind='DISPUTE_EARMARK' AND r.state='ACTIVE') AND NOT EXISTS "
+            "(SELECT 1 FROM disputes d WHERE d.order_id=o.order_id AND d.phase IN "
+            "('ACTIVE','UNKNOWN_OUTCOME')) ORDER BY o.id FOR UPDATE",
+            (week_start + timedelta(days=6),),
+        )
+        obligations = await cursor.fetchall()
+        replacements = await self._plan_replacements(conn, week_start, obligations)
+        grouped = defaultdict(list)
+        planned_lines = []
+        for obligation in obligations:
+            grouped[obligation["maker_id"]].append(obligation)
+        # F16 adjustments reduce what we owe; pay only a strictly positive net.
+        # Keep nonpositive maker balances OPEN so future earnings can offset them.
+        grouped = {
+            maker: shares
+            for maker, shares in grouped.items()
+            if sum(share["amount_minor"] for share in shares) > 0
+        }
+        obligations = [share for shares in grouped.values() for share in shares]
+        if not obligations and not replacements:
+            raise ApprovalError("NO_PAYABLE_OBLIGATIONS")
+        currencies = {r["currency"].strip() for r in obligations} | {
+            r["amount"]["currency"] for r in replacements
+        }
+        if len(currencies) != 1:
+            raise ApprovalError("MIXED_CURRENCY_RUN")
+        currency = currencies.pop()
+        total = sum(r["amount_minor"] for r in obligations) + sum(
+            r["amount"]["minor"] for r in replacements
+        )
+        run = await repos.payout_runs.insert(week_start=week_start, state="AWAITING_OWNER")
+        for maker_id, shares in sorted(grouped.items()):
+            line = await repos.payout_lines.insert(
                 run_id=run["id"],
+                maker_id=maker_id,
+                amount_minor=sum(r["amount_minor"] for r in shares),
+                currency=shares[0]["currency"],
+                state="APPROVED",
             )
-            result = await repos.payout_runs.get(run["id"])
-            return {**result, "proposal_id": row["id"]}
+            planned_lines.append(
+                {
+                    "line_id": str(line["id"]),
+                    "maker_id": str(maker_id),
+                    "amount": {
+                        "minor": line["amount_minor"],
+                        "currency": line["currency"].strip(),
+                    },
+                }
+            )
+            for obligation in shares:
+                await repos.payout_line_obligations.insert(
+                    line_id=line["id"],
+                    obligation_id=obligation["id"],
+                    amount_minor=obligation["amount_minor"],
+                )
+                await cas_transition(
+                    conn,
+                    OBLIGATION,
+                    "obligations",
+                    obligation["id"],
+                    obligation["state"],
+                    obligation["version"],
+                    ObligationEvent.LINE_APPROVED,
+                )
+        row = await repos.proposals.insert(
+            action="SCHEDULE_PAYOUT_RUN",
+            params={"run_id": str(run["id"]), "lines": planned_lines, "replacements": replacements},
+            evidence_refs=[],
+            model="deterministic-planner",
+            raw_output={},
+            rationale="Pay eligible open obligations once",
+            expected_effect={
+                "available_change": {
+                    "minor": -total,
+                    "currency": currency,
+                }
+            },
+            state="CREATED",
+        )
+        proposal, snap, payload = await load_context(conn, row, now=self.clock(), behavior=self.behavior)
+        decision = evaluate(proposal, snap)
+        if decision.verdict is Verdict.BLOCK:
+            raise ApprovalError("SHIELD_BLOCKED")
+        details = {
+            "rule_results": decision.rule_results(),
+            "approval_request": {
+                "payload_hash": proposal.payload_hash,
+                "record_versions": snap.record_versions(),
+                "expires_at": (snap.now + RUN_REQUEST_LIFETIME).isoformat(),
+            },
+            "operation_payload": payload,
+        }
+        await repos.proposals.update(
+            row["id"],
+            verdict=str(decision.verdict),
+            verdict_rules=[str(r) for r in decision.rules],
+            verdict_details=details,
+            raw_output={
+                "approval_request": details["approval_request"],
+                "operation_payload": payload,
+            },
+        )
+        current = await repos.proposals.get(row["id"])
+        await cas_transition(
+            conn,
+            PROPOSAL,
+            "proposals",
+            row["id"],
+            current["state"],
+            current["version"],
+            VERDICT_EVENT[str(decision.verdict)],
+        )
+        await create_reservation(
+            conn,
+            "PROPOSAL_CASH",
+            sum((i.amount for i in snap.payouts), Money.zero(snap.cash.unreserved.currency)),
+            proposal_id=row["id"],
+            run_id=run["id"],
+        )
+        result = await repos.payout_runs.get(run["id"])
+        return {**result, "proposal_id": row["id"]}
+
+    async def refresh_run_requests(self) -> int:
+        """Expire and replace unapproved stale runs atomically, never owner rejections.
+
+        The selected rows are fixed before planning: a newly created request is
+        never refreshed again in this pass. A savepoint rolls back a refused
+        replan while retaining the old request's release; unexpected failures
+        roll back the whole transaction, so a crash cannot strand half a refresh.
+        """
+        refreshed = 0
+        async with self.database.tx() as conn:
+            await self._lock(conn)
+            repos = Repositories(conn)
+            cursor = await conn.execute(
+                "SELECT p.* FROM proposals p JOIN payout_runs r "
+                "ON r.id::text=p.params->>'run_id' "
+                "WHERE p.action='SCHEDULE_PAYOUT_RUN' AND p.state='NEEDS_OWNER' "
+                "AND r.state='AWAITING_OWNER' ORDER BY p.created_at,p.id FOR UPDATE OF p,r"
+            )
+            pending_rows = await cursor.fetchall()
+            seen = set()
+            for row in pending_rows:
+                run_id = UUID(row["params"]["run_id"])
+                if run_id in seen:
+                    continue
+                seen.add(run_id)
+                pending = (row["verdict_details"] or {}).get("approval_request") or (
+                    row["raw_output"] or {}
+                ).get("approval_request", {})
+                now = self.clock()
+                reason = None
+                try:
+                    expires = datetime.fromisoformat(pending["expires_at"])
+                    if expires.utcoffset() is None:
+                        raise ValueError
+                except (KeyError, ValueError, TypeError):
+                    reason = "STALE"
+                else:
+                    if now >= expires:
+                        reason = "EXPIRED"
+                    else:
+                        try:
+                            proposal, snap, _ = await load_context(
+                                conn, row, now=now, behavior=self.behavior
+                            )
+                        except ApprovalError as error:
+                            if error.code != "STALE_PROPOSAL":
+                                raise
+                            reason = "STALE"
+                        else:
+                            if (proposal.payload_hash != pending.get("payload_hash")
+                                    or snap.record_versions() != pending.get("record_versions")):
+                                reason = "STALE"
+                if reason is None:
+                    continue
+                run = await repos.payout_runs.get(run_id)
+                await cas_transition(
+                    conn, PROPOSAL, "proposals", row["id"], row["state"], row["version"],
+                    ProposalEvent.APPROVAL_EXPIRED,
+                )
+                await repos.audit_log.insert(
+                    actor="system", kind="STATE_TRANSITION", proposal_id=row["id"],
+                    details={"event": "APPROVAL_EXPIRED", "state": "EXPIRED", "reason": reason},
+                )
+                for reservation in await repos.reservations.find(
+                    {"proposal_id": row["id"], "state": "ACTIVE", "kind": "PROPOSAL_CASH"}
+                ):
+                    await release_reservation(conn, reservation["id"])
+                await self._release_run(conn, run_id)
+                details = {"run_id": str(run_id), "week_start": run["week_start"].isoformat(),
+                           "reason": reason}
+                try:
+                    async with conn.transaction():
+                        await self._plan_run(conn, run["week_start"])
+                except ApprovalError as error:
+                    if error.code not in {"NO_PAYABLE_OBLIGATIONS", "SHIELD_BLOCKED"}:
+                        raise
+                    details["code"] = error.code
+                await repos.audit_log.insert(
+                    actor="system", kind="RUN_REQUEST_REFRESHED", proposal_id=row["id"],
+                    details=details,
+                )
+                refreshed += 1
+        return refreshed
 
     async def approve(self, proposal_id: UUID, payload_hash: str, approved_by="owner") -> dict:
         hash_bytes(payload_hash)

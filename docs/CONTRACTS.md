@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.3 (Oct 25, 2026).** 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.4 (Oct 27, 2026).** 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -78,7 +78,7 @@ All examples below use the demo week from HANDOFF section 10.
 
 ```json
 {"mode": "demo", "paypal_env": "mock", "simulated": true, "simulation_label": "Simulated: mock PayPal",
- "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.3"}
+ "clock": "2026-11-06T09:00:00Z", "version": "0.1.0", "contract_version": "1.0.4"}
 ```
 
 - `mode` is `demo` (runs against the local mock) or `live` (runs against the sandbox).
@@ -314,7 +314,7 @@ This example is Friday morning of the demo week, before the run is approved.
 ```
 
 - `actor` is one of `agent`, `owner`, `shield`, `executor` or `system`.
-- `kind` is one of: `PROPOSAL_CREATED`, `SHIELD_VERDICT`, `OWNER_APPROVED`, `OWNER_REJECTED`, `APPROVAL_VOIDED`, `OPERATION_PREPARED`, `PAYPAL_CALL`, `PAYPAL_RESPONSE`, `OPERATION_UNKNOWN`, `REPLAY_RESOLVED`, `WEBHOOK_RECEIVED`, `WEBHOOK_REJECTED`, `STATE_TRANSITION`, `INCIDENT_OPENED`, `INCIDENT_RESOLVED`, `INJECTION_FLAGGED`, `RECONCILE_MISMATCH`.
+- `kind` is one of: `PROPOSAL_CREATED`, `SHIELD_VERDICT`, `OWNER_APPROVED`, `OWNER_REJECTED`, `APPROVAL_VOIDED`, `OPERATION_PREPARED`, `PAYPAL_CALL`, `PAYPAL_RESPONSE`, `OPERATION_UNKNOWN`, `REPLAY_RESOLVED`, `WEBHOOK_RECEIVED`, `WEBHOOK_REJECTED`, `STATE_TRANSITION`, `INCIDENT_OPENED`, `INCIDENT_RESOLVED`, `INJECTION_FLAGGED`, `RECONCILE_MISMATCH`, `RUN_REQUEST_REFRESHED`.
 - `details` never contains a full email, a token or a secret.
 
 ### 2.10 Money graph
@@ -346,7 +346,7 @@ In live mode these endpoints require the header `X-Owner-Token` (the value comes
 
 - **`POST /api/v1/proposals/{id}/approve`** with body `{"payload_hash": "sha256:9c1e...", "approved_by": "owner"}`.
   - **201:** `{"approval": {"id", "approved_by", "approved_at", "expires_at", "payload_hash", "used_at": null}}`.
-  - **409** when the hash or any record version has changed since the proposal was shown, with code `STALE_PROPOSAL` or `APPROVAL_EXPIRED`. The UI must then reload the proposal.
+  - **409** when the hash or any record version has changed since the proposal was shown, with code `STALE_PROPOSAL` or `APPROVAL_EXPIRED`. The UI must then reload the proposal. On the next Engine tick, an expired or stale unapproved payout-run request is released and replaced with a fresh request reflecting current facts, if payable obligations and the shield permit a new run. The replacement requires its own hash and owner approval; owner-rejected runs are never automatically replanned. Run requests last 24 hours; other owner requests retain 30 minutes.
 - **`POST /api/v1/proposals/{id}/reject`** with body `{"reason": "..."}`. Returns 200 with the updated Proposal.
 - **`POST /api/v1/payout-runs`** with body `{"week_start": "2026-11-02"}`. Returns 201 with the run. This plans the run and creates a `SCHEDULE_PAYOUT_RUN` proposal.
 - **`POST /api/v1/makers/{id}/payout-email`** with body `{"payout_email": "...", "confirm": true}`. Returns 200 with the Maker. This is the only way a payee email changes.

@@ -129,6 +129,25 @@ async def proposal_for(world, run):
         return await Repositories(conn).proposals.get(run["proposal_id"])
 
 
+async def test_expired_run_refresh_keeps_historical_replacement_identity(replacement_world):
+    world = replacement_world
+    await add_current(world)
+    old_run = await world.service.plan_run(WEEK)
+    original = await proposal_for(world, old_run)
+    world.service.clock = lambda: NOW + timedelta(hours=24)
+    assert await world.service.refresh_run_requests() == 1
+    async with world.database.tx() as conn:
+        repos = Repositories(conn)
+        [pending] = await repos.proposals.find({"state": "NEEDS_OWNER"})
+        assert pending["params"]["replacements"] == original["params"]["replacements"]
+        assert pending["expected_effect"]["available_change"]["minor"] == -108600
+        assert (await repos.payout_lines.get(world.old_line["id"]))["state"] == "UNPAID"
+        assert (await repos.obligations.get(world.old_share["id"]))["state"] == "SCHEDULED"
+        assert len(await repos.payout_attempts.find({"line_id": world.old_line["id"]})) == 1
+        assert len(await repos.payout_line_obligations.find(
+            {"line_id": world.old_line["id"], "active": True})) == 1
+
+
 @pytest.mark.parametrize("with_current", [False, True])
 async def test_plan_binds_returned_line_once_and_simulates_its_cash(
     replacement_world, with_current
