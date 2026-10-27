@@ -23,9 +23,9 @@ One branch and PR per task. Never merge. No real PayPal or LLM calls for these t
 Task reviews and implementation were delegated in batches; Professor Pickle
 maintains these context files while the primary agent owns feature completion.
 
-- Latest fetched main: `dc24c7f`; M13, M15 and M17 are already integrated there.
-- Current branch: `mate/M18-eval`, on top of M14. M14 commits: `4449c99`
-  (rebased WIP), `c2c4fca` (coverage/failure evidence), `fc65de0` (context workflow).
+- Latest integration base: `a9a186d`; M13, M15 and M17 are already integrated.
+- Current branch: `mate/C26-sandbox-eval`, stacked on M18/M14 dependencies.
+  PR merge order must be M14, then M18, then C26; none are merged by this agent.
 - M14 has 48 mock scenarios: at least two per fault class and three realistic
   dispute-triage cases. Independent rules_only run: 43 pass, five fail, zero
   runner errors and zero measured invariant violations. Provenance: 8 recorded,
@@ -34,16 +34,19 @@ maintains these context files while the primary agent owns feature completion.
   FAILED items cannot claim recorded provenance; walkthrough completeness test.
   Complete: [PR #11](https://github.com/Razeefshaik/CounterSign/pull/11) is open,
   ready for review, not merged. Full suite: 3,883 passed, five legacy toolkit
-  skips. Ruff and all three import contracts pass in the isolated M14 checkout.
+  skips. Ruff and three import contracts pass. Current PR head: `8402932`
+  (integration documentation sync); GitHub reports it mergeable.
 - M18: `e2f5687` orchestration; `f9e8dfd` persists all 480 model-disabled cells
   (48 scenarios x two systems x k=5), evaluated on `e2f5687`. rules_only: 215/240
   pass, pass^5 43/48, zero errors, 260 owner interruptions. CounterSign: 80/240
   pass, pass^5 16/48, 80 EVALUATION_FAILED rows, 200 owner interruptions. Both
   have zero measured four-invariant counts, calls and tokens; error-row zeros do
-  not establish safety. Full M18 pytest is running; 17 fake tests pass. No PR yet.
-- C26 is uncommitted preparation; 12 fake/real-Engine mock dry-run tests pass.
-  The CLI mock dry-run completed all five checks, labelled mock. Scenario JSON
-  files remain held. No real model/sandbox calls were made for this batch.
+  not establish safety. M18 full suite: 3,900 passed, five legacy toolkit skips;
+  Ruff and three import contracts pass. Additional commits: `23d0e11` (context),
+  `ef00286` (integration docs). M18 is ready for PR creation; no PR number yet.
+- C26 is uncommitted preparation; 17 focused tests pass. All 53 scenario files
+  validate (48 mock, five sandbox). CLI mock dry-run passed all five checks.
+  Full C26 suite is running. No real model/sandbox calls were made for this batch.
 
 ## Working rules for continuation
 
@@ -52,7 +55,8 @@ may be untracked while parallel agents prepare them. Never use `git add .`.
 Before each PR, run required tests, Ruff and all three import contracts. Record
 exact checks, commit hashes, limitations and PR links here after completion.
 Do not edit web/ for this batch; the other owner is working there.
-Context-file updates after `fc65de0` are uncommitted and belong with M18's handoff.
+The context workflow and prior summaries are committed; refresh these notes at
+the next verified PR/feature boundary without assuming pending checks passed.
 
 See [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md) only for the related task's
 details. Update this summary after each feature instead of carrying the whole
