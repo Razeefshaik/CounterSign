@@ -230,9 +230,13 @@ No merge performed. Next: owner review, then configured-model comparison.
 ## M21 evaluation gaps and hosted readiness (prompt 09)
 
 Branch `mate/M21-eval-gaps` starts at upstream/main `f330b3f`; commits `41ff10f`
-(code), `d7d4ad9` (HTTP smoke/docs), `057a595` (results). No PR yet. The owner
+(code), `d7d4ad9` (HTTP smoke/docs), `057a595` (results), `04f6fe0` (validation),
+`dee7c90` (context). [PR #15](https://github.com/Razeefshaik/CounterSign/pull/15)
+is open, non-draft, base main f330b3f. Branch pushed to origin and upstream;
+no merge. The owner
 permits independently ready future tasks with separate task branches and PRs to
-main. M19 replay already exists; no prompt 10/new task is selected. Current scope
+main. Inspection found M19 replay already exists and no new prompt 10; no
+further independently ready task was found. Current scope
 forbids web edits; core FAILED repair is reserved for Razeef/Claude, and actual
 deployment/configured-model runs remain owner work. No `.env` reads.
 
@@ -270,4 +274,5 @@ full pytest: **4004 passed, 5 skipped in 986.70 s**, exit 0, with explicit
 test DB/toolkit settings; temporary log `countersign-m21-full.log`. Final JSON
 privacy scan, 15-cell code identity and all three original scenario hashes pass.
 No web/src/mock changes relative to base; upstream/main remains f330b3f.
-Validation is complete; add the PR reference before final handoff.
+Validation is complete; PR #15 is ready for owner review. Core FAILED replacement
+repair remains reserved for Razeef/Claude.

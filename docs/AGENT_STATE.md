@@ -14,8 +14,10 @@ Money is integer minor units. Keep mock and sandbox evidence separate.
 ## Current work: M21 evaluation gaps and hosted readiness (prompt 09)
 
 - Branch `mate/M21-eval-gaps` from `upstream/main` `f330b3f`; code `41ff10f`,
-  HTTP smoke/docs `d7d4ad9`, results `057a595`. No PR yet. C31 is merged
-  (`bb77df0`); old merged local `mate/M18-eval-fix` was deleted.
+  HTTP smoke/docs `d7d4ad9`, results `057a595`, validation `04f6fe0`, context
+  `dee7c90`. [PR #15](https://github.com/Razeefshaik/CounterSign/pull/15) is open,
+  non-draft, base main `f330b3f`; pushed to origin and upstream. No merge.
+  C31 is merged (`bb77df0`); old merged local `mate/M18-eval-fix` was deleted.
 - Both key-window scenarios omitted SCHEDULE_PAYOUT_RUN because a lost response
   leaves the proposal EXECUTING although the matching run approval was consumed.
   The adapter now records scheduling once per proposal when that run's snapshot
@@ -47,9 +49,10 @@ Money is integer minor units. Keep mock and sandbox evidence separate.
 
 ## Continuation
 
-Record the PR reference before handoff; final validation is complete. PR base is
-main. The owner authorized independently ready future tasks in separate
-main-based task branches and PRs. Inspection found M19 replay already exists
-and no new prompt 10; no new task is selected. Current prompt forbids web edits;
+M21 is ready for owner review in PR #15; final validation is complete. The owner
+authorized independently ready future tasks in separate main-based task branches
+and PRs. Inspection found M19 replay already exists
+and no new prompt 10; no further independently ready task was found. Current
+prompt forbids web edits;
 core FAILED repair, actual deployment and configured-model runs remain with their
 owners. Consult the M21 section of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).
