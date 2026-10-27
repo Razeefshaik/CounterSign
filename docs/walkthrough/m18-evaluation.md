@@ -297,3 +297,20 @@ CounterSign scenarios still failing outcomes (five repetitions each):
 Final prompt07 validation: **3,963 passed, five skipped** in full pytest with
 test PostgreSQL and isolated toolkit settings; Ruff clean; three import contracts
 kept; all 39 web tests pass. The skips are legacy optional toolkit checks.
+
+## Oct 27 rerun after C31 and reserve observation
+
+Artifacts: `eval/results/2026-10-27-model-none-c31/` (source `09034ce`). The scenario hashes, systems and k=5 are unchanged, and both earlier folders are kept.
+
+Two changes since the corrected run:
+- **C31** refreshes expired or stale payout-run approval requests instead of stranding the week.
+- **The CounterSign adapter** now records the Engine's own dispute reserves and releases (`RESERVE_EARNINGS`, `RELEASE_RESERVE`), once per `DISPUTE_EARMARK` reservation. It records only reservations the Engine actually holds.
+
+| System | Original | After PR 07 | After C31 + reserves | pass^5 now |
+| --- | ---: | ---: | ---: | ---: |
+| rules_only | 215/240 | 215/240 | 215/240 | 43/48 |
+| countersign (model disabled) | 80/240 | 115/240 | 170/240 | 34/48 |
+
+There are zero error rows and zero invariant violations. Eleven scenarios moved to passing and none regressed.
+
+Of the 14 CounterSign scenarios still failing, 11 need an agent action (PROVIDE_EVIDENCE, ACCEPT_CLAIM or CANCEL_UNCLAIMED_PAYOUT), which only the configured-model run can score. Three are open follow-ups: both key-window-expired cases and on-hold-then-failed. The results README lists them.

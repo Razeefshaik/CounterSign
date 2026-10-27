@@ -421,3 +421,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Expired or hash/version-stale NEEDS_OWNER run requests become EXPIRED and release allocations/cash before replanning in one locked transaction; known no-payable/shield refusals retain the release and an audit code | Owner C31 prompt | Accept | A rolled-back approval refusal must not strand scheduled shares; new facts require a new owner approval, while owner rejections and APPROVED or later requests stay untouched |
 | Payout-run approval requests live for the named 24-hour RUN_REQUEST_LIFETIME; other owner requests retain 30 minutes and all hash/version/single-use/execution-time checks remain | Owner C31 prompt | Accept | A small-shop owner needs time to approve a weekly run; short expiry is not a substitute for current binding and the shield |
 | CONTRACTS 1.0.4 documents refresh after approve 409 and the RUN_REQUEST_REFRESHED audit kind | Owner C31 prompt; AGENTS contract version rule | Accept | Consumers must reload the replacement request rather than retry an old hash or assume a refused approval released its commitment |
+
+## Oct 27 M18 reserve observation
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| The CounterSign evaluation adapter records RESERVE_EARNINGS and RELEASE_RESERVE once per Engine DISPUTE_EARMARK reservation it observes, with the PayPal dispute ID and reserved amount | Prompt 08 review of C31 results | Accept | The Engine reserves disputed shares deterministically without a proposal, so the trace hid reserves that rules_only gets credit for; only observed Engine facts are recorded and grading is unchanged |
