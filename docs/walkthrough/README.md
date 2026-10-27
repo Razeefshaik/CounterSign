@@ -67,6 +67,7 @@ The first working version of the product itself, built step by step. Hashes belo
 | [m13-baseline-llm.md](m13-baseline-llm.md) | The plain LLM baseline: mock-only tools, PayPal's own idempotency used correctly, quota stop and the TCP mock option |
 | [c27-hosting.md](c27-hosting.md) | Free hosting options compared, the single-container demo image, owner deploy steps and what stays off |
 | [c28-submission-checklist.md](c28-submission-checklist.md) | README placeholders, claims check, video shot list, GitHub About, hosting and the Devpost form |
+| [m17-demo-bar.md](m17-demo-bar.md) | The dashboard's staged-week control bar, why it cannot bypass the shield, and the step-by-step video recording flow |
 
 ## Words used everywhere
 

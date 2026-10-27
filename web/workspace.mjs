@@ -1,6 +1,6 @@
 import {createClient, submitDecision} from "./api.mjs";
 import {decisionView, runView, auditView, cashView, graphView, esc, canDecide} from "./views.mjs";
-import {label} from "./data.mjs";
+import {label, isStaged} from "./data.mjs";
 
 const titles = {incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph"};
 export function route(hash) {
@@ -39,7 +39,9 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
         const resource = current.name === "decision" ? "proposals" : "payout-runs";
         const items = await client.list(resource);
         if (ticket !== serial) return;
-        const id = current.id || items[0]?.id;
+        // Without a chosen record, open the proposal that is waiting for the owner.
+        const waiting = current.name === "decision" ? items.find(item => item.state === "NEEDS_OWNER") : null;
+        const id = current.id || (waiting || items[0])?.id;
         $("view-picker").hidden = !items.length;
         $("record-picker").innerHTML = items.map(item => `<option value="${esc(item.id)}" ${item.id === id ? "selected" : ""}>${esc(current.name === "decision" ? `${label(item.action)} · ${label(item.state)}` : `Week of ${item.week_start} · ${label(item.state)}`)}</option>`).join("");
         $("record-picker").onchange = event => {location.hash = `${current.name}/${event.target.value}`;};
@@ -48,7 +50,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
         if (current.name === "decision") {
           proposal = doc;
           const incident = workspace.incidents.find(i => i.id === doc?.incident_id);
-          const staged = workspace.disputes.some(d => d.id === incident?.subject.dispute_id && d.staged);
+          const staged = Boolean(incident) && isStaged(incident, workspace.disputes);
           html = decisionView(doc, workspace.meta, staged);
         } else html = runView(doc);
       } else if (current.name === "audit") html = auditView(await client.list("audit-log"));
@@ -65,10 +67,13 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
       $("view-body").innerHTML = html;
       if (current.name === "decision") bindDecision();
       return true;
-    } catch {
+    } catch (error) {
       if (ticket !== serial) return;
       invalidate();
-      $("view-body").innerHTML = '<p class="empty">These records could not be loaded. Use Refresh to try again.</p>';
+      // A new marketplace has no balance snapshot yet; cash is unavailable, never zero.
+      $("view-body").innerHTML = current.name === "cash" && error?.status === 503
+        ? '<p class="empty">No PayPal balance has been read yet, so cash is unavailable. It appears after the first balance check.</p>'
+        : '<p class="empty">These records could not be loaded. Use Refresh to try again.</p>';
       return false;
     }
   }

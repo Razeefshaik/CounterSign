@@ -6,6 +6,7 @@ runtime owns this pool's lifespan; it never shares the executor's connections.
 Missing database cash is unavailable, never replaced by fixture/zero money.
 """
 
+import asyncio
 import base64
 import hashlib
 import json
@@ -16,12 +17,14 @@ from copy import deepcopy
 from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import ClassVar, Protocol
+from urllib.parse import urlsplit
 from uuid import UUID
 
 import psycopg
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from psycopg import sql
+from psycopg.conninfo import conninfo_to_dict
 from psycopg.rows import dict_row
 from psycopg_pool import AsyncConnectionPool
 
@@ -476,7 +479,17 @@ class DbSource:
             rows = await (await conn.execute(query, [*values, limit + 1])).fetchall()
         page = rows[:limit]
         next_cursor = self._cursor(resource, filters, page[-1]) if len(rows) > limit else None
-        return [masked(row["doc"]) for row in page], next_cursor
+        return [self._present(resource, masked(row["doc"])) for row in page], next_cursor
+
+    def _present(self, resource, doc):
+        """Every dispute on the local mock was opened through its staged control.
+
+        The contract's `staged` flag marks disputes opened for the demo through the
+        sandbox Resolution Center or the mock; the mock does not echo that flag.
+        """
+        if resource == "disputes" and doc is not None and self.runtime.paypal.is_mock:
+            doc["staged"] = True
+        return doc
 
     async def get(self, resource, id):
         if resource not in self.details:
@@ -494,7 +507,7 @@ class DbSource:
                     (identifier,),
                 )
             ).fetchone()
-        return masked(row["doc"]) if row else None
+        return self._present(resource, masked(row["doc"])) if row else None
 
     async def singleton(self, resource, params):
         if resource == "money-graph":
@@ -619,3 +632,329 @@ def build_router(source: DashboardSource | None = None):
 
 
 router = build_router()
+
+
+# --- M17 demo control bar -------------------------------------------------
+#
+# The bar replays C25's scripted mock week (scripts/demo_week.py), the same
+# command the hosted container uses to seed it. Each POST runs that command once
+# more with --pause-after-step, so one checkpoint step succeeds and the process
+# exits. The bar never receives parameters, never calls PayPal or the engine
+# itself, and therefore cannot reach the shield or executor any other way than
+# the week already does. It exists only in demo mode on the loopback mock.
+
+REPO_ROOT = Path(__file__).resolve().parents[3]
+DEMO_STEP_TIMEOUT = 900
+_CODE = re.compile(r"[A-Z][A-Z0-9_]{2,80}")
+# (checkpoint step, what the presenter sees, whether the step contains a staged action)
+DEMO_STEPS = (
+    (
+        "setup",
+        "Monday: stage four buyer orders on the mock; C's old $300 payout is UNCLAIMED",
+        True,
+    ),
+    (
+        "seed",
+        "Monday: load makers, orders and maker shares; $1,500 available",
+        True,
+    ),
+    (
+        "monday_dispute",
+        ("Monday: buyer disputes Maker A's $400 order; A's $360 share is reserved and "
+        "the evidence path is checked"),
+        True,
+    ),
+    (
+        "wednesday_dispute",
+        "Wednesday: buyer disputes Maker B's $60 order; B's $54 share is reserved",
+        True,
+    ),
+    (
+        "cancel_and_verify",
+        ("Thursday: agent cancels C's UNCLAIMED $300 payout and a GET confirms RETURNED; "
+        "owner verifies C's payee"),
+        True,
+    ),
+    (
+        "friday_plan",
+        ("Friday: plan the run; A's $360 and B's $54 stay reserved; the naive comparison "
+        "is read only"),
+        False,
+    ),
+    (
+        "friday_execute",
+        ("Friday: owner approves the exact $1,086 run once; a lost PayPal response is "
+        "recovered with the same keys"),
+        True,
+    ),
+    (
+        "owner_claim_and_draft",
+        ("Friday: agent drafts a note to Maker A; B's $60 claim acceptance waits for the "
+        "owner"),
+        False,
+    ),
+    (
+        "safety_blocks",
+        ("Friday: a buyer note asks for a refund to another account, and a settled line "
+        "is retried; both blocked"),
+        True,
+    ),
+    (
+        "following_week_settle",
+        ("Following week: A's dispute is adjudicated for the seller; the reconciler "
+        "releases A's reserve"),
+        True,
+    ),
+    (
+        "following_week_pay_a",
+        ("Following week: owner approves A's $360 only after the release; $354 "
+        "available"),
+        True,
+    ),
+)
+DEMO_STAGED_NOTE = (
+    "Staged: buyer actions, dispute settlement, the lost response and owner clicks are "
+    "simulated on the mock. The agent is a scripted model; no LLM or PayPal call is made."
+)
+
+
+def demo_bar_allowed(runtime) -> bool:
+    """Demo mode on the loopback mock with a disposable database name, never live."""
+    try:
+        paypal = runtime.paypal
+        name = conninfo_to_dict(runtime.database_url).get("dbname") or ""
+        host = urlsplit(paypal.base_url).hostname
+    except Exception:  # noqa: BLE001 - a private DSN never reaches an error message.
+        return False
+    return (
+        runtime.mode == "demo"
+        and paypal.is_mock is True
+        and host in {"127.0.0.1", "localhost"}
+        and name.endswith(("_demo", "_test"))
+    )
+
+
+async def _run_week_command(arguments, timeout=DEMO_STEP_TIMEOUT):
+    """Run the staged week CLI once; return (exit code, its last fixed code or None).
+
+    Its notes are redacted by the CLI but still discarded here: only a fixed
+    upper-case code from the final line reaches the API.
+    """
+    import subprocess
+    import sys
+
+    def run():
+        try:
+            completed = subprocess.run(
+                [sys.executable, "-m", "scripts.demo_week", *arguments],
+                cwd=REPO_ROOT,
+                stdin=subprocess.DEVNULL,
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+                errors="replace",
+                timeout=timeout,
+                check=False,
+            )
+        except subprocess.TimeoutExpired:
+            return 124, "DEMO_STEP_TIMEOUT"
+        lines = [line.strip() for line in completed.stdout.splitlines() if line.strip()]
+        last = lines[-1] if lines else ""
+        return completed.returncode, last if _CODE.fullmatch(last) else None
+
+    return await asyncio.to_thread(run)
+
+
+class DemoBar:
+    """Steps or restarts the staged mock week; one command at a time."""
+
+    def __init__(self, runtime, root, app_url, *, runner=_run_week_command, today=None):
+        if not demo_bar_allowed(runtime):
+            raise ValueError("The demo bar runs only in demo mode on the local mock")
+        self.runtime = runtime
+        self.base = Path(root)
+        self.app_url = app_url
+        self.runner = runner
+        self.today = today or (lambda: datetime.now(UTC).date())
+        self.task = None
+        self.action = None
+        self.last = None
+        # Earlier resets leave sibling roots behind; continue after the newest.
+        resets = [
+            int(path.name.rsplit("-", 1)[1])
+            for path in self.base.parent.glob(self.base.name + ".reset-*")
+            if path.name.rsplit("-", 1)[1].isdigit()
+        ]
+        self.generation = max(resets, default=0)
+
+    @property
+    def root(self):
+        if not self.generation:
+            return self.base
+        return self.base.with_name(f"{self.base.name}.reset-{self.generation}")
+
+    @property
+    def running(self):
+        return self.task is not None and not self.task.done()
+
+    def _checkpoint(self):
+        """The newest saved run under the current root: (date, steps, data)."""
+        runs = (
+            sorted(
+                path
+                for path in self.root.iterdir()
+                if path.is_dir() and re.fullmatch(r"\d{4}-\d{2}-\d{2}", path.name)
+            )
+            if self.root.is_dir()
+            else []
+        )
+        if not runs:
+            return None, {}, {}
+        try:
+            state = json.loads((runs[-1] / "state.json").read_text(encoding="utf-8"))
+            steps, data = state.get("steps", {}), state.get("data", {})
+            if not isinstance(steps, dict) or not isinstance(data, dict):
+                raise TypeError
+        except (OSError, ValueError, TypeError):
+            return runs[-1].name, {}, {}
+        return runs[-1].name, steps, data
+
+    def state(self):
+        _, saved, data = self._checkpoint()
+        done = [saved.get(name) == "SUCCEEDED" for name, _, _ in DEMO_STEPS]
+        step = sum(done)
+        stopped = [name for name, _, _ in DEMO_STEPS if saved.get(name) == "IN_PROGRESS"]
+        clock = data.get("mock_now") or data.get("monday")
+        upcoming = next(
+            (label for (_, label, _), finished in zip(DEMO_STEPS, done, strict=True) if not finished),
+            None,
+        )
+        mock = self.runtime.paypal.is_mock
+        return {
+            "scenario": "demo_week",
+            "step": step,
+            "total": len(DEMO_STEPS),
+            "complete": all(done),
+            "replaying": True,
+            "running": self.running,
+            "action": self.action if self.running else None,
+            "simulated": mock,
+            "simulation_label": "Simulated: mock PayPal" if mock else None,
+            "model": "scripted",
+            "staged_note": DEMO_STAGED_NOTE,
+            "clock": clock if isinstance(clock, str) and _time_text(clock) else None,
+            "steps": [
+                {
+                    "index": index,
+                    "name": name,
+                    "label": label,
+                    "staged": staged,
+                    "done": finished,
+                    "interrupted": name in stopped and not self.running,
+                }
+                for index, ((name, label, staged), finished) in enumerate(
+                    zip(DEMO_STEPS, done, strict=True), 1
+                )
+            ],
+            "next_label": upcoming,
+            "last_result": self.last,
+        }
+
+    async def _execute(self, action, arguments):
+        try:
+            code, last = await self.runner(arguments)
+        except Exception:  # noqa: BLE001 - subprocess failures stay a fixed code.
+            code, last = 1, None
+        ok = code == 0
+        if action == "reset" and ok:
+            self.generation += 1
+        self.last = {
+            "action": action,
+            "ok": ok,
+            "code": last or ("DEMO_" + action.upper() + ("_DONE" if ok else "_FAILED")),
+        }
+
+    def _common(self):
+        return ["--target", "mock", "--model", "scripted", "--app-url", self.app_url]
+
+    def start(self, action):
+        """Start one step or reset in the background; returns an error code or None."""
+        if not demo_bar_allowed(self.runtime):
+            return "DEMO_DISABLED"
+        if self.running:
+            return "DEMO_BUSY"
+        if action == "step":
+            date, _, _ = self._checkpoint()
+            if self.state()["complete"]:
+                return "DEMO_WEEK_COMPLETE"
+            arguments = [
+                *self._common(),
+                "--root", str(self.root),
+                "--date", date or self.today().isoformat(),
+                "--pause-after-step",
+            ]
+        else:
+            arguments = [*self._common(), "--root", str(self.root), "--reset-mock-week"]
+        self.action = action
+        self.task = asyncio.get_running_loop().create_task(self._execute(action, arguments))
+        return None
+
+    async def wait(self):
+        if self.task is not None:
+            await self.task
+
+
+def _time_text(value):
+    try:
+        return datetime.fromisoformat(value).utcoffset() is not None
+    except ValueError:
+        return False
+
+
+def configured_demo_bar(runtime):
+    """COUNTERSIGN_DEMO_ROOT/APP_URL enable the bar; live or sandbox never does."""
+    root = os.environ.get("COUNTERSIGN_DEMO_ROOT", "").strip()
+    app_url = os.environ.get("COUNTERSIGN_DEMO_APP_URL", "").strip()
+    if not root or not re.fullmatch(r"http://(127\.0\.0\.1|localhost):\d{1,5}", app_url):
+        return None
+    if not demo_bar_allowed(runtime):
+        return None
+    return DemoBar(runtime, root, app_url)
+
+
+def build_demo_router(bar: DemoBar):
+    """GET state, POST step, POST reset. Bodies are ignored; nothing is parameterised."""
+    result = APIRouter()
+
+    def refused():
+        return error(404, "NOT_FOUND", "Resource not found")
+
+    @result.get("/demo/state", name="demo_state")
+    async def demo_state():
+        if not demo_bar_allowed(bar.runtime):
+            return refused()
+        return bar.state()
+
+    async def begin(action):
+        if not demo_bar_allowed(bar.runtime):
+            return refused()
+        problem = bar.start(action)
+        if problem == "DEMO_DISABLED":
+            return refused()
+        if problem:
+            messages = {
+                "DEMO_BUSY": "A staged step is already running",
+                "DEMO_WEEK_COMPLETE": "The staged week is complete; reset to replay it",
+            }
+            return error(409, problem, messages[problem])
+        return JSONResponse(status_code=202, content=bar.state())
+
+    @result.post("/demo/step", name="demo_step")
+    async def demo_step():
+        return await begin("step")
+
+    @result.post("/demo/reset", name="demo_reset")
+    async def demo_reset():
+        return await begin("reset")
+
+    return result

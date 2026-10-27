@@ -27,6 +27,28 @@ from countersign.reconcile import Reconciler
 from countersign.worker import load_worker_settings, run_workers
 
 
+class RevalidatedStaticFiles(StaticFiles):
+    """Dashboard code is revalidated by ETag on every load (M17).
+
+    After a redeploy a browser must not combine a cached app.mjs with a newer
+    data.mjs. no-cache still allows a cheap 304; versioned vendor files keep the
+    default caching.
+    """
+
+    REVALIDATE = (".html", ".mjs", ".css", ".json")
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        # "/" arrives as "." and a 304 carries no content type, so check the path too.
+        page = path in {"", "."} or path.endswith("/")
+        if page or path.endswith(self.REVALIDATE):
+            response.headers["Cache-Control"] = "no-cache"
+        if path.endswith(".mjs") and response.status_code == 200:
+            # Some platforms' MIME tables lack .mjs; module scripts need a JS type.
+            response.headers["Content-Type"] = "text/javascript; charset=utf-8"
+        return response
+
+
 class _DashboardFixtures:
     """M15 is pending: financial documents stay fixtures; metadata reflects runtime."""
 
@@ -114,9 +136,15 @@ def create_app(
                 ),
                 prefix="/api/v1",
             )
+            # M17: present only in demo mode on the loopback mock, when configured.
+            demo_bar = dashboard.configured_demo_bar(runtime)
+            if demo_bar is not None:
+                app.include_router(dashboard.build_demo_router(demo_bar), prefix="/api/v1")
             if static_dir is not None:
                 # Mounted last so every API and webhook route above keeps priority.
-                app.mount("/", StaticFiles(directory=static_dir, html=True), name="web")
+                app.mount(
+                    "/", RevalidatedStaticFiles(directory=static_dir, html=True), name="web"
+                )
             app.openapi_schema = None
             stop = asyncio.Event()
             task = None
@@ -130,6 +158,8 @@ def create_app(
                 stop.set()
                 if task is not None:
                     await task
+                if demo_bar is not None and demo_bar.running:
+                    demo_bar.task.cancel()
                 app.router.routes[:] = original_routes
                 app.openapi_schema = None
 

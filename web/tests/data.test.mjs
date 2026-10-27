@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {filterIncidents, summary, money, atRisk, modeLabel, isStaged, loadWorkspace} from "../data.mjs";
+import {filterIncidents, summary, money, atRisk, modeLabel, isStaged, loadWorkspace, bannerText} from "../data.mjs";
 const incidents = JSON.parse(await readFile(new URL("../fixtures/incidents.json", import.meta.url))).items;
 const disputes = JSON.parse(await readFile(new URL("../fixtures/disputes.json", import.meta.url))).items;
 test("state and kind filters combine", () => {
@@ -38,4 +38,20 @@ test("an incident without an amount at risk renders a dash, not an error", () =>
   assert.equal(atRisk(undefined), "—");
   assert.equal(atRisk({minor: 6000, currency: "USD"}), "$60.00");
   assert.throws(() => atRisk({minor: 1.5, currency: "USD"}));
+});
+test("staged labels also follow incidents that name their dispute by PayPal ID", () => {
+  const goal = {kind:"RECONCILIATION", subject:{dispute_id:null, paypal_dispute_id:disputes[0].paypal_dispute_id}};
+  assert.equal(isStaged(goal, disputes), disputes[0].staged === true);
+  assert.equal(isStaged({subject:{paypal_dispute_id:"PP-D-OTHER"}}, disputes), false);
+  assert.equal(isStaged({subject:null}, disputes), false);
+});
+test("the simulation banner text comes only from the server and never appears in live mode", () => {
+  const demo = {mode:"demo", paypal_env:"mock", simulated:true, simulation_label:"Simulated: mock PayPal"};
+  const live = {mode:"live", paypal_env:"sandbox", simulated:false, simulation_label:null};
+  const replaying = {replaying:true, simulation_label:"Simulated: mock PayPal"};
+  assert.equal(bannerText(demo), "Simulated: mock PayPal");
+  assert.equal(bannerText(undefined, replaying), "Simulated: mock PayPal");
+  assert.equal(bannerText(live), "");
+  assert.equal(bannerText(live, replaying), "");
+  assert.equal(bannerText({...demo, simulation_label:null}), "");
 });

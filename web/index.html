@@ -13,6 +13,7 @@
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <div id="simulation" class="simulation" role="status" hidden></div>
+<section id="demo-bar" class="demo-bar" aria-label="Staged demo controls" hidden></section>
 <div class="layout">
 <aside class="sidebar">
 <a class="brand" href="./"><span class="brand-mark" aria-hidden="true">✓</span>CounterSign</a>
@@ -29,7 +30,7 @@
 <header class="topbar"><span>Operations <span class="slash">/</span> <span id="breadcrumb">Incident desk</span></span><span class="operator"><span aria-hidden="true">A</span> Marketplace owner</span></header>
 <div class="content">
 <div class="eyebrow"><span class="connection-dot"></span> YOUR MARKETPLACE, IN VIEW</div>
-<section class="intro" id="intro" aria-labelledby="title"><div><h1 id="title">A clear next step.<br>For every incident.</h1><p>Disputes, stuck payouts, and Friday’s run.<br class="desktop-break"> Connected in one place, checked before money moves.</p></div><div class="clock-card"><span class="small-label">WORKSPACE CLOCK · UTC</span><strong id="clock">—</strong><span id="source">Loading incident source</span></div></section>
+<section class="intro" id="intro" aria-labelledby="title"><div><h1 id="title">A clear next step.<br>For every incident.</h1><p>Disputes, stuck payouts, and Friday’s run.<br class="desktop-break"> Connected in one place, checked before money moves.</p></div><div class="clock-card"><span class="small-label" id="clock-label">WORKSPACE CLOCK · UTC</span><strong id="clock">—</strong><span id="source">Loading incident source</span></div></section>
 <section class="stats" id="incident-stats" aria-label="Incident overview">
 <div><span class="stat-icon" aria-hidden="true">▤</span><span>Open incidents<strong id="stat-open">—</strong></span><span class="stat-note">Across your marketplace</span></div>
 <div><span class="stat-icon amber" aria-hidden="true">◷</span><span>Needs your decision<strong id="stat-owner">—</strong></span><span class="stat-note">Exact approvals, once</span></div>
@@ -45,13 +46,13 @@
 </div>
 <p id="error" class="error" role="alert" hidden></p>
 <div id="grid" class="ag-theme-quartz" aria-label="Marketplace incidents"></div>
-<div class="table-footer"><span id="table-note">Loading…</span><span>Amounts in USD · sandbox examples</span></div>
+<div class="table-footer"><span id="table-note">Loading…</span><span id="amount-note">Amounts in USD</span></div>
 </section>
 <section class="detail" id="incident-detail" aria-labelledby="detail-title"><div><span class="small-label">SELECTED INCIDENT</span><h2 id="detail-title">Choose a row to inspect the decision</h2><p id="detail-text">The AI recommends. The shield checks. The owner approves payments and refunds.</p><a id="open-decision" class="secondary decision-link" href="#decision" hidden>Review decision →</a></div><span id="detail-verdict" class="badge" hidden></span></section>
 <section id="workspace-view" aria-labelledby="view-title" hidden>
 <div class="view-heading"><h1 id="view-title">Decision</h1><button id="view-refresh" class="secondary" type="button">↻ Refresh</button></div>
 <label id="view-picker" class="record-picker" hidden>Choose a record<select id="record-picker"></select></label>
-<p class="muted">Contract fixture preview. Owner decisions require the core approval service.</p>
+<p class="muted" id="view-source-note">Contract fixture preview. Owner decisions require the core approval service.</p>
 <p id="view-notice" class="view-notice" role="status" aria-live="polite" hidden></p>
 <div id="view-body" aria-live="polite"></div>
 </section>

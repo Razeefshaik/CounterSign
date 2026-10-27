@@ -16,8 +16,18 @@ export function money(value) {
 }
 // Reconciliation incidents carry no amount at risk; the grid shows a dash, not an error.
 export const atRisk = value => value == null ? "—" : money(value);
+// Some incidents name their dispute only by PayPal ID (staged goals, reconciliation).
 export function isStaged(row, disputes) {
-  return disputes.some(d => d.id === row.subject?.dispute_id && d.staged === true);
+  const subject = row?.subject || {};
+  return disputes.some(d => d.staged === true &&
+    ((subject.dispute_id && d.id === subject.dispute_id) ||
+     (subject.paypal_dispute_id && d.paypal_dispute_id === subject.paypal_dispute_id)));
+}
+// The persistent banner text comes only from the server's simulation_label (CONTRACTS 3).
+export function bannerText(meta, demo = null) {
+  if (meta?.mode === "live" || meta?.simulated === false) return "";
+  if (meta?.simulated === true && meta.simulation_label) return meta.simulation_label;
+  return demo?.replaying && demo.simulation_label ? demo.simulation_label : "";
 }
 export function modeLabel(meta) {
   if (meta.mode === "demo" && meta.paypal_env === "mock" && meta.simulated === true) return "Demo · mock PayPal";

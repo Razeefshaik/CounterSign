@@ -1355,6 +1355,108 @@ def load_mock_model_environment(env_file):
             os.environ.setdefault(name, value)
 
 
+FINAL_STEP = "following_week_pay_a"
+
+
+class DemoPaused(Exception):
+    """M17 demo bar: one new step succeeded; the checkpoint resumes at the next one."""
+
+
+def pause_after_new_step(store):
+    """Stop the mock week after each newly completed checkpoint step.
+
+    The stop happens only after the step's SUCCEEDED state is saved: exactly the
+    point a resumed run already handles. Nothing is skipped or replayed, and the
+    final step is never a pause, so the week still ends with its full checks.
+    """
+    run = store.step
+
+    async def step(name, callback):
+        done = store.state["steps"].get(name) == "SUCCEEDED"
+        await run(name, callback)
+        if not done and name != FINAL_STEP:
+            raise DemoPaused(name)
+
+    store.step = step
+    return store
+
+
+def _hold_week_lock(directory):
+    """Take a saved run's checkpoint lock, failing while another process holds it."""
+    handle = (directory / ".lock").open("a+b")
+    handle.seek(0)
+    if os.fstat(handle.fileno()).st_size == 0:
+        handle.write(b"0")
+        handle.flush()
+    handle.seek(0)
+    try:
+        if sys.platform == "win32":
+            import msvcrt
+
+            msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+        else:
+            import fcntl
+
+            fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except OSError:
+        handle.close()
+        raise SliceError("SLICE_ALREADY_RUNNING") from None
+    return handle
+
+
+def _refuse_mock_start():
+    raise SliceError("DEMO_MOCK_NOT_RUNNING")
+
+
+async def reset_cli(args):
+    """M17 demo bar: empty the disposable database and mock so the week starts again.
+
+    Mock target only: demo settings on the loopback mock and a `_demo`/`_test`
+    database. Every saved run under --root must be idle. The checkpoints stay on
+    disk as evidence; the caller continues with a new, empty --root. The mock
+    webhook registration is recreated and must keep the app's configured ID.
+    """
+    from urllib.parse import urlsplit
+
+    from psycopg import sql
+
+    from countersign.db import Database
+    from countersign.db.repositories import TABLES
+    from countersign.ledger import journal
+    from scripts.mock_rehearsal import prepare
+
+    require(args.target == "mock", "DEMO_RESET_MOCK_ONLY")
+    settings, _ = runtime_settings("mock", args.env_file)
+    require(settings.mode == "demo" and settings.paypal.is_mock, "DEMO_RESET_MOCK_ONLY")
+    port = urlsplit(local_app_url(args.app_url)).port
+    require(isinstance(port, int), "APP_URL_MUST_BE_LOOPBACK")
+    name = database_name_guard(settings.database_url)
+    root = Path(args.root)
+    locks = []
+    try:
+        if root.is_dir():
+            for directory in sorted(path for path in root.iterdir() if path.is_dir()):
+                locks.append(_hold_week_lock(directory))
+        async with Database(settings) as database, database.tx() as conn:
+            require(conn.info.dbname == name, "DEMO_DATABASE_REFUSED")
+            await journal.serialize_on(conn, "countersign:owner-decisions")
+            cursor = await conn.execute("SELECT current_schema() AS schema")
+            schema = (await cursor.fetchone())["schema"]
+            require(bool(schema) and schema not in {"pg_catalog", "information_schema"},
+                    "RESET_SCHEMA_REFUSED")
+            tables = sql.SQL(", ").join(sql.Identifier(schema, table) for table in TABLES)
+            # Same statement as Engine.reset: fixed tables, no CASCADE.
+            await conn.execute(sql.SQL("TRUNCATE TABLE {} RESTART IDENTITY").format(tables))
+        with httpx.Client(
+            base_url=settings.paypal.base_url, timeout=10, trust_env=False, follow_redirects=False
+        ) as client:
+            result = prepare(client, reset=True, app_port=port, start_mock=_refuse_mock_start)
+        require(result["webhook_id"] == settings.paypal.webhook_id, "DEMO_RESET_WEBHOOK_MISMATCH")
+    finally:
+        for lock in locks:
+            lock.close()
+
+
 async def serve_cli(args):
     import uvicorn
 
@@ -1451,6 +1553,9 @@ async def run_cli(args):
         },
         redactor=redactor,
     )
+    if args.pause_after_step:
+        require(args.target == "mock", "DEMO_PAUSE_MOCK_ONLY")
+        pause_after_new_step(store)
     try:
         identity = model_identity(model)
         store.record("DEMO_MODEL", **identity)
@@ -1676,13 +1781,27 @@ def main(argv=None):
     parser.add_argument("--poll-limit", type=int, default=120)
     parser.add_argument("--serve", action="store_true")
     parser.add_argument("--port", type=int, default=8000)
+    # M17 demo bar (mock target only): run one more step, or start the week again.
+    parser.add_argument("--pause-after-step", action="store_true")
+    parser.add_argument("--reset-mock-week", action="store_true")
     args = parser.parse_args(argv)
     try:
         require(1 <= args.port <= 65535, "INVALID_RECEIVER_PORT")
+        # Checked before any settings, database or PayPal connection is opened.
+        require(args.target == "mock" or not (args.reset_mock_week or args.pause_after_step),
+                "DEMO_BAR_MOCK_ONLY")
+        require(not (args.reset_mock_week and (args.serve or args.pause_after_step)),
+                "DEMO_OPTIONS_CONFLICT")
+        command = serve_cli if args.serve else reset_cli if args.reset_mock_week else run_cli
         with asyncio.Runner(
             loop_factory=asyncio.SelectorEventLoop if sys.platform == "win32" else None
         ) as runner:
-            runner.run(serve_cli(args) if args.serve else run_cli(args))
+            runner.run(command(args))
+        if args.reset_mock_week:
+            print("DEMO_RESET")
+    except DemoPaused as paused:
+        print("DEMO_PAUSED_AFTER_" + str(paused.args[0]).upper())
+        return 0
     except KeyboardInterrupt:
         print(
             "Demo interrupted; preserve the checkpoint and resume with the original settings and date."

@@ -115,6 +115,8 @@ export PAYPAL_WEBHOOK_ID
 
 # 3. App and dashboard. The factory refuses anything but demo mode on the mock.
 log "starting the app on port $PORT"
+# M17 demo bar: the app steps this same checkpoint (one week process at a time).
+export COUNTERSIGN_DEMO_ROOT="$STATE/week" COUNTERSIGN_DEMO_APP_URL="http://127.0.0.1:$PORT"
 uvicorn --factory countersign.main:create_hosted_app --host 0.0.0.0 --port "$PORT" \
   --no-access-log --log-level warning &
 APP_PID=$!
