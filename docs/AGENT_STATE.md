@@ -1,79 +1,87 @@
-# CounterSign agent state
+﻿# CounterSign agent state
 
-Updated: Oct 27, 2026. This is a concise working summary, not a replacement for
-AGENTS.md, CLAUDE.md, HANDOFF.md, DECISIONS.md, PLAN.md, CONTRACTS.md or TASKS.md.
-Read the required source documents and the relevant task notes before changes.
-Never put credentials, environment values, real emails or raw model text here.
-Context keeper: **Professor Pickle**. Update this file after every feature and
-before handoff; consult only the related future-note sections for the next task.
+Updated: Oct 27, 2026. This concise working summary does not replace AGENTS.md,
+CLAUDE.md, HANDOFF.md, DECISIONS.md, PLAN.md, CONTRACTS.md or TASKS.md. Read the
+required source documents and relevant future notes before changes. Context
+keeper: **Professor Pickle**. Never store secrets, environment values, real emails
+or raw model output here.
 
 ## Project
 
 CounterSign coordinates marketplace maker payouts and buyer disputes. The model
 reads and proposes; the deterministic shield and executor authorize and perform
-financial writes. PostgreSQL holds application state, reservations and the inbox.
-The local PayPal mock supports fault evaluation; mock and sandbox evidence must
-remain separate. Money is integer minor units, with decimal strings in API payloads.
+financial writes. PostgreSQL holds state, reservations and the inbox. Money is
+integer minor units. Mock and sandbox evidence must remain separate.
 
-## Current work
+## Current work: C31 payout-run approval refresh
 
-- Active task: prompt 07, repair M18's 80 model-disabled CounterSign error rows,
-  then rerun the same 48 scenarios x two systems x k=5 into a **new** results
-  folder. Preserve the existing experiment and report honest before/after scores.
-- Current branch: `mate/M18-eval-fix`, created from updated main `2e51d41`.
-  Future PRs must target **main**, never a task branch. No new PR yet.
-- M14, M18 and C26 are integrated into main in `0d47f64`. PR #11 is merged;
-  formerly stacked PRs [#12](https://github.com/Razeefshaik/CounterSign/pull/12)
-  and [#13](https://github.com/Razeefshaik/CounterSign/pull/13) were closed with
-  the exact comment `Merged into main in 0d47f64`. Old stack instructions are obsolete.
-- Code commit: `c24783a`. Only NO_PAYABLE_OBLIGATIONS, RUN_ALREADY_EXISTS and
-  SHIELD_BLOCKED planner refusals become blocked actions; unknown errors still fail.
-  The sole core change is `src/countersign/harness.py`: loopback mock OAuth expiry
-  uses the supplied mock clock. Sandbox's real monotonic clock is unchanged.
-- Eight group-B diagnostics found GET failures from expired mock tokens; the
-  legacy clock control reproduced nine HTTP 401s and EVALUATION_FAILED. After
-  the fix, all 16 former-error scenario regressions pass with error=None,
-  zero reconciliation-stage errors and no 401s. The eight long cases refresh
-  OAuth at least twice. Eighteen adapter and two clock-construction checks pass.
-  Persistent tick errors still fail; no blanket suppression was added.
-- All 480 corrected-run cells are complete on `c24783a`, persisted in `45272b0`
-  under `eval/results/2026-10-27-model-none-fixed/`. The old report is untouched;
-  all 48 scenario hashes, two systems and k=5 match exactly.
-- CounterSign: 80/240 pass (33.3%), 80 errors before; 115/240 pass (47.9%),
-  zero errors after (pass^5 23/48). rules_only remains 215/240 (89.6%), zero
-  errors. Both have zero measured four-invariant counts, model calls and tokens.
-  CounterSign's 25 model-disabled completion failures remain visible; this is
-  not real-model evidence or proof of safety.
-- Privacy, identity and 480 unique cells are checked. Ruff, three import contracts
-  and 39 web tests pass. Full pytest (`countersign-m18fix-full.log`) is still
-  running without reported failures so far; no new PR or full-suite claim yet.
-- Model-disabled triage/injection/deadline/cancellation gaps remain visible;
-  do not invent agent actions or change expected outcomes to improve scores.
-- Previous validation: M14 3,883 passed, M18 3,900 passed, C26 3,922 passed,
-  each with five legacy toolkit skips. These counts do not validate the new fix.
-  C26 mock dry-run completed five checks; actual sandbox/model runs are not part
-  of this task. Never read .env or call real model/PayPal APIs.
+- Branch: `razeef/c31-run-approval-refresh`, isolated worktree
+  `CounterSign-c31`, based on fresh `origin/main` `4a42bce` (merged M18 fix).
+  Commits: `5b10c13` migration/schema, `29e7186` service/harness/regressions/decisions,
+  `0b7cb62` contract 1.0.4 and owner-approved dashboard metadata alignment.
+  Downgrade fix commit: `2ac9015`. Final full-suite validation passed;
+  push is pending final verification. No PR or merge is requested.
+- Migration 0006 permits CANCELLED history plus one live run per week through a
+  partial unique index. `v_dash_runs` shows the live run instead of superseded
+  cancelled history, preserving view grants/detail. Downgrade refuses conflicting
+  historical duplicates without deleting records.
+- Pending payout-run owner requests last 24 hours; other requests retain their
+  existing 30-minute lifetime. After reconciliation, Engine tick refreshes stale
+  or expired NEEDS_OWNER run requests under the owner-decision lock: expire the
+  old proposal, release cash/allocations, cancel the run and replan the same week
+  in one transaction. Known no-payable/shield refusals preserve the release and
+  are audited. Approved and owner-rejected runs are untouched; manual planning
+  can reuse a cancelled week. Shield/executor rules and eval grading are unchanged.
+- CONTRACTS is 1.0.4 with the owner-authorized approve-409 refresh note and audit
+  wording. Dashboard metadata reports 1.0.4; its one-line mate-owned edit was
+  explicitly approved by the owner.
+- Focused validation: service/schema/refresh selection 47 passed;
+  executor/replacement/Engine selection 24 passed (overlapping selections; do not
+  add these counts). Ruff clean, three import contracts kept, 39 web tests pass.
+  `node --test web/tests` fails Node 24 directory resolution; the equivalent
+  invocation with explicit test files passes.
+- Five targeted model-disabled `run_one` probes on disposable migrated `_eval`
+  databases completed with no errors and zero measured four-invariant counts.
+  Before C31 all five failed and paid nobody. After C31:
 
-## Working rules for continuation
+  | Scenario | Result | Makers paid (USD) | Remaining completion gap |
+  | --- | --- | --- | --- |
+  | F_double_spend_overlapping_weeks | PASS | A 360, B 486 | None |
+  | F_double_spend_same_week_planned_twice | PASS | A 360, B 486 | None |
+  | F_double_spend_refund_and_run_pending | FAIL | A 360, B 486 | Expected no payments; missing refund/ACCEPT_CLAIM with model disabled |
+  | F_stale_approval_dispute_opened | FAIL | B 486 only | Missing required RESERVE_EARNINGS |
+  | F_stale_approval_partial_dispute | FAIL | A 360, B 486 | Missing required RESERVE_EARNINGS |
 
-Keep staged changes and commits scoped to the current task: future-task files
-may be untracked while parallel agents prepare them. Never use `git add .`.
-Before each PR, run required tests, Ruff and all three import contracts. Record
-exact checks, commit hashes, limitations and PR links here after completion.
-Next: finish full pytest, record its exact result, then push and open one PR into
-main with before/after results and the sole core change. No unrelated web edits.
-The context workflow and prior summaries are committed; refresh these notes at
-the next verified PR/feature boundary without assuming pending checks passed.
+- Corrected probe evidence is temporary `countersign-c31-before.json` and
+  `countersign-c31-after.json`; an earlier probe had a teardown error and is not
+  the reported evidence. No full 480-cell rerun was performed. Passing payout
+  behavior and zero invariant counts do not turn the three completion failures
+  into passes or provide real-model/sandbox evidence.
+- C25 real CLI mock run exited 0 with `python -m scripts.demo_week --target mock
+  --model scripted`, loopback TCP mock/receiver and a fresh migrated `_test` DB.
+  Database/ground-truth checks confirm Friday paid 108600 minor units, final
+  available 354.00 USD and B's reserve 5400 minor units. Successful payout item
+  amounts are 300, 300, 360 and 486 USD. Temporary CLI JSON/log evidence remains;
+  the disposable database was cleaned up.
+- Exact changed source/migration files: `src/countersign/approvals/service.py`,
+  `src/countersign/harness.py`, `src/countersign/api/dashboard.py` (version only),
+  `migrations/versions/0006_run_request_refresh.py`.
+- Final full pytest: **3981 passed, 5 skipped in 1428.88 seconds**, exit 0.
+  All 31 schema/new-migration checks also pass, including downgrade coverage.
+  Ruff clean, three import contracts kept (zero broken), all 39 web tests pass
+  with explicit file arguments. Final log/XML: temporary
+  `countersign-c31-full-final.log` and matching XML. PostgreSQL WAL settings were
+  restored to max 1024/min 80 MB after verification.
+- Pending: final documentation commit and branch push. The current interpreters
+  are the original
+  CounterSign worktree's `.venv/Scripts/python.exe` and
+  `.venv/toolkit/Scripts/python.exe`; earlier temporary/worktree paths were
+  superseded by owner cleanup. No real LLM/PayPal calls or `.env` reads.
 
-See [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md) only for the related task's
-details. Update this summary after each feature instead of carrying the whole
-conversation into subsequent work.
+## Continuation
 
-Final verification: full pytest **3,963 passed, five legacy toolkit skips**;
-Ruff clean, all three import contracts kept, all 39 web tests pass.
-All 480 corrected cells completed with zero errors. PR targets main.
-
-Completed prompt07: PR #14 (https://github.com/Razeefshaik/CounterSign/pull/14) is open and ready,
-base main; code c24783a, results45272b0, final validation b9d2a04.
-The earlier pending/progress notes above are historical; full validation passed.
-No merge performed. Next: owner review, then configured-model comparison.
+Preserve task boundaries and existing work; stage explicit files only. Commit
+messages are `C31: lowercase summary`, one line, without attribution. Push the
+task branch when verified; do not merge. Any PR targets main. Refresh this state
+with final exact results and commit references before handoff, and consult only
+the relevant C31 section of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).

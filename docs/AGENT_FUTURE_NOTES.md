@@ -34,6 +34,55 @@ Current fix branch is `mate/M18-eval-fix` from `2e51d41`.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C31 payout-run approval refresh
+
+Source: `prompts/codex/active/CODEX-PROMPT-C31-RUN-APPROVAL-REFRESH.md` in the
+parent PayPalDevPost folder. Branch `razeef/c31-run-approval-refresh` starts from
+`origin/main` `4a42bce`; commits use one-line `C31: lowercase summary` without
+attribution. Commits: `5b10c13` migration/schema, `29e7186` core implementation,
+`0b7cb62` contract 1.0.4 and owner-approved dashboard metadata, `2ac9015` downgrade
+fix. Final full pytest: 3981 passed, 5 skipped in 1428.88 seconds; Ruff clean,
+three import contracts kept and all 39 web tests pass. Branch push pending.
+
+Migration 0006 replaces week-wide uniqueness with a unique non-CANCELLED run per
+week. The dashboard run view must hide superseded cancelled history while keeping
+the live run and its original grants/detail behavior. Downgrade must refuse
+duplicate historical weeks without deleting records. Manual planning ignores
+cancelled runs; owner rejection never schedules an automatic replacement.
+In both frozen view definitions use only `p.params,p.created_at` in the proposals
+lateral subquery. `SELECT *` binds the version column added by 0003 and blocks a
+later downgrade through that migration. The first C31 full suite found this
+existing downgrade-test failure (1 failed, 3980 passed, 5 skipped). Fix commit
+`2ac9015` passes all schema/new-migration checks (31 passed in 18.88 seconds),
+including the failed existing test. The repeated full suite passes (3981 passed,
+5 skipped in 1428.88 seconds); this is the final full-suite evidence.
+
+Refresh uses the same owner-decision lock as approve/reject and one transaction:
+expire a stale/expired pending run proposal, release its PROPOSAL_CASH and current
+allocations, cancel the old run, then replan from fresh context. Known planner
+refusals use a savepoint so release/audit commit; unknown failures roll everything
+back. Engine tick refreshes after reconciliation and before commander/executor.
+Payout-run requests last 24 hours; other request lifetimes stay 30 minutes.
+
+Five targeted model-disabled probes no longer strand payout-run approvals:
+overlapping weeks and same-week-twice pass. Refund/run-pending still fails: it
+pays A360/B486 against expected no payments and lacks refund/ACCEPT_CLAIM; the two
+stale-approval scenarios pay the intended makers but lack RESERVE_EARNINGS.
+Keep these completion failures visible. Corrected temporary before/after JSON
+replaces an invalid earlier teardown probe. Do not rerun the 480-cell evaluation
+or change grading/scenarios; Aman owns the next full comparison.
+
+Verification requires explicit DB/toolkit settings and Windows SelectorEventLoop.
+The verified CLI `python -m scripts.demo_week --target mock --model scripted`
+exits 0: Friday pays 1086 USD once, following-week A360 leaves354 available,
+and B54 remains earmarked. It uses a loopback TCP mock/receiver and disposable
+migrated `_test` DB. Node 24 cannot resolve the test directory via
+`node --test web/tests`; explicit test-file arguments pass all 39 web tests.
+The current main/toolkit interpreters are in the original CounterSign worktree's
+`.venv/Scripts/python.exe` and `.venv/toolkit/Scripts/python.exe` after owner
+cleanup superseded earlier paths. Record final counts/push only after completion.
+No real model/PayPal calls and no `.env` reads.
+
 ## M14 fault library
 
 Source prompt: Downloads/AMAN-PROMPT-05-M14-M18-EVAL.md. Walkthrough:

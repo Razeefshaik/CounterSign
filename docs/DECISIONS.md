@@ -1,14 +1,5 @@
 # CounterSign: Decisions Log
 
-## Oct 27 C31 run approval refresh
-
-| Change | Source | Decision | Reason |
-| --- | --- | --- | --- |
-| Migration 0006 replaces payout_runs.week_start uniqueness with one non-CANCELLED run per week; dashboard run views hide cancelled history when a live replacement exists | Owner C31 prompt | Accept | Rejected or expired weeks must be manually plannable again without permitting two live runs, losing financial history or double-counting the dashboard |
-| Expired or hash/version-stale NEEDS_OWNER run requests become EXPIRED and release allocations/cash before replanning in one locked transaction; known no-payable/shield refusals retain the release and an audit code | Owner C31 prompt | Accept | A rolled-back approval refusal must not strand scheduled shares; new facts require a new owner approval, while owner rejections and APPROVED or later requests stay untouched |
-| Payout-run approval requests live for the named 24-hour RUN_REQUEST_LIFETIME; other owner requests retain 30 minutes and all hash/version/single-use/execution-time checks remain | Owner C31 prompt | Accept | A small-shop owner needs time to approve a weekly run; short expiry is not a substitute for current binding and the shield |
-| CONTRACTS 1.0.4 documents refresh after approve 409 and the RUN_REQUEST_REFRESHED audit kind | Owner C31 prompt; AGENTS contract version rule | Accept | Consumers must reload the replacement request rather than retry an old hash or assume a refused approval released its commitment |
-
 Project was called OnceGuard Money Ops until Oct 23, 2026; older rows keep the old name.
 
 Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23, 2026 is listed with the decision and a one line reason. Sources: GPT review, Gemini review, and the planning chat (Claude). "Verified" means checked against official PayPal documentation, not yet tested in our sandbox.
@@ -421,3 +412,12 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Engine-owned HTTP clients use the supplied virtual clock for OAuth expiry only against loopback mocks | M18 per-stage diagnostics; owner-authorized minimal core fix | Accept | Advancing mock time expired server tokens while wall-clock client caches stayed valid, causing repeated 401 failures across reconciliation stages |
 | Keep the original 480-cell report and rerun unchanged scenario hashes/systems/k into a new folder, with model-disabled failures visible | Owner prompt 07 | Accept | Before/after evidence must isolate the adapter/clock corrections without changing expected answers or claiming missing agent behavior succeeded |
 | Every new pull request targets main; previous stacked PRs12/13 were closed after their contents merged in0d47f64 | Aman direct instruction and prompt07 | Accept | Review branches must not remain open against deleted feature branches after integration |
+
+## Oct 27 C31 run approval refresh
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Migration 0006 replaces payout_runs.week_start uniqueness with one non-CANCELLED run per week; dashboard run views hide cancelled history when a live replacement exists | Owner C31 prompt | Accept | Rejected or expired weeks must be manually plannable again without permitting two live runs, losing financial history or double-counting the dashboard |
+| Expired or hash/version-stale NEEDS_OWNER run requests become EXPIRED and release allocations/cash before replanning in one locked transaction; known no-payable/shield refusals retain the release and an audit code | Owner C31 prompt | Accept | A rolled-back approval refusal must not strand scheduled shares; new facts require a new owner approval, while owner rejections and APPROVED or later requests stay untouched |
+| Payout-run approval requests live for the named 24-hour RUN_REQUEST_LIFETIME; other owner requests retain 30 minutes and all hash/version/single-use/execution-time checks remain | Owner C31 prompt | Accept | A small-shop owner needs time to approve a weekly run; short expiry is not a substitute for current binding and the shield |
+| CONTRACTS 1.0.4 documents refresh after approve 409 and the RUN_REQUEST_REFRESHED audit kind | Owner C31 prompt; AGENTS contract version rule | Accept | Consumers must reload the replacement request rather than retry an old hash or assume a refused approval released its commitment |
