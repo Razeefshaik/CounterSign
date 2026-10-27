@@ -37,6 +37,9 @@ certify safety. Request delay/timeout faults wait on mock time, so library lost
 responses use drop/reset/after-commit HTTP errors instead of blocking a tick.
 The new /_mock/payout-outcomes control is proposed for CONTRACTS section 5.7;
 do not edit CONTRACTS without owner approval.
+Completed M14 is PR #11; commits `4449c99`, `c2c4fca`, `fc65de0`. Validation:
+3,883 passed, five legacy optional-toolkit skips; Ruff and three import contracts
+pass. The 43/48 rules_only score is a benchmark result, not a failing test suite.
 
 ## M18 evaluation
 
@@ -55,6 +58,21 @@ The source fingerprint covers the benchmark, system adapters, core, mock and
 migrations plus relevant JSON fixtures; it excludes independent C26 preparation
 and result artifacts. A superseded pre-fingerprint run was stopped and archived
 outside the repository; only the final run should be committed as evidence.
+The final completed run evaluates source commit `e2f5687`; results are committed
+in `f9e8dfd`. The later unused-noqa cleanup was AST-verified non-behavioural;
+the result README preserves the actual source attribution. The early attempt
+had more than 123 completed cells; its task-owned database was removed and its
+checkpoint is archived outside the repository, never scored as the final run.
+The final fingerprinted run later stopped at 410 completed cells with the CLI's
+fixed generic error (no raw cause published). Its exact identity checkpoint
+accepted `--resume` and completed the remaining 70 cells, retaining all previous
+cells. The cause is unknown; do not describe this model-disabled stop as quota.
+Final 480-cell results: rules_only 215/240 pass (pass^5 43/48), zero errors,
+260 owner interruptions; CounterSign 80/240 pass (pass^5 16/48), 80
+EVALUATION_FAILED rows, 200 owner interruptions. Both have zero model calls,
+tokens and measured invariant counts. Error-row zeros are not safety evidence.
+M18 full pytest is still in progress; these benchmark numbers do not imply the
+test suite or feature handoff has completed.
 
 ## C26 sandbox preparation
 
@@ -74,6 +92,10 @@ Required cases: registered payout, unregistered cancel confirmed RETURNED,
 lost-response duplicate-link recovery, capture PENDING with maker-share reserve,
 and an actual SETTLEMENT/BLOCK proposal after settlement (not just duplicate-week
 RUN_ALREADY_EXISTS). Mock dry-run exercises the same integration path.
+The prepared CLI mock dry-run completed all five checks with ground mock; output
+is under `%TEMP%/countersign-c26-dry-run-20261027`. Twelve fake/real-Engine dry-run
+tests pass. Implementation remains uncommitted and scenario JSON is still held;
+do not report any real sandbox evaluation or completed C26 handoff yet.
 
 ## Hosting/dashboard follow-ups
 
