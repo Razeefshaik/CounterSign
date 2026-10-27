@@ -30,6 +30,7 @@ import httpx
 
 from countersign.harness import Engine, EngineError, EngineSettings
 from eval.systems.base import ActionRecord, OwnerRequest, SystemTrace, require_local
+from eval.systems.baseline_llm import _quota_exhausted
 
 
 class _MockTransport(httpx.AsyncBaseTransport):
@@ -89,7 +90,12 @@ class _MeasuredModel:
 
     async def complete(self, request):
         self._trace.llm_calls += 1
-        response = await self._original(request)
+        try:
+            response = await self._original(request)
+        except Exception as error:  # noqa: BLE001 -- preserve only the fixed quota code.
+            if _quota_exhausted(error):
+                self._trace.errors.append("MODEL_QUOTA_EXHAUSTED")
+            raise
         usage = getattr(self._model, "last_usage_metadata", None)
         if not isinstance(usage, dict) or any(
             type(usage.get(key)) is not int or usage[key] < 0
@@ -216,6 +222,8 @@ class CountersignSystem:
 
     async def _tick(self):
         result = await self._engine.tick()
+        if "MODEL_QUOTA_EXHAUSTED" in self.trace.errors:
+            raise RuntimeError("MODEL_QUOTA_EXHAUSTED")
         self._tick_error = bool(result["errors"])
         if result["errors"]:
             # Core reports transient/unknown operations here too. Keep them visible;
