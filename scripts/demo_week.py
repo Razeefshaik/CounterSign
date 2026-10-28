@@ -1720,8 +1720,10 @@ async def run_cli(args):
                     else {}
                 ),
             ) as http,
+            # Loopback mock controls only. A multi-day clock jump makes the mock
+            # deliver every due transition; on a 0.1 CPU host that exceeds 30 s.
             httpx.AsyncClient(
-                base_url=settings.paypal.base_url, trust_env=False, timeout=30
+                base_url=settings.paypal.base_url, trust_env=False, timeout=300
             ) as control,
             httpx.AsyncClient(
                 base_url=app_url,
