@@ -456,3 +456,4 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | --- | --- | --- | --- |
 | Host the demo on Render from `render.yaml` instead of Cloud Run | Owner, Oct 28 | Accept | Owner's choice; the same image passes the full hosted smoke at Render's Free (0.1 CPU) and Starter (0.5 CPU) sizes |
 | The demo CLI's loopback mock-control client waits 300 s instead of 30 s | Hosted smoke at 0.1 CPU | Accept | A multi-day mock clock jump exceeded 30 s on a 0.1 CPU host and stopped a step; setting the clock is absolute, and no PayPal, engine or shield timeout changed |
+| Add an Azure App Service (B1, Always On) host on branch `razeef/azure-deploy`; Render stays on `main` | Owner, Oct 28 | Accept | Azure for Students credits pay for a full vCPU that never sleeps; same image and demo-only guards, no PayPal or model keys |

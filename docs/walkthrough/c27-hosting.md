@@ -76,6 +76,25 @@ Why Cloud Run is the runner-up: it starts about ten times faster (1 vCPU) and it
 6. Optional: add an uptime pinger for `https://<service>.onrender.com/api/v1/meta` every 10 minutes during judging.
 7. Auto deploy is off. After later merges, use **Manual Deploy > Deploy latest commit**.
 
+## Owner steps (Azure App Service, branch `razeef/azure-deploy`)
+
+Added Oct 28 as an alternative to Render, paid from Azure for Students credits. Render stays on `main` and `razeef/render-deploy`.
+
+The same image runs on one Linux **B1** App Service (1 vCPU, 1.75 GB, about $13 a month from credits) with **Always On**, so it never sleeps. The image is built in Azure Container Registry (Basic) and pulled with the app's managed identity, so no registry password is stored.
+
+1. Open <https://portal.azure.com>, sign in to the student subscription, and start **Cloud Shell** (Bash).
+2. Run:
+   ```bash
+   git clone -b razeef/azure-deploy https://github.com/Razeefshaik/CounterSign.git
+   cd CounterSign
+   bash deploy/azure/deploy.sh
+   ```
+   If the subscription refuses the region, rerun with `LOCATION=centralindia` (or another allowed region) in front.
+3. The script prints `https://countersign-demo-<suffix>.azurewebsites.net`. The first boot takes about a minute after the build; watch it with the printed `az webapp log tail` command until `[hosted] dashboard ready`.
+4. Do **not** add PayPal or Google keys in **Configuration**. The script sets only `WEBSITES_PORT=8080`, `WEBSITES_ENABLE_APP_SERVICE_STORAGE=false` (a `/home` mount would hide the database template in `/home/app`), `WEBSITES_CONTAINER_START_TIME_LIMIT=600` and `COUNTERSIGN_HOSTED_SEED=none`.
+5. After later merges into the branch: `git pull` in Cloud Shell, then `bash deploy/azure/deploy.sh update`.
+6. To remove everything: `az group delete -n countersign-demo-rg`.
+
 ### Google Cloud Run (fallback)
 
 The same image runs unchanged. It has about 130 MB of memory in use once the week is played, after M15's bounded mock snapshots, and it is ready in about 12 s.
