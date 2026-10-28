@@ -1,6 +1,6 @@
 # C27: hosting the demo
 
-**Status:** M21 local image and public-HTTP smoke verified; not deployed. Cloud Run is the owner's selected host. The owner deploys using the command below; no cloud resources or credentials were used for these checks.
+**Status:** M21 local image and public-HTTP smoke verified; not deployed yet. **Render (free) is the owner's selected host as of Oct 28**, replacing the Oct 27 Cloud Run choice. The owner deploys with the Render steps below; no cloud resources or credentials were used for these checks.
 
 ## What gets hosted
 
@@ -30,7 +30,7 @@ Sources (all read Oct 27, 2026): [Render free](https://render.com/docs/free), [R
 
 ## Recommendation
 
-**The owner selected Google Cloud Run on Oct 27.** The original Render comparison below is retained as historical research, not the current deployment recommendation.
+**The owner selected Render on Oct 28** (it briefly chose Cloud Run on Oct 27). Cloud Run stays documented below as the fallback if Render's speed is unacceptable.
 
 Why Render:
 
@@ -65,8 +65,8 @@ Why Cloud Run is the runner-up: it starts about ten times faster (1 vCPU) and it
 
 ## Owner steps (Render)
 
-1. Approve and merge this branch to `main` (the deploy files are shared).
-2. Create a free account at https://render.com. Sign in with GitHub and give Render access to the CounterSign repository only.
+1. Deploy from `main`; it already holds `render.yaml`, the `Dockerfile` and the start script.
+2. Create a free account at <https://render.com>. Sign in with GitHub and give Render access to the CounterSign repository only.
 3. In the Render dashboard, choose **New > Blueprint**, select the repository and branch `main`, and confirm. Render reads `render.yaml` and creates `countersign-demo` on the **Free** plan.
 4. Environment variables. The Blueprint sets the only one:
    - `COUNTERSIGN_HOSTED_SEED` = `none` (default).
@@ -76,7 +76,7 @@ Why Cloud Run is the runner-up: it starts about ten times faster (1 vCPU) and it
 6. Optional: add an uptime pinger for `https://<service>.onrender.com/api/v1/meta` every 10 minutes during judging.
 7. Auto deploy is off. After later merges, use **Manual Deploy > Deploy latest commit**.
 
-### Google Cloud Run (the owner's choice, Oct 27)
+### Google Cloud Run (fallback)
 
 The same image runs unchanged. It has about 130 MB of memory in use once the week is played, after M15's bounded mock snapshots, and it is ready in about 12 s.
 
@@ -168,6 +168,20 @@ POST, refuses redirects, waits for each background command, and exits non-zero
 with a fixed diagnostic on a mismatch or timeout. It prints no response bodies
 or credentials. Existing `tests/unit/test_hosted.py` covers all three credential
 variables; M21 also verified the actual image's entrypoint with each fake value.
+
+## Render readiness measurements (Oct 28)
+
+Image built from `main` after C33, plus the mock-control timeout fix below. Both runs used `--memory=512m`, seed `none`, and the full `scripts/hosted_smoke.py` over HTTP.
+
+| Check | Render Free size (`--cpus=0.1`) | Render Starter size (`--cpus=0.5`) |
+| --- | --- | --- |
+| First 200 on `/api/v1/meta` | 89 to 121 s (Render adds about 1 min to wake after 15 idle minutes) | 14 s (Starter does not sleep) |
+| Full smoke: reset, 11 steps, playground | **PASS** in 710 s (40 to 125 s per step) | **PASS** in 118 s (about 11 s per step) |
+| Memory after the week | 134 MiB of 512 | 135 MiB of 512 |
+
+**Fix found at 0.1 CPU:** the demo CLI's loopback mock-control client had a 30 s read timeout. A multi-day clock jump makes the mock deliver every due transition, and at 0.1 CPU that took longer, so a step stopped with `DEMO_STOPPED_REVIEW_CHECKPOINT` (`httpx.ReadTimeout` on `/_mock/clock/set`; a second click resumed it). That client now waits 300 s. Setting the clock is absolute, so a retry was already safe. No PayPal, engine or shield timeout changed.
+
+**Choosing the plan.** Free works, but each demo-bar step takes about a minute and a cold visitor waits about 3 minutes. For the judging window, Starter (0.5 CPU, no sleep) makes every step feel quick; change `plan: free` to `plan: starter` in `render.yaml` or in the Render dashboard. Check Render's current price before switching.
 
 ## Cloud Run smoke and rollback
 

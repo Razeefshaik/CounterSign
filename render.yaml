@@ -13,7 +13,7 @@ services:
     healthCheckPath: /api/v1/meta
     autoDeployTrigger: off
     envVars:
-      # none: dashboard, API and mock only (fits 512 MB). week: also play the
-      # scripted demo week at boot; needs the mock snapshot fix (c27-hosting.md).
+      # none: visitors play the week with the demo bar. week: also play the
+      # scripted demo week at boot (M15 bounds mock memory; see c27-hosting.md).
       - key: COUNTERSIGN_HOSTED_SEED
         value: none

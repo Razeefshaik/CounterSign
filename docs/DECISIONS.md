@@ -449,3 +449,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | Run planning and replacement binding accept an identity-matched GET-confirmed FAILED latest attempt as well as RETURNED (stored state and raw GET status must agree); held, blocked, pending and mismatched items still never plan a resend | M21 diagnosis of F_onhold_then_failed_replace_once | Accept | Reconciliation already returns FAILED funds to available and the line to UNPAID, and CANCEL_BEFORE_REPLACE already allows FAILED; planning was the only gap, and every resend still needs a new exact owner approval and the execution recheck |
+
+## Oct 28 Render hosting
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Host the demo on Render from `render.yaml` instead of Cloud Run | Owner, Oct 28 | Accept | Owner's choice; the same image passes the full hosted smoke at Render's Free (0.1 CPU) and Starter (0.5 CPU) sizes |
+| The demo CLI's loopback mock-control client waits 300 s instead of 30 s | Hosted smoke at 0.1 CPU | Accept | A multi-day mock clock jump exceeded 30 s on a 0.1 CPU host and stopped a step; setting the clock is absolute, and no PayPal, engine or shield timeout changed |
