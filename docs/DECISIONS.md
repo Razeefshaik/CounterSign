@@ -457,3 +457,13 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Host the demo on Render from `render.yaml` instead of Cloud Run | Owner, Oct 28 | Accept | Owner's choice; the same image passes the full hosted smoke at Render's Free (0.1 CPU) and Starter (0.5 CPU) sizes |
 | The demo CLI's loopback mock-control client waits 300 s instead of 30 s | Hosted smoke at 0.1 CPU | Accept | A multi-day mock clock jump exceeded 30 s on a 0.1 CPU host and stopped a step; setting the clock is absolute, and no PayPal, engine or shield timeout changed |
 | Add an Azure App Service (B1, Always On) host on branch `razeef/azure-deploy`; Render stays on `main` | Owner, Oct 28 | Accept | Azure for Students credits pay for a full vCPU that never sleeps; same image and demo-only guards, no PayPal or model keys |
+
+## Oct 28 C37 command center
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| The dashboard opens on a command center: a money constellation (PayPal balance, the shield, makers, held-back vault) with a drill-down per maker and an explaining side panel | Owner, Oct 28 | Accept | Owner asked for a clearer, more visual dashboard inspired by a reference video; every figure still comes from the read-only dashboard API |
+| Dark control-room theme by default; light theme behind a top-bar toggle | Owner, Oct 28 | Accept | Matches the requested look; the choice is a per-browser convenience and the scene stays dark in both |
+| Ambient motion (particles, orbit rings, draw-in) replaces C32's "motion under 300 ms" rule on the command center | Owner, Oct 28 | Accept | Particles carry meaning (money sent, held, proposed, blocked); prefers-reduced-motion removes all of it and the scene renders as a still diagram |
+| Particles move only for money in flight or paid; a planned run is drawn dashed and labelled "scheduled" | C37 review | Accept | A run waiting for the owner's signature has not moved money, so showing it as moving would overstate what happened |
+| At phone width the sidebar stretches to the page instead of growing to its nav row; the record picker may shrink | C37 browser check | Accept | Both pushed the page wider than 390 px (1,179 px and 425 px) and forced horizontal scrolling |
