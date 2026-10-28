@@ -20,5 +20,13 @@ def test_generated_bundle_does_not_drift_from_sources(tmp_path):
     assert scores["rules_only"]["pass_5_scenarios"] == 43
     assert all(r["error_rows"] == 0 for r in scores.values())
     assert len(data["history"]) == 6 and data["real_model"] is None
+    targeted = data["targeted"]
+    assert targeted["implied_passing"] == 185 and targeted["runs"] == 240
+    assert targeted["measured"] is False
+    changed = [{c["scenario"]: (c["before"], c["after"]) for c in r["changed"]}
+               for r in targeted["reruns"]]
+    assert changed == [{"F_key_window_expired_lost_response": (0, 5),
+                        "F_key_window_expired_webhooks_dropped": (0, 5)},
+                       {"F_onhold_then_failed_replace_once": (0, 5)}]
     assert {"D6", "D8", "D9", "D11", "D12"} <= {r["id"] for r in data["sandbox_findings"]}
     assert bundle() == data

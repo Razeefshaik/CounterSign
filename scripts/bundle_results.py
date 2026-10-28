@@ -12,6 +12,42 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 RESULTS = "eval/results/2026-10-27-model-none-c31"
+# Targeted model-off reruns after RESULTS, applied in this order.
+RERUNS = ("eval/results/2026-10-27-m21-three-gaps", "eval/results/2026-10-27-c33-failed-replacement")
+
+
+def runs_of(folder):
+    return [json.loads(line) for line in (folder / "runs.jsonl").read_text(encoding="utf-8").splitlines()
+            if line.strip()]
+
+
+def per_scenario(rows):
+    passing = defaultdict(int)
+    for row in rows:
+        if row["system"] == "countersign":
+            passing[row["scenario_id"]] += row["passed"]
+    return passing
+
+
+def targeted(root):
+    """Overlay each rerun's CounterSign scenarios on the full run; the total is implied, not measured."""
+    full = runs_of(root / RESULTS)
+    current = per_scenario(full)
+    reruns = []
+    for source in RERUNS:
+        rows = runs_of(root / source)
+        if any(r["ground"] != "mock" or r["model"] != "none" for r in rows):
+            raise ValueError("RERUN_NOT_MODEL_OFF_MOCK")
+        after = per_scenario(rows)
+        changed = [{"scenario": s, "before": current[s], "after": n, "runs": 5}
+                   for s, n in sorted(after.items()) if n != current[s]]
+        current.update(after)
+        reruns.append({"source": source + "/README.md", "scenarios_rerun": len(after),
+                       "changed": changed})
+    return {"system": "countersign", "ground": "mock", "model": "none", "reruns": reruns,
+            "implied_passing": sum(current.values()),
+            "runs": sum(r["system"] == "countersign" for r in full), "measured": False,
+            "label": "Full run plus targeted reruns; the full evaluation was not rerun"}
 
 
 def scoreboard(folder):
@@ -98,6 +134,7 @@ def bundle(root=ROOT):
                 "label": "Model-disabled mock evaluation; not a real-model or sandbox run",
                 "scoreboard": scoreboard(folder)},
             "history": history((folder / "README.md").read_text(encoding="utf-8")),
+            "targeted": targeted(root),
             "real_model": configured or None,
             "sandbox_findings": sandbox_findings((root / "docs/SANDBOX_FINDINGS.md").read_text(encoding="utf-8")),
             "limitations": ["Mock and sandbox evidence are separate.",
