@@ -99,6 +99,47 @@
       "source": "eval/results/2026-10-27-model-none-c31/README.md"
     }
   ],
+  "targeted": {
+    "system": "countersign",
+    "ground": "mock",
+    "model": "none",
+    "reruns": [
+      {
+        "source": "eval/results/2026-10-27-m21-three-gaps/README.md",
+        "scenarios_rerun": 3,
+        "changed": [
+          {
+            "scenario": "F_key_window_expired_lost_response",
+            "before": 0,
+            "after": 5,
+            "runs": 5
+          },
+          {
+            "scenario": "F_key_window_expired_webhooks_dropped",
+            "before": 0,
+            "after": 5,
+            "runs": 5
+          }
+        ]
+      },
+      {
+        "source": "eval/results/2026-10-27-c33-failed-replacement/README.md",
+        "scenarios_rerun": 15,
+        "changed": [
+          {
+            "scenario": "F_onhold_then_failed_replace_once",
+            "before": 0,
+            "after": 5,
+            "runs": 5
+          }
+        ]
+      }
+    ],
+    "implied_passing": 185,
+    "runs": 240,
+    "measured": false,
+    "label": "Full run plus targeted reruns; the full evaluation was not rerun"
+  },
   "real_model": null,
   "sandbox_findings": [
     {
