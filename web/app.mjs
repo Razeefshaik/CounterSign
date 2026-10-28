@@ -21,8 +21,21 @@ function showBanner() {
   $("simulation").hidden = !text;
   $("simulation").textContent = text;
 }
+// C37: the control-room theme is dark by default; the choice is a per-browser convenience.
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  $("theme").setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
+}
+let theme = "dark";
+try {theme = localStorage.getItem("countersign-theme") === "light" ? "light" : "dark";} catch {}
+applyTheme(theme);
+$("theme").addEventListener("click", () => {
+  theme = theme === "dark" ? "light" : "dark";
+  applyTheme(theme);
+  try {localStorage.setItem("countersign-theme", theme);} catch {}
+});
 const demo = createDemoBar(document, {
-  onState: state => {demoState = state; showClock(); showBanner();},
+  onState: state => {demoState = state; document.body.classList.toggle("demo-running", Boolean(state?.running)); showClock(); showBanner();},
   onChange: () => refresh(),
 });
 // Every route starts at the top; #incidents also names a section, which would scroll.

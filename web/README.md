@@ -1,5 +1,22 @@
 # CounterSign dashboard
 
+## Oct 28 command center (C37)
+
+The dashboard now opens on **Command center** (`#overview`), a picture of the week's money:
+
+- **Money constellation** (`scene.mjs`, pure functions). PayPal's balance flows through the CounterSign shield to each maker. The AI agent and the owner feed into the shield, and a held-back vault collects disputed shares. The shield's ring has one tick per rule (16), coloured by the decision that matters now.
+- **Particles mean something.** Cyan: money in flight; teal: paid; amber: held back for a dispute; violet: agent proposals; red: blocked proposals bursting at the shield. A run waiting for the owner is dashed and labelled "scheduled", with no moving particles, because no money has moved.
+- **Drill-down.** Selecting a maker zooms into its records from `GET /money-graph?maker_id=`: category cards (orders, shares, PayPal payouts, disputes, holds) with drawn connectors, then a fan of records. Selecting a record explains its links in words. Esc steps back.
+- **Side panel.** It tells the week by default: the latest step, the owner's waiting signature, Friday's saved comparison (naive $1,500 against CounterSign $1,086 with $414 held) and the three safety moments, each shown only once recorded. Selecting the shield, agent, owner, PayPal balance or vault explains that node.
+- **Week rail and dock.** A vertical day timeline sits in the scene. The demo bar floats as a dock at the bottom of every page.
+- **Theme.** Dark by default, with a light toggle in the top bar (stored per browser). The scene stays dark in both.
+- **Motion.** Ambient motion replaces the C32 "under 300 ms" rule on this page only. `prefers-reduced-motion` removes particles, rotation, draw-in and count-up.
+- **Honesty.** Every number comes from the read-only API. A balance that has not been read shows "—", never $0. A graph not rooted at a maker is never attributed to it. Names and emails are escaped and masked.
+
+The artwork (spheres, halos, particles, icons) is original SVG and CSS. No third-party images, fonts beyond the existing Google Fonts families, or libraries were added. Screenshots are in `docs/media/command-center*.png`.
+
+Tests: `node --test web/tests/*.test.mjs` (54, including `scene.test.mjs`).
+
 ## Oct 27 redesign (C32)
 
 The dashboard was rebuilt for a first-time reader who has about a minute:

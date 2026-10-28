@@ -278,7 +278,8 @@ test("navigation ignores late data from the previous view", async () => {
   assert.match(doc.getElementById("view-body").innerHTML,/Execution history/);
   assert.ok(!doc.getElementById("view-body").innerHTML.includes("Funding formula"));
   assert.deepEqual(route("#runs/run-123"),{name:"runs",id:"run-123"});
-  assert.deepEqual(route("#unknown"),{name:"incidents",id:""});
+  assert.deepEqual(route("#unknown"),{name:"overview",id:""});
+  assert.deepEqual(route("#incidents"),{name:"incidents",id:""});
 });
 
 test("simulation banner sits outside all routed panels and navigation stays available on phones", async () => {

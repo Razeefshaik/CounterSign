@@ -4,10 +4,10 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="CounterSign: an AI agent proposes marketplace payouts and dispute actions; deterministic code countersigns before PayPal money moves.">
 <meta name="color-scheme" content="light dark">
-<title>CounterSign · Incident desk</title>
+<title>CounterSign · Command center</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23173a30'/%3E%3Cpath d='M9 15h9M9 25h9M21 20l4 4 7-9' fill='none' stroke='%23e8f3ec' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
 <script type="module" src="app.mjs"></script>
 </head>
@@ -31,6 +31,8 @@
 <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
 <symbol id="i-copy" viewBox="0 0 24 24"><rect width="13" height="13" x="8" y="8" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
 <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.6 18.8A1.5 1.5 0 0 0 5.9 21h12.2a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3M7 15h10"/></symbol>
+<symbol id="i-orbit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5a9.5 9.5 0 0 1 9.5 9.5M21.5 12a9.5 9.5 0 0 1-9.5 9.5M12 21.5A9.5 9.5 0 0 1 2.5 12M2.5 12A9.5 9.5 0 0 1 12 2.5" stroke-dasharray="3 3"/><circle cx="19" cy="5" r="1.6"/><circle cx="4.5" cy="17" r="1.6"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></symbol>
 <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></symbol>
 </svg>
 <a class="skip" href="#main">Skip to content</a>
@@ -41,7 +43,8 @@
 <a class="brand" href="./"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8"/><path d="M7 12h8M7 20h8M17.5 16l3.5 3.5 6-8"/></svg><span>CounterSign</span></a>
 <p class="tagline">AI proposes.<br>Code countersigns.</p>
 <nav aria-label="Workspace">
-<a href="#incidents" data-view="incidents" class="nav-current" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-desk"/></svg><span>Incident desk</span><span class="nav-count" id="nav-count">—</span></a>
+<a href="#overview" data-view="overview" class="nav-current" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-orbit"/></svg><span>Command center</span></a>
+<a href="#incidents" data-view="incidents"><svg class="icon" aria-hidden="true"><use href="#i-desk"/></svg><span>Incident desk</span><span class="nav-count" id="nav-count">—</span></a>
 <a href="#decision" data-view="decision"><svg class="icon" aria-hidden="true"><use href="#i-decision"/></svg><span>Decision</span><span class="nav-count owner" id="nav-owner" hidden></span></a>
 <a href="#runs" data-view="runs"><svg class="icon" aria-hidden="true"><use href="#i-runs"/></svg><span>Payout runs</span></a>
 <a href="#cash" data-view="cash"><svg class="icon" aria-hidden="true"><use href="#i-cash"/></svg><span>Cash</span></a>
@@ -53,7 +56,19 @@
 <div class="sidebar-bottom"><span class="mode-dot" aria-hidden="true"></span><span id="mode">Loading mode…</span></div>
 </aside>
 <main id="main" tabindex="-1">
-<header class="topbar"><nav class="crumbs" aria-label="Breadcrumb"><span>Operations</span><span class="slash" aria-hidden="true">/</span><span id="breadcrumb" aria-current="page">Incident desk</span></nav><span class="clock"><span id="clock-label">Workspace clock</span> <strong id="clock">—</strong></span></header>
+<header class="topbar"><nav class="crumbs" aria-label="Breadcrumb"><span>Operations</span><span class="slash" aria-hidden="true">/</span><span id="breadcrumb" aria-current="page">Command center</span></nav><span class="top-right"><span class="clock"><span id="clock-label">Workspace clock</span> <strong id="clock">—</strong></span><button type="button" id="theme" class="theme-toggle" aria-label="Switch to light theme" title="Switch theme"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg></button></span></header>
+<section id="command" class="command" aria-labelledby="command-title" hidden>
+<h1 id="command-title" class="sr-only">Command center</h1>
+<div class="scene" id="scene">
+<div class="scene-sky" aria-hidden="true"><i></i><i></i><i></i></div>
+<dl class="kpis" id="kpis"></dl>
+<div id="rail-slot" class="rail-slot"></div>
+<button type="button" id="scene-back" class="scene-back" hidden>← All money</button>
+<div id="stage" class="stage"></div>
+<p id="scene-caption" class="scene-caption" hidden></p>
+</div>
+<aside id="panel" class="glass-panel" aria-live="polite" aria-label="Explanation"></aside>
+</section>
 <div class="content">
 
 <section class="intro" id="intro" aria-labelledby="title"><h1 id="title">Incident desk</h1><p>Disputes, maker payouts and the decisions between them. The agent proposes, the shield checks every proposal before money moves, and payments and refunds wait for you.</p><p class="source-note" id="source">Loading incident source</p></section>

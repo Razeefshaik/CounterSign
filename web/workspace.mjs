@@ -3,12 +3,13 @@ import {decisionView, runView, auditView, cashView, graphView, esc, canDecide} f
 import {isStaged} from "./data.mjs";
 import {createReplay} from "./replay.mjs";
 import {createTrick} from "./trick.mjs";
+import {createCommand} from "./command.mjs";
 import {action as actionWord, state as stateWord, when} from "./words.mjs";
 
-const titles = {incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
+const titles = {overview: "Command center", incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
 export function route(hash) {
   const [name, id] = hash.replace(/^#/, "").split("/");
-  return {name: Object.hasOwn(titles, name) ? name : "incidents", id: id || ""};
+  return {name: Object.hasOwn(titles, name) ? name : "overview", id: id || ""};
 }
 
 export function createWorkspaceViews(document, location, fetcher = fetch) {
@@ -16,6 +17,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
   let workspace, client, serial = 0, proposal = null, busy = false;
   const replay = createReplay(document, fetcher);
   const trick = createTrick(document, fetcher);
+  const command = createCommand(document, fetcher);
   const notice = (message = "") => {$("view-notice").textContent = message; $("view-notice").hidden = !message;};
   const invalidate = () => {
     proposal = null;
@@ -33,8 +35,14 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
       if (active) anchor.setAttribute("aria-current", "page"); else anchor.removeAttribute("aria-current");
     }
     for (const id of ["intro", "incident-stats", "incidents", "incident-detail"]) $(id).hidden = current.name !== "incidents";
-    $("workspace-view").hidden = current.name === "incidents";
+    $("workspace-view").hidden = current.name === "incidents" || current.name === "overview";
+    if ($("command")) $("command").hidden = current.name !== "overview";
+    if (document.body) document.body.dataset.route = current.name;
     if (current.name === "incidents") return;
+    if (current.name === "overview") {
+      try {await command.show(workspace, client); return true;}
+      catch {if (ticket === serial) $("stage").innerHTML = '<p class="scene-loading">The constellation could not be loaded. Use Refresh.</p>'; return false;}
+    }
     $("view-title").textContent = titles[current.name];
     $("view-picker").hidden = true;
     $("view-body").innerHTML = '<p class="empty">Loading records…</p>';
