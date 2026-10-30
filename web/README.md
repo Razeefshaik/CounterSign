@@ -1,5 +1,9 @@
 # CounterSign dashboard
 
+## Oct 31 journey overview (C39, branch razeef/c39-glass-journey)
+
+Same theme and pieces as C38, arranged around the decision: a headline written from the model (`headline()`), the agent's latest request as a message, the available balance with "Review and sign" (links to the waiting decision), the week as a path of stops (display only), the makers as a stacked deck (click to reorder; "See details" opens the front maker in the map) and a pink sticker for money held back for disputes. Below: KPIs, Friday's comparison, the money map with its panel, the shield scan, activity and status bars.
+
 ## Oct 31 glass overview (C38, branch razeef/c38-glass-atrium)
 
 - **Theme.** Light glass by default: neutral ground, soft cornflower light behind blurred chrome, near-opaque cards. Folio blue `#2a56c9` is the primary; cornflower `#6b9fe4` supports it; pink `#ec4899` only marks what needs the owner. Dark remains a toggle.

@@ -476,3 +476,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The overview becomes a working screen: a noun title with one finding, a KPI strip split by hairlines, the map with its explanation panel, a shield scan, maker folios, status bars and an activity list | Owner, Oct 31 (UX principles from the taste, impeccable and Emil Kowalski skills) | Accept | One question first ("what needs me now"), evidence beside the answer, the main job one click away; the owner's brief wins where the skills ban glass and a blue primary |
 | The week progress on the overview is display only; the demo dock still runs steps | C38 design | Accept | The demo API only moves forward or restarts, so day buttons that jump would promise something the backend cannot do |
 
+## Oct 31 C39 journey overview (branch razeef/c39-glass-journey, built on C38)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| A second overview layout: a headline written from the figures ("You can pay $1,086 to 2 makers today."), the balance with the week as a path of stops, makers as a stacked deck of folio-blue cards, and a pink sticker for money held back | Owner, Oct 31 (reference: a payout-app advert the owner shared) | Accept | Owner asked for two branches to compare; this one leads with the decision and keeps the C38 theme, map, scan and panels below |
+| The deck reorders on click and "See details" opens the front maker in the money map; nothing on the hero moves money | C39 design | Accept | The owner's signature still happens on the decision view, bound to the payload hash |
+

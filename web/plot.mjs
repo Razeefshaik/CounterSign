@@ -220,3 +220,72 @@ export function progress(demo, weekDays) {
     return `<li class="${done ? "done" : current ? "current" : ""}"><span>${esc(day.name === "Following week" ? "Next week" : day.name)}</span><span class="ticks">${day.steps.map(s => `<i class="${s.done ? "done" : s === next ? "next" : ""}" title="${esc(s.label)}"></i>`).join("")}</span></li>`;
   }).join("")}</ol>`;
 }
+
+// --- C39 journey layout pieces ---
+
+// The headline answers "what can I do now" from the same model figures.
+export function headline(model) {
+  const lines = model.makers.filter(m => m.scheduled || m.inFlight).length;
+  if (model.empty) return "Your payout week starts here.";
+  if (model.totals.paying && model.owner.waiting.length) return `You can pay <em>${esc(short(model.totals.paying))}</em> to ${lines} maker${lines === 1 ? "" : "s"} today.`;
+  if (model.owner.waiting.length) return `One decision waits for <em>your signature</em>.`;
+  if (model.totals.paid) return `<em>${esc(short(model.totals.paid))}</em> reached your makers safely.`;
+  const owed = model.makers.reduce((s, m) => s + m.owed + m.held, 0);
+  return `<em>${esc(short(owed))}</em> is owed to ${model.makers.length} makers this week.`;
+}
+
+// The agent's latest request, phrased as a message to the owner.
+export function agentLine(model) {
+  const waiting = model.owner.waiting[0], latest = model.agent.list[0];
+  if (waiting) return `<b>AI agent:</b> ${waiting.action === "SCHEDULE_PAYOUT_RUN" && model.totals.paying ? `Can you sign this week's run of ${esc(short(model.totals.paying))}?` : `Can you approve: ${esc(actionWord(waiting.action).toLowerCase())}?`}`;
+  if (latest) return `<b>AI agent:</b> ${esc(actionWord(latest.action))}, ${esc(STAMP[verdictKind(latest)].toLowerCase())}${verdictKind(latest) === "stop" ? " by the shield" : ""}.`;
+  return "<b>AI agent:</b> nothing to propose yet.";
+}
+
+// The week as a path of stops; display only, the demo dock runs the steps.
+export function journey(demo, weekDays) {
+  if (!demo?.steps?.length) return "";
+  const next = demo.steps.find(s => !s.done);
+  return `<ol class="journey" aria-label="${esc(`Staged week: step ${demo.step} of ${demo.total}`)}">${weekDays(demo.steps).map(day => {
+    const done = day.steps.every(s => s.done), current = next && day.steps.includes(next);
+    return `<li class="${done ? "done" : current ? "current" : ""}"><i title="${esc(day.steps.map(s => s.label).join(" · "))}"></i><span>${esc(day.name === "Following week" ? "Next week" : day.name)}</span></li>`;
+  }).join("")}</ol>`;
+}
+
+const coins = seed => {
+  const spots = [[250, 70, 52, -28], [330, 168, 64, 18], [205, 222, 44, 40], [356, 290, 56, -12]];
+  return `<svg class="coins" viewBox="0 0 420 360" aria-hidden="true">${spots.map(([x, y, r, a], i) =>
+    `<g class="coin c${i}" transform="translate(${x} ${y}) rotate(${a + seed * 23}) scale(1 ${0.4 + (i % 3) * 0.14})"><ellipse class="edge" cy="${r1(r * 0.24)}" rx="${r}" ry="${r}"/><circle class="face" r="${r}"/><circle class="inner" r="${r1(r * 0.76)}"/></g>`).join("")}</svg>`;
+};
+
+// Makers as a stacked deck; the front card is the one that needs attention.
+export function deck(model, order = []) {
+  if (!model.makers.length) return `<div class="dcard front"><span class="tag">Waiting for orders</span><b class="title">No makers yet</b>${coins(0)}</div>`;
+  const ids = model.makers.map(m => m.id), byNeed = [...model.makers].sort((a, b) => (b.scheduled + b.inFlight + b.held) - (a.scheduled + a.inFlight + a.held)).map(m => m.id);
+  const seq = order.length === ids.length && order.every(id => ids.includes(id)) ? order : byNeed;
+  return seq.slice(0, 3).map((id, depth) => {
+    const m = model.makers.find(x => x.id === id), i = ids.indexOf(id);
+    const [tag, what] = m.inFlight ? [`${short(m.inFlight)} sending`, "Sent to PayPal, not confirmed yet"] : m.scheduled ? [`${short(m.scheduled)} waiting`, m.held ? `${short(m.held)} held for a dispute` : "Waiting for your signature"]
+      : m.held ? [`${short(m.held)} held`, "Held while a buyer's dispute is open"] : m.paid ? [`${short(m.paid)} paid`, "Paid through PayPal"] : [`${short(m.owed)} owed`, "Owed, not scheduled yet"];
+    return `<button type="button" class="dcard" data-depth="${depth}" data-maker="${esc(m.id)}" aria-label="${esc(`${m.name}: ${tag}. ${depth ? "Bring to front" : "Show next maker"}`)}"><span class="tag">${esc(tag)}</span>${coins(i + 1)}<b class="title">${esc(m.name)}</b><span class="what">${esc(what)}</span></button>`;
+  }).reverse().join("");
+}
+
+// The held-back sticker: money kept out of payouts while disputes are open.
+export function sticker(model) {
+  const held = model.held.total, open = model.held.makers.length;
+  const ring = held ? "HELD BACK · DISPUTES OPEN · HELD BACK · DISPUTES OPEN ·" : "ALL CLEAR · NOTHING HELD · ALL CLEAR · NOTHING HELD ·";
+  return `<svg viewBox="0 0 150 150" aria-hidden="true"><defs><path id="st-ring" d="M75 75m-58 0a58 58 0 1 1 116 0a58 58 0 1 1-116 0"/></defs><text><textPath href="#st-ring" textLength="360" lengthAdjust="spacing">${ring}</textPath></text><circle cx="75" cy="75" r="46"/></svg>
+    <span class="in"><b>${esc(short(held))}</b><small>${held ? `for ${open} open dispute${open === 1 ? "" : "s"}` : "all disputes settled"}</small></span>`;
+}
+
+// Friday's recorded comparison, outside the panel.
+export function compareBars(model) {
+  const c = model.comparison;
+  if (!c) return '<p class="empty-note">Recorded on Friday, when the run is planned.</p>';
+  const naive = c.naive?.payout?.minor ?? 0, ours = c.countersign?.total?.minor ?? 0, disputed = c.naive?.disputed_shares?.minor ?? 0, max = Math.max(naive, 1);
+  const w = v => r1(100 * v / max) + "%";
+  return `<div class="vs"><div class="vs-row"><span>Naive agent</span><span class="vs-track"><i class="naive" style="width:${w(naive - disputed)}"></i><i class="naive-held" style="width:${w(disputed)}"></i></span><b>${esc(short(naive))}</b></div>
+    <div class="vs-row"><span>CounterSign</span><span class="vs-track"><i class="ours" style="width:${w(ours)}"></i><i class="kept" style="width:${w(Math.max(0, naive - ours))}"></i></span><b>${esc(short(ours))}</b></div>
+    <p>The naive agent would also send ${esc(short(disputed))} of shares under dispute. CounterSign holds it back.</p></div>`;
+}

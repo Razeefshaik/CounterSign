@@ -1,7 +1,7 @@
 // C37 command center controller: loads the read-only dashboard API, draws the
 // money constellation and explains whatever the viewer selects. No writes.
 import {sceneModel, focusModel, focusSvg, defaultCategory, nodePanel, makerPanel, itemPanel, storyPanel, kpis, short} from "./scene.mjs";
-import {plotSvg, scanSvg, scanTally, folios, stands, activity, finding, progress, makerAt, PW, PH} from "./plot.mjs";
+import {plotSvg, scanSvg, scanTally, folios, stands, activity, finding, progress, makerAt, PW, PH, headline, agentLine, journey, deck, sticker, compareBars} from "./plot.mjs";
 import {weekDays} from "./words.mjs";
 import {esc} from "./views.mjs";
 
@@ -11,7 +11,7 @@ export function createCommand(document, fetcher = fetch) {
   const $ = id => document.getElementById(id);
   const view = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
   const motion = () => !view?.matches;
-  let data = null, model = null, previous = null, selected = "", focus = "", category = "", item = "", fm = null, shown = false, serial = 0;
+  let data = null, model = null, previous = null, selected = "", focus = "", category = "", item = "", fm = null, shown = false, serial = 0, order = [];
 
   async function json(url) {
     const response = await fetcher(url, {cache: "no-store"});
@@ -96,11 +96,25 @@ export function createCommand(document, fetcher = fetch) {
     fill("folios", folios(model, focus));
     fill("stands", stands(model));
     fill("activity", activity(model));
+    if (!$("deck")) return;
+    // Journey layout: headline, balance, deck and sticker.
+    $("command-title").innerHTML = headline(model);
+    fill("agent-line", agentLine(model));
+    fill("jr-balance", esc(model.paypal.available == null ? "—" : short(model.paypal.available)));
+    const waiting = model.owner.waiting[0], review = $("jr-review");
+    review.textContent = waiting ? "Review and sign" : "See decisions";
+    review.href = waiting ? "#decision/" + waiting.id : "#decision";
+    review.classList.toggle("quiet", !waiting);
+    if (order.length !== model.makers.length || !order.every(id => model.makers.some(m => m.id === id))) order = [];
+    fill("deck", deck(model, order));
+    if (!order.length) order = [...$("deck").querySelectorAll("[data-maker]")].reverse().map(b => b.dataset.maker);
+    fill("sticker", sticker(model));
+    fill("compare", compareBars(model));
   }
 
   function draw({entrance = false, swap = ""} = {}) {
     $("kpis").innerHTML = kpis(model);
-    $("rail-slot").innerHTML = progress(data.demo, weekDays);
+    $("rail-slot").innerHTML = $("rail-slot").dataset.kind === "journey" ? journey(data.demo, weekDays) : progress(data.demo, weekDays);
     pieces();
     stage({entrance, swap});
     panel();
@@ -146,6 +160,21 @@ export function createCommand(document, fetcher = fetch) {
       if ((event.key === "Enter" || event.key === " ") && activate(event.target)) event.preventDefault();
     };
     $("scene-back").onclick = closeFocus;
+    const deckEl = $("deck");
+    if (deckEl) deckEl.onclick = event => {
+      const id = event.target.closest?.("[data-maker]")?.dataset.maker;
+      if (!id) return;
+      // The front card steps back; a card behind comes to the front.
+      order = order[0] === id ? [...order.slice(1), id] : [id, ...order.filter(x => x !== id)];
+      fill("deck", deck(model, order));
+    };
+    const details = $("deck-details");
+    if (details) details.onclick = () => {
+      if (!order[0]) return;
+      focus = ""; fm = null;
+      openMaker("maker:" + order[0]);
+      $("stage").scrollIntoView({behavior: motion() ? "smooth" : "auto", block: "center"});
+    };
     const folioEl = $("folios");
     if (folioEl) folioEl.onclick = event => {
       const id = event.target.closest?.("[data-node]")?.dataset.node;
