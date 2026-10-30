@@ -57,36 +57,19 @@
 </aside>
 <main id="main" tabindex="-1">
 <header class="topbar"><nav class="crumbs" aria-label="Breadcrumb"><span>Operations</span><span class="slash" aria-hidden="true">/</span><span id="breadcrumb" aria-current="page">Command center</span></nav><span class="top-right"><span class="clock"><span id="clock-label">Workspace clock</span> <strong id="clock">—</strong></span><button type="button" id="theme" class="theme-toggle" aria-label="Switch to light theme" title="Switch theme"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg></button></span></header>
-<section id="command" class="command ov" aria-labelledby="command-title" hidden>
-<header class="ov-head"><div class="ov-title"><h1 id="command-title">This week</h1><p id="ov-finding" class="finding" aria-live="polite"></p></div><div id="rail-slot" class="rail-slot"></div></header>
-<dl class="kpis" id="kpis"></dl>
-<div class="ov-grid">
-<article class="ov-card ov-map" aria-labelledby="map-title">
-<header class="ov-card-head"><div><h2 id="map-title">Money map</h2><p>Node area follows the amount. Line width follows money moved.</p></div>
-<ul class="map-key" aria-label="Key"><li><i class="k-money"></i>Paid or sending</li><li><i class="k-ask"></i>Waiting for you</li><li><i class="k-held"></i>Held</li><li><i class="k-agent"></i>AI proposal</li><li><i class="k-stop"></i>Dispute or stopped</li></ul></header>
-<button type="button" id="scene-back" class="scene-back" hidden>← All money</button>
-<div id="stage" class="stage"></div>
-<p id="scene-caption" class="scene-caption" hidden></p>
-</article>
+<section id="command" class="command ov brief-overview" aria-labelledby="command-title" hidden>
+<header class="ov-head"><div class="ov-title"><h1 id="command-title">Ready for your decision</h1><p id="ov-finding" class="finding" aria-live="polite"></p></div><a class="brief-all" href="#decision">All decisions <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a></header>
+<div id="overview-notice" class="brief-error" role="alert" hidden></div>
+<div class="brief-layout">
+<article class="ov-card brief-main" id="decision-brief" aria-label="Next owner decision"><p class="empty-note">Loading the next decision...</p></article>
+<aside class="ov-card brief-evidence" id="decision-evidence" aria-label="Evidence for the decision"><h2>Why this amount?</h2><p class="empty-note">Loading the recorded checks...</p></aside>
+</div>
+<div class="brief-context-head"><h2>The context behind it</h2><div id="rail-slot" class="rail-slot"></div></div>
+<dl class="kpis" id="kpis" aria-label="Current marketplace position"></dl>
+<div class="ov-grid brief-context">
+<article class="ov-card ov-map" aria-labelledby="map-title"><header class="ov-card-head"><div><h2 id="map-title">Money map</h2><p>Open a maker to trace its records.</p></div><ul class="map-key" aria-label="Key"><li><i class="k-money"></i>Paid or sending</li><li><i class="k-ask"></i>Waiting for you</li><li><i class="k-held"></i>Held</li></ul></header><button type="button" id="scene-back" class="scene-back" hidden>&larr; All money</button><div id="stage" class="stage"></div><p id="scene-caption" class="scene-caption" hidden></p></article>
 <aside id="panel" class="ov-card ov-panel" aria-live="polite" aria-label="Explanation"></aside>
-<article class="ov-card ov-scan" aria-labelledby="scan-title">
-<header class="ov-card-head"><div><h2 id="scan-title">Shield scan</h2><p>Every AI proposal is checked before money moves.</p></div></header>
-<div class="scope"><div id="scan"></div><span class="sweep" aria-hidden="true"></span></div>
-<div id="scan-tally"></div>
-</article>
-<article class="ov-card ov-makers" aria-labelledby="makers-title">
-<header class="ov-card-head"><div><h2 id="makers-title">Makers</h2><p>Paid, waiting and held money are kept apart. Open a maker to see its records.</p></div></header>
-<div id="folios" class="folios"></div>
-</article>
-<article class="ov-card ov-stands" aria-labelledby="stands-title">
-<header class="ov-card-head"><div><h2 id="stands-title">Where the money stands</h2><p>Held money stays out of every payout until its dispute settles.</p></div></header>
-<div id="stands"></div>
-<ul class="map-key" aria-label="Key"><li><i class="k-money"></i>Paid</li><li><i class="k-ask"></i>Waiting</li><li><i class="k-held"></i>Held</li><li><i class="k-owed"></i>Owed</li></ul>
-</article>
-<article class="ov-card ov-activity" aria-labelledby="activity-title">
-<header class="ov-card-head"><div><h2 id="activity-title">Activity</h2><p>What the AI proposed, and what the shield said.</p></div></header>
-<div id="activity"></div>
-</article>
+<article class="ov-card brief-records" aria-labelledby="history-title"><header class="ov-card-head"><div><h2 id="history-title">Recent decisions</h2><p>Recorded state, separate from the shield verdict.</p></div><a href="#audit">Execution history</a></header><div id="decision-history"></div></article>
 </div>
 </section>
 <div class="content">
