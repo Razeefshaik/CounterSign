@@ -1,5 +1,38 @@
 # CounterSign dashboard
 
+## Oct 31 decision brief (C40, branch razeef/c40-glass-brief)
+
+An alternative overview built directly on C38. The pending weekly run is the
+focal point: its exact total, new recipients and returned-payout replacements,
+the parameters and hash, and the run's recorded excluded shares beside every
+supplied shield check. **Review exact proposal** opens the existing decision
+route; this overview adds no approve/reject logic or writes. Other pending
+actions show their exact parameters without inventing a payout total.
+
+`brief.mjs` contains pure renderers. `command.mjs` fetches the pending run by its
+explicit `run_id`, and handles failed maker/proposal reads with Retry rather than
+an empty successful screen. The map and recorded decisions are supporting
+context. C38's palette, routes, maker drill-down and demo dock are retained.
+Amounts never count up; keyboard selection and reduced motion skip transitions.
+Maker paid totals are explicitly labelled as covering 30 days.
+
+**Visual recipe.** A 7:5 decision/evidence grid (18px gap) puts the exact payload
+beside its proof, with the money map and history below. C38's near-opaque glass
+cards (18px corners), blue primary (`#2a56c9`), cornflower support (`#6b9fe4`)
+and pink owner attention (`#ec4899`) retain their theme tokens. IBM Plex Sans
+carries the 40px total and tabular amounts; IBM Plex Mono carries payloads and
+hashes. At 1180px the panes stack and checks use two columns; at 600px checks
+become one column and the review button fills its row. Narrow maps show a swipe
+cue. The backdrop stays still; 220/180ms maker zooms and a 200ms panel reveal
+explain selection, with keyboard and reduced-motion preferences skipping them.
+
+Checks: `node --check web/brief.mjs`, `node --check web/command.mjs`, and
+`node --test web/tests/*.test.mjs`. Browser checks use existing contract fixtures
+at 1440×900 and 390px. Docker on port 8180 was unavailable, so these are fixture
+checks, not a live staged-week or PayPal verification. The old maker fixture
+balances differ from the run fixture; run-specific holds and totals remain
+labelled separately from the current maker aggregates.
+
 ## Oct 31 glass overview (C38, branch razeef/c38-glass-atrium)
 
 - **Theme.** Light glass by default: neutral ground, soft cornflower light behind blurred chrome, near-opaque cards. Folio blue `#2a56c9` is the primary; cornflower `#6b9fe4` supports it; pink `#ec4899` only marks what needs the owner. Dark remains a toggle.

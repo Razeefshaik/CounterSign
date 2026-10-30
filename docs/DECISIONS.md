@@ -476,3 +476,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The overview becomes a working screen: a noun title with one finding, a KPI strip split by hairlines, the map with its explanation panel, a shield scan, maker folios, status bars and an activity list | Owner, Oct 31 (UX principles from the taste, impeccable and Emil Kowalski skills) | Accept | One question first ("what needs me now"), evidence beside the answer, the main job one click away; the owner's brief wins where the skills ban glass and a blue primary |
 | The week progress on the overview is display only; the demo dock still runs steps | C38 design | Accept | The demo API only moves forward or restarts, so day buttons that jump would promise something the backend cannot do |
 
+## Oct 31 C40 decision brief (branch razeef/c40-glass-brief)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Put the next pending run, its exact recipients/replacements, parameters and recorded holds beside all its shield results; link to the existing decision route | Owner C40 brief | Accept | The owner can review the exact proposal without duplicating approval logic or confusing total scheduled balances with this run |
+| Keep the C38 glass palette; use a two-pane decision sheet above supporting map/history, with exact still amounts, keyboard/reduced-motion selection and visible read failures | C40 design | Accept | Financial figures must remain exact and missing reads must not look like an empty successful marketplace |
+

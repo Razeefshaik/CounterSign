@@ -1153,6 +1153,8 @@ html{scrollbar-color:var(--line-strong) transparent}
 .brief-overview .stage.zoom-in>svg{animation-duration:220ms}
 .brief-overview .stage.zoom-out>svg{animation-duration:180ms}
 .brief-overview .panel-inner.reveal{animation-duration:200ms}
+.brief-overview .map-pan-hint{display:none;color:var(--ink-3);font-size:12px;margin:0 0 12px}
+@media(max-width:860px){.brief-overview .map-pan-hint{display:block}}
 body:has(.brief-overview)::before{animation:none;--glow-a:rgb(107 159 228 / .22);--glow-b:rgb(42 86 201 / .10);--glow-c:transparent}
 .brief-overview .stage.entering>svg,.brief-overview .p-node.changed .ring{animation:none}
 .brief-overview :is(a,button,summary):focus-visible{outline:2px solid var(--accent);outline-offset:3px}
