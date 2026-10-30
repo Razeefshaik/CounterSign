@@ -33,6 +33,8 @@
 <symbol id="i-flask" viewBox="0 0 24 24"><path d="M9 3h6M10 3v6.5L4.6 18.8A1.5 1.5 0 0 0 5.9 21h12.2a1.5 1.5 0 0 0 1.3-2.2L14 9.5V3M7 15h10"/></symbol>
 <symbol id="i-orbit" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5a9.5 9.5 0 0 1 9.5 9.5M21.5 12a9.5 9.5 0 0 1-9.5 9.5M12 21.5A9.5 9.5 0 0 1 2.5 12M2.5 12A9.5 9.5 0 0 1 12 2.5" stroke-dasharray="3 3"/><circle cx="19" cy="5" r="1.6"/><circle cx="4.5" cy="17" r="1.6"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1.2 1.2M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1.2-1.2"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 1.5h-15zM10 20.5a2 2 0 0 0 4 0"/></symbol>
 <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></symbol>
 </svg>
 <a class="skip" href="#main">Skip to content</a>
@@ -56,7 +58,7 @@
 <div class="sidebar-bottom"><span class="mode-dot" aria-hidden="true"></span><span id="mode">Loading mode…</span></div>
 </aside>
 <main id="main" tabindex="-1">
-<header class="topbar"><nav class="crumbs" aria-label="Breadcrumb"><span>Operations</span><span class="slash" aria-hidden="true">/</span><span id="breadcrumb" aria-current="page">Command center</span></nav><span class="top-right"><span class="clock"><span id="clock-label">Workspace clock</span> <strong id="clock">—</strong></span><button type="button" id="theme" class="theme-toggle" aria-label="Switch to light theme" title="Switch theme"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg></button></span></header>
+<header class="topbar"><nav class="crumbs" aria-label="Breadcrumb"><span class="top-brand">CounterSign</span><span class="slash" aria-hidden="true">/</span><span id="breadcrumb" aria-current="page">Command center</span></nav><span class="top-right"><a class="top-bell" href="#decision" aria-label="Decisions waiting for you"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg><b id="top-owner" hidden></b></a><span class="clock"><span id="clock-label">Workspace clock</span> <strong id="clock">—</strong></span><button type="button" id="theme" class="theme-toggle" aria-label="Switch to light theme" title="Switch theme"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg></button></span></header>
 <section id="command" class="command ov jr" aria-labelledby="command-title" hidden>
 <div class="jr-hero">
 <div class="jr-copy">
@@ -74,7 +76,7 @@
 <div class="jr-deck-wrap" aria-labelledby="makers-title">
 <h2 id="makers-title" class="sr-only">Makers</h2>
 <div id="deck" class="deck"></div>
-<button type="button" id="deck-details" class="deck-details"><svg class="icon" aria-hidden="true"><use href="#i-graph"/></svg>See details</button>
+<button type="button" id="deck-details" class="deck-details"><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>See details</button>
 <div id="sticker" class="sticker" role="img" aria-label="Money held back for disputes"></div>
 </div>
 <div class="jr-side">

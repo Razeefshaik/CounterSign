@@ -252,10 +252,19 @@ export function journey(demo, weekDays) {
   }).join("")}</ol>`;
 }
 
+// Frosted glass coins: a lit face, a thicker rim seen edge-on, an engraved ring and a
+// dollar mark. Far coins are smaller and softly blurred for depth.
 const coins = seed => {
-  const spots = [[250, 70, 52, -28], [330, 168, 64, 18], [205, 222, 44, 40], [356, 290, 56, -12]];
-  return `<svg class="coins" viewBox="0 0 420 360" aria-hidden="true">${spots.map(([x, y, r, a], i) =>
-    `<g class="coin c${i}" transform="translate(${x} ${y}) rotate(${a + seed * 23}) scale(1 ${0.4 + (i % 3) * 0.14})"><ellipse class="edge" cy="${r1(r * 0.24)}" rx="${r}" ry="${r}"/><circle class="face" r="${r}"/><circle class="inner" r="${r1(r * 0.76)}"/></g>`).join("")}</svg>`;
+  const spots = [[262, 64, 50, -28, 0], [336, 166, 66, 18, 0], [196, 214, 42, 40, 0], [360, 292, 58, -12, 1], [150, 96, 30, 60, 1]];
+  const g = `cg${seed}`;
+  return `<svg class="coins" viewBox="0 0 420 360" aria-hidden="true"><defs>
+    <radialGradient id="${g}f" cx="34%" cy="28%" r="78%"><stop offset="0" stop-color="#ffffff" stop-opacity=".96"/><stop offset=".38" stop-color="#e6effc" stop-opacity=".78"/><stop offset="1" stop-color="#8db2e6" stop-opacity=".42"/></radialGradient>
+    <linearGradient id="${g}e" x1="0" x2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".92"/><stop offset=".6" stop-color="#c3d7f3" stop-opacity=".7"/><stop offset="1" stop-color="#7fa6dc" stop-opacity=".55"/></linearGradient>
+    <filter id="${g}b"><feGaussianBlur stdDeviation="1.6"/></filter></defs>${spots.map(([x, y, r, a, far], i) =>
+    `<g class="coin c${i}"><g transform="translate(${x} ${y}) rotate(${a + seed * 23}) scale(1 ${0.38 + (i % 3) * 0.15})"${far ? ` filter="url(#${g}b)" opacity=".75"` : ""}>
+      <ellipse cy="${r1(r * 0.24)}" rx="${r}" ry="${r}" fill="url(#${g}e)"/><circle r="${r}" fill="url(#${g}f)" stroke="rgba(255,255,255,.9)" stroke-width="1.6"/>
+      <circle r="${r1(r * 0.78)}" fill="none" stroke="rgba(110,150,210,.35)" stroke-width="1.3"/>
+      <text y="${r1(r * 0.19)}" text-anchor="middle" font-size="${r1(r * 0.56)}" font-weight="800" fill="rgba(90,130,195,.5)">$</text></g></g>`).join("")}</svg>`;
 };
 
 // Makers as a stacked deck; the front card is the one that needs attention.

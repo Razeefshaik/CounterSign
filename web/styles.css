@@ -1183,3 +1183,95 @@ html{scrollbar-color:var(--line-strong) transparent}
   .deck-details{height:48px;font-size:16px}
 }
 @media (prefers-reduced-motion:reduce){.coin,.sticker svg,.vs-track i{animation:none!important}.dcard{transition:none}}
+
+/* ---------------------------------------------------------------------------
+   C39 polish: the owner's reference. A light grey glass room, two blues
+   (cornflower #6b9fe4 from the reference for cards, buttons and orbs; folio
+   blue #2a56c9 for data and navigation), pink only as a highlight, and the
+   floating glass chrome: an icon rail on the left and a pill header on top.
+   ------------------------------------------------------------------------- */
+:root,:root[data-theme="light"]{
+  --ground:#ecebe8;--sunken:#f3f3f1;--page:var(--ground);
+  --blue-2:#6b9fe4;--blue-2-deep:#4f86d6;--blue-2-soft:#e3edfb;--navy:#1d3557;
+  --glass:rgba(255,255,255,.5);--glass-strong:rgba(255,255,255,.72);--card:rgba(255,255,255,.8);
+  --glow-a:rgb(107 159 228 / .3);--glow-b:rgb(42 86 201 / .12);--glow-c:rgb(255 255 255 / .7);
+}
+:root[data-theme="dark"]{--blue-2:#7fb0f0;--blue-2-deep:#6b9fe4;--blue-2-soft:rgba(107,159,228,.14);--navy:#2a4a78}
+body::before{background:radial-gradient(40vmax 30vmax at 16% 10%,var(--glow-c),transparent 70%),radial-gradient(36vmax 30vmax at 84% 18%,var(--glow-a),transparent 72%),
+  radial-gradient(34vmax 30vmax at 70% 92%,var(--glow-b),transparent 70%),radial-gradient(30vmax 26vmax at 12% 84%,var(--glow-a),transparent 72%);filter:blur(40px)}
+
+/* Floating glass chrome on desktop */
+@media (min-width:861px){
+  .layout,body[data-route="overview"] .layout{grid-template-columns:96px minmax(0,1fr)}
+  .sidebar,body[data-route="overview"] .sidebar,:root[data-theme="light"] .sidebar{position:fixed;z-index:40;left:16px;top:50%;transform:translateY(-50%);width:60px;height:auto;align-items:center;gap:6px;padding:12px 0;overflow:visible;
+    border-radius:30px;background:var(--glass);backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);box-shadow:inset 0 1px 0 rgb(255 255 255 / .7),0 0 0 1px rgb(255 255 255 / .45),0 18px 40px -24px rgb(20 35 60 / .45)}
+  body[data-route="overview"] .sidebar:hover,body[data-route="overview"] .sidebar:focus-within{width:60px;box-shadow:inset 0 1px 0 rgb(255 255 255 / .7),0 0 0 1px rgb(255 255 255 / .45),0 18px 40px -24px rgb(20 35 60 / .45)}
+  .sidebar .brand{padding:2px;justify-content:center}
+  .sidebar .brand span,.sidebar .tagline,.sidebar-bottom #mode{display:none}
+  .sidebar nav{gap:4px;align-items:center}
+  .sidebar nav a,body[data-route="overview"] .sidebar nav a{position:relative;width:40px;min-height:40px;padding:0;justify-content:center;border-radius:50%;color:var(--ink-2)}
+  .sidebar nav a span:nth-child(2),body[data-route="overview"] .sidebar nav a span{position:absolute;left:52px;top:50%;transform:translate(-4px,-50%);flex:none;padding:6px 10px;border-radius:9px;background:var(--ink);color:var(--surface);font-size:12.5px;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 140ms ease,transform 160ms var(--ease-out)}
+  .sidebar nav a:is(:hover,:focus-visible) span:nth-child(2){opacity:1;transform:translate(0,-50%);transition-delay:60ms}
+  .sidebar nav a .nav-count,body[data-route="overview"] .sidebar nav a .nav-count{position:absolute;top:2px;right:0;min-width:16px;height:16px;padding:0 4px;border-radius:8px;font-size:10px;line-height:16px;text-align:center;opacity:1;background:var(--surface);box-shadow:0 0 0 1px var(--line)}
+  .sidebar nav a .nav-count.owner{background:var(--highlight);color:#fff;box-shadow:none}
+  .sidebar nav a.nav-current,:root[data-theme="light"] .sidebar nav a.nav-current{background:var(--surface);color:var(--accent);box-shadow:0 6px 14px -8px rgb(20 35 60 / .5)}
+  .sidebar-bottom{padding:6px 0 2px;justify-content:center}
+  .topbar{position:sticky;top:12px;z-index:30;margin:12px 24px 8px 0;min-height:58px;padding:0 10px 0 22px;border-radius:999px;background:var(--glass);backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);
+    box-shadow:inset 0 1px 0 rgb(255 255 255 / .7),0 0 0 1px rgb(255 255 255 / .45),0 14px 34px -24px rgb(20 35 60 / .45)}
+  .demo-bar,body[data-route="overview"] .demo-bar{left:96px;border-radius:24px;background:var(--glass-strong)}
+}
+.simulation{min-height:28px;padding:4px 16px;font-size:12.5px}
+.top-brand{font-weight:700;color:var(--ink);letter-spacing:-0.01em}
+.top-right{gap:10px}
+.top-bell{position:relative;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:0 6px 14px -8px rgb(20 35 60 / .5)}
+.top-bell .icon{width:18px;height:18px}
+.top-bell b{position:absolute;top:4px;right:4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--highlight);color:#fff;font-size:10px;line-height:16px;text-align:center}
+.theme-toggle{border-radius:50%;width:40px;height:40px;background:var(--surface);box-shadow:0 6px 14px -8px rgb(20 35 60 / .5)}
+
+/* Journey in the reference's language */
+.jr-headline{color:#2b2c30}
+.jr-headline em{color:var(--blue-2)}
+.agent-line::before{background:radial-gradient(circle at 35% 30%,#fff,#b9a6ff 40%,#6a52f0)}
+.jr-balance{background:#f4f3f1;border-radius:36px;box-shadow:0 40px 80px -42px rgb(20 35 60 / .45),inset 0 0 0 1px rgb(255 255 255 / .9),0 0 0 10px var(--glass)}
+:root[data-theme="dark"] .jr-balance{background:var(--card)}
+.jr-balance h2{color:#2b2c30}
+.jr-amount{font-size:52px;letter-spacing:-0.045em;color:#1c1d21}
+:root[data-theme="dark"] .jr-amount,:root[data-theme="dark"] .jr-headline,:root[data-theme="dark"] .jr-balance h2{color:var(--ink)}
+.pill-button,.pill-button.quiet{background:var(--blue-2);color:#fff;box-shadow:0 12px 24px -12px rgb(79 134 214 / .9),inset 0 1px 0 rgb(255 255 255 / .45)}
+@media (hover:hover) and (pointer:fine){.pill-button:hover{background:var(--blue-2-deep)}}
+.journey li::before{height:3px;top:17px;background:#dcdcd9}
+.journey li.done::before,.journey li.current::before{background:var(--blue-2)}
+.journey i,.journey li.done i,.journey li.current i{width:38px;height:38px;border-radius:50%;opacity:.6;
+  background:radial-gradient(circle at 34% 28%,#fff 0 8%,#e3eaf4 22%,#b9cbe3 55%,#8ea7c9 100%);box-shadow:inset 0 -4px 8px rgb(30 60 110 / .22),0 6px 12px -6px rgb(20 35 60 / .45)}
+.journey li.done i,.journey li.current i{opacity:1;background:radial-gradient(circle at 34% 28%,#fff 0 8%,#cfe2fb 20%,var(--blue-2) 55%,#24467a 100%)}
+.journey li.current i{transform:scale(1.14);box-shadow:0 0 0 5px rgb(236 72 153 / .25),inset 0 -4px 8px rgb(10 30 70 / .3),0 10px 18px -8px rgb(36 70 122 / .7)}
+.journey li::before{top:19px}
+.dcard{background:radial-gradient(120% 90% at 70% 10%,#9cc0ef 0%,transparent 55%),linear-gradient(160deg,#7aa8e8 0%,var(--blue-2) 45%,var(--blue-2-deep) 100%);box-shadow:0 30px 60px -30px rgb(30 60 120 / .6),inset 0 1px 0 rgb(255 255 255 / .35)}
+.dcard[data-depth="1"]{filter:saturate(.75) brightness(.93)}
+.dcard[data-depth="2"]{filter:saturate(.55) brightness(.87)}
+.dcard .tag{background:rgb(255 255 255 / .22);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.dcard .title{font-size:48px;letter-spacing:-0.045em;text-shadow:0 2px 20px rgb(20 40 90 / .25)}
+.coin{animation:c39-bob 7s ease-in-out infinite alternate}
+.deck-details{border-radius:22px;height:62px;font-size:23px;letter-spacing:-0.03em;box-shadow:0 22px 40px -22px rgb(20 35 60 / .6)}
+.deck-details .icon{width:28px;height:28px;color:#3b82e8;stroke-width:2.2}
+.sticker{background:var(--navy);box-shadow:0 18px 40px -16px rgb(10 25 50 / .7)}
+.sticker.clear{background:var(--accent)}
+.jr .kpi.paying{--c:var(--highlight)}
+@media (max-width:860px){
+  .topbar{margin:8px 12px;border-radius:22px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  .sidebar{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+  .jr-amount{font-size:38px}
+  .dcard .title{font-size:34px}
+  .deck-details{height:50px;font-size:18px}
+}
+@media (min-width:861px){
+  .layout>main{grid-column:2}
+  body[data-route] .layout .sidebar nav a span:nth-child(2){opacity:0}
+  body[data-route] .layout .sidebar nav a:is(:hover,:focus-visible) span:nth-child(2){opacity:1}
+  body[data-route] .layout .sidebar .brand span{display:none}
+}
+.jr .pill-button,:root[data-theme="light"] .jr .pill-button{background:var(--blue-2);color:#fff;box-shadow:0 12px 24px -12px rgb(79 134 214 / .9),inset 0 1px 0 rgb(255 255 255 / .45)}
+@media (hover:hover) and (pointer:fine){:root .jr .pill-button:hover{background:var(--blue-2-deep)}}
+@media (min-width:861px){body .demo-bar~.layout .sidebar,body .layout .sidebar{top:50%;height:auto;max-height:calc(100vh - 40px)}}
+@media (min-width:861px){body .demo-bar:not([hidden])~.layout .sidebar{top:50%}}
+@media (min-width:861px){body .layout .sidebar nav a .nav-count:not(.owner){display:none}}

@@ -89,6 +89,7 @@ async function overview(client) {
   $("stat-owner").textContent = stats.owner;
   $("stat-owner").classList.toggle("owner-waiting", stats.owner > 0);
   $("nav-owner").hidden = !stats.owner; $("nav-owner").textContent = stats.owner;
+  const bell = $("top-owner"); if (bell) {bell.hidden = !stats.owner; bell.textContent = stats.owner;}
   $("stat-held").textContent = cash?.earmarks_not_subtracted?.dispute ? money(cash.earmarks_not_subtracted.dispute) : "—";
   $("stat-cash").textContent = cash?.unreserved ? money(cash.unreserved) : "—";
   const waiting = proposals?.find(p => p.state === "NEEDS_OWNER");
