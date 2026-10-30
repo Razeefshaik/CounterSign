@@ -466,3 +466,13 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Ambient motion (particles, orbit rings, draw-in) replaces C32's "motion under 300 ms" rule on the command center | Owner, Oct 28 | Accept | Particles carry meaning (money sent, held, proposed, blocked); prefers-reduced-motion removes all of it and the scene renders as a still diagram |
 | Particles move only for money in flight or paid; a planned run is drawn dashed and labelled "scheduled" | C37 review | Accept | A run waiting for the owner's signature has not moved money, so showing it as moving would overstate what happened |
 | At phone width the sidebar stretches to the page instead of growing to its nav row; the record picker may shrink | C37 browser check | Accept | Both pushed the page wider than 390 px (1,179 px and 425 px) and forced horizontal scrolling |
+
+## Oct 31 C38 glass theme and overview (branch razeef/c38-glass-atrium)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Light glass theme by default: a neutral ground with soft cornflower light behind blurred chrome; folio blue (#2a56c9) is the primary, cornflower (#6b9fe4) only supports it, pink (#ec4899) marks only what needs the owner; dark stays a toggle | Owner, Oct 31 | Accept | Owner chose the folio blue and the transparent glass look over the C37 dark gold scene; cards stay near-opaque so figures read |
+| The money map is a network plot (flat nodes, area follows the amount, line width follows money moved, arrows for direction, a dot grid) instead of glowing spheres | Owner, Oct 31 | Accept | Owner found the C37 constellation cartoon-like; the plot encodes amounts honestly and keeps the C37 rule that only paid or in-flight money moves |
+| The overview becomes a working screen: a noun title with one finding, a KPI strip split by hairlines, the map with its explanation panel, a shield scan, maker folios, status bars and an activity list | Owner, Oct 31 (UX principles from the taste, impeccable and Emil Kowalski skills) | Accept | One question first ("what needs me now"), evidence beside the answer, the main job one click away; the owner's brief wins where the skills ban glass and a blue primary |
+| The week progress on the overview is display only; the demo dock still runs steps | C38 design | Accept | The demo API only moves forward or restarts, so day buttons that jump would promise something the backend cannot do |
+

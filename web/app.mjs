@@ -21,13 +21,13 @@ function showBanner() {
   $("simulation").hidden = !text;
   $("simulation").textContent = text;
 }
-// C37: the control-room theme is dark by default; the choice is a per-browser convenience.
+// C38: the glass theme is light by default; dark stays a per-browser convenience.
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   $("theme").setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
 }
-let theme = "dark";
-try {theme = localStorage.getItem("countersign-theme") === "light" ? "light" : "dark";} catch {}
+let theme = "light";
+try {theme = localStorage.getItem("countersign-theme") === "dark" ? "dark" : "light";} catch {}
 applyTheme(theme);
 $("theme").addEventListener("click", () => {
   theme = theme === "dark" ? "light" : "dark";

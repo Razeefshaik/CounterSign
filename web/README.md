@@ -1,5 +1,14 @@
 # CounterSign dashboard
 
+## Oct 31 glass overview (C38, branch razeef/c38-glass-atrium)
+
+- **Theme.** Light glass by default: neutral ground, soft cornflower light behind blurred chrome, near-opaque cards. Folio blue `#2a56c9` is the primary; cornflower `#6b9fe4` supports it; pink `#ec4899` only marks what needs the owner. Dark remains a toggle.
+- **Overview layout.** Title "This week" with one finding sentence, week progress, a KPI strip, then a grid: money map + explanation panel, shield scan + maker folios, status bars + activity.
+- **Money map** (`plot.mjs`, pure functions): a network plot. Node area follows the amount, line width follows money moved, arrows show direction; pink dashed is waiting for the owner, navy dashed is held. Dots move only on paid or in-flight edges. The shield shows one bar per rule check run this week.
+- **Shield scan.** Each proposal is a blip: cleared inside, waiting for the owner in the holding loop, stopped in the turned-away sector. Blips link to their decision.
+- **Folios, bars, activity.** Maker cards (selected maker in folio blue) open the drill-down; stacked bars per maker plus the owner's signature; the latest proposals with the shield's answer.
+- The C37 drill-down, panels and model (`scene.mjs`) are kept and restyled flat.
+
 ## Oct 28 command center (C37)
 
 The dashboard now opens on **Command center** (`#overview`), a picture of the week's money:

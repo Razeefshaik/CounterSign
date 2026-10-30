@@ -1,6 +1,7 @@
 // C37 command center controller: loads the read-only dashboard API, draws the
 // money constellation and explains whatever the viewer selects. No writes.
-import {sceneModel, sceneSvg, focusModel, focusSvg, defaultCategory, nodePanel, makerPanel, itemPanel, storyPanel, kpis, rail, short, VIEW} from "./scene.mjs";
+import {sceneModel, focusModel, focusSvg, defaultCategory, nodePanel, makerPanel, itemPanel, storyPanel, kpis, short} from "./scene.mjs";
+import {plotSvg, scanSvg, scanTally, folios, stands, activity, finding, progress, makerAt, PW, PH} from "./plot.mjs";
 import {weekDays} from "./words.mjs";
 import {esc} from "./views.mjs";
 
@@ -75,19 +76,32 @@ export function createCommand(document, fetcher = fetch) {
       stageEl.innerHTML = focusSvg(fm, {category, item, motion: motion()});
       $("scene-back").hidden = false;
     } else {
-      stageEl.innerHTML = sceneSvg(model, {selected, motion: motion(), entrance: entrance && motion()});
+      stageEl.innerHTML = plotSvg(model, {selected, motion: motion()});
       $("scene-back").hidden = true;
     }
+    stageEl.classList.toggle("entering", entrance && motion());
     stageEl.classList.remove("zoom-in", "zoom-out");
     if (swap && motion()) {void stageEl.offsetWidth; stageEl.classList.add(swap);}
     const caption = $("scene-caption");
     caption.hidden = !model.empty;
-    caption.textContent = data.demo ? "The marketplace is empty. Run the first staged step below to open the week." : "No makers yet. The constellation fills in as orders arrive.";
+    caption.textContent = data.demo ? "The marketplace is empty. Run the first staged step to open the week." : "No makers yet. The map fills in as orders arrive.";
+  }
+
+  // Optional pieces: a layout that leaves one out simply has no element for it.
+  const fill = (id, html) => {const el = $(id); if (el) el.innerHTML = html;};
+  function pieces() {
+    fill("ov-finding", finding(model));
+    fill("scan", scanSvg(model));
+    fill("scan-tally", scanTally(model));
+    fill("folios", folios(model, focus));
+    fill("stands", stands(model));
+    fill("activity", activity(model));
   }
 
   function draw({entrance = false, swap = ""} = {}) {
     $("kpis").innerHTML = kpis(model);
-    $("rail-slot").innerHTML = rail(data.demo, weekDays);
+    $("rail-slot").innerHTML = progress(data.demo, weekDays);
+    pieces();
     stage({entrance, swap});
     panel();
     countUp();
@@ -97,10 +111,9 @@ export function createCommand(document, fetcher = fetch) {
   function openMaker(id) {
     const maker = model.makers.find(m => "maker:" + m.id === id);
     if (!maker) return;
-    const index = model.makers.indexOf(maker), n = model.makers.length;
-    const y = n === 1 ? 360 : 140 + index * (440 / (n - 1));
-    $("stage").style.setProperty("--ox", ((990 - VIEW[0]) / VIEW[2] * 100).toFixed(1) + "%");
-    $("stage").style.setProperty("--oy", ((y - VIEW[1]) / VIEW[3] * 100).toFixed(1) + "%");
+    const [x, y] = makerAt(model.makers.indexOf(maker), model.makers.length);
+    $("stage").style.setProperty("--ox", (x / PW * 100).toFixed(1) + "%");
+    $("stage").style.setProperty("--oy", (y / PH * 100).toFixed(1) + "%");
     focus = maker.id; selected = ""; item = "";
     fm = focusModel(data.graphs[maker.id], maker);
     category = defaultCategory(fm);
@@ -133,6 +146,15 @@ export function createCommand(document, fetcher = fetch) {
       if ((event.key === "Enter" || event.key === " ") && activate(event.target)) event.preventDefault();
     };
     $("scene-back").onclick = closeFocus;
+    const folioEl = $("folios");
+    if (folioEl) folioEl.onclick = event => {
+      const id = event.target.closest?.("[data-node]")?.dataset.node;
+      if (!id) return;
+      if (focus === id.slice(6)) {closeFocus(); return;}
+      focus = ""; fm = null;
+      openMaker(id);
+      if (!$("stage").getBoundingClientRect || $("stage").getBoundingClientRect().top < 0) $("stage").scrollIntoView({behavior: motion() ? "smooth" : "auto", block: "center"});
+    };
     $("command").onkeydown = event => {
       if (event.key !== "Escape") return;
       if (item) {item = ""; stage(); panel();} else if (focus) closeFocus(); else if (selected) {selected = ""; stage(); panel();}

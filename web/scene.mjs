@@ -410,9 +410,7 @@ export function storyPanel({demo = null, comparison = null, model}) {
       ${next ? `<p><span class="eyebrow inline">Next</span> ${esc(next.label)}</p>` : demo?.complete ? "<p>The staged week is complete.</p>" : ""}</header>
     ${waiting ? `<a class="waiting" href="#decision/${esc(waiting.id)}"><span class="eyebrow">Waiting for your signature</span><strong>${esc(actionWord(waiting.action))}</strong><span>Review and decide →</span></a>` : ""}
     ${compare}${moments ? `<h3 class="panel-sub">Safety moments</h3>${moments}` : ""}
-    <h3 class="panel-sub">Reading the scene</h3>
-    <ul class="legend-list"><li><i class="cyan"></i>Money sent to a maker</li><li><i class="planned"></i>Scheduled, not sent yet</li><li><i class="amber"></i>Money held back for a dispute</li><li><i class="violet"></i>Agent proposals into the shield</li><li><i class="red"></i>Blocked proposals</li></ul>
-    <p class="hint">Select any glowing node to explain it. Select a maker to explore its records.</p>`;
+    <p class="hint">Select any node in the money map to explain it. Select a maker to explore its records.</p>`;
 }
 
 export function kpis(model) {
