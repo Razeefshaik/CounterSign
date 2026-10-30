@@ -1,17 +1,20 @@
 // C37 command center controller: loads the read-only dashboard API, draws the
 // money constellation and explains whatever the viewer selects. No writes.
 import {sceneModel, focusModel, focusSvg, defaultCategory, nodePanel, makerPanel, itemPanel, storyPanel, kpis, short} from "./scene.mjs";
-import {plotSvg, scanSvg, scanTally, folios, stands, activity, finding, progress, makerAt, PW, PH} from "./plot.mjs";
+import {plotSvg, scanSvg, scanTally, folios, stands, activity, progress, makerAt, PW, PH} from "./plot.mjs";
 import {weekDays} from "./words.mjs";
 import {esc} from "./views.mjs";
+import {weekTimeline, trailRows, trailDetail} from "./trail.mjs";
 
 const optional = promise => promise.catch(() => null);
 
 export function createCommand(document, fetcher = fetch) {
   const $ = id => document.getElementById(id);
   const view = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
-  const motion = () => !view?.matches;
+  let keyboard = false;
+  const motion = () => !view?.matches && !keyboard;
   let data = null, model = null, previous = null, selected = "", focus = "", category = "", item = "", fm = null, shown = false, serial = 0;
+  let trailFilter = "all", trailSelected = "";
 
   async function json(url) {
     const response = await fetcher(url, {cache: "no-store"});
@@ -22,7 +25,7 @@ export function createCommand(document, fetcher = fetch) {
   async function load(workspace, client) {
     const live = !workspace.fixture;
     const [makers, proposals, cash, demo, comparison] = await Promise.all([
-      optional(client.list("makers")), optional(client.list("proposals")), optional(client.singleton("cash")),
+      client.list("makers"), client.list("proposals"), optional(client.singleton("cash")),
       live ? optional(json("/api/v1/demo/state")) : null, live ? optional(json("/api/v1/demo/comparison")) : null,
     ]);
     const graphs = {};
@@ -31,24 +34,6 @@ export function createCommand(document, fetcher = fetch) {
     }));
     return {makers: makers || [], proposals: proposals || [], cash, demo, comparison, graphs, disputes: workspace.disputes || []};
   }
-
-  function countUp() {
-    const from = new Map((previous ? kpiValues(previous) : []).map(([k, v]) => [k, v]));
-    for (const dd of document.querySelectorAll("#kpis dd[data-count]")) {
-      const target = Number(dd.dataset.count), key = dd.closest(".kpi").classList[1];
-      const start = from.has(key) ? from.get(key) : 0;
-      if (!dd.dataset.count || !Number.isSafeInteger(target) || start === target || !motion()) continue;
-      const t0 = performance.now(), dur = 900;
-      const tick = now => {
-        const p = Math.min(1, (now - t0) / dur), eased = 1 - Math.pow(1 - p, 3);
-        dd.textContent = short(Math.round(start + (target - start) * eased));
-        if (p < 1) requestAnimationFrame(tick);
-      };
-      requestAnimationFrame(tick);
-      dd.closest(".kpi").classList.add("bumped");
-    }
-  }
-  const kpiValues = m => [["paypal", m.paypal.available], ["paid", m.totals.paid], ["paying", m.totals.paying], ["held", m.held.total]];
 
   function changed() {
     if (!previous) return;
@@ -90,7 +75,12 @@ export function createCommand(document, fetcher = fetch) {
   // Optional pieces: a layout that leaves one out simply has no element for it.
   const fill = (id, html) => {const el = $(id); if (el) el.innerHTML = html;};
   function pieces() {
-    fill("ov-finding", finding(model));
+    fill("trail-week-slot", weekTimeline(data.demo));
+    fill("trail-body", trailRows(model, trailFilter, trailSelected));
+    fill("trail-detail", trailDetail(model, trailSelected));
+    fill("trail-count", `${model.agent.proposals} recorded`);
+    fill("trail-attention", model.owner.waiting.length ? `<a href="#decision/${esc(model.owner.waiting[0].id)}">${esc(model.owner.waiting.length)} waiting for you <span aria-hidden="true">↗</span></a>` : 'Nothing needs your signature');
+    fill("ov-finding", esc(model.owner.waiting.length ? `${model.owner.waiting.length} decision${model.owner.waiting.length === 1 ? '' : 's'} waiting for you. Follow the checks before signing.` : model.empty ? 'Run the first staged step to open the week.' : 'Follow the recorded checks, signatures and PayPal operations.'));
     fill("scan", scanSvg(model));
     fill("scan-tally", scanTally(model));
     fill("folios", folios(model, focus));
@@ -104,7 +94,7 @@ export function createCommand(document, fetcher = fetch) {
     pieces();
     stage({entrance, swap});
     panel();
-    countUp();
+    // Financial values remain exact; motion never interpolates an amount.
     changed();
   }
 
@@ -140,10 +130,30 @@ export function createCommand(document, fetcher = fetch) {
   }
 
   function bind() {
+    $("trail-body").onclick = event => {
+      const button = event.target.closest?.("[data-proposal]");
+      if (!button || !model) return;
+      trailSelected = button.dataset.proposal;
+      // Preserve the clicked control's focus while updating selection.
+      for (const el of document.querySelectorAll("[data-proposal]")) {
+        el.setAttribute("aria-pressed", String(el.dataset.proposal === trailSelected));
+        el.closest(".trail-row").classList.toggle("selected", el.dataset.proposal === trailSelected);
+      }
+      fill("trail-detail", trailDetail(model, trailSelected));
+    };
+    $("trail-filters").onclick = event => {
+      const button = event.target.closest?.("[data-trail-filter]");
+      if (!button || !model) return;
+      trailFilter = button.dataset.trailFilter;
+      for (const el of $("trail-filters").querySelectorAll("button")) el.setAttribute("aria-pressed", String(el === button));
+      fill("trail-body", trailRows(model, trailFilter, trailSelected));
+    };
     const stageEl = $("stage");
     stageEl.onclick = event => activate(event.target);
     stageEl.onkeydown = event => {
-      if ((event.key === "Enter" || event.key === " ") && activate(event.target)) event.preventDefault();
+      keyboard = true;
+      try {if ((event.key === "Enter" || event.key === " ") && activate(event.target)) event.preventDefault();}
+      finally {keyboard = false;}
     };
     $("scene-back").onclick = closeFocus;
     const folioEl = $("folios");
@@ -157,7 +167,9 @@ export function createCommand(document, fetcher = fetch) {
     };
     $("command").onkeydown = event => {
       if (event.key !== "Escape") return;
-      if (item) {item = ""; stage(); panel();} else if (focus) closeFocus(); else if (selected) {selected = ""; stage(); panel();}
+      keyboard = true;
+      try {if (item) {item = ""; stage(); panel();} else if (focus) closeFocus(); else if (selected) {selected = ""; stage(); panel();}}
+      finally {keyboard = false;}
     };
     $("panel").onclick = event => {
       const action = event.target.closest?.("[data-action]")?.dataset.action;
@@ -170,9 +182,20 @@ export function createCommand(document, fetcher = fetch) {
     async show(workspace, client) {
       const ticket = ++serial;
       bind();
-      if (!shown) $("stage").innerHTML = '<p class="scene-loading">Drawing the money constellation…</p>';
-      const next = await load(workspace, client);
+      if (!shown) $("stage").innerHTML = '<p class="scene-loading">Loading the money map…</p>';
+      const notice = $("overview-notice");
+      let next;
+      try {next = await load(workspace, client);}
+      catch {
+        if (ticket !== serial) return;
+        notice.hidden = false;
+        notice.innerHTML = '<p>Could not load the recorded proposals. Previous values, if shown, have not refreshed.</p><button type="button" class="secondary" id="overview-retry">Try again</button>';
+        $("overview-retry").onclick = () => this.show(workspace, client);
+        if (!shown) $("trail-body").innerHTML = '<p class="trail-empty">The proposal trail is unavailable.</p>';
+        return;
+      }
       if (ticket !== serial) return;
+      notice.hidden = true;
       data = next;
       previous = model;
       model = sceneModel(data);
