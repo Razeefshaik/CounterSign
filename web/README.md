@@ -1,5 +1,39 @@
 # CounterSign dashboard
 
+## Oct 31 proposal trail (C41, branch razeef/c41-glass-trace)
+
+An alternative overview built directly on C38. Each recorded proposal has its own
+path through **agent/planner → shield → owner → PayPal/effect**. A proposal-stage
+refusal ends at the shield. Verdict, signature, proposal state and operation state
+are shown separately: ALLOW does not mean sent, and an old NEEDS_OWNER verdict
+does not mean signed. Expected cash effects are labelled as expected.
+
+`trail.mjs` sorts a copy by recorded creation time with deterministic ID ties;
+it does not assign proposals to staged steps or invent intermediate times.
+The staged-week rail marks the API's current completed step and is display only;
+the existing demo dock runs steps. Filters and selectable proposal evidence keep
+the full checks and parameters close to the path. The unchanged money map remains
+in a supporting section with its maker drill-down. C38's palette and routes stay.
+
+**Visual recipe.** A display-only week rail leads into four aligned proposal
+stages, filters and a selectable evidence sheet; the money map sits below.
+C38's near-opaque glass cards (18px corners), blue primary (`#2a56c9`),
+cornflower support (`#6b9fe4`) and pink owner attention (`#ec4899`) retain their
+theme tokens. IBM Plex Sans carries the 27px heading and compact stage text;
+IBM Plex Mono carries step numbers and parameters, with tabular amounts.
+At 700px the column header gives way to labelled cells, the trail uses page
+scrolling, checks stack and filters use 44px targets; the week rail scrolls sideways
+and narrow maps show a swipe cue. The backdrop and trail stay still; 220/180ms
+maker zooms and a 200ms panel reveal explain selection, with keyboard and
+reduced-motion preferences skipping them.
+
+Checks: `node --check web/trail.mjs`, `node --check web/command.mjs`, and
+`node --test web/tests/*.test.mjs`. Browser checks use existing contract fixtures
+at 1440×900 and 390px. The fixture preview has no staged-week API, so its rail
+honestly reports unavailable; a controller check with explicit test data verifies
+the current marker and absence of jump controls. Docker port 8180 was unavailable.
+These checks do not verify a live staged week or PayPal calls.
+
 ## Oct 31 glass overview (C38, branch razeef/c38-glass-atrium)
 
 - **Theme.** Light glass by default: neutral ground, soft cornflower light behind blurred chrome, near-opaque cards. Folio blue `#2a56c9` is the primary; cornflower `#6b9fe4` supports it; pink `#ec4899` only marks what needs the owner. Dark remains a toggle.

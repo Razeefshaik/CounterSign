@@ -13,11 +13,13 @@ export function chronological(proposals = []) {
 
 export function proposalStages(p) {
   const stopped = p.verdict === 'BLOCK' || ['BLOCKED','BLOCKED_AT_EXECUTION'].includes(p.state);
+  // A final recheck can fail after the owner signed. Never erase that history.
+  const endsAtShield = stopped && p.state !== 'BLOCKED_AT_EXECUTION' && !p.approval && !p.operation;
   return {
-    stopped,
-    shield: stopped ? 'Stopped' : p.verdict === 'NEEDS_OWNER' ? 'Owner required' : p.verdict === 'ALLOW' ? 'Allowed' : 'No verdict recorded',
-    owner: stopped ? null : p.approval ? 'Signed' : p.state === 'NEEDS_OWNER' ? 'Waiting for you' : ['REJECTED','EXPIRED'].includes(p.state) ? state(p.state) : p.tier === 'AUTONOMOUS' ? 'Not required by policy' : 'No signature recorded',
-    paypal: stopped ? null : p.operation ? state(p.operation.state) : p.state === 'EXECUTED' && ['RESERVE_EARNINGS','RELEASE_RESERVE','DRAFT_MESSAGE','WAIT','DEFER_SCHEDULED_PAYOUT'].includes(p.action) ? 'Internal action; no PayPal write' : 'No operation recorded',
+    stopped, endsAtShield,
+    shield: p.state === 'BLOCKED_AT_EXECUTION' ? 'Stopped at final recheck' : stopped ? 'Stopped' : p.verdict === 'NEEDS_OWNER' ? 'Owner required' : p.verdict === 'ALLOW' ? 'Allowed' : 'No verdict recorded',
+    owner: endsAtShield ? null : p.approval ? 'Signed' : p.state === 'NEEDS_OWNER' ? 'Waiting for you' : ['REJECTED','EXPIRED'].includes(p.state) ? state(p.state) : p.tier === 'AUTONOMOUS' ? 'Not required by policy' : 'No signature recorded',
+    paypal: endsAtShield ? null : p.operation ? 'Recorded operation: ' + state(p.operation.state) : stopped ? 'No operation recorded; stopped' : p.state === 'EXECUTED' && ['RESERVE_EARNINGS','RELEASE_RESERVE','DRAFT_MESSAGE','WAIT','DEFER_SCHEDULED_PAYOUT'].includes(p.action) ? 'Internal action; no PayPal write' : 'No operation recorded',
   };
 }
 
@@ -37,7 +39,7 @@ export function trailRows(model, filter = 'all', selected = '') {
     return `<li class="trail-row${stages.stopped ? ' stopped' : ''}${p.state === 'NEEDS_OWNER' ? ' needs-owner' : ''}${p.id === selected ? ' selected' : ''}">
       <div class="trail-cell trail-origin"><span class="trail-mobile-label">Proposed</span><button type="button" data-proposal="${esc(p.id)}" aria-pressed="${p.id === selected}"><b>${esc(action(p.action))}</b><span>${esc(p.model === 'deterministic-planner' ? 'Deterministic planner' : p.model || 'Model not recorded')}</span></button><time datetime="${esc(p.created_at || '')}">${esc(when(p.created_at))}</time></div>
       <div class="trail-cell trail-shield"><span class="trail-mobile-label">Shield</span><strong>${esc(stages.shield)}</strong><small>${esc(checks.filter(r => r.outcome === 'PASS').length)} passed · ${esc(checks.filter(r => r.outcome === 'BLOCK').length)} blocked · ${esc(checks.filter(r => r.outcome === 'NEEDS_OWNER').length)} owner</small>${blocked.length ? `<span class="trail-block-reason">${esc(blocked.map(r => rule(r.rule)).join(' · '))}</span>` : ''}</div>
-      ${stages.stopped ? '<div class="trail-terminal"><span class="trail-end" aria-hidden="true"></span><b>Stopped at the shield</b><span>No path to owner approval or a PayPal write.</span></div>' : `<div class="trail-cell trail-owner"><span class="trail-mobile-label">Owner</span><strong>${esc(stages.owner)}</strong>${p.approval?.approved_at ? `<small>${esc(when(p.approval.approved_at))}</small>` : ''}${p.state === 'NEEDS_OWNER' ? `<a href="#decision/${esc(p.id)}">Review decision <span aria-hidden="true">↗</span></a>` : ''}</div><div class="trail-cell trail-paypal"><span class="trail-mobile-label">PayPal / effect</span><strong>${esc(stages.paypal)}</strong><small class="trail-effect">${esc(expected)}</small></div>`}
+      ${stages.endsAtShield ? '<div class="trail-terminal"><span class="trail-end" aria-hidden="true"></span><b>Stopped at the shield</b><span>No signature or PayPal operation recorded.</span></div>' : `<div class="trail-cell trail-owner"><span class="trail-mobile-label">Owner</span><strong>${esc(stages.owner)}</strong>${p.approval?.approved_at ? `<small>${esc(when(p.approval.approved_at))}</small>` : ''}${p.state === 'NEEDS_OWNER' ? `<a href="#decision/${esc(p.id)}">Review decision <span aria-hidden="true">↗</span></a>` : ''}</div><div class="trail-cell trail-paypal"><span class="trail-mobile-label">PayPal / effect</span><strong>${esc(stages.paypal)}</strong><small class="trail-effect">${esc(expected)}</small></div>`}
     </li>`;
   }).join('')}</ol>`;
 }

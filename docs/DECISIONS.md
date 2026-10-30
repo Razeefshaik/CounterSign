@@ -476,3 +476,12 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The overview becomes a working screen: a noun title with one finding, a KPI strip split by hairlines, the map with its explanation panel, a shield scan, maker folios, status bars and an activity list | Owner, Oct 31 (UX principles from the taste, impeccable and Emil Kowalski skills) | Accept | One question first ("what needs me now"), evidence beside the answer, the main job one click away; the owner's brief wins where the skills ban glass and a blue primary |
 | The week progress on the overview is display only; the demo dock still runs steps | C38 design | Accept | The demo API only moves forward or restarts, so day buttons that jump would promise something the backend cannot do |
 
+## Oct 31 C41 proposal trail (branch razeef/c41-glass-trace)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Show one recorded proposal per four-stage swimlane, with explicit shield verdict, signature and operation states, filtered evidence, and expected rather than invented actual cash effects | Owner C41 brief | Accept | The trail explains where code stopped a proposal without treating permission as execution |
+| Sort a copied proposal list by creation time and ID, keep staged stops separate with the current completed API step marked, and retain the unchanged money map below | C41 design | Accept | Recorded creation times cannot be safely mapped to staged-week stops and the demo API cannot jump backward |
+| Preserve C38 glass tokens, keep exact amounts still, and show failed reads with Retry | C41 design | Accept | The visual alternative must retain the established theme and honest unavailable states |
+| Keep the recorded signature and operation visible when the final execution recheck blocks a proposal; only a refusal without such history ends early | C41 finish review | Accept | A refusal after signing must not erase the owner's earlier approval or imply the proposal was never approved |
+

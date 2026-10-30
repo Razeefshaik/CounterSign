@@ -8,9 +8,17 @@ test('chronology sorts a copy by recorded creation time and deterministic ties',
   assert.deepEqual(chronological(list).map(p=>p.id),['a','b','z','q']);assert.equal(list[0].id,'z');
 });
 test('blocked paths end at the shield and do not infer a signature or request',()=>{
-  const p={...proposal('x','BLOCKED'),verdict:'BLOCK',approval:{approved_at:'bad'},operation:{state:'SUCCEEDED'}};
-  assert.deepEqual(proposalStages(p),{stopped:true,shield:'Stopped',owner:null,paypal:null});
+  const p={...proposal('x','BLOCKED'),verdict:'BLOCK'};
+  assert.deepEqual(proposalStages(p),{stopped:true,endsAtShield:true,shield:'Stopped',owner:null,paypal:null});
   const html=trailRows(sceneModel({proposals:[p]}));assert.match(html,/Stopped at the shield/);assert.ok(!html.includes('trail-paypal'));
+});
+test('execution recheck refusals retain recorded signatures and operation facts',()=>{
+  const p={...proposal('x','BLOCKED_AT_EXECUTION'),approval:{approved_at:'2026-11-06T09:00:00Z'},operation:{state:'PREPARED'}};
+  const stages=proposalStages(p);assert.equal(stages.stopped,true);assert.equal(stages.endsAtShield,false);
+  assert.equal(stages.owner,'Signed');assert.match(stages.paypal,/Recorded operation: Prepared/);
+  const html=trailRows(sceneModel({proposals:[p]}));assert.match(html,/Stopped at final recheck/);assert.match(html,/Signed/);
+  assert.ok(!html.includes('No path to owner approval'));assert.match(html,/Recorded operation: Prepared/);
+  assert.equal(proposalStages({...p,operation:null}).paypal,'No operation recorded; stopped');
 });
 test('allow is not execution, old needs-owner verdicts are not signatures',()=>{
   assert.equal(proposalStages({...proposal('a','ALLOWED')}).paypal,'No operation recorded');
