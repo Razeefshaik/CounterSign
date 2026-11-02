@@ -1,5 +1,13 @@
 # CounterSign dashboard
 
+## Nov 2 glass command center (C42, branch razeef/c42-glass-command, built on C39)
+
+- **Backdrop and glass.** The owner's frosted backdrops sit behind the page: `assets/backdrop-blue.webp` in light mode, `assets/backdrop-night.webp` in dark mode (rendered images, 2400 × 1500 WebP, about 130 KB each). Every surface that carries text is glass at 72% or more (`--card`, `--glass`, `--sheet`), so copy keeps 4.5:1 over the darkest part of either image; text tokens on glass were darkened to match (`--ink-3` `#46526b`, `--accent-ink` `#1f47ad`, `--highlight-ink` `#9e1a5c`, `--bad` `#a82a33`). One token set per theme; components never repaint per theme.
+- **Sidebar.** A labelled glass sidebar grouped by job: Command center; Act (Decisions, Incident desk); Money (Payout runs, Cash, Money graph); Records (Execution history, Evaluation replay); Lab (Try to trick the agent, shown only when the playground exists). Owner counts are pink; other counts are plain. Phones keep the scrolling nav row.
+- **Command center, top to bottom.** The headline and finding with the one action ("Needs your signature" strip linking to the exact decision); four figures, each with the line that makes it actionable (`kpiCards()`); the makers; where the money stands (one bar of what is owed now, plus whether the balance covers the run); the week and Friday's comparison; the shield scan and activity; then the money map with its explanation panel.
+- **Makers at any count** (`makerList()`). Up to four makers read as cards. Past four, the makers waiting for the owner stay as cards and everyone goes into a table with state filters and ten rows at a time. Cards and rows for makers on the map open them there; the map still draws six, and totals now count every maker.
+- The C39 deck, sticker, coins and icon rail are retired.
+
 ## Oct 31 journey overview (C39, branch razeef/c39-glass-journey)
 
 Same theme and pieces as C38, arranged around the decision: a headline written from the model (`headline()`), the agent's latest request as a message, the available balance with "Review and sign" (links to the waiting decision), the week as a path of stops (display only), the makers as a stacked deck (click to reorder; "See details" opens the front maker in the map) and a pink sticker for money held back for disputes. Below: KPIs, Friday's comparison, the money map with its panel, the shield scan, activity and status bars.

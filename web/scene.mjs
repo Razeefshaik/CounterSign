@@ -26,8 +26,8 @@ const ref = label => {
 
 // One model for the whole scene, built only from dashboard API documents.
 export function sceneModel({makers = [], disputes = [], proposals = [], cash = null, comparison = null, graphs = {}} = {}) {
-  const shown = makers.slice(0, 6);
-  const rows = shown.map(m => {
+  // Every maker counts toward the totals and the makers list; the map draws the first six.
+  const all = makers.map(m => {
     const graph = graphs[m.id];
     // A graph counts only if it is rooted at this maker (fixture previews return one graph for all).
     const own = graph?.nodes?.some(n => n.id === "maker:" + m.id) ? graph : null;
@@ -43,6 +43,7 @@ export function sceneModel({makers = [], disputes = [], proposals = [], cash = n
       paid, scheduled, inFlight, paying, held, owed, orders, openDisputes: open.length,
       status: inFlight ? "sending" : scheduled ? "scheduled" : held ? "held" : paid ? "paid" : owed ? "owed" : "idle"};
   });
+  const rows = all.slice(0, 6);
   const verdicts = verdict => proposals.filter(p => p.verdict === verdict).length;
   // The ring shows the decision that matters now: one waiting for the owner, else the latest.
   const focus = proposals.find(p => p.state === "NEEDS_OWNER") || proposals[0] || null;
@@ -50,14 +51,15 @@ export function sceneModel({makers = [], disputes = [], proposals = [], cash = n
   const p = cash?.paypal;
   return {
     empty: !rows.length,
-    hidden: Math.max(0, makers.length - shown.length),
+    hidden: Math.max(0, all.length - rows.length),
     makers: rows,
+    all,
     paypal: {available: p ? minor(p.available) : null, stale: Boolean(p?.stale), unreserved: cash ? minor(cash.unreserved) : null},
     agent: {proposals: proposals.length, allowed: verdicts("ALLOW"), blocked: verdicts("BLOCK"), list: proposals},
     owner: {waiting: proposals.filter(x => x.state === "NEEDS_OWNER"), approved: proposals.filter(x => x.approval).length},
     shield: {focus, ticks: Object.keys(RULES).map(code => ({code, outcome: outcomes[code] || ""})), needsOwner: verdicts("NEEDS_OWNER")},
-    held: {total: rows.reduce((s, m) => s + m.held, 0), makers: rows.filter(m => m.held)},
-    totals: {paid: rows.reduce((s, m) => s + m.paid, 0), paying: rows.reduce((s, m) => s + m.paying, 0), inFlight: rows.reduce((s, m) => s + m.inFlight, 0)},
+    held: {total: all.reduce((s, m) => s + m.held, 0), makers: all.filter(m => m.held)},
+    totals: {paid: all.reduce((s, m) => s + m.paid, 0), paying: all.reduce((s, m) => s + m.paying, 0), inFlight: all.reduce((s, m) => s + m.inFlight, 0)},
     comparison: comparison?.available ? comparison : null,
   };
 }

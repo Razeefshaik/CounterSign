@@ -1,5 +1,5 @@
-// C38 overview pieces: the money map as a network plot, the shield scan, maker
-// folios, status bars and the activity list. Pure string builders over the C37
+// Overview pieces: the money map as a network plot (C38), the shield scan, the
+// activity list and the C42 command center (action strip, KPIs, makers, money bar). Pure string builders over the C37
 // scene model, so every figure is an API value and every piece is testable in Node.
 import {esc} from "./views.mjs";
 import {rule as ruleWord, action as actionWord} from "./words.mjs";
@@ -157,34 +157,6 @@ export function scanTally(model) {
   return `<dl class="tally"><div><dt>Scanned</dt><dd>${esc(list.length)}</dd></div><div class="ok"><dt>Cleared</dt><dd>${esc(list.length - blocked - waiting)}</dd></div><div class="ask"><dt>Holding for you</dt><dd>${esc(waiting)}</dd></div><div class="stop"><dt>Turned away</dt><dd>${esc(blocked)}</dd></div></dl>`;
 }
 
-// Maker folios: the selected maker in folio blue; the large figure is what matters now.
-export function folios(model, chosen = "") {
-  if (!model.makers.length) return '<p class="empty-note">No makers yet. Run the first staged step to load the week\'s orders.</p>';
-  return model.makers.map(m => {
-    const t = total(m) || 1, letter = m.name.trim().slice(-1);
-    const [amount, what, chip] = m.inFlight ? [m.inFlight, "sent to PayPal, not confirmed yet", "Sending"] : m.scheduled ? [m.scheduled, "waiting for your signature", "Waiting"]
-      : m.held ? [m.held, "held while a buyer's dispute is open", "Held"] : m.paid ? [m.paid, "paid through PayPal", "Paid"] : [m.owed, "owed, not scheduled yet", "Owed"];
-    const extra = m.held && chip !== "Held" ? ` · ${short(m.held)} held` : "";
-    const seg = (k, v) => v ? `<i class="${k}" style="flex-grow:${r1(v / t * 100)}"></i>` : "";
-    return `<button type="button" class="folio${chosen === m.id ? " on" : ""}" data-node="maker:${esc(m.id)}" aria-label="${esc(`${m.name}: ${short(amount)} ${what}${extra}. Open records.`)}">
-      <span class="wm" aria-hidden="true">${esc(letter)}</span><span class="who"><b>${esc(m.name)}</b><span>${m.verified ? "Payee verified" : "Payee not verified"}</span></span>
-      <span class="chip ${chip.toLowerCase()}">${esc(chip)}</span><span class="amt">${esc(short(amount))}</span><span class="what">${esc(what + extra)}</span>
-      <span class="pos" aria-hidden="true">${seg("paid", m.paid)}${seg("sending", m.inFlight)}${seg("waiting", m.scheduled)}${seg("held", m.held)}${seg("owed", m.owed)}</span></button>`;
-  }).join("");
-}
-
-// Status bars: one stacked bar per maker, plus the owner's signature.
-export function stands(model) {
-  if (!model.makers.length) return '<p class="empty-note">Bars appear when makers have shares.</p>';
-  const max = Math.max(1, ...model.makers.map(total));
-  const part = (k, v) => v ? `<i class="${k}" style="flex-grow:${v}"></i>` : "";
-  const sig = model.owner.waiting.length ? "ask" : model.owner.approved ? "signed" : "none";
-  const cols = model.makers.map(m => `<div class="col"><div class="bar-stack" style="--h:${(total(m) / max).toFixed(3)}" role="img" aria-label="${esc(`${m.name}: ${short(m.paid)} paid, ${short(m.paying)} waiting or sending, ${short(m.held)} held, ${short(m.owed)} owed`)}">${part("paid", m.paid)}${part("sending", m.inFlight)}${part("waiting", m.scheduled)}${part("held", m.held)}${part("owed", m.owed)}</div>
-    <b>${esc(m.name)}</b><span>${esc(m.inFlight ? short(m.inFlight) + " sending" : m.scheduled ? short(m.scheduled) + " waiting" : m.held ? short(m.held) + " held" : m.paid ? short(m.paid) + " paid" : short(m.owed) + " owed")}</span></div>`).join("");
-  return `<div class="bars">${cols}<div class="col sig"><span class="ring ${sig}">${sig === "signed" ? "Signed" : sig === "ask" ? "Sign" : "—"}</span>
-    <b>Your signature</b><span>${esc(sig === "ask" ? `${model.owner.waiting.length} waiting` : sig === "signed" ? `${model.owner.approved} signed` : "not needed yet")}</span></div></div>`;
-}
-
 // Activity: what the agent proposed and what the shield said, newest first.
 export function activity(model, limit = 6) {
   const list = model.agent.list.filter(p => p.action !== "WAIT").slice(0, limit);
@@ -221,7 +193,7 @@ export function progress(demo, weekDays) {
   }).join("")}</ol>`;
 }
 
-// --- C39 journey layout pieces ---
+// --- Journey pieces (C39) ---
 
 // The headline answers "what can I do now" from the same model figures.
 export function headline(model) {
@@ -252,42 +224,6 @@ export function journey(demo, weekDays) {
   }).join("")}</ol>`;
 }
 
-// Frosted glass coins: a lit face, a thicker rim seen edge-on, an engraved ring and a
-// dollar mark. Far coins are smaller and softly blurred for depth.
-const coins = seed => {
-  const spots = [[262, 64, 50, -28, 0], [336, 166, 66, 18, 0], [196, 214, 42, 40, 0], [360, 292, 58, -12, 1], [150, 96, 30, 60, 1]];
-  const g = `cg${seed}`;
-  return `<svg class="coins" viewBox="0 0 420 360" aria-hidden="true"><defs>
-    <radialGradient id="${g}f" cx="34%" cy="28%" r="78%"><stop offset="0" stop-color="#ffffff" stop-opacity=".96"/><stop offset=".38" stop-color="#e6effc" stop-opacity=".78"/><stop offset="1" stop-color="#8db2e6" stop-opacity=".42"/></radialGradient>
-    <linearGradient id="${g}e" x1="0" x2="1"><stop offset="0" stop-color="#ffffff" stop-opacity=".92"/><stop offset=".6" stop-color="#c3d7f3" stop-opacity=".7"/><stop offset="1" stop-color="#7fa6dc" stop-opacity=".55"/></linearGradient>
-    <filter id="${g}b"><feGaussianBlur stdDeviation="1.6"/></filter></defs>${spots.map(([x, y, r, a, far], i) =>
-    `<g class="coin c${i}"><g transform="translate(${x} ${y}) rotate(${a + seed * 23}) scale(1 ${0.38 + (i % 3) * 0.15})"${far ? ` filter="url(#${g}b)" opacity=".75"` : ""}>
-      <ellipse cy="${r1(r * 0.24)}" rx="${r}" ry="${r}" fill="url(#${g}e)"/><circle r="${r}" fill="url(#${g}f)" stroke="rgba(255,255,255,.9)" stroke-width="1.6"/>
-      <circle r="${r1(r * 0.78)}" fill="none" stroke="rgba(110,150,210,.35)" stroke-width="1.3"/>
-      <text y="${r1(r * 0.19)}" text-anchor="middle" font-size="${r1(r * 0.56)}" font-weight="800" fill="rgba(90,130,195,.5)">$</text></g></g>`).join("")}</svg>`;
-};
-
-// Makers as a stacked deck; the front card is the one that needs attention.
-export function deck(model, order = []) {
-  if (!model.makers.length) return `<div class="dcard front"><span class="tag">Waiting for orders</span><b class="title">No makers yet</b>${coins(0)}</div>`;
-  const ids = model.makers.map(m => m.id), byNeed = [...model.makers].sort((a, b) => (b.scheduled + b.inFlight + b.held) - (a.scheduled + a.inFlight + a.held)).map(m => m.id);
-  const seq = order.length === ids.length && order.every(id => ids.includes(id)) ? order : byNeed;
-  return seq.slice(0, 3).map((id, depth) => {
-    const m = model.makers.find(x => x.id === id), i = ids.indexOf(id);
-    const [tag, what] = m.inFlight ? [`${short(m.inFlight)} sending`, "Sent to PayPal, not confirmed yet"] : m.scheduled ? [`${short(m.scheduled)} waiting`, m.held ? `${short(m.held)} held for a dispute` : "Waiting for your signature"]
-      : m.held ? [`${short(m.held)} held`, "Held while a buyer's dispute is open"] : m.paid ? [`${short(m.paid)} paid`, "Paid through PayPal"] : [`${short(m.owed)} owed`, "Owed, not scheduled yet"];
-    return `<button type="button" class="dcard" data-depth="${depth}" data-maker="${esc(m.id)}" aria-label="${esc(`${m.name}: ${tag}. ${depth ? "Bring to front" : "Show next maker"}`)}"><span class="tag">${esc(tag)}</span>${coins(i + 1)}<b class="title">${esc(m.name)}</b><span class="what">${esc(what)}</span></button>`;
-  }).reverse().join("");
-}
-
-// The held-back sticker: money kept out of payouts while disputes are open.
-export function sticker(model) {
-  const held = model.held.total, open = model.held.makers.length;
-  const ring = held ? "HELD BACK · DISPUTES OPEN · HELD BACK · DISPUTES OPEN ·" : "ALL CLEAR · NOTHING HELD · ALL CLEAR · NOTHING HELD ·";
-  return `<svg viewBox="0 0 150 150" aria-hidden="true"><defs><path id="st-ring" d="M75 75m-58 0a58 58 0 1 1 116 0a58 58 0 1 1-116 0"/></defs><text><textPath href="#st-ring" textLength="360" lengthAdjust="spacing">${ring}</textPath></text><circle cx="75" cy="75" r="46"/></svg>
-    <span class="in"><b>${esc(short(held))}</b><small>${held ? `for ${open} open dispute${open === 1 ? "" : "s"}` : "all disputes settled"}</small></span>`;
-}
-
 // Friday's recorded comparison, outside the panel.
 export function compareBars(model) {
   const c = model.comparison;
@@ -297,4 +233,116 @@ export function compareBars(model) {
   return `<div class="vs"><div class="vs-row"><span>Naive agent</span><span class="vs-track"><i class="naive" style="width:${w(naive - disputed)}"></i><i class="naive-held" style="width:${w(disputed)}"></i></span><b>${esc(short(naive))}</b></div>
     <div class="vs-row"><span>CounterSign</span><span class="vs-track"><i class="ours" style="width:${w(ours)}"></i><i class="kept" style="width:${w(Math.max(0, naive - ours))}"></i></span><b>${esc(short(ours))}</b></div>
     <p>The naive agent would also send ${esc(short(disputed))} of shares under dispute. CounterSign holds it back.</p></div>`;
+}
+
+// --- C42 command center pieces ---
+
+const plural = (n, one, many = one + "s") => `${n} ${n === 1 ? one : many}`;
+const names = list => list.length < 3 ? list.join(" and ") : `${list.slice(0, -1).join(", ")} and ${list.at(-1)}`;
+const everyone = model => model.all || model.makers;
+const runWaiting = model => model.owner.waiting.find(p => p.action === "SCHEDULE_PAYOUT_RUN");
+
+// The eyebrow over the headline: the staged step when the demo runs, else plain.
+export function weekLabel(demo) {
+  return demo?.steps?.length ? `Staged week · step ${demo.step} of ${demo.total}` : "This week";
+}
+
+// The one action on the page. With nothing waiting it says what the agent did last.
+export function actionStrip(model) {
+  const waiting = model.owner.waiting[0];
+  if (!waiting) return `<div class="cc-agent"><span class="cc-orb" aria-hidden="true"></span><p>${agentLine(model)}</p></div><a class="button secondary" href="#decision">See decisions</a>`;
+  const rules = waiting.rule_results || [];
+  const run = waiting.action === "SCHEDULE_PAYOUT_RUN" && model.totals.paying;
+  const payees = everyone(model).filter(m => m.scheduled).map(m => m.name);
+  const title = run ? `${actionWord(waiting.action)} · ${short(model.totals.paying)}${payees.length ? " to " + names(payees) : ""}` : actionWord(waiting.action);
+  const more = model.owner.waiting.length > 1 ? ` · ${model.owner.waiting.length - 1} more waiting` : "";
+  const held = model.held.total ? ` ${short(model.held.total)} stays held until its disputes settle.` : "";
+  return `<div class="cc-ask"><span class="cc-ask-icon" aria-hidden="true"><svg class="icon"><use href="#i-decision"/></svg></span>
+    <div class="cc-ask-text"><p class="cc-ask-meta"><span class="stamp ask">Needs your signature</span><span>${esc(plural(rules.length, "shield check"))}${esc(more)}</span></p>
+    <h2>${esc(title)}</h2><p>Payments and refunds always wait for your approval of this exact payload.${esc(held)}</p></div>
+    <a class="primary pill-button" href="#decision/${esc(waiting.id)}">Review and sign</a></div>`;
+}
+
+// Four figures, each with the one line of context that makes it actionable.
+export function kpiCards(model) {
+  const avail = model.paypal.available, due = everyone(model).reduce((s, m) => s + m.scheduled, 0);
+  const lines = everyone(model).filter(m => m.scheduled || m.inFlight).length;
+  const balance = avail == null ? "Not read from PayPal yet" : model.paypal.stale ? "The last balance read may be out of date"
+    : !due ? "Read from PayPal" : avail >= due ? `${short(avail - due)} left after this run` : `${short(due - avail)} short of this run`;
+  const cells = [
+    ["paypal", "PayPal available", avail, balance],
+    ["paying", "Scheduled or in flight", model.totals.paying, model.totals.paying ? plural(lines, "maker") + (runWaiting(model) ? " · needs your signature" : model.totals.inFlight ? " · sent to PayPal" : "") : "Nothing scheduled yet"],
+    ["held", "Held back", model.held.total, model.held.total ? plural(model.held.makers.length, "open dispute") : "No disputes are holding money"],
+    ["paid", "Paid to makers", model.totals.paid, "Last 30 days"],
+  ];
+  return cells.map(([k, label, v, sub]) => `<div class="kpi ${k}"><dt>${esc(label)}</dt><dd data-count="${v == null ? "" : v}">${esc(v == null ? "—" : short(v))}</dd><dd class="kpi-sub">${esc(sub)}</dd></div>`).join("");
+}
+
+// What a maker's money is doing now: one state, one figure, one sentence.
+export function makerState(m, model) {
+  const also = m.held && (m.inFlight || m.scheduled) ? ` · ${short(m.held)} held for a dispute` : "";
+  if (m.inFlight) return {key: "sending", label: "Sending", tag: `${short(m.inFlight)} sending`, amount: m.inFlight, what: "Sent to PayPal, not confirmed yet" + also};
+  if (m.scheduled) return runWaiting(model)
+    ? {key: "ask", label: "Needs your signature", tag: `${short(m.scheduled)} to sign`, amount: m.scheduled, what: "Waiting for your signature" + also}
+    : {key: "scheduled", label: "Scheduled", tag: `${short(m.scheduled)} scheduled`, amount: m.scheduled, what: "In the planned run" + also};
+  if (m.held) return {key: "held", label: "Held", tag: `${short(m.held)} held`, amount: m.held, what: "Held while a buyer's dispute is open"};
+  if (m.owed) return {key: "owed", label: "Owed", tag: `${short(m.owed)} owed`, amount: m.owed, what: "Owed, not scheduled yet"};
+  if (m.paid) return {key: "paid", label: "Paid", tag: `${short(m.paid)} paid`, amount: m.paid, what: "Paid through PayPal in the last 30 days"};
+  return {key: "idle", label: "Nothing owed", tag: "Nothing owed", amount: 0, what: "No open orders"};
+}
+
+const RANK = {ask: 0, sending: 1, held: 2, scheduled: 3, owed: 4, paid: 5, idle: 6};
+const FILTERS = [["all", "All"], ["ask", "Needs you"], ["sending", "Sending"], ["scheduled", "Scheduled"], ["held", "Held"], ["owed", "Owed"], ["paid", "Paid"]];
+export const CARD_LIMIT = 4, PAGE = 10;
+
+// A few makers read best as cards. Past CARD_LIMIT the ones waiting for the owner stay
+// as cards and everyone goes into a filterable table, PAGE rows at a time.
+export function makerList(model, {filter = "all", expanded = false} = {}) {
+  const list = everyone(model);
+  if (!list.length) return '<p class="empty-note">No makers yet. The list fills in as buyer orders arrive.</p>';
+  const onMap = new Set(model.makers.map(m => m.id));
+  const rows = list.map(m => ({m, s: makerState(m, model)})).sort((a, b) => RANK[a.s.key] - RANK[b.s.key]);
+  const card = ({m, s}) => {
+    const body = `<span class="mcard-tag">${esc(s.tag)}</span><b class="mcard-name">${esc(m.name)}</b><span class="mcard-what">${esc(s.what)}</span>`;
+    return onMap.has(m.id)
+      ? `<button type="button" class="mcard ${s.key}" data-node="maker:${esc(m.id)}" aria-label="${esc(`${m.name}: ${s.tag}. ${s.what}. Open in the money map.`)}">${body}<span class="mcard-go" aria-hidden="true">Open records →</span></button>`
+      : `<div class="mcard ${s.key}">${body}</div>`;
+  };
+  if (list.length <= CARD_LIMIT) return `<div class="mcards">${rows.map(card).join("")}</div>`;
+
+  const attention = rows.filter(r => r.s.key === "ask").slice(0, 3);
+  const count = key => key === "all" ? rows.length : rows.filter(r => r.s.key === key).length;
+  const active = FILTERS.some(([k]) => k === filter) && count(filter) ? filter : "all";
+  const shown = active === "all" ? rows : rows.filter(r => r.s.key === active);
+  const visible = expanded ? shown : shown.slice(0, PAGE);
+  const tabs = FILTERS.filter(([k]) => k === "all" || count(k)).map(([k, label]) =>
+    `<button type="button" data-filter="${k}" aria-pressed="${k === active}">${esc(label)} <span>${count(k)}</span></button>`).join("");
+  const row = ({m, s}) => `<tr><th scope="row">${onMap.has(m.id) ? `<button type="button" class="row-title" data-node="maker:${esc(m.id)}">${esc(m.name)}</button>` : esc(m.name)}</th>
+    <td><span class="stamp ${s.key}">${esc(s.label)}</span></td><td class="num">${esc(short(s.amount))}</td><td class="num">${m.held ? esc(short(m.held)) : "—"}</td><td class="note">${esc(s.what)}</td></tr>`;
+  const more = shown.length > PAGE ? `<button type="button" class="text-button" data-more="1">${expanded ? "Show fewer" : `Show all ${shown.length}`}</button>` : "";
+  return `${attention.length ? `<div class="mcards">${attention.map(card).join("")}</div>` : ""}
+    <div class="mtable"><div class="segmented" role="group" aria-label="Filter makers by state">${tabs}</div>
+    <div class="table-scroll"><table><thead><tr><th scope="col">Maker</th><th scope="col">State</th><th scope="col" class="num">Amount</th><th scope="col" class="num">Held</th><th scope="col">Note</th></tr></thead>
+    <tbody>${visible.map(row).join("")}</tbody></table></div>
+    <div class="table-footer"><span>Showing ${visible.length} of ${shown.length}${active === "all" ? "" : ` ${esc(FILTERS.find(([k]) => k === active)[1].toLowerCase())}`}</span>${more}</div></div>`;
+}
+
+// Where the money stands: what is owed now, split by what is happening to it,
+// and whether the PayPal balance covers what waits to be paid.
+export function stands(model) {
+  const list = everyone(model);
+  if (!list.length) return '<p class="empty-note">Figures appear when makers have orders.</p>';
+  const sum = key => list.reduce((s, m) => s + m[key], 0);
+  const parts = [["sending", "Sent to PayPal", sum("inFlight")], runWaiting(model) ? ["sign", "Waiting for your signature", sum("scheduled")] : ["scheduled", "Scheduled", sum("scheduled")],
+    ["held", "Held for disputes", sum("held")], ["owed", "Owed, not scheduled", sum("owed")]].filter(([, , v]) => v > 0);
+  const owed = parts.reduce((s, [, , v]) => s + v, 0), due = sum("scheduled"), avail = model.paypal.available;
+  const cover = due && avail != null ? (avail >= due
+    ? `Your PayPal balance of <b>${esc(short(avail))}</b> covers the ${esc(short(due))} waiting to be paid, leaving ${esc(short(avail - due))}.`
+    : `Your PayPal balance of <b>${esc(short(avail))}</b> is ${esc(short(due - avail))} short of the ${esc(short(due))} waiting to be paid.`) : "";
+  const paid = model.totals.paid ? `<p class="money-note">${esc(short(model.totals.paid))} already reached makers through PayPal in the last 30 days.</p>` : "";
+  if (!owed) return `<div class="money"><div class="money-total"><span>Owed to makers now</span><b>$0</b></div><p class="money-note">Nothing is owed right now.</p>${paid}</div>`;
+  return `<div class="money"><div class="money-total"><span>Owed to makers now</span><b>${esc(short(owed))}</b></div>
+    <div class="money-bar" role="img" aria-label="${esc(parts.map(([, label, v]) => `${short(v)} ${label.toLowerCase()}`).join(", "))}">${parts.map(([k, , v]) => `<i class="${k}" style="flex-grow:${v}"></i>`).join("")}</div>
+    <dl class="money-key">${parts.map(([k, label, v]) => `<div class="${k}"><dt>${esc(label)}</dt><dd>${esc(short(v))}</dd></div>`).join("")}</dl>
+    ${cover ? `<p class="money-note cover">${cover}</p>` : ""}${paid}</div>`;
 }

@@ -7,7 +7,7 @@
 <title>CounterSign · Command center</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23173a30'/%3E%3Cpath d='M9 15h9M9 25h9M21 20l4 4 7-9' fill='none' stroke='%23e8f3ec' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="styles.css">
 <script type="module" src="app.mjs"></script>
 </head>
@@ -46,45 +46,61 @@
 <p class="tagline">AI proposes.<br>Code countersigns.</p>
 <nav aria-label="Workspace">
 <a href="#overview" data-view="overview" class="nav-current" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-orbit"/></svg><span>Command center</span></a>
+<p class="nav-group">Act</p>
+<a href="#decision" data-view="decision"><svg class="icon" aria-hidden="true"><use href="#i-decision"/></svg><span>Decisions</span><span class="nav-count owner" id="nav-owner" hidden></span></a>
 <a href="#incidents" data-view="incidents"><svg class="icon" aria-hidden="true"><use href="#i-desk"/></svg><span>Incident desk</span><span class="nav-count" id="nav-count">—</span></a>
-<a href="#decision" data-view="decision"><svg class="icon" aria-hidden="true"><use href="#i-decision"/></svg><span>Decision</span><span class="nav-count owner" id="nav-owner" hidden></span></a>
+<p class="nav-group">Money</p>
 <a href="#runs" data-view="runs"><svg class="icon" aria-hidden="true"><use href="#i-runs"/></svg><span>Payout runs</span></a>
 <a href="#cash" data-view="cash"><svg class="icon" aria-hidden="true"><use href="#i-cash"/></svg><span>Cash</span></a>
 <a href="#graph" data-view="graph"><svg class="icon" aria-hidden="true"><use href="#i-graph"/></svg><span>Money graph</span></a>
+<p class="nav-group">Records</p>
 <a href="#audit" data-view="audit"><svg class="icon" aria-hidden="true"><use href="#i-audit"/></svg><span>Execution history</span></a>
-<a href="#trick" data-view="trick" id="nav-trick" hidden><svg class="icon" aria-hidden="true"><use href="#i-trick"/></svg><span>Try to trick the agent</span></a>
 <a href="#replay" data-view="replay"><svg class="icon" aria-hidden="true"><use href="#i-replay"/></svg><span>Evaluation replay</span></a>
+<p class="nav-group" id="nav-lab" hidden>Lab</p>
+<a href="#trick" data-view="trick" id="nav-trick" hidden><svg class="icon" aria-hidden="true"><use href="#i-trick"/></svg><span>Try to trick the agent</span></a>
 </nav>
 <div class="sidebar-bottom"><span class="mode-dot" aria-hidden="true"></span><span id="mode">Loading mode…</span></div>
 </aside>
 <main id="main" tabindex="-1">
 <header class="topbar"><nav class="crumbs" aria-label="Breadcrumb"><span class="top-brand">CounterSign</span><span class="slash" aria-hidden="true">/</span><span id="breadcrumb" aria-current="page">Command center</span></nav><span class="top-right"><a class="top-bell" href="#decision" aria-label="Decisions waiting for you"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg><b id="top-owner" hidden></b></a><span class="clock"><span id="clock-label">Workspace clock</span> <strong id="clock">—</strong></span><button type="button" id="theme" class="theme-toggle" aria-label="Switch to light theme" title="Switch theme"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg></button></span></header>
-<section id="command" class="command ov jr" aria-labelledby="command-title" hidden>
-<div class="jr-hero">
-<div class="jr-copy">
-<h1 id="command-title" class="jr-headline">This week</h1>
+<section id="command" class="command ov cc" aria-labelledby="command-title" hidden>
+<div class="cc-hero glass">
+<div class="cc-lede">
+<p id="cc-eyebrow" class="cc-eyebrow">This week</p>
+<h1 id="command-title" class="cc-headline">This week</h1>
 <p id="ov-finding" class="finding" aria-live="polite"></p>
-<p id="agent-line" class="agent-line"></p>
 </div>
-<div class="jr-balance" aria-labelledby="balance-title">
-<div class="jr-bal-row"><div><h2 id="balance-title">Available balance</h2><p id="jr-balance" class="jr-amount">—</p></div><a id="jr-review" class="primary pill-button" href="#decision">Review and sign</a></div>
-<h3>Week journey</h3>
+<div id="cc-action" class="cc-action"></div>
+</div>
+<dl class="kpis cc-kpis" id="kpis" aria-label="This week in numbers"></dl>
+<section class="cc-makers glass" aria-labelledby="makers-title">
+<header class="cc-head"><h2 id="makers-title">Makers this week <span id="makers-count" class="count"></span></h2><p id="makers-note">Select a maker to open its records in the money map.</p></header>
+<div id="folios" class="cc-makerlist"></div>
+</section>
+<div class="cc-row">
+<article class="ov-card cc-money" aria-labelledby="stands-title">
+<header class="ov-card-head"><div><h2 id="stands-title">Where the money stands</h2><p>Held money stays out of every payout until its dispute settles.</p></div></header>
+<div id="stands"></div>
+</article>
+<article class="ov-card cc-week" aria-labelledby="week-title">
+<header class="ov-card-head"><div><h2 id="week-title">This week</h2><p>The staged week, one stop per day.</p></div></header>
 <div id="rail-slot" class="rail-slot" data-kind="journey"></div>
+<h3 class="cc-sub">Friday's payout, side by side</h3>
+<div id="compare"></div>
+</article>
 </div>
+<div class="cc-row cc-trust">
+<article class="ov-card ov-scan" aria-labelledby="scan-title">
+<header class="ov-card-head"><div><h2 id="scan-title">Shield scan</h2><p>Every AI proposal is checked before money moves.</p></div></header>
+<div class="scope"><div id="scan"></div><span class="sweep" aria-hidden="true"></span></div>
+<div id="scan-tally"></div>
+</article>
+<article class="ov-card ov-activity" aria-labelledby="activity-title">
+<header class="ov-card-head"><div><h2 id="activity-title">Activity</h2><p>What the AI proposed, and what the shield said.</p></div><a class="cc-more" href="#audit">Execution history →</a></header>
+<div id="activity"></div>
+</article>
 </div>
-<div class="jr-deckrow">
-<div class="jr-deck-wrap" aria-labelledby="makers-title">
-<h2 id="makers-title" class="sr-only">Makers</h2>
-<div id="deck" class="deck"></div>
-<button type="button" id="deck-details" class="deck-details"><svg class="icon" aria-hidden="true"><use href="#i-link"/></svg>See details</button>
-<div id="sticker" class="sticker" role="img" aria-label="Money held back for disputes"></div>
-</div>
-<div class="jr-side">
-<dl class="kpis" id="kpis"></dl>
-<section class="ov-card jr-compare" aria-labelledby="compare-title"><h2 id="compare-title">Friday's payout, side by side</h2><div id="compare"></div></section>
-</div>
-</div>
-<div class="ov-grid">
+<div class="ov-grid cc-explore">
 <article class="ov-card ov-map" aria-labelledby="map-title">
 <header class="ov-card-head"><div><h2 id="map-title">Money map</h2><p>Node area follows the amount. Line width follows money moved.</p></div>
 <ul class="map-key" aria-label="Key"><li><i class="k-money"></i>Paid or sending</li><li><i class="k-ask"></i>Waiting for you</li><li><i class="k-held"></i>Held</li><li><i class="k-agent"></i>AI proposal</li><li><i class="k-stop"></i>Dispute or stopped</li></ul></header>
@@ -93,20 +109,6 @@
 <p id="scene-caption" class="scene-caption" hidden></p>
 </article>
 <aside id="panel" class="ov-card ov-panel" aria-live="polite" aria-label="Explanation"></aside>
-<article class="ov-card ov-scan" aria-labelledby="scan-title">
-<header class="ov-card-head"><div><h2 id="scan-title">Shield scan</h2><p>Every AI proposal is checked before money moves.</p></div></header>
-<div class="scope"><div id="scan"></div><span class="sweep" aria-hidden="true"></span></div>
-<div id="scan-tally"></div>
-</article>
-<article class="ov-card ov-activity" aria-labelledby="activity-title">
-<header class="ov-card-head"><div><h2 id="activity-title">Activity</h2><p>What the AI proposed, and what the shield said.</p></div></header>
-<div id="activity"></div>
-</article>
-<article class="ov-card ov-stands" aria-labelledby="stands-title">
-<header class="ov-card-head"><div><h2 id="stands-title">Where the money stands</h2><p>Held money stays out of every payout until its dispute settles.</p></div></header>
-<div id="stands"></div>
-<ul class="map-key" aria-label="Key"><li><i class="k-money"></i>Paid</li><li><i class="k-ask"></i>Waiting</li><li><i class="k-held"></i>Held</li><li><i class="k-owed"></i>Owed</li></ul>
-</article>
 </div>
 </section>
 <div class="content">

@@ -136,6 +136,6 @@ $("clear").addEventListener("click", () => {
   update();
 });
 // The playground exists only in demo mode on the mock; its nav item follows the server.
-fetch("/api/v1/playground/attacks", {cache: "no-store"}).then(response => {$("nav-trick").hidden = !response.ok;}).catch(() => {});
+fetch("/api/v1/playground/attacks", {cache: "no-store"}).then(response => {$("nav-trick").hidden = $("nav-lab").hidden = !response.ok;}).catch(() => {});
 refresh();
 demo.load();
