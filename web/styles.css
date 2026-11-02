@@ -1318,3 +1318,19 @@ button.mcard:is(:hover,:focus-visible) .mcard-go{opacity:1;transform:none}
   .md-panel{max-height:none}
 }
 @media (prefers-reduced-motion:reduce){.maker-dialog[open]{animation:none}}
+
+/* Matte cream glass (owner, Nov 2): light surfaces are a warm cream rather than
+   pure white, with a softer rim and less colour pulled through from the backdrop. */
+:root,:root[data-theme="light"]{
+  --surface:#fbf8f1;--sunken:rgba(246,241,230,.62);
+  --glass:rgba(250,246,238,.74);--glass-strong:rgba(250,246,238,.86);--card:rgba(250,246,238,.76);--sheet:rgba(248,244,235,.72);
+  --glass-edge:inset 0 0 0 1px rgba(255,252,244,.55),inset 0 1px 0 rgba(255,252,244,.7),0 0 0 8px rgba(255,250,240,.14),0 30px 60px -30px rgba(15,35,80,.42);
+  --card-edge:inset 0 0 0 1px rgba(120,100,70,.08),inset 0 1px 0 rgba(255,252,244,.7),0 14px 30px -22px rgba(15,35,80,.35);
+}
+:root[data-theme="dark"]{--card-edge:inset 0 0 0 1px rgba(255,255,255,.08),inset 0 1px 0 rgba(255,255,255,.06),0 14px 30px -22px rgba(0,0,0,.7)}
+:root:not([data-theme="dark"]) :is(.glass,.ov-card,.panel,.view-card,.desk,.detail,.callout,.ledger,.intro,.cc-kpis>.kpi,.workspace-view,.footer,.topbar,.sidebar,.demo-bar,.maker-dialog){
+  backdrop-filter:blur(22px) saturate(1.1);-webkit-backdrop-filter:blur(22px) saturate(1.1)}
+
+/* Cards that sit inside a page sheet or the incident desk are close together; the
+   8 px halo made neighbours run into each other, so they take a thin rim instead. */
+.workspace-view :is(.view-card,.panel,.desk,.detail,.callout,.ledger),.content :is(.view-card,.desk,.detail,.callout,.ledger,.intro){box-shadow:var(--card-edge)}
