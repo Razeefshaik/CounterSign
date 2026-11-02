@@ -497,3 +497,11 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | C42 review: money-map labels are larger and maker and PayPal labels sit below their nodes; the explanation panel drops Friday's bars when the overview already shows them; the overview leaves room for the demo dock; narrow phones hide the top bar crumbs | C42 review, Nov 2 | Accept | Map text rendered at about 7 px and collided with order satellites, the comparison appeared twice, the dock covered the last cards, and the phone header wrapped |
 | C42 wide screens: the overview, routed views, top bar and demo dock share one right edge, maker cards share the row, and the finding no longer repeats a waiting decision the headline already states | Owner, Nov 2 (screenshot at about 1870 px) | Accept | The overview stopped at 1480 px and routed views at 1180 px while the header and dock ran full width, leaving an empty band on the right |
 | C42: a maker card or table row opens that maker's money map (categories, records, explanation) in a glass dialog over the page; the map at the bottom keeps its own selection. Maker cards cap at 300 px; a 24 px gutter separates the sidebar from the page | Owner, Nov 2 | Accept | Owner saw the sidebar and page glass touching, cards stretched too wide, and wanted a maker's map without scrolling to the bottom |
+
+## Nov 2 C43 matte cards and spacing (branch razeef/c43-matte-card-fix)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Keep the original 8px glass rims and use 28px gaps for adjacent decision, split, replay and overview figure cards | Owner, Nov 2 | Accept | Two rims consumed the previous 14–16px gaps; spacing, rather than replacing the rim, prevents them from touching |
+| Use subtle warm cream light surfaces with less saturated backdrop blur; retain the blue palette and dark surfaces | Owner, Nov 2 | Accept | Pure white cards looked too bright; the warmer finish should read matte without changing the design |
+| Let grid tracks shrink and place the sticky decision column below the desktop header | C43 browser check | Accept | Long content and scrolled controls must not collide with adjacent cards or the header |

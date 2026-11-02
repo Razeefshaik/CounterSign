@@ -1,5 +1,17 @@
 # CounterSign dashboard
 
+## Nov 2 matte card spacing (C43, branch razeef/c43-matte-card-fix)
+
+Light cards use a subtle warm cream (`--surface: #fbf8f1`) with less saturated
+backdrop blur. The original glass rims and dark palette are preserved. Decision,
+split-view, replay and overview figure cards have 28px gaps, leaving 12px visible
+between their existing 8px rims. Grid tracks may shrink without pushing adjacent
+cards out, and the sticky decision column clears the desktop header.
+
+Validation: 63 frontend tests; 81 fixture-based browser layout checks across eight
+routes at 390, 768, 1080, 1440 and 1606px in both themes, including rim separation,
+page overflow and sticky-header clearance. No financial behavior changed.
+
 ## Nov 2 glass command center (C42, branch razeef/c42-glass-command, built on C39)
 
 - **Backdrop and glass.** The owner's frosted backdrops sit behind the page: `assets/backdrop-blue.webp` in light mode, `assets/backdrop-night.webp` in dark mode (rendered images, 2400 × 1500 WebP, about 130 KB each). Every surface that carries text is glass at 72% or more (`--card`, `--glass`, `--sheet`), so copy keeps 4.5:1 over the darkest part of either image; text tokens on glass were darkened to match (`--ink-3` `#46526b`, `--accent-ink` `#1f47ad`, `--highlight-ink` `#9e1a5c`, `--bad` `#a82a33`). One token set per theme; components never repaint per theme.
