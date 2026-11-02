@@ -1285,6 +1285,36 @@ button.mcard:is(:hover,:focus-visible) .mcard-go{opacity:1;transform:none}
    edge (24 px from the window) instead of stopping at 1480 or 1180 px. Maker cards
    share the row rather than leaving an empty column. */
 .command.cc,body[data-route] .content{max-width:none}
-.mcards{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-.mcards:has(>.mcard:only-child){grid-template-columns:minmax(240px,420px)}
-@media (min-width:861px){:root body[data-route] .demo-bar{left:276px}}
+.mcards{grid-template-columns:repeat(auto-fill,minmax(240px,300px))}
+@media (min-width:861px){
+  /* A clear gutter between the sidebar and the page, so their glass halos never touch. */
+  body[data-route] .layout{column-gap:24px}
+  :root body[data-route] .demo-bar{left:300px}
+}
+
+/* Maker money map in a dialog: a card opens its maker here instead of scrolling
+   to the map at the bottom of the page. */
+.maker-dialog{width:min(1180px,calc(100vw - 48px));max-width:none;max-height:calc(100vh - 48px);padding:0;border:0;border-radius:28px;overflow:hidden;color:var(--ink);
+  background:var(--glass-strong);backdrop-filter:blur(28px) saturate(1.5);-webkit-backdrop-filter:blur(28px) saturate(1.5);box-shadow:var(--glass-edge)}
+.maker-dialog[open]{display:flex;flex-direction:column;animation:md-in 260ms var(--ease-out) both}
+.maker-dialog::backdrop{background:rgb(15 26 51 / .34);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+@keyframes md-in{from{opacity:0;transform:translateY(10px) scale(.98)}}
+.md-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:22px 26px 8px}
+.md-eyebrow{font-size:12.5px;font-weight:600;color:var(--ink-3)}
+.md-head h2{margin-top:2px;font:700 28px/1.1 var(--sans);letter-spacing:-0.03em}
+.md-head p:last-child{margin-top:4px;font-size:14px;color:var(--ink-2)}
+.md-close{display:grid;place-items:center;flex:none;width:40px;height:40px;border:0;border-radius:50%;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-knob);cursor:pointer}
+.md-close .icon{width:18px;height:18px}
+.md-body{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:20px;min-height:0;padding:8px 26px 26px;overflow:auto}
+.md-stage{min-width:0;border-radius:22px;background:var(--sunken)}
+.md-stage>svg{display:block;width:100%;height:auto;max-height:calc(100vh - 220px)}
+.md-panel{min-width:0;padding:18px 20px;border-radius:22px;background:var(--card);box-shadow:var(--ring);overflow:auto;max-height:calc(100vh - 220px)}
+@media (max-width:900px){
+  .maker-dialog{width:calc(100vw - 16px);max-height:calc(100vh - 16px);border-radius:22px}
+  .md-head{padding:18px 18px 6px}
+  .md-body{grid-template-columns:minmax(0,1fr);padding:6px 14px 16px}
+  .md-stage{overflow-x:auto}
+  .md-stage>svg{min-width:640px;max-height:none}
+  .md-panel{max-height:none}
+}
+@media (prefers-reduced-motion:reduce){.maker-dialog[open]{animation:none}}

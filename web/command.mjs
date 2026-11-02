@@ -2,7 +2,7 @@
 // money map and explains whatever the viewer selects. No writes. C42 lays the
 // page out as one action, four figures, the makers, then the evidence.
 import {sceneModel, focusModel, focusSvg, defaultCategory, nodePanel, makerPanel, itemPanel, storyPanel, short} from "./scene.mjs";
-import {plotSvg, scanSvg, scanTally, stands, activity, finding, progress, makerAt, PW, PH, headline, journey, compareBars, weekLabel, actionStrip, kpiCards, makerList} from "./plot.mjs";
+import {plotSvg, scanSvg, scanTally, stands, activity, finding, progress, makerAt, PW, PH, headline, journey, compareBars, weekLabel, actionStrip, kpiCards, makerList, makerState} from "./plot.mjs";
 import {weekDays} from "./words.mjs";
 import {esc} from "./views.mjs";
 
@@ -14,6 +14,8 @@ export function createCommand(document, fetcher = fetch) {
   const motion = () => !view?.matches;
   let data = null, model = null, previous = null, selected = "", focus = "", category = "", item = "", fm = null, shown = false, serial = 0;
   let makerFilter = "all", makerMore = false;
+  // The maker dialog keeps its own selection, so the money map below stays where it was.
+  let dlg = null;
 
   async function json(url) {
     const response = await fetcher(url, {cache: "no-store"});
@@ -133,6 +135,34 @@ export function createCommand(document, fetcher = fetch) {
     draw({swap: "zoom-in"});
   }
 
+  // A maker card opens that maker's money map in a dialog over the page.
+  function drawDialog() {
+    const maker = dlg && model.makers.find(m => m.id === dlg.id);
+    if (!maker) return;
+    $("md-title").textContent = maker.name;
+    $("md-sub").textContent = makerState(maker, model).what;
+    $("md-stage").innerHTML = focusSvg(dlg.fm, {category: dlg.category, item: dlg.item, motion: motion()});
+    $("md-panel").innerHTML = `<div class="panel-inner">${dlg.item ? `<button type="button" class="panel-back" data-action="maker">← ${esc(maker.name)}</button>` + itemPanel(dlg.fm, dlg.item) : makerPanel(dlg.fm.maker)}</div>`;
+  }
+
+  function openDialog(id) {
+    const dialog = $("maker-dialog"), maker = model.makers.find(m => "maker:" + m.id === id);
+    if (!maker || !dialog?.showModal) return false;
+    const fm = focusModel(data.graphs[maker.id], maker);
+    dlg = {id: maker.id, fm, category: defaultCategory(fm), item: ""};
+    drawDialog();
+    if (!dialog.open) dialog.showModal();
+    return true;
+  }
+
+  function dialogPick(target) {
+    const it = target.closest?.("[data-item]"), card = target.closest?.("[data-category]");
+    if (!dlg || !(it || card)) return false;
+    if (it) dlg.item = it.dataset.item; else {dlg.category = card.dataset.category; dlg.item = "";}
+    drawDialog();
+    return true;
+  }
+
   function closeFocus() {
     if (!focus) return;
     focus = ""; fm = null; item = ""; category = "";
@@ -165,7 +195,7 @@ export function createCommand(document, fetcher = fetch) {
       if (filter) {makerFilter = filter; makerMore = false; makers(); return;}
       if (event.target.closest?.("[data-more]")) {makerMore = !makerMore; makers(); return;}
       const id = event.target.closest?.("[data-node]")?.dataset.node;
-      if (!id) return;
+      if (!id || openDialog(id)) return;
       if (focus === id.slice(6)) {closeFocus(); return;}
       focus = ""; fm = null;
       openMaker(id);
@@ -173,6 +203,20 @@ export function createCommand(document, fetcher = fetch) {
       const top = $("stage").getBoundingClientRect?.().top;
       if (top == null || top < 0 || top > (globalThis.innerHeight || 800) * 0.6) $("stage").scrollIntoView({behavior: motion() ? "smooth" : "auto", block: "center"});
     };
+    const dialog = $("maker-dialog");
+    if (dialog) {
+      // A click on the backdrop lands on the dialog itself; its content sits in inner boxes.
+      dialog.onclick = event => {if (event.target === dialog || event.target.closest?.("[data-close]")) dialog.close();};
+      dialog.onclose = () => {dlg = null;};
+      $("md-stage").onclick = event => dialogPick(event.target);
+      $("md-stage").onkeydown = event => {
+        if ((event.key === "Enter" || event.key === " ") && dialogPick(event.target)) event.preventDefault();
+      };
+      $("md-panel").onclick = event => {
+        if (event.target.closest?.('[data-action="maker"]') && dlg) {dlg.item = ""; drawDialog();}
+        else if (event.target.closest?.("a[href]")) dialog.close();
+      };
+    }
     $("command").onkeydown = event => {
       if (event.key !== "Escape") return;
       if (item) {item = ""; stage(); panel();} else if (focus) closeFocus(); else if (selected) {selected = ""; stage(); panel();}
@@ -199,7 +243,13 @@ export function createCommand(document, fetcher = fetch) {
         if (maker) fm = focusModel(data.graphs[maker.id], maker); else {focus = ""; fm = null;}
       }
       if (selected && !nodePanel(model, selected, {cash: data.cash})) selected = "";
+      if (dlg) {
+        const maker = model.makers.find(m => m.id === dlg.id);
+        if (maker) {dlg.fm = focusModel(data.graphs[maker.id], maker); if (!dlg.fm.categories.some(c => c.type === dlg.category)) dlg.category = defaultCategory(dlg.fm);}
+        else {dlg = null; $("maker-dialog").close();}
+      }
       draw({entrance: !shown});
+      drawDialog();
       shown = true;
     },
   };

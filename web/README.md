@@ -8,6 +8,7 @@
 - **Makers at any count** (`makerList()`). Up to four makers read as cards. Past four, the makers waiting for the owner stay as cards and everyone goes into a table with state filters and ten rows at a time. Cards and rows for makers on the map open them there; the map still draws six, and totals now count every maker.
 - The C39 deck, sticker, coins and icon rail are retired.
 - **Review fixes.** The headline counts every maker and matches the owed figure below it; map labels are readable at card size and sit below maker and PayPal nodes; the explanation panel skips Friday's bars when the overview shows them (`storyPanel({bars})`); the overview leaves room for the demo dock.
+- **Maker dialog.** A maker card or table row opens that maker's money map in a dialog (`#maker-dialog`): select a category, then a record, to see how it connects. Esc, the close button or the backdrop closes it. The money map at the bottom keeps its own selection.
 
 ## Oct 31 journey overview (C39, branch razeef/c39-glass-journey)
 

@@ -74,9 +74,13 @@
 </div>
 <dl class="kpis cc-kpis" id="kpis" aria-label="This week in numbers"></dl>
 <section class="cc-makers glass" aria-labelledby="makers-title">
-<header class="cc-head"><h2 id="makers-title">Makers this week <span id="makers-count" class="count"></span></h2><p id="makers-note">Select a maker to open its records in the money map.</p></header>
+<header class="cc-head"><h2 id="makers-title">Makers this week <span id="makers-count" class="count"></span></h2><p id="makers-note">Select a maker to open its money map.</p></header>
 <div id="folios" class="cc-makerlist"></div>
 </section>
+<dialog id="maker-dialog" class="maker-dialog" aria-labelledby="md-title">
+<header class="md-head"><div><p class="md-eyebrow">Maker money map</p><h2 id="md-title">Maker</h2><p id="md-sub"></p></div><button type="button" class="md-close" data-close aria-label="Close"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button></header>
+<div class="md-body"><div id="md-stage" class="md-stage"></div><aside id="md-panel" class="md-panel" aria-live="polite" aria-label="Explanation"></aside></div>
+</dialog>
 <div class="cc-row">
 <article class="ov-card cc-money" aria-labelledby="stands-title">
 <header class="ov-card-head"><div><h2 id="stands-title">Where the money stands</h2><p>Held money stays out of every payout until its dispute settles.</p></div></header>
