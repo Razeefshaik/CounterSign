@@ -101,7 +101,7 @@ export function createCommand(document, fetcher = fetch) {
 
   function pieces() {
     fill("cc-eyebrow", esc(weekLabel(data.demo)));
-    fill("command-title", headline(model));
+    if (!$("command-title")?.dataset?.brand) fill("command-title", headline(model));
     fill("ov-finding", finding(model));
     fill("cc-action", actionStrip(model));
     fill("scan", scanSvg(model));
@@ -183,6 +183,13 @@ export function createCommand(document, fetcher = fetch) {
   }
 
   function bind() {
+    const heroMotion = $("hero-motion");
+    if (heroMotion) heroMotion.onclick = () => {
+      const paused = heroMotion.getAttribute("aria-pressed") !== "true";
+      document.querySelector(".brand-hero").dataset.paused = String(paused);
+      heroMotion.setAttribute("aria-pressed", String(paused));
+      heroMotion.textContent = paused ? "Play animation" : "Pause animation";
+    };
     const stageEl = $("stage");
     stageEl.onclick = event => activate(event.target);
     stageEl.onkeydown = event => {

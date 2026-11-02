@@ -1,5 +1,24 @@
 # CounterSign dashboard
 
+## Nov 2 selected hero and integration (C45)
+
+The approved Combined study now opens the real overview: Porcelain's frame and
+pane proportions, the blue background, local satin-blue / pink spheres and a
+fuller pearl-white / pale-blue oval at the lower right. The approved pink-ball
+position is retained. A 3px matte-rose reflection follows the existing glass rim;
+Pause animation and reduced motion stop the decorative movement. The new
+corner-and-check SVG is the favicon, sidebar mark and hero title highlight.
+
+The hero contains identity copy only. The actual finding and approval link remain
+bound to the dashboard data immediately below it; no amount or live state is
+copied from the study. Existing empty/loading/error states and approval logic
+are retained. `hero.css` scopes the new art; the four transparent WebP assets total
+548,910 bytes. Their exact material prompts are in `assets/hero-prompts.json`.
+
+Owner-attention accents now use muted matte rose in both themes, including the
+map, money bars, badges and panels; dark rose text retains contrast. Local cream
+styling is preserved, and C43's spacing retains the original 8px card rims.
+
 ## Nov 2 matte card spacing (C43, branch razeef/c43-matte-card-fix)
 
 Light cards use a subtle warm cream (`--surface: #fbf8f1`) with less saturated

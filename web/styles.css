@@ -713,7 +713,7 @@ body[data-route="overview"] .content{padding-bottom:0}
   --ink:#0f1a33;--ink-2:#3d4863;--ink-3:#46526b;--line:rgba(15,26,51,.09);--line-strong:rgba(15,26,51,.18);
   --accent:#2a56c9;--accent-hover:#2349ad;--accent-ink:#1f47ad;--accent-soft:#e7eefc;--on-accent:#ffffff;
   --cornflower:#6b9fe4;--support:#4f86d6;--support-soft:#e3edfb;
-  --highlight:#ec4899;--highlight-ink:#9e1a5c;--highlight-soft:#fde8f2;
+  --highlight:#c18dA5;--highlight-ink:#80415f;--highlight-soft:#f2e8ed;
   --bad:#a82a33;--bad-soft:#fdebec;--held:#1d3557;--held-soft:#e7ecf4;--navy:#1d3557;--on-navy:#ffffff;
   --deck-hi:#9cc0ef;--deck-top:#7aa8e8;--deck-bottom:#3566c2;--on-deck:#ffffff;
   --orb-hi:#ffffff;--orb-idle:#b9cbe3;--orb-deep:#24467a;
@@ -735,7 +735,7 @@ body[data-route="overview"] .content{padding-bottom:0}
   --ink:#eef1f7;--ink-2:#b9c1d2;--ink-3:#8c95a9;--line:rgba(255,255,255,.08);--line-strong:rgba(255,255,255,.16);
   --accent:#8ab4f0;--accent-hover:#a3c4f5;--accent-ink:#8ab4f0;--accent-soft:rgba(138,180,240,.14);--on-accent:#0b1430;
   --cornflower:#7fb0f0;--support:#7fb0f0;--support-soft:rgba(127,176,240,.14);
-  --highlight:#f472b6;--highlight-ink:#f9a8d4;--highlight-soft:rgba(244,114,182,.14);
+  --highlight:#b88da4;--highlight-ink:#e4bfd2;--highlight-soft:rgba(184,141,164,.12);
   --bad:#f87171;--bad-soft:rgba(248,113,113,.14);--held:#a9b9d8;--held-soft:rgba(169,185,216,.12);--navy:#2a4a78;--on-navy:#ffffff;
   --deck-hi:#6f9fe0;--deck-top:#4f86d6;--deck-bottom:#2f5ba8;--on-deck:#ffffff;
   --orb-hi:#dbe7f8;--orb-idle:#3a4a63;--orb-deep:#1b3358;
@@ -937,7 +937,7 @@ html{scrollbar-color:var(--line-strong) transparent}
 /* Explanation panel */
 .eyebrow{font:500 12.5px/1.3 var(--sans);letter-spacing:0;text-transform:none;color:var(--ink-3)}
 .panel-head h2{font-size:19px}
-.waiting,:root[data-theme="light"] .waiting{background:var(--highlight-soft);box-shadow:0 0 0 1px rgb(236 72 153 / .3);animation:none}
+.waiting,:root[data-theme="light"] .waiting{background:var(--highlight-soft);box-shadow:0 0 0 1px color-mix(in srgb,var(--highlight) 25%,transparent);animation:none}
 .waiting .eyebrow,.waiting span:last-child{color:var(--highlight-ink)}
 .tiles div,.feed li,.links li,.compare{background:var(--sunken);box-shadow:none}
 .tiles .good dd,:root[data-theme="light"] .tiles .good dd{color:var(--accent-ink)}
@@ -976,7 +976,7 @@ html{scrollbar-color:var(--line-strong) transparent}
 @keyframes c38-blip{0%{opacity:1}55%,100%{opacity:.4}}
 .s-blip path{fill:var(--accent)}.s-blip .halo{fill:rgb(42 86 201 / .14)}
 .s-blip.stop path{fill:var(--bad)}.s-blip.stop .halo{fill:rgb(210 60 67 / .14)}
-.s-blip.ask path,.s-blip.signed path{fill:var(--highlight)}.s-blip.ask .halo{fill:rgb(236 72 153 / .16)}
+.s-blip.ask path,.s-blip.signed path{fill:var(--highlight)}.s-blip.ask .halo{fill:color-mix(in srgb,var(--highlight) 12%,transparent)}
 .s-blip text{font:500 10.5px var(--sans);fill:var(--bad);paint-order:stroke;stroke:var(--sunken);stroke-width:3px}
 .s-blip:focus-visible .halo{stroke:var(--ink);stroke-width:1.5}
 .tally{margin:12px 0 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;padding-top:12px;box-shadow:inset 0 1px 0 var(--line)}
@@ -1202,7 +1202,7 @@ button.mcard:is(:hover,:focus-visible) .mcard-go{opacity:1;transform:none}
 .money-bar{display:flex;gap:4px;height:14px;margin:16px 0 14px}
 .money-bar i{display:block;min-width:6px;border-radius:7px;transform-origin:left;animation:cc-grow 800ms var(--ease-out) both}
 .money-bar .sending,.money-bar .scheduled{background:var(--support)}
-.money-bar .sign{background:var(--highlight)}
+.money-bar .sign{background:color-mix(in srgb,var(--highlight) 65%,var(--surface))}
 .money-bar .held{background:repeating-linear-gradient(135deg,var(--held) 0 5px,color-mix(in srgb,var(--held) 62%,var(--surface)) 5px 9px)}
 .money-bar .owed{background:var(--line-strong)}
 @keyframes cc-grow{from{transform:scaleX(0)}}
@@ -1354,9 +1354,7 @@ button.mcard:is(:hover,:focus-visible) .mcard-go{opacity:1;transform:none}
 :root:not([data-theme="dark"]) :is(.glass,.ov-card,.panel,.view-card,.desk,.detail,.callout,.ledger,.intro,.cc-kpis>.kpi,.workspace-view,.footer,.topbar,.sidebar,.demo-bar,.maker-dialog){
   backdrop-filter:blur(22px) saturate(1.1);-webkit-backdrop-filter:blur(22px) saturate(1.1)}
 
-/* Cards that sit inside a page sheet or the incident desk are close together; the
-   8 px halo made neighbours run into each other, so they take a thin rim instead. */
-.workspace-view :is(.view-card,.panel,.desk,.detail,.callout,.ledger),.content :is(.view-card,.desk,.detail,.callout,.ledger,.intro){box-shadow:var(--card-edge)}
+/* Spacing leaves room for the original glass rims on adjacent cards. */
 /* Warm matte light surfaces retain the blue glass backdrop and semantic accents. */
 :root:not([data-theme="dark"]) :is(.glass,.ov-card,.panel,.view-card,.desk,.detail,.callout,.ledger,.intro,.cc-kpis>.kpi,.workspace-view,.footer,.topbar,.sidebar,.demo-bar,.maker-dialog){
   backdrop-filter:blur(22px) saturate(1.1);-webkit-backdrop-filter:blur(22px) saturate(1.1)}

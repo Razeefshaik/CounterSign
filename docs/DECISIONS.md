@@ -484,6 +484,16 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The deck reorders on click and "See details" opens the front maker in the money map; nothing on the hero moves money | C39 design | Accept | The owner's signature still happens on the decision view, bound to the payload hash |
 | Journey takes the owner's reference look: a light grey glass room, two blues (cornflower #6b9fe4 for the maker deck, main button, headline amount and glass orbs; folio blue #2a56c9 for data and navigation), frosted glass coins, a navy held-back sticker, pink only for highlights; navigation becomes a floating glass icon rail and a glass pill header with a bell for waiting decisions | Owner, Oct 31 | Accept | Owner rejected C38, C40 and C41 and asked for the reference blues and glass on the Journey layout |
 
+## Nov 2 C45 selected design integration
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Integrate the selected Combined identity hero with Porcelain proportions, generated satin materials, the fuller pearl ring, unchanged approved pink-ball placement and a 3px flowing rim accent | Owner, Nov 2 | Accept | Owner selected the study for main; identity copy avoids repeating live amounts already shown in the cards |
+| Keep the genuine data-driven finding and owner approval link immediately below the hero; protect the static brand title from financial headline refreshes | C45 integration | Accept | The selected branding must not hide an actionable approval or replace current financial evidence with captured study data |
+| Use the owner-selected corner/check SVG as favicon, sidebar mark and title highlight | Owner, Nov 2 | Accept | One crisp project mark connects the hero with the rest of the interface |
+| Replace bright pink attention accents with muted matte rose in both themes, keeping darker text and named approval states | Owner, Nov 2 | Accept | Pink should guide attention without dominating maps, bars or panels |
+| Preserve the local matte cream styling in its own commit and retain C43 spacing with original 8px card rims | Owner integration request and earlier rim constraint | Accept | Existing local work is recorded without using thin replacement rims to solve overlap |
+
 ## Nov 2 C44 overview polish
 
 | Change | Source | Decision | Reason |

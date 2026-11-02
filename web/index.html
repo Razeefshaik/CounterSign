@@ -5,10 +5,12 @@
 <meta name="description" content="CounterSign: an AI agent proposes marketplace payouts and dispute actions; deterministic code countersigns before PayPal money moves.">
 <meta name="color-scheme" content="light dark">
 <title>CounterSign · Command center</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='10' fill='%23173a30'/%3E%3Cpath d='M9 15h9M9 25h9M21 20l4 4 7-9' fill='none' stroke='%23e8f3ec' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" type="image/svg+xml" href="assets/countersign-mark.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="hero.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap">
 <script type="module" src="app.mjs"></script>
 </head>
 <body>
@@ -42,7 +44,7 @@
 <section id="demo-bar" class="demo-bar" aria-label="Staged demo week" hidden></section>
 <div class="layout">
 <aside class="sidebar">
-<a class="brand" href="./"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8"/><path d="M7 12h8M7 20h8M17.5 16l3.5 3.5 6-8"/></svg><span>CounterSign</span></a>
+<a class="brand" href="./"><svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M4 12V4h11M28 20v8H17M4 21h9m3-5 4 4L28 8"/></svg><span>CounterSign</span></a>
 <p class="tagline">AI proposes.<br>Code countersigns.</p>
 <nav aria-label="Workspace">
 <a href="#overview" data-view="overview" class="nav-current" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-orbit"/></svg><span>Command center</span></a>
@@ -64,12 +66,18 @@
 <main id="main" tabindex="-1">
 <header class="topbar"><nav class="crumbs" aria-label="Breadcrumb"><span class="top-brand">CounterSign</span><span class="slash" aria-hidden="true">/</span><span id="breadcrumb" aria-current="page">Command center</span></nav><span class="top-right"><a class="top-bell" href="#decision" aria-label="Decisions waiting for you"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg><b id="top-owner" hidden></b></a><span class="clock"><span id="clock-label">Workspace clock</span> <strong id="clock">—</strong></span><button type="button" id="theme" class="theme-toggle" aria-label="Switch to light theme" title="Switch theme"><svg class="icon" aria-hidden="true"><use href="#i-moon"/></svg></button></span></header>
 <section id="command" class="command ov cc" aria-labelledby="command-title" hidden>
-<div class="cc-hero glass">
-<div class="cc-lede">
-<p id="cc-eyebrow" class="cc-eyebrow">This week</p>
-<h1 id="command-title" class="cc-headline">This week</h1>
-<p id="ov-finding" class="finding" aria-live="polite"></p>
+<div class="cc-hero glass brand-hero" data-paused="false">
+<div class="brand-art" aria-hidden="true"><span class="brand-sphere brand-blue"></span><span class="brand-sphere brand-pink"></span><span class="brand-loop brand-loop-blue"></span><span class="brand-loop brand-loop-pearl"></span></div>
+<div class="brand-pane">
+<p class="brand-eyebrow">Marketplace operations</p>
+<div class="brand-title"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 12V4h11M28 20v8H17M4 21h9m3-5 4 4L28 8"/></svg><h1 id="command-title" data-brand="true">CounterSign</h1></div>
+<p class="brand-purpose">Disputes and payouts, managed together.</p>
+<p class="brand-policy">Review AI proposals, track disputes, and approve payments and refunds from one workspace.</p>
 </div>
+<button id="hero-motion" class="brand-motion" type="button" aria-pressed="false">Pause animation</button>
+</div>
+<div class="cc-next">
+<p id="ov-finding" class="finding" aria-live="polite"></p>
 <div id="cc-action" class="cc-action"></div>
 </div>
 <dl class="kpis cc-kpis" id="kpis" aria-label="This week in numbers"></dl>
