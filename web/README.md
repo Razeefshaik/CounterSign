@@ -11,6 +11,25 @@ cards out, and the sticky decision column clears the desktop header.
 Validation: 63 frontend tests; 81 fixture-based browser layout checks across eight
 routes at 390, 768, 1080, 1440 and 1606px in both themes, including rim separation,
 page overflow and sticky-header clearance. No financial behavior changed.
+## Nov 2 overview polish (C44)
+
+The display-only week milestones use the owner-selected generated satin-blue
+material, served locally as `assets/milestone-blue.webp` (128 × 128, 7,352 bytes).
+The material was generated with the built-in image tool using the owner's satin
+glass-metal reference; the prompt requested a seamless blue sphere, fine grain,
+polished reflections and no coloured bands. Existing day states and labels stay
+derived from the demo steps. The current marker is static rather than pulsing.
+
+Friday's comparison uses two aligned bars on one scale, labelled “Simulated”
+and “Recorded plan”. The disputed portion stays visible in the simulated payout;
+CounterSign's bar stops at its planned payout, without a hatched tail that could
+look like money being sent. Amounts remain sourced from the saved comparison,
+not current balances. Missing or invalid amounts show unavailable.
+
+Validation: 67 Node tests passed, syntax check passed, and 20 read-only browser
+checks cover five widths, both themes, all eight routes and reduced motion.
+Browser evidence uses public contract fixtures and the captured mock Friday,
+not a running backend. No Python suite or real services were used for this UI work.
 
 ## Nov 2 glass command center (C42, branch razeef/c42-glass-command, built on C39)
 

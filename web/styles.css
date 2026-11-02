@@ -1235,6 +1235,29 @@ button.mcard:is(:hover,:focus-visible) .mcard-go{opacity:1;transform:none}
 .vs-track .ours{background:var(--accent)}.vs-track .kept{background:repeating-linear-gradient(135deg,var(--held) 0 3px,var(--held-soft) 3px 6px)}
 .vs p{margin-top:6px;font-size:12.5px;color:var(--ink-3)}
 
+/* C44: rendered satin material on the existing display-only week milestones. */
+.journey li{gap:12px;min-width:0}
+.journey i,.journey li.done i,.journey li.current i{background:url("assets/milestone-blue.webp") center/106% 106% no-repeat;box-shadow:0 5px 9px -5px rgba(20,47,94,.32)}
+.journey i{opacity:.6;filter:saturate(.55)}
+.journey li.done i,.journey li.current i{opacity:1;filter:none}
+.journey li.current i{transform:none;animation:none;box-shadow:0 0 0 3px var(--surface),0 0 0 5px color-mix(in srgb,var(--highlight) 72%,transparent),0 5px 9px -5px rgba(20,47,94,.32)}
+.journey li::before{height:2px;top:18px}
+.vs-comparison{margin-top:18px;display:grid;gap:20px}
+.vs-entry{min-width:0}
+.vs-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin-bottom:10px}
+.vs-heading>span{font-size:13px;font-weight:600;color:var(--ink)}
+.vs-heading small{display:block;font-size:11.5px;color:var(--ink-3);font-weight:400;line-height:1.6}
+.vs-heading b{text-align:right;font-size:23px;font-weight:600;letter-spacing:-.025em;line-height:1.2;white-space:nowrap}
+.vs-comparison .vs-track{height:18px;border-radius:5px;background:var(--sunken);box-shadow:inset 0 0 0 1px var(--line)}
+.vs-comparison .vs-track i{animation:none}
+.vs-comparison .vs-track .naive{background:color-mix(in srgb,var(--ink-3) 55%,var(--surface))}
+.vs-comparison .vs-track .naive-held{background:color-mix(in srgb,var(--bad) 68%,var(--surface));box-shadow:inset 2px 0 0 var(--surface)}
+.vs-comparison .vs-track .ours{background:var(--accent);border-radius:5px}
+.vs-comparison .vs-caption{display:flex;align-items:center;gap:7px;margin-top:9px;font-size:12px;line-height:1.5;color:var(--ink-2)}
+.vs-dot{flex:none;width:6px;height:6px;border-radius:2px}.vs-dot.risk{background:var(--bad)}.vs-dot.safe{background:var(--accent)}
+.vs-comparison .vs-note{margin:0;padding-top:13px;border-top:1px solid var(--line);font-size:12px;line-height:1.65;color:var(--ink-3)}
+@media(max-width:600px){.vs-comparison{gap:18px}.vs-heading b{font-size:22px}.vs-comparison .vs-track{height:16px}}
+
 /* One entrance per view: the sections rise in reading order */
 @keyframes cc-rise{from{opacity:0;transform:translateY(12px)}}
 .cc>*{animation:cc-rise 560ms var(--ease-out) both}

@@ -484,6 +484,14 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The deck reorders on click and "See details" opens the front maker in the money map; nothing on the hero moves money | C39 design | Accept | The owner's signature still happens on the decision view, bound to the payload hash |
 | Journey takes the owner's reference look: a light grey glass room, two blues (cornflower #6b9fe4 for the maker deck, main button, headline amount and glass orbs; folio blue #2a56c9 for data and navigation), frosted glass coins, a navy held-back sticker, pink only for highlights; navigation becomes a floating glass icon rail and a glass pill header with a bell for waiting decisions | Owner, Oct 31 | Accept | Owner rejected C38, C40 and C41 and asked for the reference blues and glass on the Journey layout |
 
+## Nov 2 C44 overview polish
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Existing display-only week milestones use a local generated satin-blue sphere material; the current marker stays static | Owner, Nov 2 | Accept | Matches the selected shiny material without adding step controls or implying money is moving |
+| Friday's comparison uses aligned bars with explicit simulated/recorded labels and words for disputed shares; the hatched remainder is removed | Owner, Nov 2 | Accept | Makes the payout difference readable without presenting reserved shares as part of CounterSign's payout |
+| Missing, invalid or non-USD comparison amounts display unavailable instead of falling back to zero | C44 presentation check | Accept | An incomplete comparison must not look like an observed zero-dollar payout |
+
 ## Nov 2 C42 glass command center (branch razeef/c42-glass-command, built on C39)
 
 | Change | Source | Decision | Reason |

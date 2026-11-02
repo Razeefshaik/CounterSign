@@ -236,11 +236,19 @@ export function journey(demo, weekDays) {
 export function compareBars(model) {
   const c = model.comparison;
   if (!c) return '<p class="empty-note">Recorded on Friday, when the run is planned.</p>';
-  const naive = c.naive?.payout?.minor ?? 0, ours = c.countersign?.total?.minor ?? 0, disputed = c.naive?.disputed_shares?.minor ?? 0, max = Math.max(naive, 1);
+  const amounts = [c.naive?.payout, c.countersign?.total, c.naive?.disputed_shares];
+  if (amounts.some(m => !Number.isSafeInteger(m?.minor) || m.minor < 0 || m.currency !== "USD")) return '<p class="empty-note">Friday’s comparison is unavailable.</p>';
+  const [naive, ours, disputed] = amounts.map(m => m.minor), max = Math.max(naive, ours, 1);
+  if (disputed > naive) return '<p class="empty-note">Friday’s comparison is unavailable.</p>';
   const w = v => r1(100 * v / max) + "%";
-  return `<div class="vs"><div class="vs-row"><span>Naive agent</span><span class="vs-track"><i class="naive" style="width:${w(naive - disputed)}"></i><i class="naive-held" style="width:${w(disputed)}"></i></span><b>${esc(short(naive))}</b></div>
-    <div class="vs-row"><span>CounterSign</span><span class="vs-track"><i class="ours" style="width:${w(ours)}"></i><i class="kept" style="width:${w(Math.max(0, naive - ours))}"></i></span><b>${esc(short(ours))}</b></div>
-    <p>The naive agent would also send ${esc(short(disputed))} of shares under dispute. CounterSign holds it back.</p></div>`;
+  return `<div class="vs vs-comparison" aria-label="Recorded Friday payout comparison">
+    <div class="vs-entry"><div class="vs-heading"><span>Naive agent <small>Simulated</small></span><b>${esc(short(naive))}<small>would send</small></b></div>
+      <div class="vs-track" role="img" aria-label="${esc(`${short(naive)} would be sent, including ${short(disputed)} under dispute`)}"><i class="naive" style="width:${w(naive - disputed)}"></i><i class="naive-held" style="width:${w(disputed)}"></i></div>
+      <p class="vs-caption"><span class="vs-dot risk" aria-hidden="true"></span>${esc(short(disputed))} under dispute, included</p></div>
+    <div class="vs-entry"><div class="vs-heading"><span>CounterSign <small>Recorded plan</small></span><b>${esc(short(ours))}<small>planned payout</small></b></div>
+      <div class="vs-track" role="img" aria-label="${esc(`${short(ours)} planned payout; disputed shares excluded`)}"><i class="ours" style="width:${w(ours)}"></i></div>
+      <p class="vs-caption"><span class="vs-dot safe" aria-hidden="true"></span>Disputed shares excluded from the payout</p></div>
+    <p class="vs-note">The same Friday snapshot. ${esc(short(disputed))} in disputed shares stays reserved.</p></div>`;
 }
 
 // --- C42 command center pieces ---
