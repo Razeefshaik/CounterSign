@@ -1,6 +1,8 @@
 // C37 command center controller: loads the read-only dashboard API, draws the
-// money constellation and explains whatever the viewer selects. No writes.
-import {sceneModel, sceneSvg, focusModel, focusSvg, defaultCategory, nodePanel, makerPanel, itemPanel, storyPanel, kpis, rail, short, VIEW} from "./scene.mjs";
+// money map and explains whatever the viewer selects. No writes. C42 lays the
+// page out as one action, four figures, the makers, then the evidence.
+import {sceneModel, focusModel, focusSvg, defaultCategory, nodePanel, makerPanel, itemPanel, storyPanel, short} from "./scene.mjs";
+import {plotSvg, scanSvg, scanTally, stands, activity, finding, progress, makerAt, PW, PH, headline, journey, compareBars, weekLabel, actionStrip, kpiCards, makerList} from "./plot.mjs";
 import {weekDays} from "./words.mjs";
 import {esc} from "./views.mjs";
 
@@ -11,6 +13,7 @@ export function createCommand(document, fetcher = fetch) {
   const view = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)");
   const motion = () => !view?.matches;
   let data = null, model = null, previous = null, selected = "", focus = "", category = "", item = "", fm = null, shown = false, serial = 0;
+  let makerFilter = "all", makerMore = false;
 
   async function json(url) {
     const response = await fetcher(url, {cache: "no-store"});
@@ -65,7 +68,7 @@ export function createCommand(document, fetcher = fetch) {
     let html;
     if (focus && fm) html = (item ? `<button type="button" class="panel-back" data-action="maker">← ${esc(fm.maker.name)}</button>` + itemPanel(fm, item) : back + makerPanel(fm.maker));
     else if (selected) html = back + nodePanel(model, selected, {cash: data.cash});
-    else html = storyPanel({demo: data.demo, comparison: model.comparison, model});
+    else html = storyPanel({demo: data.demo, comparison: model.comparison, model, bars: !$("compare")});
     $("panel").innerHTML = `<div class="panel-inner${motion() ? " reveal" : ""}">${html}</div>`;
   }
 
@@ -75,19 +78,43 @@ export function createCommand(document, fetcher = fetch) {
       stageEl.innerHTML = focusSvg(fm, {category, item, motion: motion()});
       $("scene-back").hidden = false;
     } else {
-      stageEl.innerHTML = sceneSvg(model, {selected, motion: motion(), entrance: entrance && motion()});
+      stageEl.innerHTML = plotSvg(model, {selected, motion: motion()});
       $("scene-back").hidden = true;
     }
+    stageEl.classList.toggle("entering", entrance && motion());
     stageEl.classList.remove("zoom-in", "zoom-out");
     if (swap && motion()) {void stageEl.offsetWidth; stageEl.classList.add(swap);}
     const caption = $("scene-caption");
     caption.hidden = !model.empty;
-    caption.textContent = data.demo ? "The marketplace is empty. Run the first staged step below to open the week." : "No makers yet. The constellation fills in as orders arrive.";
+    caption.textContent = data.demo ? "The marketplace is empty. Run the first staged step to open the week." : "No makers yet. The map fills in as orders arrive.";
+  }
+
+  // Optional pieces: a layout that leaves one out simply has no element for it.
+  const fill = (id, html) => {const el = $(id); if (el) el.innerHTML = html;};
+  function makers() {
+    const count = (model.all || model.makers).length;
+    fill("makers-count", count ? esc(count) : "");
+    fill("folios", makerList(model, {filter: makerFilter, expanded: makerMore}));
+  }
+
+  function pieces() {
+    fill("cc-eyebrow", esc(weekLabel(data.demo)));
+    fill("command-title", headline(model));
+    fill("ov-finding", finding(model));
+    fill("cc-action", actionStrip(model));
+    fill("scan", scanSvg(model));
+    fill("scan-tally", scanTally(model));
+    fill("stands", stands(model));
+    fill("activity", activity(model));
+    fill("compare", compareBars(model));
+    makers();
   }
 
   function draw({entrance = false, swap = ""} = {}) {
-    $("kpis").innerHTML = kpis(model);
-    $("rail-slot").innerHTML = rail(data.demo, weekDays);
+    $("kpis").innerHTML = kpiCards(model);
+    const week = $("rail-slot").dataset.kind === "journey" ? journey(data.demo, weekDays) : progress(data.demo, weekDays);
+    $("rail-slot").innerHTML = week || '<p class="empty-note">No staged week to show yet.</p>';
+    pieces();
     stage({entrance, swap});
     panel();
     countUp();
@@ -97,10 +124,9 @@ export function createCommand(document, fetcher = fetch) {
   function openMaker(id) {
     const maker = model.makers.find(m => "maker:" + m.id === id);
     if (!maker) return;
-    const index = model.makers.indexOf(maker), n = model.makers.length;
-    const y = n === 1 ? 360 : 140 + index * (440 / (n - 1));
-    $("stage").style.setProperty("--ox", ((990 - VIEW[0]) / VIEW[2] * 100).toFixed(1) + "%");
-    $("stage").style.setProperty("--oy", ((y - VIEW[1]) / VIEW[3] * 100).toFixed(1) + "%");
+    const [x, y] = makerAt(model.makers.indexOf(maker), model.makers.length);
+    $("stage").style.setProperty("--ox", (x / PW * 100).toFixed(1) + "%");
+    $("stage").style.setProperty("--oy", (y / PH * 100).toFixed(1) + "%");
     focus = maker.id; selected = ""; item = "";
     fm = focusModel(data.graphs[maker.id], maker);
     category = defaultCategory(fm);
@@ -133,6 +159,20 @@ export function createCommand(document, fetcher = fetch) {
       if ((event.key === "Enter" || event.key === " ") && activate(event.target)) event.preventDefault();
     };
     $("scene-back").onclick = closeFocus;
+    const folioEl = $("folios");
+    if (folioEl) folioEl.onclick = event => {
+      const filter = event.target.closest?.("[data-filter]")?.dataset.filter;
+      if (filter) {makerFilter = filter; makerMore = false; makers(); return;}
+      if (event.target.closest?.("[data-more]")) {makerMore = !makerMore; makers(); return;}
+      const id = event.target.closest?.("[data-node]")?.dataset.node;
+      if (!id) return;
+      if (focus === id.slice(6)) {closeFocus(); return;}
+      focus = ""; fm = null;
+      openMaker(id);
+      // The map sits below the makers; bring it into view when it is off screen either way.
+      const top = $("stage").getBoundingClientRect?.().top;
+      if (top == null || top < 0 || top > (globalThis.innerHeight || 800) * 0.6) $("stage").scrollIntoView({behavior: motion() ? "smooth" : "auto", block: "center"});
+    };
     $("command").onkeydown = event => {
       if (event.key !== "Escape") return;
       if (item) {item = ""; stage(); panel();} else if (focus) closeFocus(); else if (selected) {selected = ""; stage(); panel();}

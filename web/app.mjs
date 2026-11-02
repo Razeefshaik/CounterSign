@@ -21,13 +21,13 @@ function showBanner() {
   $("simulation").hidden = !text;
   $("simulation").textContent = text;
 }
-// C37: the control-room theme is dark by default; the choice is a per-browser convenience.
+// C38: the glass theme is light by default; dark stays a per-browser convenience.
 function applyTheme(theme) {
   document.documentElement.dataset.theme = theme;
   $("theme").setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
 }
-let theme = "dark";
-try {theme = localStorage.getItem("countersign-theme") === "light" ? "light" : "dark";} catch {}
+let theme = "light";
+try {theme = localStorage.getItem("countersign-theme") === "dark" ? "dark" : "light";} catch {}
 applyTheme(theme);
 $("theme").addEventListener("click", () => {
   theme = theme === "dark" ? "light" : "dark";
@@ -89,6 +89,7 @@ async function overview(client) {
   $("stat-owner").textContent = stats.owner;
   $("stat-owner").classList.toggle("owner-waiting", stats.owner > 0);
   $("nav-owner").hidden = !stats.owner; $("nav-owner").textContent = stats.owner;
+  const bell = $("top-owner"); if (bell) {bell.hidden = !stats.owner; bell.textContent = stats.owner;}
   $("stat-held").textContent = cash?.earmarks_not_subtracted?.dispute ? money(cash.earmarks_not_subtracted.dispute) : "—";
   $("stat-cash").textContent = cash?.unreserved ? money(cash.unreserved) : "—";
   const waiting = proposals?.find(p => p.state === "NEEDS_OWNER");
@@ -135,6 +136,6 @@ $("clear").addEventListener("click", () => {
   update();
 });
 // The playground exists only in demo mode on the mock; its nav item follows the server.
-fetch("/api/v1/playground/attacks", {cache: "no-store"}).then(response => {$("nav-trick").hidden = !response.ok;}).catch(() => {});
+fetch("/api/v1/playground/attacks", {cache: "no-store"}).then(response => {$("nav-trick").hidden = $("nav-lab").hidden = !response.ok;}).catch(() => {});
 refresh();
 demo.load();

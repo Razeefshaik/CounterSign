@@ -466,3 +466,32 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Ambient motion (particles, orbit rings, draw-in) replaces C32's "motion under 300 ms" rule on the command center | Owner, Oct 28 | Accept | Particles carry meaning (money sent, held, proposed, blocked); prefers-reduced-motion removes all of it and the scene renders as a still diagram |
 | Particles move only for money in flight or paid; a planned run is drawn dashed and labelled "scheduled" | C37 review | Accept | A run waiting for the owner's signature has not moved money, so showing it as moving would overstate what happened |
 | At phone width the sidebar stretches to the page instead of growing to its nav row; the record picker may shrink | C37 browser check | Accept | Both pushed the page wider than 390 px (1,179 px and 425 px) and forced horizontal scrolling |
+
+## Oct 31 C38 glass theme and overview (branch razeef/c38-glass-atrium)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Light glass theme by default: a neutral ground with soft cornflower light behind blurred chrome; folio blue (#2a56c9) is the primary, cornflower (#6b9fe4) only supports it, pink (#ec4899) marks only what needs the owner; dark stays a toggle | Owner, Oct 31 | Accept | Owner chose the folio blue and the transparent glass look over the C37 dark gold scene; cards stay near-opaque so figures read |
+| The money map is a network plot (flat nodes, area follows the amount, line width follows money moved, arrows for direction, a dot grid) instead of glowing spheres | Owner, Oct 31 | Accept | Owner found the C37 constellation cartoon-like; the plot encodes amounts honestly and keeps the C37 rule that only paid or in-flight money moves |
+| The overview becomes a working screen: a noun title with one finding, a KPI strip split by hairlines, the map with its explanation panel, a shield scan, maker folios, status bars and an activity list | Owner, Oct 31 (UX principles from the taste, impeccable and Emil Kowalski skills) | Accept | One question first ("what needs me now"), evidence beside the answer, the main job one click away; the owner's brief wins where the skills ban glass and a blue primary |
+| The week progress on the overview is display only; the demo dock still runs steps | C38 design | Accept | The demo API only moves forward or restarts, so day buttons that jump would promise something the backend cannot do |
+
+## Oct 31 C39 journey overview (branch razeef/c39-glass-journey, built on C38)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| A second overview layout: a headline written from the figures ("You can pay $1,086 to 2 makers today."), the balance with the week as a path of stops, makers as a stacked deck of folio-blue cards, and a pink sticker for money held back | Owner, Oct 31 (reference: a payout-app advert the owner shared) | Accept | Owner asked for two branches to compare; this one leads with the decision and keeps the C38 theme, map, scan and panels below |
+| The deck reorders on click and "See details" opens the front maker in the money map; nothing on the hero moves money | C39 design | Accept | The owner's signature still happens on the decision view, bound to the payload hash |
+| Journey takes the owner's reference look: a light grey glass room, two blues (cornflower #6b9fe4 for the maker deck, main button, headline amount and glass orbs; folio blue #2a56c9 for data and navigation), frosted glass coins, a navy held-back sticker, pink only for highlights; navigation becomes a floating glass icon rail and a glass pill header with a bell for waiting decisions | Owner, Oct 31 | Accept | Owner rejected C38, C40 and C41 and asked for the reference blues and glass on the Journey layout |
+
+## Nov 2 C42 glass command center (branch razeef/c42-glass-command, built on C39)
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| The four stacked token layers (C37, C37 light, C38, C39) become one light and one dark token set; components read tokens only | Owner, Nov 2 | Accept | The theme drifted because each redesign re-declared tokens on top of the last (warm grey ground under navy ink, three action blues, white glass rims in dark mode) |
+| The page sits on the owner's chosen rendered backdrops, frosted blue in light mode and frosted night in dark mode, with every text-bearing surface glass at 72% or more and darker text tokens on glass | Owner, Nov 2 | Accept | Owner asked for a glassy, transparent look like their reference images; 72% glass keeps every text pair at 4.5:1 over the darkest part of either image |
+| The icon rail becomes a labelled sidebar grouped by job (Act, Money, Records, Lab) | Owner, Nov 2 | Accept | Owner asked for written navigation; groups let a first-time viewer find a page without hovering |
+| The command center reads top to bottom: one action, four figures with context, makers, where the money stands, the week, then shield scan, activity and the money map; the deck and sticker are retired | Owner, Nov 2 (mockup approved on the design canvas) | Accept | The same makers appeared three times and the signature request four times; each figure now appears once, the action first |
+| Makers show as cards up to four; past four, makers waiting for the owner stay as cards and everyone goes into a filterable table; totals count every maker while the map still draws six | Owner, Nov 2 | Accept | Owner asked what happens with many makers; the deck only fits three and the old totals silently dropped makers past the sixth |
+| C42 review: the headline counts every maker and uses the same owed total as "Where the money stands" (money sent to PayPal but unconfirmed is still owed); the finding says when money is on its way | C42 review, Nov 2 | Accept | The headline read $1,200 owed while the card below read $1,500, and it counted only the six makers on the map |
+| C42 review: money-map labels are larger and maker and PayPal labels sit below their nodes; the explanation panel drops Friday's bars when the overview already shows them; the overview leaves room for the demo dock; narrow phones hide the top bar crumbs | C42 review, Nov 2 | Accept | Map text rendered at about 7 px and collided with order satellites, the comparison appeared twice, the dock covered the last cards, and the phone header wrapped |

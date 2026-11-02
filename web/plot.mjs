@@ -1,0 +1,356 @@
+// Overview pieces: the money map as a network plot (C38), the shield scan, the
+// activity list and the C42 command center (action strip, KPIs, makers, money bar). Pure string builders over the C37
+// scene model, so every figure is an API value and every piece is testable in Node.
+import {esc} from "./views.mjs";
+import {rule as ruleWord, action as actionWord} from "./words.mjs";
+import {short} from "./scene.mjs";
+
+// World units of the plot; the SVG scales to its card.
+export const PW = 1000, PH = 560;
+const AT = {paypal: [120, 290], agent: [270, 96], owner: [270, 474], shield: [490, 280], held: [560, 500]};
+const r1 = n => Math.round(n * 10) / 10;
+const total = m => m.paid + m.inFlight + m.scheduled + m.held + m.owed;
+
+// Node area follows money: radius grows with the square root of the amount.
+export const moneyRadius = (minor, lo = 7, hi = 24) => Math.max(lo, Math.min(hi, lo + Math.sqrt(Math.max(0, minor) / 100) * 0.55));
+// Edge width follows money moved, with a hairline floor.
+export const moneyWidth = minor => r1(Math.max(1, Math.min(7, Math.sqrt(Math.max(0, minor) / 100) * 0.2)));
+
+export function makerAt(i, n) {
+  return [790, n === 1 ? 280 : Math.round(96 + i * (368 / (n - 1)))];
+}
+
+const verdictKind = p => p.verdict === "BLOCK" ? "stop" : p.state === "NEEDS_OWNER" ? "ask" : p.verdict === "NEEDS_OWNER" ? "signed" : "ok";
+const STAMP = {stop: "Stopped", ask: "Needs you", signed: "Signed by you", ok: "Allowed"};
+
+function line(id, [x1, y1], [x2, y2], kind, {width = 1, dashed = false, arrow = true, r0 = 0, r2 = 0} = {}) {
+  const L = Math.hypot(x2 - x1, y2 - y1) || 1, ux = (x2 - x1) / L, uy = (y2 - y1) / L;
+  const a = [r1(x1 + ux * (r0 + 3)), r1(y1 + uy * (r0 + 3))], b = [r1(x2 - ux * (r2 + 5)), r1(y2 - uy * (r2 + 5))];
+  return `<path id="${id}" class="p-edge ${kind}${dashed ? " dashed" : ""}" d="M${a[0]} ${a[1]}L${b[0]} ${b[1]}" style="stroke-width:${width}"${arrow ? ` marker-end="url(#p-arrow-${kind})"` : ""}/>`;
+}
+function flow(id, count, dur) {
+  let out = "";
+  for (let i = 0; i < count; i++) out += `<circle class="p-flow" r="3"><animateMotion dur="${dur}s" begin="${-r1(i * dur / count)}s" repeatCount="indefinite"><mpath href="#${id}"/></animateMotion></circle>`;
+  return out;
+}
+const mid = ([x1, y1], [x2, y2], dy = -8) => [r1((x1 + x2) / 2), r1((y1 + y2) / 2 + dy)];
+const label = ([x, y], text, cls = "", anchor = "start") => `<text class="p-text ${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${esc(text)}</text>`;
+
+// Labels sit beside a node, or centred below it where satellites or the plot edge
+// would otherwise collide with them.
+function node(id, kind, [x, y], r, {name, value = "", aria, selected = false, left = false, below = false}) {
+  const tx = below ? x : left ? x - r - 10 : x + r + 10, anchor = below ? "middle" : left ? "end" : "start";
+  const ty = below ? r1(y + r + 22) : y - 1;
+  return `<g class="p-node ${kind}${selected ? " selected" : ""}" data-node="${esc(id)}" tabindex="0" role="button" aria-label="${esc(aria)}">
+    <circle class="hit" cx="${x}" cy="${y}" r="${r + 12}"/><circle class="dot" cx="${x}" cy="${y}" r="${r1(r)}"/><circle class="ring" cx="${x}" cy="${y}" r="${r1(r + 4)}"/>
+    ${label([tx, ty], name, "name", anchor)}${value ? label([tx, r1(ty + 19)], value, "value", anchor) : ""}</g>`;
+}
+
+// The shield draws one bar per rule check run this week: short and blue for pass,
+// long and red for a block, long and pink where it asked the owner.
+function shieldNode(model, selected) {
+  const [x, y] = AT.shield, outcomes = model.agent.list.flatMap(p => (p.rule_results || []).map(r => r.outcome));
+  const n = outcomes.length, R = 34;
+  const bars = outcomes.map((o, i) => {
+    const a = -Math.PI / 2 + (i + 0.5) / n * Math.PI * 2, h = o === "PASS" ? 6 : 12;
+    const kind = o === "BLOCK" ? "stop" : o === "NEEDS_OWNER" ? "ask" : "ok";
+    return `<line class="check ${kind}" x1="${r1(x + Math.cos(a) * R)}" y1="${r1(y + Math.sin(a) * R)}" x2="${r1(x + Math.cos(a) * (R + h))}" y2="${r1(y + Math.sin(a) * (R + h))}"/>`;
+  }).join("");
+  return `<g class="p-node shield${selected ? " selected" : ""}" data-node="shield" tabindex="0" role="button"
+      aria-label="${esc(`CounterSign shield: ${n} checks on ${model.agent.proposals} proposals, ${model.agent.blocked} stopped, ${model.shield.needsOwner} asked the owner`)}">
+    <circle class="hit" cx="${x}" cy="${y}" r="52"/><g class="checks">${bars}</g>
+    <circle class="seal" cx="${x}" cy="${y}" r="28"/><circle class="seal-in" cx="${x}" cy="${y}" r="22"/>
+    ${label([x, y + 4], String(n), "count", "middle")}${label([x, y + 16], "checks", "unit", "middle")}
+    ${label([x, y - 58], "CounterSign shield", "name", "middle")}</g>`;
+}
+
+export function plotSvg(model, {selected = "", motion = true} = {}) {
+  const sh = AT.shield, n = model.makers.length, edges = [], flows = [], tags = [], sats = [];
+  const sending = model.totals.inFlight > 0, anyPaid = model.totals.paid > 0;
+  const avail = model.paypal.available;
+  edges.push(line("pe-paypal", AT.paypal, sh, avail ? "money" : "quiet", {width: moneyWidth(avail || 0), r0: 14, r2: 46}));
+  if (avail) tags.push(label(mid(AT.paypal, sh), short(avail), "flowtag money", "middle"));
+  if (motion && (sending || anyPaid)) flows.push(flow("pe-paypal", sending ? 3 : 2, sending ? 2.4 : 4.6));
+  edges.push(line("pe-agent", AT.agent, sh, model.agent.proposals ? "agent" : "quiet", {r0: 12, r2: 46}));
+  edges.push(line("pe-owner", AT.owner, sh, model.owner.waiting.length ? "ask" : model.owner.approved ? "signed" : "quiet", {dashed: Boolean(model.owner.waiting.length), r0: 12, r2: 46}));
+  if (model.held.total) {
+    edges.push(line("pe-held", sh, AT.held, "held", {width: moneyWidth(model.held.total), dashed: true, r0: 46, r2: 12}));
+    tags.push(label(mid(sh, AT.held, 0).map((v, i) => i ? v : v + 14), short(model.held.total), "flowtag held"));
+  }
+  const makers = model.makers.map((m, i) => {
+    const at = makerAt(i, n), r = moneyRadius(total(m), 9, 22);
+    const moving = m.paid + m.inFlight + m.scheduled;
+    const kind = m.inFlight ? "money live" : m.scheduled ? "ask" : m.paid ? "money" : "quiet";
+    edges.push(line("pe-m" + i, sh, at, kind, {width: moneyWidth(moving), dashed: Boolean(m.scheduled && !m.inFlight), r0: 46, r2: r + 4}));
+    if (moving) tags.push(label(mid(sh, at), short(moving), "flowtag " + (m.scheduled && !m.inFlight ? "ask" : "money"), "middle"));
+    if (motion && m.inFlight) flows.push(flow("pe-m" + i, 3, 2.2));
+    else if (motion && m.paid && !m.scheduled) flows.push(flow("pe-m" + i, 2, 4.8));
+    // Satellites: each buyer order, sized by its amount; disputed orders in red.
+    m.orders.slice(0, 5).forEach((o, k, list) => {
+      const a = (list.length === 1 ? 0 : -42 + k * (84 / (list.length - 1))) * Math.PI / 180;
+      const sx = r1(at[0] + 82 * Math.cos(a)), sy = r1(at[1] + 82 * Math.sin(a)), sr = moneyRadius(o.amount, 3, 8);
+      const open = o.dispute && o.dispute.phase === "ACTIVE";
+      sats.push(`<g class="p-sat${open ? " disputed" : o.dispute ? " settled" : ""}"><line x1="${r1(at[0] + (r + 4) * Math.cos(a))}" y1="${r1(at[1] + (r + 4) * Math.sin(a))}" x2="${sx}" y2="${sy}"/><circle cx="${sx}" cy="${sy}" r="${r1(sr)}"/>${label([r1(sx + sr + 5), r1(sy + 4)], short(o.amount) + (open ? " disputed" : ""), "sat")}<title>Order ${esc(o.ref)}</title></g>`);
+    });
+    const value = m.inFlight ? short(m.inFlight) + " sending" : m.scheduled ? short(m.scheduled) + " waiting" : m.paid ? short(m.paid) + " paid" : m.held ? short(m.held) + " held" : m.owed ? short(m.owed) + " owed" : "nothing owed";
+    return node("maker:" + m.id, "maker", at, r, {name: m.name, value, below: n <= 4, selected: selected === "maker:" + m.id,
+      aria: `${m.name}: ${short(m.paid)} paid, ${short(m.paying)} scheduled or sending, ${short(m.held)} held. Open to explore.`});
+  });
+  const nodes = [
+    node("paypal", "paypal", AT.paypal, 14, {name: "PayPal balance", value: avail == null ? "not read yet" : short(avail) + " available", below: true, selected: selected === "paypal",
+      aria: `PayPal balance: ${avail == null ? "not read yet" : short(avail) + " available"}`}),
+    node("agent", "agent", AT.agent, 12, {name: "AI agent", value: `${model.agent.proposals} proposal${model.agent.proposals === 1 ? "" : "s"}, reads only`, selected: selected === "agent",
+      aria: `AI agent: ${model.agent.proposals} proposals. It never moves money.`}),
+    node("owner", "owner", AT.owner, 12, {name: "You, the owner", value: model.owner.waiting.length ? `${model.owner.waiting.length} to sign` : "nothing to sign", selected: selected === "owner",
+      aria: `You, the owner: ${model.owner.waiting.length} decisions waiting`}),
+    model.held.total ? node("held", "held", AT.held, moneyRadius(model.held.total, 8, 16), {name: "Held for disputes", value: short(model.held.total), selected: selected === "held",
+      aria: `Held back for disputes: ${short(model.held.total)}`}) : "",
+    shieldNode(model, selected === "shield"),
+    ...makers,
+  ];
+  // Each proposal is a small mark around the agent; its ring shows the share of checks it passed.
+  const pa = Math.atan2(AT.agent[1] - sh[1], AT.agent[0] - sh[0]), list = model.agent.list.slice(0, 14);
+  const props = list.map((p, k) => {
+    const a = pa + (list.length === 1 ? 0 : -1.15 + 2.3 * k / (list.length - 1)), d = k % 2 ? 74 : 50;
+    const x = r1(AT.agent[0] + d * Math.cos(a)), y = r1(AT.agent[1] + d * Math.sin(a)), rules = p.rule_results || [];
+    const pass = rules.length ? rules.filter(r => r.outcome === "PASS").length / rules.length : 1, kind = verdictKind(p), C = 2 * Math.PI * 7;
+    return `<a class="p-prop ${kind}" href="#decision/${esc(p.id)}" aria-label="${esc(`${actionWord(p.action)}: ${STAMP[kind]}`)}"><line x1="${AT.agent[0]}" y1="${AT.agent[1]}" x2="${x}" y2="${y}"/>
+      <circle class="arc-bg" cx="${x}" cy="${y}" r="7"/><circle class="arc" cx="${x}" cy="${y}" r="7" stroke-dasharray="${r1(pass * C)} ${r1(C)}" transform="rotate(-90 ${x} ${y})"/><circle class="core" cx="${x}" cy="${y}" r="3.6"/><title>${esc(actionWord(p.action))}: ${esc(STAMP[kind])}</title></a>`;
+  }).join("");
+  const markers = ["money", "ask", "held", "agent", "signed", "quiet"].map(k => `<marker id="p-arrow-${k}" class="p-arrow ${k}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" markerUnits="userSpaceOnUse" orient="auto-start-reverse"><path d="M0 1L9 5L0 9z"/></marker>`).join("");
+  return `<svg class="plot" viewBox="0 0 ${PW} ${PH}" preserveAspectRatio="xMidYMid meet" role="group" aria-label="Money map: PayPal balance, the shield and each maker. Node area follows the amount; line width follows money moved.">
+    <defs><pattern id="p-grid" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1"/></pattern>${markers}</defs>
+    <rect class="p-ground" width="${PW}" height="${PH}" fill="url(#p-grid)"/>
+    <g class="p-edges">${edges.join("")}</g><g class="p-sats">${sats.join("")}</g><g class="p-props">${props}</g>
+    <g class="p-flows" aria-hidden="true">${flows.join("")}</g><g class="p-tags" aria-hidden="true">${tags.join("")}</g><g class="p-nodes">${nodes.join("")}</g></svg>`;
+}
+
+// The shield scan: each proposal is a blip. Cleared ones sit inside, ones waiting
+// for the owner circle the holding loop, stopped ones sit in the turned-away sector.
+export function scanSvg(model) {
+  const list = model.agent.list, blocked = list.filter(p => p.verdict === "BLOCK"), waiting = list.filter(p => p.state === "NEEDS_OWNER");
+  let rings = "";
+  [140, 104, 68].forEach((r, i) => rings += `<circle class="s-ring${i === 1 ? " dashed" : ""}" r="${r}"/>`);
+  for (let a = 0; a < 360; a += 10) {
+    const rad = a * Math.PI / 180, r0 = a % 30 ? 134 : 128;
+    rings += `<line class="s-tick" x1="${r1(Math.cos(rad) * r0)}" y1="${r1(Math.sin(rad) * r0)}" x2="${r1(Math.cos(rad) * 140)}" y2="${r1(Math.sin(rad) * 140)}"/>`;
+  }
+  const sector = (a0, a1) => `M0 0L${r1(Math.cos(a0) * 140)} ${r1(Math.sin(a0) * 140)}A140 140 0 0 1 ${r1(Math.cos(a1) * 140)} ${r1(Math.sin(a1) * 140)}Z`;
+  let i = 0;
+  const blips = list.map(p => {
+    const kind = verdictKind(p);
+    let x, y, tag = "";
+    if (kind === "stop") { const k = blocked.indexOf(p), a = -2.32 + k * 0.42; x = Math.cos(a) * 112; y = Math.sin(a) * 112; tag = actionWord(p.action); }
+    else if (kind === "ask") { const k = waiting.indexOf(p), a = k * 2.1; x = -58 + Math.cos(a) * 34; y = 86 + Math.sin(a) * 14; tag = actionWord(p.action); }
+    else { const a = (i++ * 137.5) * Math.PI / 180, r = 38 + (i % 3) * 20; x = Math.cos(a) * r; y = Math.sin(a) * r; }
+    x = r1(x); y = r1(y);
+    const angle = r1(((Math.atan2(y, x) * 180 / Math.PI) + 450) % 360);
+    return `<a class="s-blip ${kind}" href="#decision/${esc(p.id)}" style="--at:${angle}" aria-label="${esc(`${actionWord(p.action)}: ${STAMP[kind]}`)}"><circle class="halo" cx="${x}" cy="${y}" r="8"/><path d="M${x} ${r1(y - 5)}L${r1(x + 5)} ${y}L${x} ${r1(y + 5)}L${r1(x - 5)} ${y}Z"/>${tag && kind === "stop" ? `<text x="${r1(x - 9)}" y="${r1(y + 4)}" text-anchor="end">${esc(tag)}</text>` : ""}<title>${esc(actionWord(p.action))}: ${esc(STAMP[kind])}</title></a>`;
+  }).join("");
+  const askTag = waiting[0] ? `<text class="s-label ask" x="-58" y="62" text-anchor="middle">${esc(actionWord(waiting[0].action))}</text>` : "";
+  return `<svg class="scan" viewBox="-160 -160 320 320" role="group" aria-label="${esc(`Shield scan: ${list.length} proposals, ${list.length - blocked.length - waiting.length} cleared, ${waiting.length} waiting for you, ${blocked.length} stopped`)}">
+    <circle class="s-ground" r="140"/>${rings}<path class="s-away" d="${sector(-2.55, -1.75)}"/>
+    <text class="s-label stop" x="-44" y="-84" text-anchor="middle">Turned away</text>
+    <ellipse class="s-hold" cx="-58" cy="86" rx="38" ry="16"/><text class="s-label ask" x="-58" y="120" text-anchor="middle">Holding for you</text>${askTag}
+    ${blips}<circle class="s-core" r="15"/></svg>`;
+}
+
+export function scanTally(model) {
+  const list = model.agent.list, blocked = model.agent.blocked, waiting = model.owner.waiting.length;
+  return `<dl class="tally"><div><dt>Scanned</dt><dd>${esc(list.length)}</dd></div><div class="ok"><dt>Cleared</dt><dd>${esc(list.length - blocked - waiting)}</dd></div><div class="ask"><dt>Holding for you</dt><dd>${esc(waiting)}</dd></div><div class="stop"><dt>Turned away</dt><dd>${esc(blocked)}</dd></div></dl>`;
+}
+
+// Activity: what the agent proposed and what the shield said, newest first.
+export function activity(model, limit = 6) {
+  const list = model.agent.list.filter(p => p.action !== "WAIT").slice(0, limit);
+  if (!list.length) return '<p class="empty-note">No proposals yet. The agent starts when the first dispute arrives.</p>';
+  return `<ol class="strips">${list.map(p => {
+    const kind = verdictKind(p), rules = p.rule_results || [];
+    const why = kind === "stop" ? "Refused by " + rules.filter(r => r.outcome === "BLOCK").map(r => ruleWord(r.rule).toLowerCase()).join(", ") + "."
+      : kind === "ask" ? "Waits for your signature on this exact payload." : kind === "signed" ? `Passed ${rules.filter(r => r.outcome === "PASS").length} checks, then you signed.`
+      : rules.length ? `Passed ${rules.length} checks and ran.` : "Moves no money, so no money checks ran.";
+    return `<li><a href="#decision/${esc(p.id)}"><span class="what"><b>${esc(actionWord(p.action))}</b><span>${esc(why)}</span></span><span class="n">${esc(rules.length)} checks</span><span class="stamp ${kind}">${esc(STAMP[kind])}</span></a></li>`;
+  }).join("")}</ol>`;
+}
+
+// The one finding under the title: what most needs the owner right now.
+export function finding(model) {
+  const waiting = model.owner.waiting.length, held = model.held.total, open = model.held.makers.length;
+  const holdText = held ? ` ${short(held)} stays held for ${open} open dispute${open === 1 ? "" : "s"}.` : "";
+  if (model.empty) return "Nothing is owed yet. The week starts when buyer orders arrive.";
+  if (model.totals.paying && waiting) return `${short(model.totals.paying)} waits for your signature.${holdText}`;
+  if (waiting) return `${waiting} decision${waiting === 1 ? "" : "s"} wait${waiting === 1 ? "s" : ""} for you.${holdText}`;
+  if (model.agent.blocked) return `${short(model.totals.paid)} paid. The shield stopped ${model.agent.blocked} unsafe proposal${model.agent.blocked === 1 ? "" : "s"} before money moved.${holdText}`;
+  if (model.totals.paid) return `${short(model.totals.paid)} reached makers through PayPal.${holdText}`;
+  if (model.totals.inFlight) return `Nothing is confirmed paid yet; ${short(model.totals.inFlight)} is on its way through PayPal.${holdText}`;
+  return `Nothing has been paid yet.${holdText}`;
+}
+
+// Week progress: one segment per staged step, grouped by day. Display only;
+// the demo dock runs the steps.
+export function progress(demo, weekDays) {
+  if (!demo?.steps?.length) return "";
+  const next = demo.steps.find(s => !s.done);
+  return `<ol class="week" aria-label="${esc(`Staged week: step ${demo.step} of ${demo.total}`)}">${weekDays(demo.steps).map(day => {
+    const done = day.steps.every(s => s.done), current = next && day.steps.includes(next);
+    return `<li class="${done ? "done" : current ? "current" : ""}"><span>${esc(day.name === "Following week" ? "Next week" : day.name)}</span><span class="ticks">${day.steps.map(s => `<i class="${s.done ? "done" : s === next ? "next" : ""}" title="${esc(s.label)}"></i>`).join("")}</span></li>`;
+  }).join("")}</ol>`;
+}
+
+// --- Journey pieces (C39) ---
+
+// The headline answers "what can I do now" from the same model figures.
+// It counts every maker (not only the six on the map) and uses the same total as
+// "Where the money stands", so the page never shows two owed figures.
+export function headline(model) {
+  const list = everyone(model), waiting = model.owner.waiting.length;
+  const lines = list.filter(m => m.scheduled || m.inFlight).length;
+  if (model.empty) return "Your payout week starts here.";
+  if (model.totals.paying && runWaiting(model)) return `You can pay <em>${esc(short(model.totals.paying))}</em> to ${plural(lines, "maker")} today.`;
+  if (waiting) return `${waiting === 1 ? "One decision waits" : `${waiting} decisions wait`} for <em>your signature</em>.`;
+  if (model.totals.paid) return `<em>${esc(short(model.totals.paid))}</em> reached your makers safely.`;
+  const owing = list.filter(m => m.inFlight + m.scheduled + m.held + m.owed > 0);
+  const owed = owing.reduce((s, m) => s + m.inFlight + m.scheduled + m.held + m.owed, 0);
+  return `<em>${esc(short(owed))}</em> is owed to ${plural(owing.length, "maker")} this week.`;
+}
+
+// The agent's latest request, phrased as a message to the owner.
+export function agentLine(model) {
+  const waiting = model.owner.waiting[0], latest = model.agent.list[0];
+  if (waiting) return `<b>AI agent:</b> ${waiting.action === "SCHEDULE_PAYOUT_RUN" && model.totals.paying ? `Can you sign this week's run of ${esc(short(model.totals.paying))}?` : `Can you approve: ${esc(actionWord(waiting.action).toLowerCase())}?`}`;
+  if (latest) return `<b>AI agent:</b> ${esc(actionWord(latest.action))}, ${esc(STAMP[verdictKind(latest)].toLowerCase())}${verdictKind(latest) === "stop" ? " by the shield" : ""}.`;
+  return "<b>AI agent:</b> nothing to propose yet.";
+}
+
+// The week as a path of stops; display only, the demo dock runs the steps.
+export function journey(demo, weekDays) {
+  if (!demo?.steps?.length) return "";
+  const next = demo.steps.find(s => !s.done);
+  return `<ol class="journey" aria-label="${esc(`Staged week: step ${demo.step} of ${demo.total}`)}">${weekDays(demo.steps).map(day => {
+    const done = day.steps.every(s => s.done), current = next && day.steps.includes(next);
+    return `<li class="${done ? "done" : current ? "current" : ""}"><i title="${esc(day.steps.map(s => s.label).join(" · "))}"></i><span>${esc(day.name === "Following week" ? "Next week" : day.name)}</span></li>`;
+  }).join("")}</ol>`;
+}
+
+// Friday's recorded comparison, outside the panel.
+export function compareBars(model) {
+  const c = model.comparison;
+  if (!c) return '<p class="empty-note">Recorded on Friday, when the run is planned.</p>';
+  const naive = c.naive?.payout?.minor ?? 0, ours = c.countersign?.total?.minor ?? 0, disputed = c.naive?.disputed_shares?.minor ?? 0, max = Math.max(naive, 1);
+  const w = v => r1(100 * v / max) + "%";
+  return `<div class="vs"><div class="vs-row"><span>Naive agent</span><span class="vs-track"><i class="naive" style="width:${w(naive - disputed)}"></i><i class="naive-held" style="width:${w(disputed)}"></i></span><b>${esc(short(naive))}</b></div>
+    <div class="vs-row"><span>CounterSign</span><span class="vs-track"><i class="ours" style="width:${w(ours)}"></i><i class="kept" style="width:${w(Math.max(0, naive - ours))}"></i></span><b>${esc(short(ours))}</b></div>
+    <p>The naive agent would also send ${esc(short(disputed))} of shares under dispute. CounterSign holds it back.</p></div>`;
+}
+
+// --- C42 command center pieces ---
+
+const plural = (n, one, many = one + "s") => `${n} ${n === 1 ? one : many}`;
+const names = list => list.length < 3 ? list.join(" and ") : `${list.slice(0, -1).join(", ")} and ${list.at(-1)}`;
+const everyone = model => model.all || model.makers;
+const runWaiting = model => model.owner.waiting.find(p => p.action === "SCHEDULE_PAYOUT_RUN");
+
+// The eyebrow over the headline: the staged step when the demo runs, else plain.
+export function weekLabel(demo) {
+  return demo?.steps?.length ? `Staged week · step ${demo.step} of ${demo.total}` : "This week";
+}
+
+// The one action on the page. With nothing waiting it says what the agent did last.
+export function actionStrip(model) {
+  const waiting = model.owner.waiting[0];
+  if (!waiting) return `<div class="cc-agent"><span class="cc-orb" aria-hidden="true"></span><p>${agentLine(model)}</p></div><a class="button secondary" href="#decision">See decisions</a>`;
+  const rules = waiting.rule_results || [];
+  const run = waiting.action === "SCHEDULE_PAYOUT_RUN" && model.totals.paying;
+  const payees = everyone(model).filter(m => m.scheduled).map(m => m.name);
+  const title = run ? `${actionWord(waiting.action)} · ${short(model.totals.paying)}${payees.length ? " to " + names(payees) : ""}` : actionWord(waiting.action);
+  const more = model.owner.waiting.length > 1 ? ` · ${model.owner.waiting.length - 1} more waiting` : "";
+  const held = model.held.total ? ` ${short(model.held.total)} stays held until its disputes settle.` : "";
+  return `<div class="cc-ask"><span class="cc-ask-icon" aria-hidden="true"><svg class="icon"><use href="#i-decision"/></svg></span>
+    <div class="cc-ask-text"><p class="cc-ask-meta"><span class="stamp ask">Needs your signature</span><span>${esc(plural(rules.length, "shield check"))}${esc(more)}</span></p>
+    <h2>${esc(title)}</h2><p>Payments and refunds always wait for your approval of this exact payload.${esc(held)}</p></div>
+    <a class="primary pill-button" href="#decision/${esc(waiting.id)}">Review and sign</a></div>`;
+}
+
+// Four figures, each with the one line of context that makes it actionable.
+export function kpiCards(model) {
+  const avail = model.paypal.available, due = everyone(model).reduce((s, m) => s + m.scheduled, 0);
+  const lines = everyone(model).filter(m => m.scheduled || m.inFlight).length;
+  const balance = avail == null ? "Not read from PayPal yet" : model.paypal.stale ? "The last balance read may be out of date"
+    : !due ? "Read from PayPal" : avail >= due ? `${short(avail - due)} left after this run` : `${short(due - avail)} short of this run`;
+  const cells = [
+    ["paypal", "PayPal available", avail, balance],
+    ["paying", "Scheduled or in flight", model.totals.paying, model.totals.paying ? plural(lines, "maker") + (runWaiting(model) ? " · needs your signature" : model.totals.inFlight ? " · sent to PayPal" : "") : "Nothing scheduled yet"],
+    ["held", "Held back", model.held.total, model.held.total ? plural(model.held.makers.length, "open dispute") : "No disputes are holding money"],
+    ["paid", "Paid to makers", model.totals.paid, "Last 30 days"],
+  ];
+  return cells.map(([k, label, v, sub]) => `<div class="kpi ${k}"><dt>${esc(label)}</dt><dd data-count="${v == null ? "" : v}">${esc(v == null ? "—" : short(v))}</dd><dd class="kpi-sub">${esc(sub)}</dd></div>`).join("");
+}
+
+// What a maker's money is doing now: one state, one figure, one sentence.
+export function makerState(m, model) {
+  const also = m.held && (m.inFlight || m.scheduled) ? ` · ${short(m.held)} held for a dispute` : "";
+  if (m.inFlight) return {key: "sending", label: "Sending", tag: `${short(m.inFlight)} sending`, amount: m.inFlight, what: "Sent to PayPal, not confirmed yet" + also};
+  if (m.scheduled) return runWaiting(model)
+    ? {key: "ask", label: "Needs your signature", tag: `${short(m.scheduled)} to sign`, amount: m.scheduled, what: "Waiting for your signature" + also}
+    : {key: "scheduled", label: "Scheduled", tag: `${short(m.scheduled)} scheduled`, amount: m.scheduled, what: "In the planned run" + also};
+  if (m.held) return {key: "held", label: "Held", tag: `${short(m.held)} held`, amount: m.held, what: "Held while a buyer's dispute is open"};
+  if (m.owed) return {key: "owed", label: "Owed", tag: `${short(m.owed)} owed`, amount: m.owed, what: "Owed, not scheduled yet"};
+  if (m.paid) return {key: "paid", label: "Paid", tag: `${short(m.paid)} paid`, amount: m.paid, what: "Paid through PayPal in the last 30 days"};
+  return {key: "idle", label: "Nothing owed", tag: "Nothing owed", amount: 0, what: "No open orders"};
+}
+
+const RANK = {ask: 0, sending: 1, held: 2, scheduled: 3, owed: 4, paid: 5, idle: 6};
+const FILTERS = [["all", "All"], ["ask", "Needs you"], ["sending", "Sending"], ["scheduled", "Scheduled"], ["held", "Held"], ["owed", "Owed"], ["paid", "Paid"]];
+export const CARD_LIMIT = 4, PAGE = 10;
+
+// A few makers read best as cards. Past CARD_LIMIT the ones waiting for the owner stay
+// as cards and everyone goes into a filterable table, PAGE rows at a time.
+export function makerList(model, {filter = "all", expanded = false} = {}) {
+  const list = everyone(model);
+  if (!list.length) return '<p class="empty-note">No makers yet. The list fills in as buyer orders arrive.</p>';
+  const onMap = new Set(model.makers.map(m => m.id));
+  const rows = list.map(m => ({m, s: makerState(m, model)})).sort((a, b) => RANK[a.s.key] - RANK[b.s.key]);
+  const card = ({m, s}) => {
+    const body = `<span class="mcard-tag">${esc(s.tag)}</span><b class="mcard-name">${esc(m.name)}</b><span class="mcard-what">${esc(s.what)}</span>`;
+    return onMap.has(m.id)
+      ? `<button type="button" class="mcard ${s.key}" data-node="maker:${esc(m.id)}" aria-label="${esc(`${m.name}: ${s.tag}. ${s.what}. Open in the money map.`)}">${body}<span class="mcard-go" aria-hidden="true">Open records →</span></button>`
+      : `<div class="mcard ${s.key}">${body}</div>`;
+  };
+  if (list.length <= CARD_LIMIT) return `<div class="mcards">${rows.map(card).join("")}</div>`;
+
+  const attention = rows.filter(r => r.s.key === "ask").slice(0, 3);
+  const count = key => key === "all" ? rows.length : rows.filter(r => r.s.key === key).length;
+  const active = FILTERS.some(([k]) => k === filter) && count(filter) ? filter : "all";
+  const shown = active === "all" ? rows : rows.filter(r => r.s.key === active);
+  const visible = expanded ? shown : shown.slice(0, PAGE);
+  const tabs = FILTERS.filter(([k]) => k === "all" || count(k)).map(([k, label]) =>
+    `<button type="button" data-filter="${k}" aria-pressed="${k === active}">${esc(label)} <span>${count(k)}</span></button>`).join("");
+  const row = ({m, s}) => `<tr><th scope="row">${onMap.has(m.id) ? `<button type="button" class="row-title" data-node="maker:${esc(m.id)}">${esc(m.name)}</button>` : esc(m.name)}</th>
+    <td><span class="stamp ${s.key}">${esc(s.label)}</span></td><td class="num">${esc(short(s.amount))}</td><td class="num">${m.held ? esc(short(m.held)) : "—"}</td><td class="note">${esc(s.what)}</td></tr>`;
+  const more = shown.length > PAGE ? `<button type="button" class="text-button" data-more="1">${expanded ? "Show fewer" : `Show all ${shown.length}`}</button>` : "";
+  return `${attention.length ? `<div class="mcards">${attention.map(card).join("")}</div>` : ""}
+    <div class="mtable"><div class="segmented" role="group" aria-label="Filter makers by state">${tabs}</div>
+    <div class="table-scroll"><table><thead><tr><th scope="col">Maker</th><th scope="col">State</th><th scope="col" class="num">Amount</th><th scope="col" class="num">Held</th><th scope="col">Note</th></tr></thead>
+    <tbody>${visible.map(row).join("")}</tbody></table></div>
+    <div class="table-footer"><span>Showing ${visible.length} of ${shown.length}${active === "all" ? "" : ` ${esc(FILTERS.find(([k]) => k === active)[1].toLowerCase())}`}</span>${more}</div></div>`;
+}
+
+// Where the money stands: what is owed now, split by what is happening to it,
+// and whether the PayPal balance covers what waits to be paid.
+export function stands(model) {
+  const list = everyone(model);
+  if (!list.length) return '<p class="empty-note">Figures appear when makers have orders.</p>';
+  const sum = key => list.reduce((s, m) => s + m[key], 0);
+  const parts = [["sending", "Sent to PayPal", sum("inFlight")], runWaiting(model) ? ["sign", "Waiting for your signature", sum("scheduled")] : ["scheduled", "Scheduled", sum("scheduled")],
+    ["held", "Held for disputes", sum("held")], ["owed", "Owed, not scheduled", sum("owed")]].filter(([, , v]) => v > 0);
+  const owed = parts.reduce((s, [, , v]) => s + v, 0), due = sum("scheduled"), avail = model.paypal.available;
+  const cover = due && avail != null ? (avail >= due
+    ? `Your PayPal balance of <b>${esc(short(avail))}</b> covers the ${esc(short(due))} waiting to be paid, leaving ${esc(short(avail - due))}.`
+    : `Your PayPal balance of <b>${esc(short(avail))}</b> is ${esc(short(due - avail))} short of the ${esc(short(due))} waiting to be paid.`) : "";
+  const paid = model.totals.paid ? `<p class="money-note">${esc(short(model.totals.paid))} already reached makers through PayPal in the last 30 days.</p>` : "";
+  if (!owed) return `<div class="money"><div class="money-total"><span>Owed to makers now</span><b>$0</b></div><p class="money-note">Nothing is owed right now.</p>${paid}</div>`;
+  return `<div class="money"><div class="money-total"><span>Owed to makers now</span><b>${esc(short(owed))}</b></div>
+    <div class="money-bar" role="img" aria-label="${esc(parts.map(([, label, v]) => `${short(v)} ${label.toLowerCase()}`).join(", "))}">${parts.map(([k, , v]) => `<i class="${k}" style="flex-grow:${v}"></i>`).join("")}</div>
+    <dl class="money-key">${parts.map(([k, label, v]) => `<div class="${k}"><dt>${esc(label)}</dt><dd>${esc(short(v))}</dd></div>`).join("")}</dl>
+    ${cover ? `<p class="money-note cover">${cover}</p>` : ""}${paid}</div>`;
+}
