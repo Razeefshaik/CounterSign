@@ -35,6 +35,48 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C45 selected overview integration (Nov 2–3)
+
+Owner explicitly authorized integration to main and push, then selected the
+corner/check SVG for project identity/hero and matte muted pink highlights.
+Worktree CounterSign-integrate, branch razeef/c45-overview-integration. Main's
+pre-existing dirty stylesheet was preserved as main commit `0c3ca93`; main is
+clean. Branch rebased on it, replaying C43 as `c0d9134` and C44 as `5ec1eb5`.
+Keep C43 spacing and original 8px card rims; the thin-rim override was removed
+because the owner explicitly asked not to replace those rims.
+
+Feature commit `6a8c096`. Selected hero uses local optimized WebP materials
+(four assets, 548910 bytes),
+Porcelain pane heights 469/452/407, pink placement 6%/7%, thick pearl ring v4 and
+3px pink rim. New web/hero.css is separate from shared UI styling. Identity title
+is static via a narrow data-brand guard; real finding/action stay data-bound
+below it. Selected corner/check mark appears in hero/sidebar/favicon. Pause
+control and reduced motion govern decorative animation; it represents no money.
+Muted rose tokens: light #c18da5/ink #80415f, dark #b88da4/ink #e4bfd2. C44's
+shiny display-only milestones and truthful recorded/simulated bars remain.
+
+Verified: 70 web tests, 48 Python dashboard tests (schema compatibility/results
+bundle), syntax checks, Ruff clean, three import contracts kept and eight
+production static-handler asset checks. Feature `6a8c096` was fast-forwarded
+into main and pushed to origin/main; the remote hash was verified Nov 3.
+Final integrated browser checks: 99 passed (six widths 360/390/768/1080/1440/1606,
+two themes, eight routes, plus pause/reduced motion/zero writes), runtime exceptions
+zero. First run's pause assertion mistakenly included completed finite entrance
+animations; checker now filters infinite decorative animations. No pause app-code
+fix was needed.
+Evidence: design-demos/reference/integrated. Read-only review found the remaining
+hard-coded .waiting hot-pink border; it now uses color-mix of muted --highlight
+at 25% and has a brand-test assertion. The full backend suite did not complete:
+the first session ended without a summary; a persistent retry was deliberately
+stopped at 23% after a long database integration section, with no failures
+reported. The retry used fast PostgreSQL 55433 and runtime toolkit settings but
+omitted COUNTERSIGN_TEST_TOOLKIT_PYTHON, so optional cases were skipped. No full
+suite pass is claimed. External log: design-demos/.impeccable/integrate/pytest-final.log.
+Future full runs should use COUNTERSIGN_TEST_TOOLKIT_PYTHON as documented above;
+run-toolkit.ps1 is an unexecuted optional follow-up helper, not test evidence.
+No .env reads, real APIs or attribution. Frontend-only integration is complete;
+backend full-suite completion remains unverified.
+
 ## W2 story data
 
 Source: parent PayPalDevPost `prompts/codex/active/CODEX-PROMPT-W2-NAIVE-TRACE-RESULTS.md`.
