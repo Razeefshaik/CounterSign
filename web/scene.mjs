@@ -389,12 +389,13 @@ const MOMENTS = [
 
 const sentence = text => text.charAt(0).toUpperCase() + text.slice(1);
 
-export function storyPanel({demo = null, comparison = null, model}) {
+// bars: false when the page already draws Friday's comparison elsewhere (C42).
+export function storyPanel({demo = null, comparison = null, model, bars = true}) {
   const steps = demo?.steps || [];
   const last = steps.filter(s => s.done).at(-1), next = steps.find(s => !s.done);
   const waiting = model.owner.waiting[0];
   let compare = "";
-  if (comparison) {
+  if (comparison && bars) {
     const naive = minor(comparison.naive.payout), ours = minor(comparison.countersign.total), disputed = minor(comparison.naive.disputed_shares);
     const max = Math.max(naive, ours + disputed, 1);
     compare = `<section class="compare" aria-label="Friday's payout run compared">

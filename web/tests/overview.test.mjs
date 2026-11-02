@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {sceneModel} from "../scene.mjs";
-import {makerList, kpiCards, stands, actionStrip, weekLabel, CARD_LIMIT, PAGE} from "../plot.mjs";
+import {makerList, kpiCards, stands, actionStrip, weekLabel, headline, finding, CARD_LIMIT, PAGE} from "../plot.mjs";
 
 // C42 command center pieces. Shapes follow GET /api/v1/makers, /proposals and /cash
 // (CONTRACTS 2); values are the staged Friday after planning.
@@ -93,4 +93,22 @@ test("untrusted maker names stay inert in cards and the table", () => {
     assert.ok(!html.includes("<img"));
     assert.match(html, /&lt;img src=x/);
   }
+});
+
+test("the headline counts every maker and matches the owed figure in where the money stands", () => {
+  const model = sceneModel({makers: crowd(24), proposals: []});
+  const owed = model.all.reduce((s, m) => s + m.inFlight + m.scheduled + m.held + m.owed, 0);
+  const figure = "$" + (owed / 100).toLocaleString("en-US");
+  assert.ok(headline(model).includes(`${figure}</em> is owed to 24 makers`));
+  assert.ok(stands(model).includes(`Owed to makers now</span><b>${figure}<`));
+  // Money sent to PayPal but not confirmed is still owed, and the finding says it is on its way.
+  const sending = sceneModel({makers: [maker("a", "Maker A", {owed: 36000}), maker("c", "Maker C", {inFlight: 30000})], proposals: []});
+  assert.match(headline(sending), /\$660<\/em> is owed to 2 makers/);
+  assert.match(finding(sending), /\$300 is on its way through PayPal/);
+});
+
+test("the headline offers to pay only when a payout run waits for the owner", () => {
+  assert.match(headline(sceneModel({makers: friday, proposals: [run]})), /You can pay <em>\$1,086<\/em> to 2 makers today/);
+  const other = {...run, id: "p2", action: "ACCEPT_DISPUTE_CLAIM"};
+  assert.match(headline(sceneModel({makers: friday, proposals: [other, {...other, id: "p3"}]})), /2 decisions wait for <em>your signature<\/em>/);
 });

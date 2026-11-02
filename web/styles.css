@@ -1267,3 +1267,16 @@ button.mcard:is(:hover,:focus-visible) .mcard-go{opacity:1;transform:none}
   .cc>*,.money-bar i,.vs-track i,.journey li.current i,.cc-ask-icon::after{animation:none!important}
   .mcard,.mcard-go{transition:none}
 }
+
+/* C42 review fixes: map text readable at card size (the 1000-unit plot renders at
+   about 0.65x), and room under the overview for the floating demo dock. */
+.p-text{font-size:15px;stroke-width:5px}
+.p-text.name{font-size:18px}
+.p-text.value,.p-text.flowtag{font-size:15.5px}
+.p-text.sat{font-size:14px}
+.p-text.count{font-size:19px}
+.p-text.unit{font-size:11px}
+@media (min-width:861px){
+  body[data-route] .demo-bar:not([hidden])~.layout main{padding-bottom:184px}
+}
+@media (max-width:440px){.topbar .crumbs{display:none}}

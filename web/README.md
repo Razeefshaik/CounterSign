@@ -7,6 +7,7 @@
 - **Command center, top to bottom.** The headline and finding with the one action ("Needs your signature" strip linking to the exact decision); four figures, each with the line that makes it actionable (`kpiCards()`); the makers; where the money stands (one bar of what is owed now, plus whether the balance covers the run); the week and Friday's comparison; the shield scan and activity; then the money map with its explanation panel.
 - **Makers at any count** (`makerList()`). Up to four makers read as cards. Past four, the makers waiting for the owner stay as cards and everyone goes into a table with state filters and ten rows at a time. Cards and rows for makers on the map open them there; the map still draws six, and totals now count every maker.
 - The C39 deck, sticker, coins and icon rail are retired.
+- **Review fixes.** The headline counts every maker and matches the owed figure below it; map labels are readable at card size and sit below maker and PayPal nodes; the explanation panel skips Friday's bars when the overview shows them (`storyPanel({bars})`); the overview leaves room for the demo dock.
 
 ## Oct 31 journey overview (C39, branch razeef/c39-glass-journey)
 

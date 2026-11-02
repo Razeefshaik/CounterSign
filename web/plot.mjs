@@ -17,7 +17,7 @@ export const moneyRadius = (minor, lo = 7, hi = 24) => Math.max(lo, Math.min(hi,
 export const moneyWidth = minor => r1(Math.max(1, Math.min(7, Math.sqrt(Math.max(0, minor) / 100) * 0.2)));
 
 export function makerAt(i, n) {
-  return [820, n === 1 ? 280 : Math.round(96 + i * (368 / (n - 1)))];
+  return [790, n === 1 ? 280 : Math.round(96 + i * (368 / (n - 1)))];
 }
 
 const verdictKind = p => p.verdict === "BLOCK" ? "stop" : p.state === "NEEDS_OWNER" ? "ask" : p.verdict === "NEEDS_OWNER" ? "signed" : "ok";
@@ -36,11 +36,14 @@ function flow(id, count, dur) {
 const mid = ([x1, y1], [x2, y2], dy = -8) => [r1((x1 + x2) / 2), r1((y1 + y2) / 2 + dy)];
 const label = ([x, y], text, cls = "", anchor = "start") => `<text class="p-text ${cls}" x="${x}" y="${y}" text-anchor="${anchor}">${esc(text)}</text>`;
 
-function node(id, kind, [x, y], r, {name, value = "", aria, selected = false, left = false}) {
-  const tx = left ? x - r - 10 : x + r + 9, anchor = left ? "end" : "start";
+// Labels sit beside a node, or centred below it where satellites or the plot edge
+// would otherwise collide with them.
+function node(id, kind, [x, y], r, {name, value = "", aria, selected = false, left = false, below = false}) {
+  const tx = below ? x : left ? x - r - 10 : x + r + 10, anchor = below ? "middle" : left ? "end" : "start";
+  const ty = below ? r1(y + r + 22) : y - 1;
   return `<g class="p-node ${kind}${selected ? " selected" : ""}" data-node="${esc(id)}" tabindex="0" role="button" aria-label="${esc(aria)}">
     <circle class="hit" cx="${x}" cy="${y}" r="${r + 12}"/><circle class="dot" cx="${x}" cy="${y}" r="${r1(r)}"/><circle class="ring" cx="${x}" cy="${y}" r="${r1(r + 4)}"/>
-    ${label([tx, y - 1], name, "name", anchor)}${value ? label([tx, y + 15], value, "value", anchor) : ""}</g>`;
+    ${label([tx, ty], name, "name", anchor)}${value ? label([tx, r1(ty + 19)], value, "value", anchor) : ""}</g>`;
 }
 
 // The shield draws one bar per rule check run this week: short and blue for pass,
@@ -90,11 +93,11 @@ export function plotSvg(model, {selected = "", motion = true} = {}) {
       sats.push(`<g class="p-sat${open ? " disputed" : o.dispute ? " settled" : ""}"><line x1="${r1(at[0] + (r + 4) * Math.cos(a))}" y1="${r1(at[1] + (r + 4) * Math.sin(a))}" x2="${sx}" y2="${sy}"/><circle cx="${sx}" cy="${sy}" r="${r1(sr)}"/>${label([r1(sx + sr + 5), r1(sy + 4)], short(o.amount) + (open ? " disputed" : ""), "sat")}<title>Order ${esc(o.ref)}</title></g>`);
     });
     const value = m.inFlight ? short(m.inFlight) + " sending" : m.scheduled ? short(m.scheduled) + " waiting" : m.paid ? short(m.paid) + " paid" : m.held ? short(m.held) + " held" : m.owed ? short(m.owed) + " owed" : "nothing owed";
-    return node("maker:" + m.id, "maker", at, r, {name: m.name, value, selected: selected === "maker:" + m.id,
+    return node("maker:" + m.id, "maker", at, r, {name: m.name, value, below: n <= 4, selected: selected === "maker:" + m.id,
       aria: `${m.name}: ${short(m.paid)} paid, ${short(m.paying)} scheduled or sending, ${short(m.held)} held. Open to explore.`});
   });
   const nodes = [
-    node("paypal", "paypal", AT.paypal, 14, {name: "PayPal balance", value: avail == null ? "not read yet" : short(avail) + " available", left: true, selected: selected === "paypal",
+    node("paypal", "paypal", AT.paypal, 14, {name: "PayPal balance", value: avail == null ? "not read yet" : short(avail) + " available", below: true, selected: selected === "paypal",
       aria: `PayPal balance: ${avail == null ? "not read yet" : short(avail) + " available"}`}),
     node("agent", "agent", AT.agent, 12, {name: "AI agent", value: `${model.agent.proposals} proposal${model.agent.proposals === 1 ? "" : "s"}, reads only`, selected: selected === "agent",
       aria: `AI agent: ${model.agent.proposals} proposals. It never moves money.`}),
@@ -179,6 +182,7 @@ export function finding(model) {
   if (waiting) return `${waiting} decision${waiting === 1 ? "" : "s"} wait${waiting === 1 ? "s" : ""} for you.${holdText}`;
   if (model.agent.blocked) return `${short(model.totals.paid)} paid. The shield stopped ${model.agent.blocked} unsafe proposal${model.agent.blocked === 1 ? "" : "s"} before money moved.${holdText}`;
   if (model.totals.paid) return `${short(model.totals.paid)} reached makers through PayPal.${holdText}`;
+  if (model.totals.inFlight) return `Nothing is confirmed paid yet; ${short(model.totals.inFlight)} is on its way through PayPal.${holdText}`;
   return `Nothing has been paid yet.${holdText}`;
 }
 
@@ -196,14 +200,18 @@ export function progress(demo, weekDays) {
 // --- Journey pieces (C39) ---
 
 // The headline answers "what can I do now" from the same model figures.
+// It counts every maker (not only the six on the map) and uses the same total as
+// "Where the money stands", so the page never shows two owed figures.
 export function headline(model) {
-  const lines = model.makers.filter(m => m.scheduled || m.inFlight).length;
+  const list = everyone(model), waiting = model.owner.waiting.length;
+  const lines = list.filter(m => m.scheduled || m.inFlight).length;
   if (model.empty) return "Your payout week starts here.";
-  if (model.totals.paying && model.owner.waiting.length) return `You can pay <em>${esc(short(model.totals.paying))}</em> to ${lines} maker${lines === 1 ? "" : "s"} today.`;
-  if (model.owner.waiting.length) return `One decision waits for <em>your signature</em>.`;
+  if (model.totals.paying && runWaiting(model)) return `You can pay <em>${esc(short(model.totals.paying))}</em> to ${plural(lines, "maker")} today.`;
+  if (waiting) return `${waiting === 1 ? "One decision waits" : `${waiting} decisions wait`} for <em>your signature</em>.`;
   if (model.totals.paid) return `<em>${esc(short(model.totals.paid))}</em> reached your makers safely.`;
-  const owed = model.makers.reduce((s, m) => s + m.owed + m.held, 0);
-  return `<em>${esc(short(owed))}</em> is owed to ${model.makers.length} makers this week.`;
+  const owing = list.filter(m => m.inFlight + m.scheduled + m.held + m.owed > 0);
+  const owed = owing.reduce((s, m) => s + m.inFlight + m.scheduled + m.held + m.owed, 0);
+  return `<em>${esc(short(owed))}</em> is owed to ${plural(owing.length, "maker")} this week.`;
 }
 
 // The agent's latest request, phrased as a message to the owner.

@@ -68,7 +68,7 @@ export function createCommand(document, fetcher = fetch) {
     let html;
     if (focus && fm) html = (item ? `<button type="button" class="panel-back" data-action="maker">← ${esc(fm.maker.name)}</button>` + itemPanel(fm, item) : back + makerPanel(fm.maker));
     else if (selected) html = back + nodePanel(model, selected, {cash: data.cash});
-    else html = storyPanel({demo: data.demo, comparison: model.comparison, model});
+    else html = storyPanel({demo: data.demo, comparison: model.comparison, model, bars: !$("compare")});
     $("panel").innerHTML = `<div class="panel-inner${motion() ? " reveal" : ""}">${html}</div>`;
   }
 
