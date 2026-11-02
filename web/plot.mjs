@@ -179,7 +179,7 @@ export function finding(model) {
   const holdText = held ? ` ${short(held)} stays held for ${open} open dispute${open === 1 ? "" : "s"}.` : "";
   if (model.empty) return "Nothing is owed yet. The week starts when buyer orders arrive.";
   if (model.totals.paying && waiting) return `${short(model.totals.paying)} waits for your signature.${holdText}`;
-  if (waiting) return `${waiting} decision${waiting === 1 ? "" : "s"} wait${waiting === 1 ? "s" : ""} for you.${holdText}`;
+  // Other waiting decisions are already the headline; the finding reports the money.
   if (model.agent.blocked) return `${short(model.totals.paid)} paid. The shield stopped ${model.agent.blocked} unsafe proposal${model.agent.blocked === 1 ? "" : "s"} before money moved.${holdText}`;
   if (model.totals.paid) return `${short(model.totals.paid)} reached makers through PayPal.${holdText}`;
   if (model.totals.inFlight) return `Nothing is confirmed paid yet; ${short(model.totals.inFlight)} is on its way through PayPal.${holdText}`;

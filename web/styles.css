@@ -1280,3 +1280,11 @@ button.mcard:is(:hover,:focus-visible) .mcard-go{opacity:1;transform:none}
   body[data-route] .demo-bar:not([hidden])~.layout main{padding-bottom:184px}
 }
 @media (max-width:440px){.topbar .crumbs{display:none}}
+
+/* Wide screens: the overview, routed views, top bar and demo dock share one right
+   edge (24 px from the window) instead of stopping at 1480 or 1180 px. Maker cards
+   share the row rather than leaving an empty column. */
+.command.cc,body[data-route] .content{max-width:none}
+.mcards{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.mcards:has(>.mcard:only-child){grid-template-columns:minmax(240px,420px)}
+@media (min-width:861px){:root body[data-route] .demo-bar{left:276px}}
