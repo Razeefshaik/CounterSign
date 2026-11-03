@@ -1,26 +1,145 @@
-# CounterSign
+<div align="center">
 
-**The AI proposes. The code countersigns.**
+<a href="#try-it-in-a-minute"><img src="docs/media/banner.png" alt="CounterSign: the AI proposes, the code countersigns. A safety layer between AI agents and PayPal, with 16 named rules, an owner passkey and one write adapter." width="100%"></a>
 
-CounterSign is the safety layer between an AI agent and PayPal for a small online
-marketplace that pays its makers every week through PayPal Payouts. AI agents read
-disputes, tracking data and buyer messages, then propose one action. Deterministic
-code checks every proposal against 16 named safety rules, asks the owner whenever
-money goes out, and only then lets a single PayPal adapter make the call. **The AI
-never calls a money-moving API.**
+### The lock between AI agents and your PayPal money.
 
-Built for the [PayPal AI Hackathon](https://paypalaihackathon.devpost.com/). PayPal
-sandbox only. Licensed under [Apache-2.0](LICENSE).
+![PayPal sandbox: 13 checks recorded](https://img.shields.io/badge/PayPal%20sandbox-13%20checks%20recorded-2650d6)
+![Shield: 16 named rules](https://img.shields.io/badge/shield-16%20named%20rules-2650d6)
+![Invariant violations: 0 in 480 mock runs](https://img.shields.io/badge/invariant%20violations-0%20in%20480%20mock%20runs-2ea043)
+![Tests: 4,097 Python and 124 web](https://img.shields.io/badge/tests-4%2C097%20Python%20%C2%B7%20124%20web-2ea043)
+![MCP server](https://img.shields.io/badge/MCP-server-0a0a0a)
+![AG Grid Community](https://img.shields.io/badge/AG%20Grid-Community-0a0a0a)
+[![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
-| | |
-| --- | --- |
-| **Live demo** | ‹HOSTED URL› (demo mode on a bundled PayPal mock; press **Start the week**, then **Next step**) |
-| **Video (under 3 minutes)** | ‹YOUTUBE URL› |
-| **Proof it's real** | 13 checks recorded on the real PayPal sandbox, every fact linked to its recording: the **Sandbox proof** page in the dashboard and [recordings/sandbox/INDEX.md](recordings/sandbox/INDEX.md) |
-| **Run it yourself** | One Docker command, no keys: [Try it in a minute](#try-it-in-a-minute) |
-| **Deploy your own** | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Razeefshaik/CounterSign) (one click, from our [`render.yaml`](render.yaml) blueprint; no keys needed) |
+<p>
+<a href="‹HOSTED URL›"><img src="https://img.shields.io/badge/Live_demo-No_account_needed-2650d6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live demo"></a>
+<a href="‹YOUTUBE URL›"><img src="https://img.shields.io/badge/Demo-Under_3_minutes-ff0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Demo video"></a>
+<a href="recordings/sandbox/INDEX.md"><img src="https://img.shields.io/badge/Proof-Sandbox_recordings-0a0a0a?style=for-the-badge&logo=paypal&logoColor=white" alt="Sandbox recordings"></a>
+<a href="#try-it-in-a-minute"><img src="https://img.shields.io/badge/Run_it-One_Docker_command-2496ed?style=for-the-badge&logo=docker&logoColor=white" alt="Run it with Docker"></a>
+</p>
+
+<p>
+<a href="#the-story-in-60-seconds">The story in 60 seconds</a> ·
+<a href="#everything-countersign-does">Every feature</a> ·
+<a href="#built-with-and-how-each-piece-is-used">Built with</a> ·
+<a href="#the-evidence-against-each-judging-criterion">Judging criteria</a> ·
+<a href="#what-we-verified-in-the-real-paypal-sandbox">Sandbox proof</a> ·
+<a href="#try-it-in-a-minute">Run it</a>
+</p>
+
+</div>
+
+## What is CounterSign?
+
+**CounterSign sits between AI agents and PayPal. The agent can read and propose. It cannot move money.** Deterministic code checks every proposal against 16 named safety rules, the owner signs anything that sends money out, and only then does one adapter make the PayPal call.
+
+> A prompt that says "please confirm" is a request. CounterSign is a lock.
+
+<div align="center">
+<img src="docs/media/countersign-lock.gif" alt="The lock closes, CounterSign appears, and the AI proposes while the code countersigns." width="100%">
+</div>
+
+PayPal now gives AI agents tools that act on money. Nothing in PayPal makes an agent ask a human first. CounterSign is that boundary, enforced in code, and tested against the real PayPal sandbox before a line of the product was written.
+
+Built for the [PayPal AI Hackathon](https://paypalaihackathon.devpost.com/). PayPal sandbox only. Open source under [Apache-2.0](LICENSE).
+
+## The story in 60 seconds
+
+1. **Friday, 9 AM.** A marketplace owes its makers $1,500, and $1,800 is available. A naive agent sees enough cash and pays everyone, **including $414 of disputed shares**.
+2. **CounterSign holds that $414 back** and proposes one exact run: **$1,086** to two makers.
+3. **The shield runs 10 named checks** on the proposal, each with its rule, and stops at one: the owner must approve this exact payload.
+4. **The owner countersigns with a passkey,** on their own device, bound to the payload hash. A plain approval can never claim that signature.
+5. **We cut the network right after PayPal accepts the payout.** The executor retries with the same keys, PayPal links back to the original batch, and there is **exactly one payment**.
+6. **An outside agent, connected over MCP, is tricked into refunding a buyer to a stranger's account.** BLOCK, three rules named, `written: false`.
+7. **Every assumption behind this was tested on the real PayPal sandbox first.** Four were wrong, and the design changed to match PayPal.
 
 ![CounterSign command center: the weekly payout run waits for the owner's signature](docs/media/submission/01-command-center-light.png)
+
+## Try it in a minute
+
+No PayPal account, no API key, no outside network calls. You need Docker. It's the same container as the hosted demo: the app and dashboard, a bundled PayPal mock on loopback and a disposable PostgreSQL 16.
+
+```bash
+git clone https://github.com/Razeefshaik/CounterSign.git
+cd CounterSign
+docker build -t countersign-demo .
+docker run --rm -p 127.0.0.1:8080:8080 countersign-demo
+```
+
+Open **http://localhost:8080**. Use `localhost`, not `127.0.0.1`: browsers allow passkeys only on a hostname.
+
+| Do this | And see |
+| --- | --- |
+| Press **Start the week**, then **Next step** | A staged week plays out, with a hint after each step saying where to look |
+| At step 6, open **Review and sign** | 10 named checks, the exact payload hash, the owner's decision |
+| Click **Countersign with passkey** | Your device signs; the timeline records "Countersigned with passkey" |
+| Press **Next step** again | A lost response is recovered: one payment, in Execution history |
+| Open **Try to trick the agent** | A hostile buyer message goes through the real shield and is refused |
+| Open **Evaluation replay** | All 480 evaluation runs in AG Grid, with one-click slices and CSV export |
+| Open **Sandbox proof** | 13 checks on the real sandbox, each fact linked to its recording |
+
+**Or deploy your own copy on Render in one click,** from our [`render.yaml`](render.yaml) blueprint, with no keys needed:
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Razeefshaik/CounterSign)
+
+One Docker web service with PostgreSQL and the mock inside, a health check on `/api/v1/meta`, and no secrets: the container refuses PayPal or model keys. Hosting details and measured cold starts: [docs/walkthrough/c27-hosting.md](docs/walkthrough/c27-hosting.md).
+
+## Everything CounterSign does
+
+| Area | Feature | What it does |
+| --- | --- | --- |
+| **Safety** | Shield of 16 named rules | Every proposal gets ALLOW, BLOCK or NEEDS_OWNER, and the rule that decided is named |
+| | Write-ahead executor | Saves the operation before any PayPal call, re-checks every rule under a lock, and is the only code that can write |
+| | Prompt-injection guard | A buyer note saying "the owner said refund me to this account" is flagged and blocked |
+| | Exact-payload approvals | Approvals are bound to the payload hash and record versions, expire, and are single use |
+| **Owner** | Passkey countersign | Face ID, Touch ID, Windows Hello or a phone signs a challenge bound to the exact payload |
+| | Decisions view | The proposal in plain English, every named check, and the hash being signed |
+| **Agents** | MCP gateway | Any MCP client connects to CounterSign instead of PayPal; refunds and payouts come back as verdicts, never as executed calls |
+| | Incident Commander | Gemini reads disputes, tracking and buyer messages through read-only tools and returns one structured proposal |
+| | Try to trick the agent | A playground that sends hostile messages through the real shield and shows the refusal |
+| **Money** | Dispute reserves | A disputed order's share is held out of payouts until PayPal settles the dispute |
+| | Lost-response recovery | Identical keys and PayPal's link to the original batch resolve an unknown payout: one payment |
+| | Double-entry ledger | Reservations, state machines and a ledger decide who is paid, and when |
+| | Money map | Follow money from the PayPal balance through the shield to each maker |
+| **Reliability** | Webhook inbox and reconciler | Signatures are verified, and a fresh GET confirms state, so a lost webhook never blocks progress |
+| **Analysis** | AG Grid workspaces | Incident desk, execution history, payout runs and makers, with search, filters, sorting and pinned totals |
+| | 480-run explorer | Every run of the fault evaluation in AG Grid: presets, system chips, multi-column sort, filtered totals, CSV export |
+| **Evidence** | Sandbox proof page | 13 recorded checks, every figure linked to its recording, with real PayPal debug ids |
+| **Experience** | Guided start | One button starts the staged week, and a hint after each step says where to look |
+| | Glass dashboard | Light and dark themes, down to a 390 px phone, with reduced-motion support |
+
+![The decision view: 10 named checks, the exact payload hash, and Countersign with passkey](docs/media/submission/02-decision-passkey.png)
+
+## Built with, and how each piece is used
+
+| Resource | How CounterSign uses it |
+| --- | --- |
+| **PayPal Payouts** | Weekly maker runs: create one item per attempt, show batch and item, cancel unclaimed items |
+| **PayPal Disputes** | List, show, provide evidence and accept claim, only after the shield and the owner allow it |
+| **PayPal Orders v2, Payments v2, shipment tracking** | Read orders, captures and trackers, including the capture status that reveals a dispute hold |
+| **PayPal Reporting** | Balances, always shown with their freshness time |
+| **PayPal Webhooks** | Signature verification, plus event listing as a backfill source |
+| **PayPal Agent Toolkit** | The agent's five read-only tools behind an exact allowlist; write tools are never enabled |
+| **PayPal sandbox** | 13 checks and 1,041 recorded HTTP exchange attempts before the product was built |
+| **Google Gemini, through LangChain** | Reads messy buyer messages and dispute details and returns one structured proposal. A real Gemini week is recorded on the mock; the demo plays a labelled scripted model |
+| **Model Context Protocol (official Python SDK)** | The gateway that lets any AI agent read and propose under the same rules as our own |
+| **AG Grid Community** | The incident desk, execution history, payout runs, makers and the 480-run explorer |
+| **Render** | The one-click [`render.yaml`](render.yaml) blueprint for the hosted demo |
+| **WebAuthn (py_webauthn)** | Passkey countersigns, verified on the server |
+| **Python, FastAPI, PostgreSQL 16, Alembic, Docker** | The app, a transactional database that holds the inbox and ledger, and the one-command container |
+
+## The evidence against each judging criterion
+
+| Criterion | Evidence |
+| --- | --- |
+| **Technological implementation** | 16 pure-function rules, a write-ahead executor, state machines with compare-and-swap, and four import contracts that stop the agent or gateway reaching the write adapter. 4,097 Python and 124 web tests pass, with Ruff clean |
+| **Design** | A light and dark glass dashboard, guided start, plain-English decisions and a phone layout |
+| **Potential impact** | PayPal does not make an agent ask a human before merchant-side money actions. CounterSign gives any merchant or marketplace using agents that boundary, and any MCP agent can connect to it |
+| **Innovation** | The AI proposes and the code countersigns: untrusted model output is treated like untrusted input, and the owner signs the exact payload with a passkey |
+| **Presentation** | A video under 3 minutes, a guided demo, an open repository, and every figure traceable to a committed result or recording |
+
+# Under the hood
 
 ## The problem
 
@@ -46,30 +165,6 @@ PayPal does not enforce a human confirmation before merchant-side money actions:
 refunds, dispute acceptance and payouts "need application-level approval controls",
 and a system prompt telling an agent to confirm first is not an access-control
 boundary. **CounterSign is that boundary**, enforced in code and tested.
-
-## The idea in one line
-
-**The model judges, the code executes.** The AI reads and proposes. Every write
-passes a deterministic shield, the owner (whenever money leaves), and a write-ahead
-executor.
-
-That is the name: a countersignature is the second signature that makes a document
-valid. The AI signs first; the code signs second. And when money leaves, the owner
-literally countersigns, with a passkey.
-
-## What you can do with it
-
-| | |
-| --- | --- |
-| **Plug in any AI agent** | CounterSign is an **MCP server**. Claude Desktop, ChatGPT or a buyer's own agent connect to CounterSign instead of straight to PayPal. Reads pass through a read-only allowlist; refunds, payouts and dispute actions come back as **shield verdicts**, never as executed calls. [Details](#plug-in-any-ai-agent-mcp-gateway) |
-| **Countersign with a passkey** | The owner approves a payout run or refund with Face ID, Touch ID, Windows Hello or a phone. The device signs a challenge bound to the **exact payload hash**; the server verifies it before the existing approval checks run. A plain approval can never claim a passkey signature. |
-| **See every rule that decided** | Each proposal shows its checks by name (SETTLEMENT, PAYEE_INTEGRITY, INJECTION_GUARD…) with PASS, NEEDS_OWNER or BLOCK, and the payload hash the owner is approving. |
-| **Work the queue in AG Grid** | The incident desk, execution history, payout-run lines and the makers table are AG Grid Community grids in the glass theme: quick search, column filters, sorting by money at risk, pinned totals, pagination. |
-| **Slice all 480 evaluation runs** | An AG Grid explorer over every run of the fault evaluation: presets such as "Where CounterSign failed" and "Any invariant above zero", system chips, multi-column sort, totals for the current filter and CSV export. |
-| **Watch money move** | A money map from PayPal balance through the shield to each maker, with each maker's own records a click away. Held money, money waiting for the owner and money sent are separate colours. |
-| **Try to trick the agent** | A playground sends a hostile buyer message ("refund me to this other account") through the real shield and shows the refusal. Nothing is stored. |
-
-![The decision view: 10 named checks, the exact payload hash, and Countersign with passkey](docs/media/submission/02-decision-passkey.png)
 
 ## What the AI does, and what the code does
 
@@ -225,9 +320,7 @@ committed recording it came from, with real PayPal debug ids. Full detail:
 ## Results
 
 Mock and sandbox evidence are reported separately and never added together.
-<!-- C58 -->
 Explore all 480 runs in the dashboard's **Evaluation replay** (`#replay`).
-<!-- /C58 -->
 
 **Fault evaluation on the mock, model disabled** (48 fault scenarios × 5 runs = 240
 runs per system; source
@@ -260,8 +353,8 @@ GET), drafted a note to Maker A, left the $60 refund to the owner (NEEDS_OWNER),
 chose **WAIT** on both the "refund to another account" bait and the settled-retry
 bait. Friday's $1,086 was paid once.
 
-**Test suite:** 4,082 Python tests (unit, integration on PostgreSQL 16, property
-and contract) and 102 web tests pass on `main`; Ruff clean; four import contracts
+**Test suite:** 4,097 Python tests (unit, integration on PostgreSQL 16, property
+and contract) and 124 web tests pass on `main`; Ruff clean; four import contracts
 kept.
 
 Zero measured violations do not establish universal safety. Disputes opened on
@@ -363,32 +456,7 @@ decision and safety layer.
   printed or logged. Recordings are redacted before they are published. The hosted
   demo refuses to start if PayPal or model credentials are set.
 
-## Try it in a minute
-
-The same container as the hosted demo: the app and dashboard, a bundled PayPal mock
-on loopback and a disposable PostgreSQL 16. No PayPal account, no API key, no
-outside network calls. You need Docker.
-
-```bash
-git clone https://github.com/Razeefshaik/CounterSign.git
-cd CounterSign
-docker build -t countersign-demo .
-docker run --rm -p 127.0.0.1:8080:8080 countersign-demo
-```
-
-Open **http://localhost:8080** and press **Start the week**, then **Next step**
-(bottom right) to play the week. Use `localhost`, not `127.0.0.1`: browsers allow passkeys only on a hostname.
-At step 6 the payout run waits for you: open **Review and sign**, then **Countersign
-with passkey**.
-
-**Or deploy your own copy on Render in one click:**
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Razeefshaik/CounterSign)
-
-The live demo runs on Render from the same [`render.yaml`](render.yaml) blueprint: one
-Docker web service with PostgreSQL and the mock inside, a health check on
-`/api/v1/meta`, and no secrets (the container refuses PayPal or model keys). Hosting
-details and measured cold starts: [docs/walkthrough/c27-hosting.md](docs/walkthrough/c27-hosting.md).
+## Run from source and run the tests
 
 <details>
 <summary><b>Run from source: the mock demo week in a terminal</b></summary>
@@ -400,67 +468,6 @@ You need Python 3.12, Docker (for PostgreSQL 16) and Git.
 ```powershell
 py -3.12 -m venv .venv
 .venv\Scripts\python.exe -m pip install -e ".[dev]"
-
-# Disposable PostgreSQL on 127.0.0.1:55433, plus an empty *_demo database
-docker compose --profile test up -d --wait postgres-test
-docker compose --profile test exec -T postgres-test createdb -U countersign countersign_quickstart_demo
-
-$env:PYTHONPATH = 'src'
-$env:DATABASE_URL = 'postgresql://countersign:countersign-dev@127.0.0.1:55433/countersign_quickstart_demo'
-.venv\Scripts\python.exe -m alembic -c migrations/alembic.ini upgrade head
-
-# Start the mock on 127.0.0.1:8099 and register its webhook; prints a webhook id
-.venv\Scripts\python.exe -m scripts.mock_rehearsal --reset --root "$env:TEMP\countersign-quickstart"
-```
-
-Then set the same variables in two terminals, using the printed webhook id:
-
-```powershell
-$env:PYTHONPATH = 'src'
-$env:DATABASE_URL = 'postgresql://countersign:countersign-dev@127.0.0.1:55433/countersign_quickstart_demo'
-$env:COUNTERSIGN_MODE = 'demo'
-$env:PAYPAL_BASE_URL = 'http://127.0.0.1:8099'
-$env:PAYPAL_WEBHOOK_ID = 'PASTE-THE-PRINTED-WH-MOCK-ID'
-
-# Terminal 1: the app (webhook receiver and owner API), background workers off
-.venv\Scripts\python.exe -m scripts.demo_week --target mock --serve --port 8000
-# Terminal 2: play the week
-.venv\Scripts\python.exe -m scripts.demo_week --target mock --model scripted --root "$env:TEMP\countersign-quickstart"
-```
-
-**bash** (Linux or macOS): the same steps with `python3.12`, `.venv/bin/python`,
-`export` instead of `$env:` and `/tmp/countersign-quickstart` as the root. In Git
-Bash on Windows, use `.venv/Scripts/python.exe`.
-
-- The demo refuses any database whose name does not end in `_demo` or `_test`. Your
-  working database is never touched.
-- Port 55433 is a throwaway service: its data lives in memory and is lost on restart.
-- `--reset` deliberately clears the local mock. Leave it out to resume a run.
-- A real model on the mock and the sandbox runbook need private keys and are run by
-  the owner: see [c23-agent.md](docs/walkthrough/c23-agent.md) and
-  [c25-demo-week.md](docs/walkthrough/c25-demo-week.md).
-
-</details>
-
-<details>
-<summary><b>Running the tests</b></summary>
-
-```powershell
-docker compose --profile test up -d --wait postgres-test
-$env:COUNTERSIGN_TEST_DATABASE_URL = 'postgresql://countersign:countersign-dev@127.0.0.1:55433/countersign'
-$env:PYTHONPATH = 'src'
-.venv\Scripts\python.exe -m pytest -q
-.venv\Scripts\ruff.exe check .
-.venv\Scripts\lint-imports.exe
-node --test web/tests/*.test.mjs
-```
-
-In bash, use `export` and `.venv/bin/`. Without `COUNTERSIGN_TEST_DATABASE_URL` the
-database integration tests are skipped and the unit tests still run. Tests use fake
-data and need no PayPal credentials or model key. See
-[docs/walkthrough/test-database.md](docs/walkthrough/test-database.md).
-
-</details>
 
 ## Dashboard
 
@@ -474,9 +481,7 @@ a dark glass theme, down to a 390 px phone, with reduced-motion support.
 - **Decisions:** the proposal in plain English, every named check, the exact payload
   hash, and **Countersign with passkey**.
 - **Incident desk, Execution history, Payout runs:** AG Grid Community.
-<!-- C58 -->
 - **Evaluation explorer:** all 480 historical mock runs in AG Grid Community, with preset filters, filtered totals and CSV export.
-<!-- /C58 -->
 - **Cash** (with the balance's freshness time), **Money graph**, **Evaluation
   replay**, **Sandbox proof** and **Try to trick the agent**.
 
@@ -506,6 +511,13 @@ a dark glass theme, down to a 390 px phone, with reduced-motion support.
 | `recordings/` | Redacted real sandbox exchanges and webhooks; the real-model week | core |
 | `tests/` | Unit, integration, property and contract tests | core and mate |
 | `docs/` | Design, decisions, findings, contracts, tasks and walkthroughs | shared |
+
+## Limits and what's next
+
+- **The demo week runs on a PayPal mock built from recorded sandbox payloads.** The dashboard says so on every screen. Sandbox evidence and mock evidence are reported separately and never added together.
+- **Zero measured violations do not establish universal safety.** Disputes opened on captures already settled into available remain untested.
+- **Payouts is a focused prototype of the decision and safety layer.** Real marketplaces collecting for third parties may use PayPal's platform products.
+- **Next:** run the same layer on those platform products, policies the owner can tune, partial refunds and more dispute types, multi-currency, and the gateway as a drop-in approval layer for PayPal's hosted MCP server.
 
 ## Team and how we worked
 
