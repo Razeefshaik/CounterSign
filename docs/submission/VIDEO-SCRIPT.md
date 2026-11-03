@@ -16,7 +16,7 @@ Under 3:00 (2:52). Built in Remotion from code, in `PayPalDevPost/remotion-video
 | 1:31 | The network cut | Then we cut the network... right after PayPal accepts the payout. The executor retries, with the same keys. PayPal points back to the original batch. Exactly. One. Payment. |
 | 1:44 | Any AI agent | And it isn't just our agent. CounterSign is an MCP server... so any AI agent can plug in. Here, one is tricked into refunding a buyer to a stranger's account. Blocked. Three rules, named. Nothing sent. |
 | 1:59 | Built on, real footage | And this is no mockup. This is the real build, on PayPal's real APIs. Payouts. Disputes. Orders. Webhooks. PayPal's Agent Toolkit... with every write tool switched off. Google Gemini reads the mess. The code decides. And every single run... is yours to slice, in AG Grid. |
-| 2:19 | Sandbox proof | Every PayPal assumption was tested on the real sandbox first. Thirteen checks. Over a thousand recorded calls. Four assumptions were wrong... so the design changed to match PayPal. |
+| 2:19 | Sandbox proof | The key PayPal assumptions were tested on the real sandbox first. Thirteen checks. Over a thousand recorded calls. Four were wrong... so the design changed to match PayPal. |
 | 2:32 | Results | Forty-eight fault scenarios. Five runs each. Zero duplicate settlements. Zero refunds without the owner. Zero payments to an unverified payee. |
 | 2:42 | Close | AI can move money now. CounterSign makes sure it asks first. The AI proposes. The code countersigns. |
 

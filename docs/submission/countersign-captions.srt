@@ -291,27 +291,27 @@ And every single run...
 is yours to slice, in AG Grid.
 
 74
-00:02:19,880 --> 00:02:23,060
-Every PayPal assumption was tested on the real sandbox
+00:02:19,820 --> 00:02:22,400
+The key PayPal assumptions were tested on the real
 
 75
-00:02:23,160 --> 00:02:23,540
-first.
+00:02:22,560 --> 00:02:23,520
+sandbox first.
 
 76
-00:02:24,140 --> 00:02:25,100
+00:02:24,120 --> 00:02:25,060
 Thirteen checks.
 
 77
-00:02:25,580 --> 00:02:27,380
+00:02:25,500 --> 00:02:27,360
 Over a thousand recorded calls.
 
 78
-00:02:28,140 --> 00:02:29,440
-Four assumptions were wrong...
+00:02:28,060 --> 00:02:28,800
+Four were wrong...
 
 79
-00:02:29,960 --> 00:02:32,100
+00:02:29,380 --> 00:02:31,520
 so the design changed to match PayPal.
 
 80

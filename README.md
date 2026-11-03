@@ -52,7 +52,7 @@ Built for the [PayPal AI Hackathon](https://paypalaihackathon.devpost.com/). Pay
 4. **The owner countersigns with a passkey,** on their own device, bound to the payload hash. A plain approval can never claim that signature.
 5. **We cut the network right after PayPal accepts the payout.** The executor retries with the same keys, PayPal links back to the original batch, and there is **exactly one payment**.
 6. **An outside agent, connected over MCP, is tricked into refunding a buyer to a stranger's account.** BLOCK, three rules named, `written: false`.
-7. **Every assumption behind this was tested on the real PayPal sandbox first.** Four were wrong, and the design changed to match PayPal.
+7. **The key assumptions behind this were tested on the real PayPal sandbox first.** Four were wrong, and the design changed to match PayPal.
 
 ![CounterSign command center: the weekly payout run waits for the owner's signature](docs/media/submission/01-command-center-light.png)
 
