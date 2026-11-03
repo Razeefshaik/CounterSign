@@ -31,7 +31,7 @@ staged, sandbox and real-model evidence stay distinct.
 - Preview `http://localhost:8198`, own `countersign-c62-preview` at one CPU.
   Do not touch 8180/8196/8197. No secrets, .env reads, real PayPal/LLM calls,
   dependencies or styles.css changes. Full evidence/shared inserts in C62 README.
-  Next: push this branch only; owner reviews, Claude integrates/full-tests later.
+  Branch pushed to origin; owner reviews, Claude integrates/full-tests later.
 
 ## Earlier feature: C58 evaluation explorer (Nov 3)
 

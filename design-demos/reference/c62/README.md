@@ -106,3 +106,7 @@ are listed below; numbers are new-side hunk starts for review, relative to base.
 | `web/demo.mjs` | 12, 14, 104 |
 | `web/guide.mjs` | 4, 40, 44, 47, 71, 82 |
 | `web/index.html` | 20 |
+
+Final captures force a full navigation and assert the completed card contains
+Back to Friday before saving. All six have no horizontal overflow or uncaught
+runtime exception. The preview was returned to unsigned Friday after capture.
