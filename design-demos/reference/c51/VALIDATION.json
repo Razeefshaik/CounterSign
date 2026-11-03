@@ -1,0 +1,62 @@
+{
+  "tested_commit": "93f0e35f7f86c51386a06e8745b8e79e8dfabb07",
+  "base_commit": "454d2cc",
+  "date": "2026-11-03",
+  "platform": "Windows, Python 3.12.10",
+  "full_pytest": {
+    "tests": 4070,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 5,
+    "passed": 4065,
+    "collected_items": 4070,
+    "exit_code": 0,
+    "reported_elapsed_seconds": 2035.32,
+    "junit_suite_seconds": 2034.948
+  },
+  "node_tests": {
+    "passed": 81,
+    "failed": 0
+  },
+  "ruff": "passed",
+  "import_contracts": {
+    "kept": 4,
+    "broken": 0
+  },
+  "dependencies": {
+    "webauthn": "3.0.1",
+    "mcp": "2.3.0",
+    "langchain-core": "1.7.0",
+    "langchain-google-genai": "4.4.2",
+    "google-genai": "2.33.0"
+  },
+  "test_database": {
+    "engine": "PostgreSQL 16",
+    "service": "dedicated disposable Docker",
+    "port": 55434,
+    "name": "countersign_c51",
+    "tmpfs_mib": 1024,
+    "max_wal_size_mib": 128,
+    "checkpoint_seconds": 60
+  },
+  "previous_attempt": {
+    "tests": 4071,
+    "failures": 3,
+    "errors": 86,
+    "skipped": 19,
+    "passed": 3963,
+    "seconds": 1737.851,
+    "reason": "Shared PostgreSQL 512 MiB temporary storage filled and crashed; optional parent model packages also missing. Final clean run supersedes this attempt."
+  },
+  "skips": "Five checks need the legacy toolkit installed in the parent environment. The separate genuine legacy child check passed.",
+  "review": "REVIEW.md: P2 signed-timeline provenance issue reproduced; runtime left unchanged.",
+  "runtime_changed_during_validation": false,
+  "merged": false,
+  "pr_creation": "Owner retains PR creation.",
+  "log_hashes": {
+    "c51-full-verified.log": "d025ee229038f2f2c24039d8921d814fa126168bb1a7713911386b77d4f3679e",
+    "c51-full-verified.xml": "94948da7ac683913141205105212327bbe91ea6f55ae6f83411f799f872374e6",
+    "c51-full-pytest.log": "4c08bb6fe9d6178390ac6d1badd577d0df2ab3fde4108e229285317d6db8aaef",
+    "c51-full-pytest.xml": "cb3baecb33eabb976c7e232e008852b05f70aa39eb65ea9c7de1806e0fe1d693"
+  }
+}

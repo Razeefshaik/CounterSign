@@ -35,6 +35,41 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C51 resumed full validation (Nov 3)
+
+Restored the pushed C51 branch into CounterSign-c51 with owner authorization:
+`razeef/c51-passkey-countersign`, tested source `93f0e35`, feature `38877ef`,
+base `454d2cc`. Existing feature and test assertions were preserved. WebAuthn
+3.0.1/migration0007/contract1.0.8 remain as committed; no runtime changes.
+
+Final complete run: **4065 passed, 5 skipped in 2035.32s (33:55)**, exit0,
+4070 collected, `c51-full-verified.log/xml`. Dedicated pinned `.[dev,llm]` venv
+and explicit existing legacy-toolkit child interpreter were used. Genuine child
+and Gemini stub checks passed; five skips require legacy toolkit IN the parent.
+Node81, Ruff, four import contracts and pip check passed on unchanged source.
+
+The first resumed run is retained (3963 passed,19 skipped,3 failed,86 errors in
+1738.48s): shared PostgreSQL55433 exhausted its512MB tmpfs WAL and parent LLM
+prerequisites were absent. A fresh full pass supersedes it. Own PostgreSQL16
+container `countersign-c51-validation` on55434, database countersign_c51, used
+1GB tmpfs, maxWAL128MB/min32MB/checkpoint60s. Primary removes its own container
+after verification; no other container was stopped. Raw logs:
+`S:\flutter\temp\countersign-c51-validation-20261103-195029`.
+Public VALIDATION.json/HANDOFF addendum summarize the result.
+
+REVIEW.md records an **unfixed P2 provenance issue**: plain approval accepts an
+arbitrary approved_by string, while views.mjs trusts owner:passkey: for its signed
+label. Actual plain HTTP201 with zero credentials and zero OWNER_COUNTERSIGNED
+audits still renders Countersigned. Normal financial approval checks run; this is
+a false signature label, not bypass of financial authorization. User requested
+validation and preservation, so no fix was made. Review before integration;
+do not declare unconditional merge readiness from passing tests.
+
+Earlier six Chrome virtual-authenticator screenshots remain historical local
+browser evidence; not rerun during this resume. No .env reads, real PayPal/model
+calls, PR creation, merge or deployment. Owner opens the PR. Final docs commit
+and push remain for the primary agent.
+
 ## C48 MCP gateway (Nov 3; ready for Claude review)
 
 Source: parent PayPalDevPost `prompts/codex/active/CODEX-PROMPT-C48-MCP-GATEWAY.md`

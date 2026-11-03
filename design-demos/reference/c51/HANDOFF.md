@@ -1,5 +1,29 @@
 # C51 handoff — November 3, 2026
 
+## Local continuation completed (November 3, 2026)
+
+This supersedes the incomplete cloud-validation status below. Restored pushed
+commit `93f0e35` in `CounterSign-c51`, preserving existing worktrees. A clean full
+Python run finished **4065 passed, 5 skipped, zero failures/errors**, exit 0,
+in **2035.32 seconds**. All 81 Node tests, Ruff and four import contracts passed.
+See `VALIDATION.json` for exact counts, versions and log hashes.
+
+The first local full run encountered a shared PostgreSQL temporary-disk crash
+and missing optional parent model packages. Its unsuccessful results are retained
+in the validation record. The clean rerun used the project's pinned optional
+packages and a dedicated PostgreSQL 16 test container on loopback 55434, with
+bounded WAL. Five skips require legacy toolkit packages in the parent environment;
+the genuine separate-toolkit child test passed. No real provider calls, environment-file
+reads or application/environment configuration file changes were made.
+
+Review found one open P2: plain approval can forge the passkey-signed timeline
+label through caller-supplied `approved_by`; see `REVIEW.md` for the real endpoint
+reproduction. This affects signature provenance, while normal approval checks
+remain in force. Runtime, migrations and test assertions remain unchanged from
+the tested commit. No merge or deployment; the owner retains PR creation.
+
+---
+
 Branch: `razeef/c51-passkey-countersign`, based on main `454d2cc`.
 Feature commit: `38877ef` (`C51: countersign owner approvals with verified passkeys`).
 Scope: C51 only. No C49, merge, deployment or environment configuration changes.
