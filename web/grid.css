@@ -1,5 +1,5 @@
 /* C49: scoped Community grid skin. Theme changes inherit live application tokens. */
-.cs-grid.ag-theme-quartz{
+.cs-grid.ag-theme-quartz,.cs-grid .ag-theme-quartz{
   --ag-background-color:var(--card);--ag-foreground-color:var(--ink);
   --ag-header-background-color:var(--surface);--ag-header-foreground-color:var(--ink-2);
   --ag-odd-row-background-color:transparent;--ag-row-hover-color:color-mix(in srgb,var(--accent) 6%,transparent);
@@ -7,6 +7,7 @@
   --ag-border-color:var(--line);--ag-row-border-color:var(--line);
   --ag-secondary-border-color:var(--line);--ag-input-border-color:var(--line);
   --ag-active-color:var(--accent);--ag-input-focus-border-color:var(--accent);
+  --ag-input-focus-box-shadow:0 0 0 2px color-mix(in srgb,var(--accent) 22%,transparent);
   --ag-range-selection-border-color:var(--accent);--ag-cell-horizontal-border:0;
   --ag-font-family:var(--sans);--ag-font-size:13px;--ag-grid-size:6px;
   --ag-wrapper-border-radius:12px;--ag-border-radius:8px;
@@ -14,6 +15,8 @@
   --ag-popup-background-color:var(--surface);--ag-disabled-foreground-color:var(--ink-3);
   --ag-secondary-foreground-color:var(--ink-3);--ag-input-background-color:var(--surface);
   --ag-checkbox-checked-color:var(--accent);--ag-icon-font-color:var(--ink-3);
+}
+.cs-grid.ag-theme-quartz{
   width:100%;height:430px;min-width:0;overflow:hidden;color:var(--ink);
 }
 .cs-grid .ag-root-wrapper{border:1px solid var(--line);box-shadow:none}
