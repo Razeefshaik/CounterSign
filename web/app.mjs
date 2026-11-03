@@ -73,7 +73,7 @@ const demo = createDemoBar(document, {
   onChange: () => refresh(),
 });
 // C57: shared guarded commands; guidance never sends its own requests.
-const guide = createGuide(document, {step:() => demo.step(), reset:() => demo.reset()});
+const guide = createGuide(document, {step:() => demo.step(), reset:() => demo.reset(), friday:() => demo.friday()});
 // Every route starts at the top; #incidents also names a section, which would scroll.
 window.addEventListener("hashchange", () => {window.scrollTo({top: 0}); views.render();});
 if (location.hash === "#incidents") requestAnimationFrame(() => window.scrollTo({top: 0}));

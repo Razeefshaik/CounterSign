@@ -14,7 +14,7 @@ sandbox only. Licensed under [Apache-2.0](LICENSE).
 
 | | |
 | --- | --- |
-| **Live demo** | ‹HOSTED URL› (demo mode on a bundled PayPal mock; press **Start the week**, then **Next step**) |
+| **Live demo** | ‹HOSTED URL› (opens on Friday: **Review and sign**; **Watch from Monday** replays the week on a bundled PayPal mock) |
 | **Video (under 3 minutes)** | ‹YOUTUBE URL› |
 | **Proof it's real** | 13 checks recorded on the real PayPal sandbox, every fact linked to its recording: the **Sandbox proof** page in the dashboard and [recordings/sandbox/INDEX.md](recordings/sandbox/INDEX.md) |
 | **Run it yourself** | One Docker command, no keys: [Try it in a minute](#try-it-in-a-minute) |
@@ -376,10 +376,11 @@ docker build -t countersign-demo .
 docker run --rm -p 127.0.0.1:8080:8080 countersign-demo
 ```
 
-Open **http://localhost:8080** and press **Start the week**, then **Next step**
-(bottom right) to play the week. Use `localhost`, not `127.0.0.1`: browsers allow passkeys only on a hostname.
-At step 6 the payout run waits for you: open **Review and sign**, then **Countersign
-with passkey**.
+Open **http://localhost:8080**. The demo opens on **Friday**, with the unsigned
+weekly payout run ready for **Review and sign**. Use **Countersign with passkey**
+or plain approval. Use `localhost`, not `127.0.0.1`: browsers allow passkeys only on a hostname.
+**Watch from Monday** restarts the story; **Next step** plays it forward. At the
+end, **Back to Friday** restores the unsigned run without replaying the slow steps.
 
 **Or deploy your own copy on Render in one click:**
 
@@ -389,6 +390,14 @@ The live demo runs on Render from the same [`render.yaml`](render.yaml) blueprin
 Docker web service with PostgreSQL and the mock inside, a health check on
 `/api/v1/meta`, and no secrets (the container refuses PayPal or model keys). Hosting
 details and measured cold starts: [docs/walkthrough/c27-hosting.md](docs/walkthrough/c27-hosting.md).
+
+The image bakes a checkpoint by playing the real scripted steps 1–6, on the mock.
+It restores the PostgreSQL, mock and week records on each boot. An idle instance
+returns to unsigned Friday after 20 minutes without a demo or owner POST; it waits
+for active decisions and passkey prompts. `COUNTERSIGN_HOSTED_IDLE_MINUTES=0`
+disables this. Set `COUNTERSIGN_HOSTED_START=monday` to boot with the old empty
+marketplace instead; optional `COUNTERSIGN_HOSTED_SEED=week` requires that setting.
+No external service or model is called to create or restore this checkpoint.
 
 <details>
 <summary><b>Run from source: the mock demo week in a terminal</b></summary>

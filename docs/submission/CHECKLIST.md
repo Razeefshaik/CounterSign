@@ -76,5 +76,8 @@ submit). The rest is done or prepared in the repo.
 - [ ] No `‹…›` placeholder left: `grep -rn "‹" README.md docs/submission/`.
 - [ ] Claims check, every hit must be an allowed form:
       `grep -n -i -E "payroll|never moves twice|money never|wrongful refund|guarantee|100%|always safe" README.md docs/submission/*.md`.
-- [ ] The hosted demo plays the week from a fresh start (Restart, then Start the week and Next step to the
+- [ ] The hosted demo opens at unsigned Friday (step 6); Review and sign works with
+      plain approval and a newly registered passkey. Back to Friday restores the run;
+      Watch from Monday restarts the story. Confirm idle restore waits for decisions.
+- [ ] The hosted demo plays the week from Monday (Watch from Monday, then Start the week and Next step to the
       end) and the passkey countersign works on it.

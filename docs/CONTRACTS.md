@@ -441,6 +441,36 @@ owner tokens. Existing proposal approval fields supply the signed timeline.
 
 ---
 
+### C62: hosted Friday checkpoint (written contract 1.0.9)
+
+Only the hosted demo on the loopback mock with its baked checkpoint exposes this
+capability. `POST /api/v1/demo/friday` takes no body or query parameters and starts
+an asynchronous restore of the image's fixed Friday artifact. It returns 202 with
+the demo state; poll `GET /api/v1/demo/state` until `running` is false. It shares
+the step/reset gate: 409 `DEMO_BUSY` while a step or owner decision is active;
+requests during the restore may receive 503 `DEMO_BUSY`. No supplied snapshot or
+filename is accepted (422 `INVALID_REQUEST`). An instance without the artifact
+returns 409 `DEMO_CHECKPOINT_UNAVAILABLE`; failed restores report
+`DEMO_RESTORE_FAILED` without private details. A failed cross-store rollback
+requires restarting the container before money or data routes reopen.
+
+Demo state adds `checkpoint: "friday" | null` and `friday_available: boolean`.
+The checkpoint label requires a restored step 6 with its original unsigned,
+waiting proposal/run; signing or changing its verified-payee binding removes it.
+The availability field means the hosted artifact can be restored, not that an
+arbitrary local demo can do so. Successful restore records
+`last_result: {action: "friday", ok: true, code: "DEMO_FRIDAY_RESTORED"}`.
+`POST /api/v1/demo/reset` still restarts at Monday. Passkeys and increasing
+signature counters survive a Friday restore; old challenges are cleared.
+
+Hosted defaults are `COUNTERSIGN_HOSTED_START=friday` and
+`COUNTERSIGN_HOSTED_IDLE_MINUTES=20` (0 disables idle restore). Activity is any
+demo/owner POST measured with a monotonic clock. Idle restore skips fresh Friday,
+active commands/owner decisions and unexpired passkey challenges. Dashboard cash
+age and maker 30-day totals use staged time on the mock; live calculations and
+real-time passkey challenge expiry are unchanged. The checkpoint is simulated,
+never new sandbox or model evidence.
+
 ## 4. Core engine interface: `src/countersign/harness.py`
 
 Core implements this (task C20), and it stays stable. Two things use it: the eval `countersign` system and the demo control bar. **Mate code imports `countersign.harness` and nothing else from `countersign`.** `dashboard.py` reads the `v_dash_*` views through its own read-only connection to `DATABASE_URL`.
@@ -1123,34 +1153,3 @@ Startup errors never expose configuration values. SDK validation does not coerce
 proposal values or reflect rejected arguments: raw tool arguments are bounded
 before dispatch, then the existing strict parser validates them.
 <!-- /C48 -->
-
-
-### C62: hosted Friday checkpoint (written contract 1.0.9)
-
-Only the hosted demo on the loopback mock with its baked checkpoint exposes this
-capability. `POST /api/v1/demo/friday` takes no body or query parameters and starts
-an asynchronous restore of the image's fixed Friday artifact. It returns 202 with
-the demo state; poll `GET /api/v1/demo/state` until `running` is false. It shares
-the step/reset gate: 409 `DEMO_BUSY` while a step or owner decision is active;
-requests during the restore may receive 503 `DEMO_BUSY`. No supplied snapshot or
-filename is accepted (422 `INVALID_REQUEST`). An instance without the artifact
-returns 409 `DEMO_CHECKPOINT_UNAVAILABLE`; failed restores report
-`DEMO_RESTORE_FAILED` without private details. A failed cross-store rollback
-requires restarting the container before money or data routes reopen.
-
-Demo state adds `checkpoint: "friday" | null` and `friday_available: boolean`.
-The checkpoint label requires a restored step 6 with its original unsigned,
-waiting proposal/run; signing or changing its verified-payee binding removes it.
-The availability field means the hosted artifact can be restored, not that an
-arbitrary local demo can do so. Successful restore records
-`last_result: {action: "friday", ok: true, code: "DEMO_FRIDAY_RESTORED"}`.
-`POST /api/v1/demo/reset` still restarts at Monday. Passkeys and increasing
-signature counters survive a Friday restore; old challenges are cleared.
-
-Hosted defaults are `COUNTERSIGN_HOSTED_START=friday` and
-`COUNTERSIGN_HOSTED_IDLE_MINUTES=20` (0 disables idle restore). Activity is any
-demo/owner POST measured with a monotonic clock. Idle restore skips fresh Friday,
-active commands/owner decisions and unexpired passkey challenges. Dashboard cash
-age and maker 30-day totals use staged time on the mock; live calculations and
-real-time passkey challenge expiry are unchanged. The checkpoint is simulated,
-never new sandbox or model evidence.

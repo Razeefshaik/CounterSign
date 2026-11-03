@@ -183,9 +183,12 @@ separately.
 its first commit is dated Oct 23, 2026. AI coding agents helped write the code under
 written rules; every change was reviewed and tested before merging.
 
-**Testing instructions for judges.** Open the live demo and press **Start the week**,
-then **Next step** until step 6; a hint after each step says where to look. At step 6
-open **Review and sign** to see the shield's checks and countersign with a passkey.
+**Testing instructions for judges.** Open the live demo: it starts on Friday with
+the weekly payout run waiting for you. Open **Review and sign** to inspect the
+shield's checks and countersign with your passkey, or use plain approval. Choose
+**Watch from Monday** to replay the earlier events with **Next step**. At the end,
+**Back to Friday** restores the unsigned run in seconds. An idle shared demo
+returns to Friday after 20 minutes, waiting for active decisions and passkey prompts.
 **Evaluation replay** lets you slice all 480 evaluation runs in AG Grid. Or run it locally with one Docker command (README, "Try it in a minute"). No
 accounts or keys are needed; the demo runs on a bundled PayPal mock and says so on
 every screen.
