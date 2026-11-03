@@ -40,7 +40,10 @@ Current M21 branch references are in the M21 section below.
 Source: owner-invoked Downloads `CODEX-PROMPT-C58-EVAL-EXPLORER.md`. Work only in
 `CounterSign-c58`, branch `razeef/c58-eval-explorer`, from upstream/main `97a464b`.
 Code commits `01656d3` (bundle/tests) and `dae163b` (explorer/integration).
-Evidence/docs commit, push and PR pending; integration/full pytest belong to Claude. Do not
+Evidence/docs `f7feb76`, context `0959a4d`. PR #17:
+https://github.com/Razeefshaik/CounterSign/pull/17 is open, non-draft, base main;
+branch pushed to origin and upstream. No merge. Integration/full pytest belong
+to Claude. Do not
 touch original checkout, other worktrees/databases, or ports 8180/8196.
 
 `scripts/bundle_eval_runs.py` publishes only its exact field allowlist from

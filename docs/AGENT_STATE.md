@@ -15,7 +15,9 @@ staged, sandbox and real-model evidence stay distinct.
 
 - Isolated worktree `CounterSign-c58`, branch `razeef/c58-eval-explorer`, base
   upstream/main `97a464b`. Code commits: `01656d3` bundle/tests and `dae163b`
-  explorer/integration. Evidence/docs commit, push and PR are pending. The history
+  explorer/integration; `f7feb76` evidence/docs and `0959a4d` context.
+  [PR #17](https://github.com/Razeefshaik/CounterSign/pull/17) is open, non-draft,
+  targeting main. Branch pushed to upstream and origin; no merge. The history
   below describes earlier work; it does not establish current integration status.
 - Historical 480-run explorer is implemented above the existing `#replay` lanes,
   using C49's vendored AG Grid Community 32.3.9. Deterministic allowlisted bundle
@@ -37,8 +39,7 @@ staged, sandbox and real-model evidence stay distinct.
   leave it running. No database needed. No environment-file reads,
   PayPal/model calls, dependencies or `styles.css` changes; 8180/8196 and other
   databases/worktrees remain untouched; original checkout had only the authorized
-  Git fetch. Next: primary commits evidence/docs, pushes and records the PR, then
-  hands off for integration. Evidence README has the full report/shared inserts.
+  Git fetch. Next: owner reviews PR #17 and Claude runs integrated validation. Evidence README has the full report/shared inserts.
   See C58 future notes.
 
 ## Earlier integrated state (Nov 3, after cleanup)

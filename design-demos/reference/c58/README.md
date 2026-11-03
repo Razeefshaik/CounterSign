@@ -1,7 +1,10 @@
 # C58 evaluation explorer: verification and handoff
 
 Worktree: sibling `CounterSign-c58`, branch `razeef/c58-eval-explorer`, based on
-fresh upstream/main `97a464b`. The original checkout and other worktrees, ports
+fresh upstream/main `97a464b`.
+Commits: `01656d3` bundle/tests, `dae163b` explorer/integration, `f7feb76`
+browser/evidence, `0959a4d` context. [PR #17](https://github.com/Razeefshaik/CounterSign/pull/17)
+is open against main, non-draft. Branch pushed to both remotes; no merge. The original checkout and other worktrees, ports
 8180/8196 and databases are untouched. Preview uses only port **8197** and contract
 fixtures; these source-only checks need no database.
 
