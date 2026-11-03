@@ -53,7 +53,7 @@ def nonnegative(value):
 def project(row):
     private_guard(row)
     if not isinstance(row, dict):
-        raise ValueError("EVAL_RUN_INVALID")
+        raise TypeError("EVAL_RUN_INVALID")
     if (row.get("system") not in {"countersign", "rules_only"}
             or row.get("ground") != "mock" or row.get("model") != "none"
             or not nonnegative(row.get("k")) or row["k"] > 4
