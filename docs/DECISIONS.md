@@ -554,3 +554,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Read dashboard views under the read-only role; proposal status omits rationale, payloads and flag excerpts | C48 boundary review | Accept | External reads need verdicts and rules without replaying untrusted agent instructions |
 | Keep SDK DNS-rebinding checks and extend only the trusted deployment HTTPS origin; redirect exact /mcp before static routing | C48 HTTP verification | Accept | The hosted static catch-all otherwise returns 405 before the mounted transport receives an exact-path POST |
 | Payout convenience proposals reuse an existing planned manifest; gateway never creates a plan | C48 integration | Accept | Planning and the staged week stay in their existing owner workflows |
+
+## Nov 3 C49 AG Grid
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Use the existing vendored AG Grid Community 32.3.9 behind a lazy, scoped bridge with pure API projections and token-based CSS | Owner C49 prompt | Accept | Sorting, text/number filters, keyboard navigation and pagination belong in operational tables without adding dependencies or replacing the glass theme |
+| Preserve integer minor units until cell formatting, keep missing money unavailable and pin the API's run total | C49 data review | Accept | A display grid must not introduce floating money, fabricate an observed zero or drop resend amounts from a run |
