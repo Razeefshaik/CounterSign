@@ -1,0 +1,29 @@
+/* C57: one next action, in the existing glass palette. No shell/style overrides. */
+.guide{padding:24px 28px;color:var(--ink);min-width:0}
+.guide[hidden],.guide [hidden]{display:none!important}
+.guide-start,.guide-hint{display:grid;grid-template-columns:minmax(0,1fr) 36px;gap:18px 20px;align-items:start}
+.guide-copy{min-width:0}
+.guide h2{font-size:clamp(19px,1.65vw,24px);font-weight:600;line-height:1.35;letter-spacing:-.015em;max-width:46ch}
+.guide-copy>p:not(.guide-label){margin-top:8px;color:var(--ink-2);font-size:14px;line-height:1.6}
+.guide-close{width:36px;min-height:36px;padding:8px;display:grid;place-items:center;border:0;background:transparent;color:var(--ink-3);border-radius:9px}
+.guide-actions{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+.guide-actions>button{min-height:42px;white-space:nowrap}
+.guide a,.guide summary{color:var(--accent-ink);font-weight:500;font-size:14px;text-underline-offset:4px}
+.guide a{display:inline-block;margin-inline-start:10px;min-height:28px;line-height:28px}
+.guide-actions>a{margin:0}
+.guide-explainer{flex:1;min-width:180px}
+.guide-explainer summary{cursor:pointer;width:fit-content;min-height:42px;display:flex;align-items:center;gap:8px}
+.guide-explainer summary::before{content:"+";font-size:18px;font-weight:400}
+.guide-explainer[open] summary::before{content:"−"}
+.guide-explainer p{max-width:70ch;color:var(--ink-2);font-size:14px;line-height:1.6;margin-top:8px}
+.guide-label{font-size:14px;font-weight:600;line-height:1.6;overflow-wrap:anywhere}
+.guide-owner .guide-label{color:var(--highlight-ink)}
+.guide-owner{border-inline-start:3px solid var(--highlight);padding-inline-start:16px}
+.guide .guide-status{grid-column:1/-1;font-size:13px;color:var(--ink-2);line-height:1.5}
+.guide :is(button,a,summary):focus-visible{outline:2px solid var(--accent);outline-offset:4px}
+#command :is(#makers-title,#stands-title,#map-title,#activity-title){scroll-margin-top:130px}
+.demo-bar.c57-next-pulse::after{content:"";position:absolute;inset:-5px;pointer-events:none;border:2px solid var(--accent);border-radius:inherit;opacity:0;animation:c57-next-pulse 1200ms cubic-bezier(.23,1,.32,1) 1}
+@keyframes c57-next-pulse{0%{opacity:0;transform:scale(.98)}25%{opacity:.45}100%{opacity:0;transform:scale(1.06)}}
+@media(hover:hover) and (pointer:fine){.guide-close:hover{background:var(--sunken);color:var(--ink)}}
+@media(max-width:600px){.guide{padding:20px}.guide-start,.guide-hint{gap:14px 8px}.guide-actions{align-items:stretch;gap:12px}.guide-actions>button{min-height:44px}.guide-explainer{flex-basis:100%}.guide-close{min-height:44px;width:36px}.guide a{min-height:44px;line-height:1.6;padding-block:10px}.guide-owner{padding-inline-start:12px}}
+@media(prefers-reduced-motion:reduce){.demo-bar.c57-next-pulse::after{animation:none;display:none}}

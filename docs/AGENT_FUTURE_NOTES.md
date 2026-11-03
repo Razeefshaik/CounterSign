@@ -663,3 +663,34 @@ CounterSign/.venv/toolkit/Scripts/python.exe. Logs/results under ignored
 Final own static preview PID 25720 was stopped at 19:08; 8192 confirmed not listening.
 No own container was created; owner 8180/other task ports remain untouched.
 No .env reads, real PayPal/model calls.
+
+## C57 guided start (Nov 4)
+
+Own CounterSign-c57 worktree and razeef/c57-guided-start branch from fresh main
+97a464b. Runtime commit 16ffe85; Claude integrates, no merge. guide.mjs owns pure
+API-state projection and a dismissible controller; guide.css uses the existing
+glass tokens without styles.css edits. index adds its hidden host below the hero
+and above cc-next. app shares demo state/notices with the guide. demo.mjs still
+owns every POST, busy guard and poll; its public reset now includes the same
+confirmation as compact Restart. Missing demo API clears the guide too.
+
+Pointers name all actual DEMO_STEPS and use confirmed API labels; unknown/renamed
+step names fall back to neutral history guidance. Setup is not maker loading;
+reserve release is not payment. Only steps 6/8 use matte rose. A native explainer,
+per-step dismissals, preserved details/focus and existing-section scroll/focus
+keep it keyboard usable. One accent-blue pulse after idle step 1 does not alter
+the strip dimensions and is off under reduced motion.
+
+Verified 115 Node tests (13 C57) and hosted asset test 1 passed/5.00 s, syntax and
+Ruff clean; no full pytest per owner. Browser preview uses public contract
+fixtures and AST-read actual step labels, not a financial/model/sandbox run.
+Own preview 8196 only; no DB created, no other ports/services changed, no .env
+reads, real LLM/PayPal calls or dependency/contract/migration changes. Twelve
+screenshots cover steps 0/6/11 x light/dark x 1440/390. Browser layout/API-label/
+banner checks completed; keyboard Start, shared click-burst guard, dismissal and
+reduced-motion checks passed before extended CDP automation timed out. No full
+browser pass claimed; final decision-link/restart browser checks remain for
+integration, while Node covers shared reset confirmation and request paths.
+Evidence under design-demos/reference/c57/. Own preview 8196 stopped. Commit and
+push C57 only; Claude integrates, no merge. Primary updated notes because the
+Professor Pickle context-keeper session was unavailable.

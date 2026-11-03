@@ -1,0 +1,24 @@
+{
+  "runtime_source_commit": "16ffe85",
+  "base_commit": "97a464b",
+  "branch": "razeef/c57-guided-start",
+  "web_tests": {"passed": 115, "failed": 0, "skipped": 0, "new_c57_tests": 13},
+  "dashboard_tests": {"passed": 1, "failed": 0, "skipped": 0, "seconds": 5.00, "path": "tests/dashboard/test_guide_assets.py"},
+  "ruff": "passed",
+  "javascript_syntax": "passed",
+  "full_pytest": "not run; deferred to integration by owner",
+  "browser": {
+    "preview_origin": "http://127.0.0.1:8196",
+    "data": "Public contract fixtures and simulated API state; labels read from actual DEMO_STEPS without executing backend code",
+    "screenshots": 12,
+    "steps": [0, 6, 11],
+    "themes": ["light", "dark"],
+    "widths": [1440, 390],
+    "completed_checks": "Guide geometry/no page overflow, source API labels, simulation banner, under-hero placement; keyboard explainer and Start, one-POST Start/Next burst, one-time strip pulse/dimensions, reduced motion and dismissal across navigation",
+    "status": "partial automation: screenshots complete; extended decision-link and restart checks hit local CDP timeouts",
+    "financial_or_real_model_proof": false
+  },
+  "temporary_preview": "stopped",
+  "database_created": false,
+  "real_paypal_or_llm_calls": false
+}

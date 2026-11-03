@@ -602,3 +602,13 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | In demo mode on the loopback mock, owner approve, reject and passkey approvals are judged at the mock's staged clock (as the playground and MCP gateway already are); live mode, or a demo whose mock clock can't be read, keeps the real clock. Passkey challenges keep real time | Submission review, Nov 3 | Accept | At staged Friday the dashboard's Approve returned SHIELD_BLOCKED, because judging at the real date (Nov 3) refused facts already true in the staged week (C's payout RETURNED on Thursday); judges clicking Review and sign would have hit an error |
+
+## Nov 4 C57 guided start
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Add a dismissible step-zero start card below the hero, with a native explainer and the shared demo step action | Owner C57 prompt | Accept | A judge arriving at an empty marketplace needs an obvious first action without a modal or a second request path |
+| Show the confirmed API label above step-specific pointers; renamed steps get neutral history guidance | C57 API-label review | Accept | Display hints must not substitute an invented step label or claim a different server action happened |
+| Keep stage 1 setup distinct from maker loading and stage 10 reserve release distinct from stage 11 payment | C57 actual DEMO_STEPS | Accept | Orders exist before makers are loaded, and releasing a reserve does not mean the maker was paid |
+| Share immediate busy/error feedback and restart confirmation through demo.mjs; clear guidance if the demo API disappears | C57 integration | Accept | Start, Next and Restart need one guarded POST path, with no stale guide or confirmation bypass |
+| Add one accent-blue pulse to the compact strip after step 1, disabled under reduced motion | Owner C57 prompt | Accept | Help viewers find Next without moving or resizing it; rose remains reserved for owner decisions |
