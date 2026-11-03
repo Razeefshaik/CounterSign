@@ -13,7 +13,7 @@ owner-attention accents remain muted matte rose.
 
 Checks: 70 frontend tests, 23 Python demo-control tests, and 22 read-only browser
 checks across five widths, both themes and overview/decision routes. Browser
-checks used the real local backend and left its completed mock week unchanged.
+checks used the real local backend without posting any demo actions.
 
 ## Nov 2 selected hero and integration (C45)
 
