@@ -62,7 +62,7 @@ staged, sandbox and real-model evidence stay distinct.
   validate the combined main, then Render **New > Blueprint** as documented.
   Do not deploy combined main on C47-only proof. No rebase/new suite performed.
 
-### C49 AG Grid (Nov 3; validation in progress)
+### C49 AG Grid (Nov 3; focused validation complete)
 
 - Worktree `CounterSign-c49`, branch `razeef/c49-ag-grid`, base `454d2cc`
   (C47 merged). Commits `8fab59c` foundation, `b5ef25a` integration/docs and
@@ -70,7 +70,8 @@ staged, sandbox and real-model evidence stay distinct.
   incident-mount navigation guard; `eca2b52` refresh/retry fixes and `fd09a09`
   nested-popup theme fix (final runtime source).
   `2b3034c` corrects the C48-stale import-count assertion (test only).
-  Review branch pushed through `50cf9eb`; Claude integrates after final validation.
+  Review branch pushed through `ade363b`; Claude integrates. Owner directs full
+  suites to wait until all features are merged; no separate PostgreSQL requested.
   Shared edits are fenced C49 inserts;
   no index/styles.css, backend, contract or dependency changes.
 - New grid.mjs/grid.css use vendored AG Grid Community 32.3.9 (MIT): incidents,
@@ -81,8 +82,9 @@ staged, sandbox and real-model evidence stay distinct.
   identified items, and operation links require actual proposal bindings. Escaped
   text/masked email, keyboard incident detail, filtering/sorting and lazy maker
   dialog graphs retain genuine API meaning; light/dark/phone/reduced motion supported.
-- Verified so far: **90 Node tests** (15 beyond base), syntax, hosted vendor asset **1
-  passed**, Ruff clean, **four import contracts kept** (C48 added the fourth).
+- Latest owner-requested checks: **90 Node tests passed** (including C49's 15),
+  hosted vendor asset **1 passed in 2.78 s**, no failures/skips. Earlier syntax,
+  Ruff and **four import contracts kept** remain recorded; no runtime change since.
   Final browser: **31 checks passed**, zero JS errors/exceptions/warnings/POSTs,
   18 PNGs: four grids x two themes x 390/1440, plus two native filter popups.
   verification.json records source `fd09a09`, the capture-start commit and LF
@@ -101,9 +103,10 @@ staged, sandbox and real-model evidence stay distinct.
   After the test-only fix, **15 smoke tests passed**, Ruff clean/four contracts kept.
   Final rerun was interrupted after the shared 55433 PostgreSQL exhausted its
   512 MB tmpfs and exited. Only C49's test processes were stopped; no shared
-  container/database was restarted. Owner approval for a separate C49 PostgreSQL
-  on 55449 is pending. Logs/results under ignored `.venv/c49-tools`; no full-green
-  claim. Final own preview PID 25720
+  container/database was restarted. Owner subsequently directed focused C49/web
+  checks only and deferred full suites until all features are merged. No new
+  database/container or full run started after that instruction. Logs/results
+  under ignored `.venv/c49-tools`; no full-green claim. Final own preview PID 25720
   stopped at 19:08; 8192 confirmed not listening, no own container created. Other task
   ports/8180 untouched. No .env/real services.
 

@@ -82,14 +82,18 @@ Branch `razeef/c49-ag-grid` is pushed for review, not merged. Runtime source is
 to match the existing four contracts. The branch starts at `454d2cc`; fetched
 main advanced to `d43e04b`, which is not included in this validation.
 
-- Node: **90 passed**; browser: **31 passed**, **18 screenshots**, no JavaScript
-  errors or POSTs. Ruff passes; **4 import contracts kept, 0 broken**.
+- Latest owner-requested focused rerun: C49's Python hosted-asset test **1 passed
+  in 2.78 s**; all web tests **90 passed in 1.05 s**, including C49's 15. No skips
+  or failures. Full suites are deferred until all features are merged, per owner.
+- Earlier browser proof: **31 passed**, **18 screenshots**, no JavaScript errors
+  or POSTs. Earlier Ruff passes; **4 import contracts kept, 0 broken**.
 - Initial full PostgreSQL suite: **4041 passed, 5 skipped, 2 failed** in 2348.53 s.
   Both failures were the stale assertion; after its fix, **15 smoke tests passed**.
-- Final full rerun is **blocked**: shared PostgreSQL 55433 exhausted its 512 MB
+- Historical full rerun was **interrupted**: shared PostgreSQL 55433 exhausted its 512 MB
   temporary filesystem and exited. C49's rerun was stopped at 234 completed cases;
-  no shared container/database was reset. Approval requested for a separate
-  temporary PostgreSQL 16 instance on 55449. This is not a full-green report.
+  no shared container/database was reset. The owner then directed C49/web tests
+  only and deferred full suites to integration. No separate temporary PostgreSQL
+  instance or another full run was started. This is not a full-green report.
 - The five skips require optional toolkit/LangChain packages in main Python;
   the isolated toolkit interpreter was configured for child-process checks.
 - Preview 8192 is stopped. Owner preview 8180 and other task ports are untouched.
@@ -113,6 +117,6 @@ New files are `web/grid.mjs`, `web/grid.css`, the two grid Node test modules,
 `tests/dashboard/test_grid_assets.py` and this evidence folder. No runtime Python,
 import contract, dependency, migration, approval binding or write path changed.
 
-Commits before this final handoff-only update: `8fab59c`, `b5ef25a`, `2b28f70`,
-`a6abd0b`, `eca2b52`, `fd09a09`, `2b3034c`, `50cf9eb`. All have one-line C49
+Commits before this focused-validation update: `8fab59c`, `b5ef25a`, `2b28f70`,
+`a6abd0b`, `eca2b52`, `fd09a09`, `2b3034c`, `50cf9eb`, `ade363b`. All have one-line C49
 subjects without attribution.

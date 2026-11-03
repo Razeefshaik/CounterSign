@@ -577,8 +577,13 @@ was interrupted at 234 completed cases after shared PostgreSQL on 55433 exited
 with "No space left on device" in pg_wal (its tmpfs is limited to 512 MB).
 Only C49's pytest processes 25392/18764 were stopped, avoiding long connection
 timeouts against the failed server. No shared container/database was restarted.
-Owner approval requested for isolated PostgreSQL 16 on 55449. No full-green claim.
-Review branch pushed through 50cf9eb (evidence/context); remote hash verified.
+Owner declined another full run: full suites wait until all features are merged.
+Latest requested focused rerun passed: 1 C49 Python hosted-asset test in 2.78 s,
+all 90 web tests in 1.05 s (including 15 C49 tests), no failures or skips.
+No new PostgreSQL container/database or full run was started after this direction.
+Full-suite validation is deferred to integration, not a current C49 blocker;
+the historical initial/interrupted results above remain evidence, not a green claim.
+Review branch pushed through ade363b (evidence/context); remote hash verified.
 Main advanced to d43e04b during the work; C49 remains based on tested 454d2cc.
 Claude must integrate and validate the combined main; no rebase/merge performed.
 Runs use Windows Selector and COUNTERSIGN_TEST_TOOLKIT_PYTHON pointing to original

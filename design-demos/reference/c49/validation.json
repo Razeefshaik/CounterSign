@@ -7,6 +7,8 @@
   "import_contracts": {"kept": 4, "broken": 0},
   "initial_full_pytest": {"passed": 4041, "failed": 2, "skipped": 5, "seconds": 2348.53, "failures": "Both parametrizations of test_executor_can_import_write_adapter expected three kept contracts; C48 introduced a fourth."},
   "fixed_smoke_pytest": {"passed": 15, "failed": 0, "seconds": 25.27},
-  "final_full_pytest": {"status": "blocked", "reason": "Shared test PostgreSQL exited after its 512 MB tmpfs filled. C49-only rerun stopped after 234 completed cases; no shared database or container was reset."},
+  "focused_c49_pytest": {"passed": 1, "failed": 0, "skipped": 0, "seconds": 2.78, "path": "tests/dashboard/test_grid_assets.py"},
+  "focused_web_rerun": {"passed": 90, "failed": 0, "skipped": 0, "seconds": 1.0515436, "includes_c49_tests": 15},
+  "final_full_pytest": {"status": "deferred_by_owner_until_all_features_are_merged", "previous_attempt": "Shared test PostgreSQL exited after its 512 MB tmpfs filled. C49-only rerun stopped after 234 completed cases; no shared database or container was reset.", "new_database_created": false, "another_full_run_started": false},
   "optional_skips": "Five tests require paypal-agent-toolkit and LangChain in the main Python environment; the separate toolkit interpreter was configured."
 }
