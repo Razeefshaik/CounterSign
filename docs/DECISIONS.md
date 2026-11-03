@@ -596,3 +596,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Add OWNER_COUNTERSIGNED audit fingerprints and a scoped accent-blue primary action; keep plain approval unchanged | C51 task | Accept | The timeline must show verified signatures without storing assertions or keys, and counterless/unsupported devices still need a fallback |
 | Bump written contracts to 1.0.8, retaining dashboard response shapes and their 1.0.6 metadata | C51 task | Accept | New owner endpoints are additive and require no consumer shape changes |
 | The plain approve endpoint refuses an `approved_by` beginning with `owner:passkey` (422 INVALID_REQUEST) | C51 review (P2), Nov 3 | Accept | Only the verified passkey route may record that identity; otherwise a plain approval could show "Countersigned with passkey" without any signature |
+
+## Nov 3 C55 staged clock for owner decisions
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| In demo mode on the loopback mock, owner approve, reject and passkey approvals are judged at the mock's staged clock (as the playground and MCP gateway already are); live mode, or a demo whose mock clock can't be read, keeps the real clock. Passkey challenges keep real time | Submission review, Nov 3 | Accept | At staged Friday the dashboard's Approve returned SHIELD_BLOCKED, because judging at the real date (Nov 3) refused facts already true in the staged week (C's payout RETURNED on Thursday); judges clicking Review and sign would have hit an error |
