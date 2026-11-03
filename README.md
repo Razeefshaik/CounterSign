@@ -18,6 +18,7 @@ sandbox only. Licensed under [Apache-2.0](LICENSE).
 | **Video (under 3 minutes)** | ‹YOUTUBE URL› |
 | **Proof it's real** | 13 checks recorded on the real PayPal sandbox, every fact linked to its recording: the **Sandbox proof** page in the dashboard and [recordings/sandbox/INDEX.md](recordings/sandbox/INDEX.md) |
 | **Run it yourself** | One Docker command, no keys: [Try it in a minute](#try-it-in-a-minute) |
+| **Deploy your own** | [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Razeefshaik/CounterSign) (one click, from our [`render.yaml`](render.yaml) blueprint; no keys needed) |
 
 ![CounterSign command center: the weekly payout run waits for the owner's signature](docs/media/submission/01-command-center-light.png)
 
@@ -376,8 +377,14 @@ week. Use `localhost`, not `127.0.0.1`: browsers allow passkeys only on a hostna
 At step 6 the payout run waits for you: open **Review and sign**, then **Countersign
 with passkey**.
 
-Hosting details (Render blueprint, measured cold starts):
-[docs/walkthrough/c27-hosting.md](docs/walkthrough/c27-hosting.md).
+**Or deploy your own copy on Render in one click:**
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Razeefshaik/CounterSign)
+
+The live demo runs on Render from the same [`render.yaml`](render.yaml) blueprint: one
+Docker web service with PostgreSQL and the mock inside, a health check on
+`/api/v1/meta`, and no secrets (the container refuses PayPal or model keys). Hosting
+details and measured cold starts: [docs/walkthrough/c27-hosting.md](docs/walkthrough/c27-hosting.md).
 
 <details>
 <summary><b>Run from source: the mock demo week in a terminal</b></summary>
