@@ -1,37 +1,66 @@
 # CounterSign agent state
 
-Updated: Nov 3, 2026. Context keeper: **Professor Pickle**. This summary does
-not replace AGENTS.md, CLAUDE.md or the required source documents. Read those
-and only the relevant future notes before changes. Never store secrets,
-environment values, real emails or raw model output here.
+Updated: Nov 3, 2026. Context keeper: **Professor Pickle**. This summary does not
+replace AGENTS.md or required source documents. Read those and relevant future
+notes before changes. Never store secrets, environment values, real emails or
+raw model output here.
 
 ## Project
 
-The model reads and proposes; the deterministic shield and executor authorize
-and perform financial writes. PostgreSQL owns state, reservations and the inbox.
-Money is integer minor units. Mock, staged, sandbox and real-model evidence stay distinct.
+The model reads and proposes; deterministic code authorizes and performs writes.
+PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
+staged, sandbox and real-model evidence stay distinct.
 
-## Current work: C46 compact demo controls
+## Current work: C47 release check
 
-- Active branch `razeef/c46-compact-demo-controls`, based on main `91eb0f0`.
-  Feature commit `3c4a4f7`. No push or merge for this task.
-- `web/demo.mjs` replaces the large floating dock with exactly Next step and
-  Restart, a small genuine step/total, next-step/context tooltips and screen-reader
-  status. Errors remain visible as a small popup. One POST per click, busy and
-  complete states, restart confirmation and polling retain their existing logic.
-  Bottom-right strip stays below 320x60; the simulation banner remains visible.
-- Hero's flowing 3px rim returns to normal pink #ec4899. The rest of the interface
-  keeps C45's matte rose accents. Tests updated in views/redesign/brand.
-- Verified: **70 Node tests passed**, **23 Python demo-bar dashboard tests passed**
-  (`tests/dashboard/test_demo_bar.py`), syntax and Ruff passed; all three import
-  contracts kept. **22 browser checks passed** across five widths, both themes
-  and overview/decision routes, with zero writes or runtime exceptions. The
-  checker waits for live maker data; owner-operated step changes are allowed.
-- Local Docker `countersign-c45` at loopback 8180 was started after the stale
-  runtime socket folder was backed up. Full 11-stage hosted smoke passed before
-  this UI update; new dock files were copied into that same running container,
-  without posting any staged actions. No reset, environment-file reads, real LLM or
-  real PayPal calls for C46. C45's full-backend limitation below still applies.
+- Worktree `CounterSign-release-check`, branch `razeef/c47-release-check`, from
+  tested base `1303ad2` (C46 merged), image source `e661516`. During the run,
+  main/origin/main advanced to `02a4a47` (C48 MCP gateway). C48 is not integrated
+  or covered by C47's test/image proof. Original main remains clean and untouched;
+  owner `countersign-c45` on 8180 is untouched. No merge or cloud deployment.
+- Release fixes: `73ab781` aligns a frozen-clock owner HTTP test; `88ba5ee`
+  explicitly serves image/webp; `3d3d844` fixes Restart/Next polling; owner-approved
+  `e661516` keeps server-derived simulation text readable inside maker dialogs
+  using existing styling. Production approval rules/palette are unchanged.
+- Full Python suite finished normally: **4019 passed, 0 failed, 5 skipped in
+  2132.33 s**, exit 0; JUnit 4024 cases, zero errors/failures. Windows Selector,
+  explicit DB 55433 and correct isolated test-toolkit setting were enabled.
+  Five skips require toolkit/LangChain in main Python; child checks ran.
+  Backend Python has not changed since `88ba5ee`.
+- Current checks: **75 Node tests**, syntax pass; Ruff clean, three import
+  contracts kept. Focused hosted/demo-bar Python follow-up: **36 passed in
+  29.49 s**, exit 0.
+- Pre-dialog image `3d3d844` completed both local sizes: Starter boot 27.079 s,
+  smoke PASS 282.750 s, 135.2 MiB; quiet Free boot 99.578 s, smoke PASS 970.812 s,
+  134.1 MiB/512. Ten assets passed 200/MIME and three invented credentials exited
+  64 without values. This is local resource-limited proof, not Render timing.
+  Archived evidence: `pre-dialog-image-measurements-final-{free,starter}.json`.
+- Earlier `88ba5ee` Free failure during concurrent pytest is retained in
+  `image-measurements.json`; it was not removed or represented as a pass.
+- Pre-dialog browser run passed 57 checks with 54 PNGs: eight routes, three
+  widths, two themes, six maker dialogs/Esc and genuine Restart/Next actions.
+  Exactly two POSTs, all on 8190; no unexpected JS/network errors. Expected cash
+  503s after reset are separate. Archived `pre-dialog-verification.json`.
+  Manual screenshot review then found the blurred global label inside modals,
+  motivating approved `e661516`; final verification below includes physical labels.
+- Final image built from `e661516`, id
+  `sha256:cc0c3d9d57f81729e7a6244c4193b190df70e65a7551e10bf7169fccee34ae3a`.
+  Both final image smokes passed: Free boot **128.984 s**, smoke **1168.407 s**;
+  Starter boot **40.328 s**, smoke **168.390 s**; both **133.3 MiB/512**, no OOM,
+  10/10 assets and all three credential refusals pass at each size.
+- Final browser **57 checks passed**, 54 PNGs: eight routes x three widths x two
+  themes, six physical modal-label visibility/Esc checks, Restart confirmation and
+  Next burst exactly one POST/UI 1/11. Zero JS console/page exceptions/unexpected
+  network errors; four expected contract cash 503 entries after reset recorded
+  separately. Exactly two POSTs total, all on disposable 8190.
+  Earlier meta503 attempt is retained; helper now waits for local network idle
+  rather than stale hidden route HTML. No application clock change was made.
+- Logs/results: sibling `design-demos/.impeccable/c47/`; screenshots:
+  `design-demos/reference/c47/`. Primary owns c27-hosting.md. No .env reads,
+  real LLM/PayPal calls, cloud deployment/accounts or merge.
+- Owner next: review/merge C47 while retaining C48 and resolving shared notes,
+  validate the combined main, then Render **New > Blueprint** as documented.
+  Do not deploy combined main on C47-only proof. No rebase/new suite performed.
 
 ### C48 MCP gateway (Nov 3; ready for Claude review)
 
@@ -60,65 +89,19 @@ Money is integer minor units. Mock, staged, sandbox and real-model evidence stay
 - Use only `countersign_c48` on PostgreSQL 55433 and preview port 8191. No
   environment-file reads or real PayPal/model calls. See the C48 future note.
 
-## Completed: C45 overview integration
+## Relevant history
 
-- Owner explicitly authorized integrating the selected design to main and
-  pushing. Main was fast-forwarded to feature `6a8c096` and pushed to
-  `origin/main`; the remote hash was verified on Nov 3. Integration worktree:
-  `CounterSign-integrate`, branch `razeef/c45-overview-integration`.
-- Original dirty main stylesheet was preserved in main commit `0c3ca93`; main
-  is clean. This branch rebased on it, then replayed C43 as `c0d9134` and C44 as
-  `5ec1eb5`. C43 spacing/matte cards and the original 8px rims are retained;
-  the local thin-rim override was removed at the owner's request.
-- Feature commit `6a8c096`: selected identity hero in `web/hero.css` and
-  `index.html`, four optimized local WebP assets (548910 bytes total), selected
-  corner/check mark at title/sidebar/favicon, and guarded static brand title
-  plus animation pause binding in `command.mjs`. Genuine data-bound action and
-  finding remain below the hero. Existing C44 milestones/comparison remain.
-- Hero uses Porcelain pane heights 469/452/407, copied pink placement 6%/7%,
-  thick pearl ring v4 and 3px pink rim. Global highlights use muted rose:
-  light #c18da5/ink #80415f, dark #b88da4/ink #e4bfd2.
-- Verified: **70 web tests passed**, **48 focused Python dashboard tests passed**
-  (`test_schema_compatibility.py`, `test_results_bundle.py`), syntax checks passed,
-  Ruff clean, all three import contracts kept. Eight production static-handler
-  checks confirm the page, CSS, icon and WebP assets are served.
-  Integrated browser checks **99 passed**: six widths (360/390/768/1080/1440/1606),
-  two themes and eight routes, plus pause/reduced motion/zero writes; zero runtime
-  exceptions. Evidence: `design-demos/reference/integrated`.
-- Full backend pytest was not completed: the first process ended without a
-  summary; a persistent retry was intentionally stopped at 23% after a long
-  database integration section, with no failures reported. It used PostgreSQL
-  55433 but omitted the optional test-toolkit variable (two skips visible).
-  No full-suite pass is claimed. External log:
-  `design-demos/.impeccable/integrate/pytest-final.log`.
-- Read-only review's remaining `.waiting` hot-pink edge was fixed with a muted
-  token-based color mix and a regression assertion. No app change was required
-  for pause behavior. No environment-file reads or real API calls.
-
-## Merged on Oct 27 (historical)
-
-- **W2 story data** (`razeef/w2-story-data`, merged into main): contract 1.0.6;
-  demo/mock-only `GET /api/v1/demo/comparison` reads the CLI-saved Friday
-  simulation and recorded run history; sanitized `agent_trace` (16-call cap) on
-  proposals, null for planners/older rows; scripted rationales say "Scripted:";
-  generated `web/results/summary.json` via `scripts/bundle_results.py`.
-  Full pytest 4000 passed, 5 skipped.
-- **M21 eval gaps and hosted readiness** (PR #15, merged into main): adapter
-  records SCHEDULE_PAYOUT_RUN once when the run approval is consumed and the
-  proposal stays EXECUTING; both key-window scenarios 0/5 -> 5/5. ONHOLD -> FAILED
-  stays 0/5 and is a core planner gap (`_plan_replacements` and `_replacement_ids`
-  accept RETURNED only); its fix belongs to Razeef/Claude. `scripts/hosted_smoke.py`
-  checks a running image over public HTTP; local 1 CPU/512 MB boot 4.181 s,
-  137.8 MiB after the week, image under 1 GB. Full pytest 4004 passed, 5 skipped.
-  Evidence: `eval/results/2026-10-27-m21-three-gaps/`, `docs/walkthrough/c27-hosting.md`.
+- C46 compact controls `3c4a4f7` merged as `1303ad2`: Next step/Restart,
+  genuine progress, normal-pink hero rim; rest UI retains matte rose.
+- C45 `6a8c096` integrated/pushed: selected hero/mark, C43 spacing/original 8px
+  rims and C44 milestones/comparison. Its full suite was incomplete; C47 now
+  supplies completed Python evidence. Detailed C45 measurements remain in notes.
+- W2 story data is contract 1.0.6; M21/C31 evaluation history is preserved in
+  future notes. Historical owner follow-ups must be checked against current Git.
 
 ## Continuation
 
-Use explicit file staging. One-line commits with the task prefix, no attribution.
-C45 integration/push authorization was task-specific; C46 has no push or merge
-authorization. Full tests require
-the explicit database URL on 55433 and the toolkit test setting. On Windows use
-SelectorEventLoop. Consult the matching section of
-[AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md); older entries are history, not status.
-Historical Oct 27 owner items were the FAILED replacement fix, Cloud Run deploy
-and configured-model runs; verify current status before resuming them.
+Stage explicit files; one-line `C47: lowercase summary` commits, no attribution.
+Push only the C47 branch after verification; owner approves merge. No cloud
+actions. Ask before shield/executor/approvals/migrations/contracts/visual changes.
+Consult matching sections of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).

@@ -46,6 +46,9 @@ class RevalidatedStaticFiles(StaticFiles):
         if path.endswith(".mjs") and response.status_code == 200:
             # Some platforms' MIME tables lack .mjs; module scripts need a JS type.
             response.headers["Content-Type"] = "text/javascript; charset=utf-8"
+        if path.endswith(".webp") and response.status_code == 200:
+            # Minimal hosted images may lack WebP in their system MIME tables.
+            response.headers["Content-Type"] = "image/webp"
         return response
 
 

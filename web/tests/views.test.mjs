@@ -362,6 +362,37 @@ test("one click posts once without a body, follows the step and refreshes the da
   assert.match(doc.bar.innerHTML, /Step complete/);
 });
 
+test("a step accepted during the restart refresh keeps polling until it completes", async () => {
+  const doc = barDouble(), posts = [];
+  let command = "load", changes = 0, releaseRefresh, refreshStarted;
+  const refreshing = new Promise(resolve => {refreshStarted = resolve;});
+  const heldRefresh = new Promise(resolve => {releaseRefresh = resolve;});
+  const fetcher = async (url, options = {}) => {
+    if (options.method === "POST") {
+      posts.push(url);
+      command = url.endsWith("/reset") ? "reset" : "step";
+      return response(demoState(0, {running:true, action:command}), 202);
+    }
+    return response(demoState(command === "load" ? 3 : command === "reset" ? 0 : 1));
+  };
+  const demo = createDemoBar(doc, {fetcher, wait: async () => {}, onChange: async () => {
+    if (++changes === 1) {refreshStarted(); await heldRefresh;}
+  }});
+  await demo.load();
+  const restarting = demo.reset();
+  await refreshing;
+  assert.equal(demo.state.step, 0);
+  assert.equal(doc.getElementById("demo-step").disabled, false);
+  await demo.step();
+  releaseRefresh();
+  await restarting;
+  assert.deepEqual(posts, ["/api/v1/demo/reset", "/api/v1/demo/step"]);
+  assert.equal(demo.state.step, 1);
+  assert.equal(demo.state.running, false);
+  assert.equal(doc.getElementById("demo-step").disabled, false);
+  assert.equal(changes, 2);
+});
+
 test("a busy or finished week reports the server's fixed reason and restart asks first", async () => {
   const doc = barDouble(), posts = [];
   const fetcher = async (url, options = {}) => {
