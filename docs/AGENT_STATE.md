@@ -105,3 +105,47 @@ Stage explicit files; one-line `C47: lowercase summary` commits, no attribution.
 Push only the C47 branch after verification; owner approves merge. No cloud
 actions. Ask before shield/executor/approvals/migrations/contracts/visual changes.
 Consult matching sections of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).
+
+## Nov 3 C51 passkey countersignatures
+
+- Current feature branch `razeef/c51-passkey-countersign` starts at `origin/main`
+  `454d2cc`; feature commit `38877ef` is ready to push. Only attached Task C51
+  was authorized. No C49 work, worktrees, merge or cloud deployment. The owner
+  requested immediate handoff and will open the PR after the branch is pushed.
+- Migration `0007` adds owner-only credentials and two-minute, single-use bound
+  challenges; pinned WebAuthn 3.0.1 verifies real signatures, origin/RP, presence,
+  user verification and increasing counters. Four guarded owner endpoints wrap
+  unchanged `ApprovalService.approve`; challenge consumption, credential updates,
+  approval and fingerprint-only `OWNER_COUNTERSIGNED` audit commit atomically.
+  Original approval checks and executor rechecks remain authoritative; shield and
+  executor logic is unchanged. Agent/MCP capabilities receive no owner grants.
+- The decision UI offers a primary passkey action with explicit plain-approval
+  fallback. Contract 1.0.8 documents the additive endpoints; dashboard shapes and
+  advertised 1.0.6 metadata remain unchanged. Live RP/origin require explicit
+  configuration; guarded hosted-demo defaults follow the request host/scheme.
+- Actual Chrome on disposable localhost 8194 registered and approved through a
+  CDP virtual authenticator. Six screenshots in `design-demos/reference/c51/`
+  cover prompt/signed states, light/dark and 390px phone; no overflow or JS
+  exceptions were observed. This is local simulated-browser evidence.
+- Checks actually passed: **81 Node tests** using `--test-isolation=none`, Ruff,
+  and **four import contracts** (the original three plus existing C48). Focused
+  Python checks: **24 passkey/role**, **48 passkey/slice**, and **2 reset/rollback**
+  tests passed. These runs overlap and are not a combined unique-test count.
+- The first complete Python run finished **4031 passed, 28 skipped, 8 failed**
+  in 572 seconds. Six failures were stale migration-head expectations (`0006`
+  versus `0007`); two pre-existing smoke assertions expected three import
+  contracts despite C48's fourth. Expectations were corrected and focused
+  follow-ups passed. The final full run reached **about 22% with no failures so far**
+  and is being stopped at the owner's request for immediate handoff. **No final
+  full-suite pass is claimed.** Its log is
+  `/workspace/countersign-cloud/c51-pytest-final.log`.
+- Tests used a dedicated PostgreSQL 16 Docker service on 5432 because the
+  injected URL targets unavailable 55433 and no native PostgreSQL was installed.
+  No environment values or secrets were read/recorded, and no configuration
+  draft or publication was changed. Git push works; `api.github.com` returns
+  403 in this environment. Do not attempt PR creation: the owner explicitly said
+  “Push the branch; I’ll open the PR.” Next: push feature/context commits, let the
+  owner open the PR, and complete the full Python suite before claiming final
+  validation. No merge is authorized.
+
+Final interrupted-run result: **909 passed, 3 skipped in 260.92 seconds**; no failures before the user-requested stop. Updated import smoke assertions: **2 passed**.
