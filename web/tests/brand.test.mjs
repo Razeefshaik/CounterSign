@@ -23,6 +23,7 @@ test("the hero contains identity copy and decorative material assets without dup
     assert.ok(asset.size > 1000 && asset.size < 250000);
   }
   assert.match(css, /padding:3px/);
+  assert.match(css, /#ec4899c9 303deg/);
   assert.match(css, /prefers-reduced-motion:reduce/);
   assert.match(css, /data-paused="true"/);
 });

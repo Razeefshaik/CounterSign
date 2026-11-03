@@ -64,14 +64,14 @@ test("decisions waiting count payout runs, not only incidents", () => {
   assert.equal(ownerCallout(null), "");
 });
 
-test("the week stepper groups steps by day and marks done and next", () => {
+test("the compact controls keep exact progress and name the next step", () => {
   const steps = [["Monday: a", true], ["Monday: b", true], ["Friday: c", false], ["Following week: d", false]]
     .map(([label, done], i) => ({index: i + 1, label, staged: true, done}));
   assert.deepEqual(weekDays(steps).map(d => [d.name, d.steps.length]), [["Monday", 2], ["Friday", 1], ["Following week", 1]]);
   const html = demoBarView({step: 2, total: 4, steps, clock: null, model: "scripted"});
-  assert.equal((html.match(/class="tick done"/g) || []).length, 2);
-  assert.equal((html.match(/class="tick next"/g) || []).length, 1);
-  assert.match(html, /<li class="current"[^>]*><span class="day">Friday/);
+  assert.match(html, /aria-label="Step 2 of 4"/);
+  assert.match(html, /aria-label="Next step: Friday: c"/);
+  assert.ok(!html.includes('class="stepper"'));
 });
 
 test("the trick page reports the verdict honestly and never claims money moved", () => {
