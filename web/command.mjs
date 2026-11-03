@@ -5,6 +5,7 @@ import {sceneModel, focusModel, focusSvg, defaultCategory, nodePanel, makerPanel
 import {plotSvg, scanSvg, scanTally, stands, activity, finding, progress, makerAt, PW, PH, headline, journey, compareBars, weekLabel, actionStrip, kpiCards, makerList, makerState} from "./plot.mjs";
 import {weekDays} from "./words.mjs";
 import {esc} from "./views.mjs";
+import {bannerText} from "./data.mjs";
 
 const optional = promise => promise.catch(() => null);
 
@@ -33,7 +34,7 @@ export function createCommand(document, fetcher = fetch) {
     await Promise.all((makers || []).slice(0, 6).map(async m => {
       graphs[m.id] = await optional(client.singleton("money-graph", {maker_id: m.id}));
     }));
-    return {makers: makers || [], proposals: proposals || [], cash, demo, comparison, graphs, disputes: workspace.disputes || []};
+    return {makers: makers || [], proposals: proposals || [], cash, demo, comparison, graphs, disputes: workspace.disputes || [], simulationLabel: bannerText(workspace.meta, demo)};
   }
 
   function countUp() {
@@ -141,6 +142,11 @@ export function createCommand(document, fetcher = fetch) {
     if (!maker) return;
     $("md-title").textContent = maker.name;
     $("md-sub").textContent = makerState(maker, model).what;
+    const simulation = $("md-simulation");
+    if (simulation) {
+      simulation.textContent = data.simulationLabel;
+      simulation.hidden = !data.simulationLabel;
+    }
     $("md-stage").innerHTML = focusSvg(dlg.fm, {category: dlg.category, item: dlg.item, motion: motion()});
     $("md-panel").innerHTML = `<div class="panel-inner">${dlg.item ? `<button type="button" class="panel-back" data-action="maker">← ${esc(maker.name)}</button>` + itemPanel(dlg.fm, dlg.item) : makerPanel(dlg.fm.maker)}</div>`;
   }
