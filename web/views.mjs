@@ -129,8 +129,10 @@ export function runView(run) {
     `<p class="mono">${esc(a.sender_batch_id)}</p><p class="mono">${esc(a.request_id)}</p>`, time(a.last_checked_at)]));
   return `<div class="page-head enter"><div><h2>Week of ${esc(when(run.week_start + "T00:00:00Z").replace(/, 00:00 UTC$/, ""))}</h2><p class="run-total">${amount(run.total)}</p>
       <div class="meta-line"><span>${esc(run.line_count)} payout line${run.line_count === 1 ? "" : "s"}</span><span aria-hidden="true">·</span><span>${esc(run.replacement_count)} resend${run.replacement_count === 1 ? "" : "s"}</span><span aria-hidden="true">·</span><span>${amount(run.reserved_not_paid)} held back</span></div></div>${status(run.state)}</div>
-    ${card("Paying", lines ? `<div class="lines">${lines}</div>` : empty("No payout lines."))}
+    <!-- C49: preserve the complete HTML fallback until the run grid mounts. -->
+    <div data-c49-grid="runs">${card("Paying", lines ? `<div class="lines">${lines}</div>` : empty("No payout lines."))}
     ${resends ? card("Resending", `<div class="lines">${resends}</div>`) : ""}
+    </div><!-- /C49 -->
     ${card("Held back, not paid", held ? `<div class="lines">${held}</div><p class="muted" style="margin-top:8px">Total ${amount(run.reserved_not_paid)}. These shares wait until their disputes settle.</p>` : empty("Nothing is held back in this run."))}
     ${card("", `<details class="tech"><summary>PayPal references and idempotency keys</summary>${table(["Maker", "Attempt", "State", "Amount", "PayPal references", "Keys", "Last checked"], attempts, [3])}
       <dl class="facts" style="margin-top:12px"><dt>Run</dt><dd class="mono">${esc(run.id)}</dd>${(run.lines || []).map(l => `<dt>${esc(l.maker.display_name)} line</dt><dd class="mono">${esc(l.id)}</dd>`).join("")}${(run.replacements || []).map(r => `<dt>Resend of</dt><dd class="mono">${esc(r.from_run_id)} / ${esc(r.line_id)}</dd>`).join("")}</dl></details>`)}`;
@@ -139,7 +141,8 @@ export function runView(run) {
 export function auditView(entries) {
   const items = entries.map(e => `<li>${time(e.at)}<div><div class="event"><strong>${esc(label(e.kind))}</strong>${e.verdict ? status(e.verdict) : ""}<span class="actor">by ${esc(e.actor)}</span></div>
     <details><summary>Details</summary><dl class="facts"><dt>Proposal</dt><dd class="mono">${esc(e.proposal_id || "—")}</dd><dt>Operation</dt><dd class="mono">${esc(e.operation_id || "—")}</dd></dl>${json(e.details)}</details></div></li>`);
-  return card("Execution history", items.length ? `<p class="muted" style="margin-bottom:8px">Every shield verdict, owner decision and PayPal write, newest first.</p><ol class="timeline">${items.join("")}</ol>` : empty("No records yet."));
+  // C49: the original timeline remains the no-vendor fallback.
+  return card("Execution history", `<div data-c49-grid="audit">${items.length ? `<p class="muted" style="margin-bottom:8px">Every shield verdict, owner decision and PayPal write, newest first.</p><ol class="timeline">${items.join("")}</ol>` : empty("No records yet.")}</div>`);
 }
 
 export function cashView(cash) {

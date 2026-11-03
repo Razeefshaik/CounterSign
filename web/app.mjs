@@ -4,10 +4,43 @@ import {incidentTable, incidentTitle, ownerCallout, esc} from "./views.mjs";
 import {action as actionWord, state as stateWord, tone, when} from "./words.mjs";
 import {createWorkspaceViews} from "./workspace.mjs";
 import {createDemoBar} from "./demo.mjs";
+// C49: loaded on demand when the incident desk is opened.
+import {mountGrid, incidentRows} from "./grid.mjs";
 
 const $ = id => document.getElementById(id);
 const views = createWorkspaceViews(document, window.location);
 let workspace = null, demoState = null, selected = "", firstPaint = true;
+// C49: only the visible incident grid owns these resources.
+let incidentGrid = null, incidentGridSerial = 0;
+async function showIncidentGrid() {
+  if (!workspace || location.hash.split("/")[0] !== "#incidents") return;
+  const ticket = ++incidentGridSerial, source = workspace;
+  const client = createClient({fixture: source.fixture});
+  const makers = await client.list("makers").catch(() => []);
+  if (ticket !== incidentGridSerial || workspace !== source || location.hash.split("/")[0] !== "#incidents") return;
+  const filtered = filterIncidents(source.incidents, {state: $("state").value, kind: $("kind").value});
+  const host = $("incident-list"); host.dataset.c49Grid = "incidents";
+  incidentGrid?.destroy();
+  const handle = await mountGrid(host, "incidents", incidentRows(filtered, {makers, disputes:source.disputes, staged:row => isStaged(row, source.disputes)}), {
+    isActive:() => ticket === incidentGridSerial && location.hash.split("/")[0] === "#incidents",
+    quickFilterText:$("search").value, onOpen:row => inspect(source.incidents.find(item => item.id === row.id)),
+    onFilterChanged:event => {
+      const count = event.api.getDisplayedRowCount(); $("result-count").textContent = count; $("table-note").textContent = `${count} of ${source.incidents.length} incidents`;
+      let first = null, current = null;
+      event.api.forEachNodeAfterFilterAndSort(node => {first ||= node.data; if (node.data.id === selected) current = node.data;});
+      const visible = current || first;
+      if (visible) inspect(source.incidents.find(row => row.id === visible.id));
+      else {$("detail-title").textContent = "No incidents match these filters"; $("detail-text").textContent = "Clear a filter or try another search."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
+    },
+  });
+  // C49: navigation can happen while the vendor bundle is still loading.
+  if (ticket !== incidentGridSerial || location.hash.split("/")[0] !== "#incidents") handle?.destroy();
+  else incidentGrid = handle;
+}
+window.addEventListener("hashchange", () => {
+  if (location.hash.split("/")[0] === "#incidents") showIncidentGrid();
+  else {incidentGridSerial++; incidentGrid?.destroy(); incidentGrid = null;}
+});
 
 function showClock() {
   // The staged week runs on the mock's clock; show it while the demo bar is present.
@@ -61,6 +94,8 @@ function inspect(row) {
 
 function update() {
   if (!workspace) return;
+  // C49: destroy before replacing the fallback so late grid loads cannot win.
+  incidentGridSerial++; incidentGrid?.destroy(); incidentGrid = null;
   const rows = filterIncidents(workspace.incidents, {state: $("state").value, kind: $("kind").value, query: $("search").value});
   $("incident-list").innerHTML = incidentTable(rows, {staged: row => isStaged(row, workspace.disputes || []), selected});
   for (const button of $("incident-list").querySelectorAll(".row-title")) {
@@ -76,6 +111,8 @@ function update() {
     $("detail-text").textContent = workspace.incidents.length ? "Clear a filter or try another search." : "Nothing needs attention yet.";
     $("detail-verdict").hidden = true; $("open-decision").hidden = true;
   }
+  // C49: untouched HTML remains visible while the vendored grid loads.
+  showIncidentGrid();
 }
 
 async function overview(client) {
@@ -128,7 +165,8 @@ for (const button of document.querySelectorAll("#kind-group button")) button.add
   $("kind").value = button.dataset.kind; update();
 });
 $("state").addEventListener("change", update);
-$("search").addEventListener("input", update);
+// C49: quick search updates the live grid without refetching or losing its sort.
+$("search").addEventListener("input", () => incidentGrid?.api ? incidentGrid.setQuickFilter($("search").value) : update());
 $("refresh").addEventListener("click", refresh);
 $("clear").addEventListener("click", () => {
   $("state").value = ""; $("search").value = ""; $("kind").value = "";

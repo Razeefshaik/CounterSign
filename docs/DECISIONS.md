@@ -567,3 +567,20 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Refuse private-looking output before replacing the generated artifact | C50 task | Accept | Public historical recordings still need a fail-closed publishing guard |
 | Add proof to the existing workspace router and glass tokens; preserve the simulated banner | C50 integration | Accept | Keeps navigation and theme behavior consistent without changing command-center layout or payment paths |
 | Preserve LF for sandbox-proof.json in its local attributes file | C50 deterministic build | Accept | Windows Git newline conversion must not change the generated artifact bytes |
+
+## Nov 3 C49 AG Grid
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Use the existing vendored AG Grid Community 32.3.9 behind a lazy, scoped bridge with pure API projections and token-based CSS | Owner C49 prompt | Accept | Sorting, text/number filters, keyboard navigation and pagination belong in operational tables without adding dependencies or replacing the glass theme |
+| Preserve integer minor units until cell formatting, keep missing money unavailable and pin the API's run total | C49 data review | Accept | A display grid must not introduce floating money, fabricate an observed zero or drop resend amounts from a run |
+| Enhance the incident desk, execution history, payout lines and large maker lists while retaining the existing HTML and four-maker cards | Owner C49 prompt | Accept | The grid should improve working tables without duplicating owner actions or removing the no-script fallback |
+| Resolve makers beyond the map's first six through an on-demand graph read when their row opens the dialog | C49 integration | Accept | Pagination must not turn extra makers into dead rows or attribute another maker's records to them |
+| Show PayPal item status only for an identified item, and leave a planned resend's new state unavailable | C49 data review | Accept | A local prepared attempt or the previous returned item does not prove the replacement item's current PayPal status |
+| Let incident quick search update the mounted grid and its visible selection without refetching | C49 browser review | Accept | Searching should preserve column sorting and keep the detail panel and count consistent with the filtered rows |
+| Show loading or unavailable text until a selected maker's graph is read and rooted at that maker | C49 large-list review | Accept | An absent or mismatched graph must not appear to prove that the maker has zero linked records |
+| Check the active incident route again after a delayed vendor load | C49 navigation review | Accept | Leaving the desk must not let a late script mount an off-route grid or replace a newer filter selection |
+| Match makerList's fallback to All when a refreshed state filter has no remaining rows; retry failed initial maker graphs when opened | C49 refresh/error review | Accept | A completed approval must not leave the All tab showing an empty filtered grid, and the graph retry message must work for the first six makers too |
+| Map theme tokens on AG Grid's nested popup theme as well as the main grid | C49 native filter-popup screenshot | Accept | The vendor's nested Quartz class otherwise resets popup surfaces and focus colours, especially in dark mode |
+| Update the smoke test's kept-contract count from three to four | C49 full-suite verification | Accept | C48 added the gateway import contract; the assertion must reflect that boundary without changing any import rules |
+| Finish C49 with its focused tests and the web suite; defer full suites until all features are merged | Owner follow-up, Nov 3 | Accept | Integrated validation belongs after the parallel features land; no separate PostgreSQL instance or further full run is needed for C49 |
