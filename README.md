@@ -413,7 +413,7 @@ Tests use fake data and need no PayPal credentials or model key.
 | `scripts/` | `demo_week.py`, `mock_rehearsal.py`, `slice_e2e.py`, `llm_smoke.py`, `sandbox_checks/` (D1 to D13) | core |
 | `mock_paypal/` | Local PayPal mock built from the recorded sandbox payloads | mate |
 | `eval/` | Scenarios, runner, metrics and the compared systems | mate |
-| `web/` | AG Grid Community tables: incident quick search/risk sorting, history verdict/actor filters, payout lines with pinned totals, and maker pagination | mate |
+| `web/` | <!-- C49 --> AG Grid Community tables: incident quick search/risk sorting, history verdict/actor filters, payout lines with pinned totals, and maker pagination <!-- /C49 --> | mate |
 | `recordings/sandbox/` | Redacted real sandbox exchanges and webhooks | core |
 | `tests/` | Unit, integration, property and contract tests | core and mate |
 | `docs/` | Design, decisions, findings, contracts, tasks and walkthroughs | shared |

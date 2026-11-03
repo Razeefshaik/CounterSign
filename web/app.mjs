@@ -23,7 +23,14 @@ async function showIncidentGrid() {
   incidentGrid?.destroy();
   incidentGrid = await mountGrid(host, "incidents", incidentRows(filtered, {makers, disputes:source.disputes, staged:row => isStaged(row, source.disputes)}), {
     quickFilterText:$("search").value, onOpen:row => inspect(source.incidents.find(item => item.id === row.id)),
-    onFilterChanged:event => {const count = event.api.getDisplayedRowCount(); $("result-count").textContent = count; $("table-note").textContent = `${count} of ${source.incidents.length} incidents`;},
+    onFilterChanged:event => {
+      const count = event.api.getDisplayedRowCount(); $("result-count").textContent = count; $("table-note").textContent = `${count} of ${source.incidents.length} incidents`;
+      let first = null, current = null;
+      event.api.forEachNodeAfterFilterAndSort(node => {first ||= node.data; if (node.data.id === selected) current = node.data;});
+      const visible = current || first;
+      if (visible) inspect(source.incidents.find(row => row.id === visible.id));
+      else {$("detail-title").textContent = "No incidents match these filters"; $("detail-text").textContent = "Clear a filter or try another search."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
+    },
   });
 }
 window.addEventListener("hashchange", () => {
@@ -154,7 +161,8 @@ for (const button of document.querySelectorAll("#kind-group button")) button.add
   $("kind").value = button.dataset.kind; update();
 });
 $("state").addEventListener("change", update);
-$("search").addEventListener("input", update);
+// C49: quick search updates the live grid without refetching or losing its sort.
+$("search").addEventListener("input", () => incidentGrid?.api ? incidentGrid.setQuickFilter($("search").value) : update());
 $("refresh").addEventListener("click", refresh);
 $("clear").addEventListener("click", () => {
   $("state").value = ""; $("search").value = ""; $("kind").value = "";

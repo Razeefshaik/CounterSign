@@ -166,7 +166,8 @@ export function createCommand(document, fetcher = fetch) {
       simulation.textContent = data.simulationLabel;
       simulation.hidden = !data.simulationLabel;
     }
-    $("md-stage").innerHTML = focusSvg(dlg.fm, {category: dlg.category, item: dlg.item, motion: motion()});
+    // C49: missing graph reads are unavailable, not an observed zero-record graph.
+    $("md-stage").innerHTML = dlg.loading ? '<p class="scene-loading">Loading maker records…</p>' : dlg.unavailable ? '<p class="scene-loading">Maker records could not be loaded. Close and open this maker to try again.</p>' : focusSvg(dlg.fm, {category: dlg.category, item: dlg.item, motion: motion()});
     $("md-panel").innerHTML = `<div class="panel-inner">${dlg.item ? `<button type="button" class="panel-back" data-action="maker">← ${esc(maker.name)}</button>` + itemPanel(dlg.fm, dlg.item) : makerPanel(dlg.fm.maker)}</div>`;
   }
 
@@ -174,15 +175,20 @@ export function createCommand(document, fetcher = fetch) {
     const dialog = $("maker-dialog"), maker = (model.all || model.makers).find(m => "maker:" + m.id === id); // C49
     if (!maker || !dialog?.showModal) return false;
     const fm = focusModel(data.graphs[maker.id], maker);
-    dlg = {id: maker.id, fm, category: defaultCategory(fm), item: ""};
+    const ownGraph = data.graphs[maker.id]?.nodes?.some(n => n.id === "maker:" + maker.id); // C49
+    dlg = {id: maker.id, fm, category: defaultCategory(fm), item: "", unavailable:!ownGraph};
     drawDialog();
     if (!dialog.open) dialog.showModal();
     // C49: only the selected extra maker needs another graph read.
     if (!Object.hasOwn(data.graphs, maker.id) && currentClient) {
       const ticket = serial;
+      dlg.loading = true; drawDialog();
       optional(currentClient.singleton("money-graph", {maker_id:maker.id})).then(graph => {
         if (ticket !== serial || dlg?.id !== maker.id) return;
-        data.graphs[maker.id] = graph; dlg.fm = focusModel(graph, maker); dlg.category = defaultCategory(dlg.fm); drawDialog();
+        dlg.loading = false;
+        dlg.unavailable = !graph?.nodes?.some(n => n.id === "maker:" + maker.id);
+        if (!dlg.unavailable) data.graphs[maker.id] = graph;
+        dlg.fm = focusModel(graph, maker); dlg.category = defaultCategory(dlg.fm); drawDialog();
       });
     }
     return true;
@@ -286,7 +292,7 @@ export function createCommand(document, fetcher = fetch) {
       if (selected && !nodePanel(model, selected, {cash: data.cash})) selected = "";
       if (dlg) {
         const maker = (model.all || model.makers).find(m => m.id === dlg.id); // C49
-        if (maker) {dlg.fm = focusModel(data.graphs[maker.id], maker); if (!dlg.fm.categories.some(c => c.type === dlg.category)) dlg.category = defaultCategory(dlg.fm);}
+        if (maker) {dlg.fm = focusModel(data.graphs[maker.id], maker); dlg.loading = false; dlg.unavailable = !data.graphs[maker.id]?.nodes?.some(n => n.id === "maker:" + maker.id); if (!dlg.fm.categories.some(c => c.type === dlg.category)) dlg.category = defaultCategory(dlg.fm);} // C49
         else {dlg = null; $("maker-dialog").close();}
       }
       draw({entrance: !shown});

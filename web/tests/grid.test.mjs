@@ -130,6 +130,13 @@ test("a route removed during lazy loading never creates a grid", async () => {
   const {host} = fakeHost(); let release, called = false;
   const wait = new Promise(resolve => {release = resolve;});
   const mounting = mountGrid(host, "audit", [], {vendorLoader:() => wait});
+  assert.equal(host.dataset.gridState, "loading");
   host.isConnected = false; release({createGrid:() => {called = true;}});
   assert.equal(await mounting, null); assert.equal(called, false);
+});
+
+test("a vendor initialization exception restores the original table", async () => {
+  const {host, original} = fakeHost();
+  const handle = await mountGrid(host, "incidents", [], {vendorLoader:async () => ({createGrid:() => {throw Error("Unavailable renderer");}})});
+  assert.equal(handle, null); assert.equal(original.hidden, false); assert.equal(host.dataset.gridState, "fallback");
 });

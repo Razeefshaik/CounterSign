@@ -155,6 +155,7 @@ export async function mountGrid(host, view, rows, options = {}) {
     }, token,
   };
   mounted.set(host, handle);
+  host.dataset.gridState = "loading";
   const library = await vendorLoader(document);
   if (disposed || !host.isConnected || mounted.get(host)?.token !== token) return null;
   if (!library?.createGrid) {
