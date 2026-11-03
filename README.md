@@ -224,6 +224,9 @@ committed recording it came from, with real PayPal debug ids. Full detail:
 ## Results
 
 Mock and sandbox evidence are reported separately and never added together.
+<!-- C58 -->
+Explore all 480 runs in the dashboard's **Evaluation replay** (`#replay`).
+<!-- /C58 -->
 
 **Fault evaluation on the mock, model disabled** (48 fault scenarios × 5 runs = 240
 runs per system; source
@@ -470,6 +473,9 @@ a dark glass theme, down to a 390 px phone, with reduced-motion support.
 - **Decisions:** the proposal in plain English, every named check, the exact payload
   hash, and **Countersign with passkey**.
 - **Incident desk, Execution history, Payout runs:** AG Grid Community.
+<!-- C58 -->
+- **Evaluation explorer:** all 480 historical mock runs in AG Grid Community, with preset filters, filtered totals and CSV export.
+<!-- /C58 -->
 - **Cash** (with the balance's freshness time), **Money graph**, **Evaluation
   replay**, **Sandbox proof** and **Try to trick the agent**.
 
