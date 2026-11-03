@@ -109,7 +109,9 @@ def create_app(
         from mock_paypal.checkpoint import build_router as checkpoint_router
 
         app.include_router(checkpoint_router(
-            checkpoint_directory, allow_save=os.environ.get("COUNTERSIGN_FRIDAY_BUILD") == "1"
+            checkpoint_directory, allow_save=os.environ.get("COUNTERSIGN_FRIDAY_BUILD") == "1",
+            backup_directory=os.environ.get("COUNTERSIGN_MOCK_CHECKPOINT_BACKUP"),
+            callback_url=os.environ.get("COUNTERSIGN_MOCK_CALLBACK_URL"),
         ))
 
     @app.middleware("http")

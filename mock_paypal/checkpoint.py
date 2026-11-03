@@ -170,7 +170,7 @@ def restore(app, document):
     store.config, store.clock = config, clock
 
 
-def build_router(directory, *, allow_save=False):
+def build_router(directory, *, allow_save=False, backup_directory=None, callback_url=None):
     """The name is fixed; callers never supply a path or file contents."""
     router, base = APIRouter(), Path(directory).resolve()
 
@@ -178,25 +178,37 @@ def build_router(directory, *, allow_save=False):
     async def checkpoint(action: str, request: Request):
         if request.client.host not in {"127.0.0.1", "::1", "localhost"}:
             return JSONResponse({"error":"CHECKPOINT_LOCAL_ONLY"}, status_code=404)
-        if request.url.query or await request.body() or action not in ({"save", "load", "validate"} if allow_save else {"load", "validate"}):
+        if request.url.query or await request.body() or action not in ({"save", "load", "validate", "stash", "rollback"} if allow_save else {"load", "validate", "stash", "rollback"}):
             return JSONResponse({"error":"CHECKPOINT_REQUEST_REFUSED"}, status_code=422)
         path = base / "mock.json"
-        if path.is_symlink() or path.resolve().parent != base:
+        if action in {"stash", "rollback"}:
+            if backup_directory is None:
+                return JSONResponse({"error":"CHECKPOINT_REQUEST_REFUSED"}, status_code=422)
+            path = Path(backup_directory).resolve() / "mock-backup.json"
+        allowed_parent = base if action not in {"stash", "rollback"} else Path(backup_directory).resolve()
+        if path.is_symlink() or path.resolve().parent != allowed_parent:
             return JSONResponse({"error":"CHECKPOINT_FILE_REFUSED"}, status_code=422)
         async with request.app.state.control_lock:
             try:
-                if action == "save":
-                    base.mkdir(parents=True, exist_ok=True)
-                    temporary = base / "mock.json.tmp"
+                if action in {"save", "stash"}:
+                    allowed_parent.mkdir(parents=True, exist_ok=True)
+                    temporary = path.with_suffix(".tmp")
                     temporary.write_text(json.dumps(snapshot(request.app.state.store)), encoding="utf-8")
                     temporary.replace(path)
                 else:
                     document = json.loads(path.read_text(encoding="utf-8"))
-                    if action == "load":
+                    if action in {"load", "rollback"}:
                         restore(request.app, document)
+                        if action == "load" and callback_url:
+                            from mock_paypal.webhooks import local_url
+
+                            for registration in request.app.state.store.webhooks.registrations.values():
+                                registration["url"] = local_url(callback_url)
                     else:
                         decode(document["graph"])
-                return {"checkpoint":"friday", "action":action}
+                identifiers = list(request.app.state.store.webhooks.registrations)
+                return {"checkpoint":"friday", "action":action,
+                        "webhook_id":identifiers[0] if len(identifiers) == 1 else None}
             except Exception:  # noqa: BLE001 - private state/paths never reach HTTP errors.
                 return JSONResponse({"error":"MOCK_CHECKPOINT_FAILED"}, status_code=503)
     return router

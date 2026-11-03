@@ -44,5 +44,7 @@ ENV PYTHONPATH=/app \
 USER app
 # A migrated, empty template cluster; each boot copies it and sets a new password.
 RUN bash scripts/hosted_start.sh --build-template
+# C62: immutable unsigned Friday, produced by the same real scripted runner.
+RUN bash scripts/hosted_start.sh --build-friday
 EXPOSE 8080
 ENTRYPOINT ["tini", "--", "bash", "/app/scripts/hosted_start.sh"]

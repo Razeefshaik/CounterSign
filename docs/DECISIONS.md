@@ -637,3 +637,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | --- | --- | --- | --- |
 | Persist the quiescent mock as allowlisted JSON data with shared references, random/id counters and explicit pending-event descriptors | C62 state review | Accept | Copying only resource records loses pending payouts, webhook signatures and future clock behavior; executable callbacks must never be serialized |
 | Expose fixed-name checkpoint operations only on the configured loopback mock; refuse uploaded contents, query paths and unsupported active timers | C62 security requirements | Accept | Only baked files or container-written snapshots may be restored, never network-supplied state or code |
+
+| Friday boot and restore | Bake real scripted steps 1–6, preserve their dates and IDs, and clone the cleanly stopped PostgreSQL cluster; rebind only the runner identity to the random per-boot DSN and callback. Monday remains an explicit start option. |
+| Restore boundary | Use a single constrained PostgreSQL transaction, serialize owner decisions, block data access during cross-store restoration, and retain a local mock rollback file; preserve owner passkeys/counters and discard challenges. |
+| Idle and binding | Use monotonic time since demo/owner POST, wait for active commands/decisions/challenges, and invalidate fresh-Friday status after a verified-payee edit so stale bindings are not mistaken for an unsigned fresh run. |
+| Staged expiry | Retain C55 staged approvals and real-time passkey challenges; clear cached mock authentication after restore and project cash age and maker 30-day sums at the staged clock, without changing live views or schema. |
+| Written contract 1.0.9 | Owner approved documenting the fixed no-input Friday API and additive checkpoint state fields; keep the dashboard's existing advertised 1.0.6 metadata. |
