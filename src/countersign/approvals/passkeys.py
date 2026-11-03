@@ -147,7 +147,8 @@ class Passkeys:
             return {"registered": True, "challenge_id": str(identifier),
                     "publicKey": json.loads(options_to_json(options))}
 
-    async def approve(self, proposal_id, payload_hash, identifier, credential, rp_id, origin):
+    async def approve(self, proposal_id, payload_hash, identifier, credential, rp_id, origin,
+                      *, decided_at=None):
         async with self.database.tx() as conn:
             # Same order as every owner decision, before locking any binding rows.
             await serialize_on(conn, "countersign:owner-decisions")
@@ -183,7 +184,7 @@ class Passkeys:
             short = hashlib.sha256(credential_id).hexdigest()[:12]
             # No change to approve's state, expiry, versions, shield or single-use checks.
             approval = await ApprovalService(
-                TransactionDatabase(conn), behavior=self.settings.paypal.behavior
+                TransactionDatabase(conn), clock=decided_at, behavior=self.settings.paypal.behavior
             ).approve(proposal_id, payload_hash, approved_by="owner:passkey:" + short)
             await conn.execute(
                 "INSERT INTO audit_log(actor,kind,proposal_id,details) VALUES ('owner',%s,%s,%s)",

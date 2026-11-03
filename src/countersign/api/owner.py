@@ -4,6 +4,7 @@ from hmac import compare_digest
 from typing import Annotated, Literal
 from uuid import UUID
 
+import httpx
 from fastapi import APIRouter, Depends, Header, HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -97,6 +98,26 @@ async def public_result(awaitable):
         raise HTTPException(status_code=503, detail={"code": "OWNER_STORAGE_UNAVAILABLE"}) from None
 
 
+async def decision_clock(settings):
+    """The clock an owner decision is judged at.
+
+    In demo mode on the loopback mock the week runs on the mock's staged clock, so a
+    decision must be judged at that time, as the playground and the gateway already
+    are; judging it at the real date would refuse facts that are already true in the
+    staged week. Live mode returns None, which means the real clock, and so does a demo
+    whose mock clock cannot be read: the shield still judges the decision either way.
+    """
+    from countersign.api.playground import _staged_now, playground_allowed
+
+    if not playground_allowed(settings):
+        return None
+    try:
+        now = await _staged_now(settings)
+    except (httpx.HTTPError, ValueError, KeyError, TypeError):
+        return None
+    return lambda: now
+
+
 async def owner_document(database: Database, resource: str, row_id: UUID) -> dict:
     """Return the contract document, never private storage columns or raw payloads."""
     queries = {
@@ -123,14 +144,22 @@ def build_router(database: Database, settings: Settings) -> APIRouter:
     router.include_router(passkey_router(database, settings))
     service = ApprovalService(database, behavior=settings.paypal.behavior)
 
+    async def deciding():
+        clock = await decision_clock(settings)
+        if clock is None:
+            return service
+        return ApprovalService(database, clock=clock, behavior=settings.paypal.behavior)
+
     @router.post("/proposals/{id}/approve", status_code=201)
     async def approve(id: UUID, body: ApproveBody):
-        approval = await public_result(service.approve(id, body.payload_hash, body.approved_by))
+        decider = await deciding()
+        approval = await public_result(decider.approve(id, body.payload_hash, body.approved_by))
         return {"approval": approval}
 
     @router.post("/proposals/{id}/reject")
     async def reject(id: UUID, body: RejectBody):
-        await public_result(service.reject(id, body.reason))
+        decider = await deciding()
+        await public_result(decider.reject(id, body.reason))
         return await owner_document(database, "proposal", id)
 
     @router.post("/makers/{id}/payout-email")

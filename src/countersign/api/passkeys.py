@@ -7,7 +7,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Request
 from pydantic import Field
 
-from countersign.api.owner import OwnerBody, OwnerRoute, owner_guard, public_result
+from countersign.api.owner import OwnerBody, OwnerRoute, decision_clock, owner_guard, public_result
 from countersign.approvals.passkeys import PasskeyError, Passkeys
 
 
@@ -83,8 +83,10 @@ def build_router(database, settings):
     @router.post("/owner/proposals/{id}/passkey/approve", status_code=201)
     async def approve(id: UUID, body: AssertionBody, request: Request):
         async def run():
+            # The challenge keeps real time; the approval is judged at the decision clock.
             return await service.approve(id, body.payload_hash, body.challenge_id,
-                                         bounded(body.credential), *relying_party(request, settings))
+                                         bounded(body.credential), *relying_party(request, settings),
+                                         decided_at=await decision_clock(settings))
         return await public_result(run())
 
     return router

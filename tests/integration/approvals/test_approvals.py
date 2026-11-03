@@ -10,7 +10,7 @@ import pytest_asyncio
 from fastapi import FastAPI
 from psycopg import IntegrityError
 
-from countersign.api import owner, runs
+from countersign.api import owner, playground, runs
 from countersign.approvals import (
     ApprovalError,
     ApprovalService,
@@ -367,6 +367,33 @@ async def test_demo_owner_reject_returns_public_proposal_and_stale_http_code(wor
     assert public["rule_results"]
     assert "raw_output" not in public and "verdict_details" not in public
     assert "maker@example.test" not in response.text
+
+
+async def test_demo_owner_approval_is_judged_at_the_staged_clock(world, monkeypatch):
+    # C55: on the demo mock the week runs on the mock's staged clock. The request below
+    # expired by the real date long ago, but is valid at the staged time, so the owner's
+    # approval from the dashboard must succeed rather than be judged against today.
+    database, _, _, _ = world
+    _, proposal, pending = await planned(world)
+
+    async def staged_now(runtime):
+        return NOW
+
+    monkeypatch.setattr(playground, "playground_allowed", lambda runtime: True)
+    monkeypatch.setattr(playground, "_staged_now", staged_now)
+    app = FastAPI()
+    app.include_router(
+        owner.build_router(database, Settings("postgresql://fake:fake@localhost/fake")),
+        prefix="/api/v1",
+    )
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app), base_url="http://local"
+    ) as client:
+        response = await client.post(
+            f"/api/v1/proposals/{proposal['id']}/approve",
+            json={"payload_hash": pending["payload_hash"]},
+        )
+    assert response.status_code == 201, response.text
 
 
 async def test_owner_http_storage_errors_do_not_expose_driver_values(world, monkeypatch):
