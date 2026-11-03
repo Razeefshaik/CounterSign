@@ -207,6 +207,20 @@ async def test_registration_endpoints_and_plain_approve(world):
     assert response.status_code == 201 and response.json()["approval"]["approved_by"] == "owner"
 
 
+@pytest.mark.parametrize("forged", ["owner:passkey:abcd", " Owner:PassKey:abcd", "owner:passkey"])
+async def test_plain_approve_cannot_claim_a_passkey_signature(world, forged):
+    _, _, proposal, client = world
+    response = await client.post(f"/api/v1/proposals/{proposal['id']}/approve",
+                                 json={"payload_hash": payload(proposal), "approved_by": forged})
+    assert response.status_code == 422
+    assert response.json()["error"]["code"] == "INVALID_REQUEST"
+    assert "passkey" not in response.text.lower()
+    # Nothing was approved, so a real passkey countersign can still follow.
+    response = await client.post(f"/api/v1/proposals/{proposal['id']}/approve",
+                                 json={"payload_hash": payload(proposal)})
+    assert response.status_code == 201
+
+
 async def test_options_validate_current_state_and_hash(world):
     _, service, proposal, _ = world
     with pytest.raises(PasskeyError, match="PASSKEY_HASH_MISMATCH"):

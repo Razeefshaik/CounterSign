@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from psycopg import Error as DatabaseError
 from psycopg_pool import PoolTimeout
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from countersign.approvals import ApprovalError, ApprovalService
 from countersign.config import Settings
@@ -24,6 +24,15 @@ class OwnerBody(BaseModel):
 class ApproveBody(OwnerBody):
     payload_hash: str = Field(pattern=r"^sha256:[0-9a-f]{64}$")
     approved_by: str = Field(default="owner", min_length=1, max_length=100)
+
+    @field_validator("approved_by")
+    @classmethod
+    def not_passkey_identity(cls, value):
+        # Only the verified passkey route may record an owner:passkey identity;
+        # the decision view shows "Countersigned with passkey" for that prefix.
+        if value.strip().lower().startswith("owner:passkey"):
+            raise ValueError("reserved")
+        return value
 
 
 class RejectBody(OwnerBody):
