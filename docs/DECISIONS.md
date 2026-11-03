@@ -630,3 +630,10 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | When a passkey prompt fails with NotAllowedError, the decision view offers **Set up a passkey on this device**; that click registers this device's own passkey (skipping setup if the device already holds one) and then countersigns. The server is unchanged | Video capture review, Nov 4 | Accept | The server keeps one shared list of owner passkeys, so on the shared hosted demo every visitor after the first was sent straight to a signing prompt for another visitor's passkey and could never countersign |
+
+## Nov 5 C62 Friday checkpoint
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Persist the quiescent mock as allowlisted JSON data with shared references, random/id counters and explicit pending-event descriptors | C62 state review | Accept | Copying only resource records loses pending payouts, webhook signatures and future clock behavior; executable callbacks must never be serialized |
+| Expose fixed-name checkpoint operations only on the configured loopback mock; refuse uploaded contents, query paths and unsupported active timers | C62 security requirements | Accept | Only baked files or container-written snapshots may be restored, never network-supplied state or code |

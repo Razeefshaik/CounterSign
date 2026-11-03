@@ -137,9 +137,11 @@ class ResourceService:
             if state is not self.store.resources or generation != state.snapshot_generation:
                 return
             self.snapshot()
-            self.store.clock.schedule(self.store.config.balance_refresh_seconds, refresh)
+            self.store.clock.schedule(self.store.config.balance_refresh_seconds, refresh,
+                checkpoint={"kind":"refresh", "state":state, "generation":generation})  # C62
 
-        self.store.clock.schedule(self.store.config.balance_refresh_seconds, refresh)
+        self.store.clock.schedule(self.store.config.balance_refresh_seconds, refresh,
+            checkpoint={"kind":"refresh", "state":state, "generation":generation})  # C62
 
     def get(self, resource, id):
         try:
@@ -349,6 +351,7 @@ class ResourceService:
                         if self.store.payouts is funds and item.status == "UNCLAIMED"
                         else None
                     ),
+                    checkpoint={"kind":"seed_expire", "state":funds, "item":item},  # C62
                 )
             elif item.status == "PENDING":
                 self.store.clock.schedule(
@@ -363,6 +366,7 @@ class ResourceService:
                         if self.store.payouts is funds and item.status == "PENDING"
                         else None
                     ),
+                    checkpoint={"kind":"seed_process", "state":funds, "item":item},  # C62
                 )
         for capture in state.captures.values():
             if capture["status"] == "COMPLETED":
