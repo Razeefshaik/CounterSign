@@ -70,7 +70,8 @@ staged, sandbox and real-model evidence stay distinct.
   incident-mount navigation guard; `eca2b52` refresh/retry fixes and `fd09a09`
   nested-popup theme fix (final runtime source).
   `2b3034c` corrects the C48-stale import-count assertion (test only).
-  Push branch when complete; Claude merges. Shared edits are fenced C49 inserts;
+  Review branch pushed through `50cf9eb`; Claude integrates after final validation.
+  Shared edits are fenced C49 inserts;
   no index/styles.css, backend, contract or dependency changes.
 - New grid.mjs/grid.css use vendored AG Grid Community 32.3.9 (MIT): incidents,
   audit history, run lines/resends with API pinned total, and maker lists over

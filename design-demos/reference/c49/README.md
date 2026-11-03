@@ -74,3 +74,45 @@ The small C49 insertions in `app.mjs`, `command.mjs`, `views.mjs` and
 `workspace.mjs` own the mounts; no approval handler, endpoint or financial write
 was added. Operation references link only when an actual proposal association
 is known; unidentified PayPal items and planned resend states remain unavailable.
+
+## Handoff and validation
+
+Branch `razeef/c49-ag-grid` is pushed for review, not merged. Runtime source is
+`fd09a09`; `2b3034c` only corrects the smoke test's stale three-contract assertion
+to match the existing four contracts. The branch starts at `454d2cc`; fetched
+main advanced to `d43e04b`, which is not included in this validation.
+
+- Node: **90 passed**; browser: **31 passed**, **18 screenshots**, no JavaScript
+  errors or POSTs. Ruff passes; **4 import contracts kept, 0 broken**.
+- Initial full PostgreSQL suite: **4041 passed, 5 skipped, 2 failed** in 2348.53 s.
+  Both failures were the stale assertion; after its fix, **15 smoke tests passed**.
+- Final full rerun is **blocked**: shared PostgreSQL 55433 exhausted its 512 MB
+  temporary filesystem and exited. C49's rerun was stopped at 234 completed cases;
+  no shared container/database was reset. Approval requested for a separate
+  temporary PostgreSQL 16 instance on 55449. This is not a full-green report.
+- The five skips require optional toolkit/LangChain packages in main Python;
+  the isolated toolkit interpreter was configured for child-process checks.
+- Preview 8192 is stopped. Owner preview 8180 and other task ports are untouched.
+
+Every existing shared file touched:
+
+| File | C49 change |
+| --- | --- |
+| `README.md` | Make the web feature claim describe the four actual Community grids |
+| `web/README.md` | Add C49 setup/behaviour notes and replace the obsolete no-grid claim |
+| `web/app.mjs` | Incident mount, keyboard/detail/filter selection and navigation cleanup |
+| `web/command.mjs` | Large-maker grid and read-only lazy dialog graph loading |
+| `web/views.mjs` | Fallback host wrappers around run lines and audit history |
+| `web/workspace.mjs` | Mount the appropriate run/history grid after API reads |
+| `docs/DECISIONS.md` | Append C49 decisions, including the stale test assertion correction |
+| `docs/AGENT_STATE.md` | Add the self-contained C49 state section |
+| `docs/AGENT_FUTURE_NOTES.md` | Append the C49 evidence and continuation notes |
+
+`tests/test_smoke.py:108` is the only existing Python file changed (test only).
+New files are `web/grid.mjs`, `web/grid.css`, the two grid Node test modules,
+`tests/dashboard/test_grid_assets.py` and this evidence folder. No runtime Python,
+import contract, dependency, migration, approval binding or write path changed.
+
+Commits before this final handoff-only update: `8fab59c`, `b5ef25a`, `2b28f70`,
+`a6abd0b`, `eca2b52`, `fd09a09`, `2b3034c`, `50cf9eb`. All have one-line C49
+subjects without attribution.

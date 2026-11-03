@@ -578,6 +578,9 @@ with "No space left on device" in pg_wal (its tmpfs is limited to 512 MB).
 Only C49's pytest processes 25392/18764 were stopped, avoiding long connection
 timeouts against the failed server. No shared container/database was restarted.
 Owner approval requested for isolated PostgreSQL 16 on 55449. No full-green claim.
+Review branch pushed through 50cf9eb (evidence/context); remote hash verified.
+Main advanced to d43e04b during the work; C49 remains based on tested 454d2cc.
+Claude must integrate and validate the combined main; no rebase/merge performed.
 Runs use Windows Selector and COUNTERSIGN_TEST_TOOLKIT_PYTHON pointing to original
 CounterSign/.venv/toolkit/Scripts/python.exe. Logs/results under ignored
 .venv/c49-tools; initial-* retains the completed first-run evidence.
