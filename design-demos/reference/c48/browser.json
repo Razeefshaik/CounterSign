@@ -1,0 +1,40 @@
+{
+  "evidence": "Actual local dashboard over TCP 8191; recorded test proposal; simulated PayPal",
+  "checks": [
+    {
+      "name": "decision-light",
+      "width": 1440,
+      "height": 1080,
+      "theme": "light",
+      "banner": "Simulated: mock PayPal",
+      "bannerVisible": true,
+      "overflow": false,
+      "decision": "#decision/01a1a12e-a374-76cf-bfa6-12c8b5c85cd1",
+      "ownerAction": true
+    },
+    {
+      "name": "decision-dark",
+      "width": 1440,
+      "height": 1080,
+      "theme": "dark",
+      "banner": "Simulated: mock PayPal",
+      "bannerVisible": true,
+      "overflow": false,
+      "decision": "#decision/01a1a12e-a374-76cf-bfa6-12c8b5c85cd1",
+      "ownerAction": true
+    },
+    {
+      "name": "decision-phone",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "banner": "Simulated: mock PayPal",
+      "bannerVisible": true,
+      "overflow": false,
+      "decision": "#decision/01a1a12e-a374-76cf-bfa6-12c8b5c85cd1",
+      "ownerAction": true
+    }
+  ],
+  "runtime_exceptions": 0,
+  "owner_actions_sent": 0
+}

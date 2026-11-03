@@ -1,0 +1,57 @@
+{
+  "evidence": "real MCP SDK 2.3.0 client; simulated PayPal; isolated PostgreSQL",
+  "transport": "stdio-preview-owner",
+  "http_port": null,
+  "initialize": "completed by SDK legacy client context entry",
+  "list_tools": [
+    "get_cash",
+    "get_incident",
+    "get_proposal",
+    "list_actions",
+    "list_incidents",
+    "list_makers",
+    "propose",
+    "propose_cancel_unclaimed",
+    "propose_evidence",
+    "propose_payout_run",
+    "propose_refund"
+  ],
+  "propose_refund": {
+    "verdict": "NEEDS_OWNER",
+    "rule_results": [
+      {
+        "rule": "PAYEE_INTEGRITY",
+        "outcome": "PASS",
+        "detail": "no payee in the proposal"
+      },
+      {
+        "rule": "REFUND_POLICY",
+        "outcome": "NEEDS_OWNER",
+        "detail": "ACCEPT_CLAIM and every refund require the owner at any amount"
+      },
+      {
+        "rule": "DEADLINE_GUARD",
+        "outcome": "PASS",
+        "detail": "seller response deadline is open; action may proceed at its configured tier"
+      },
+      {
+        "rule": "UNKNOWN_SCOPED",
+        "outcome": "PASS",
+        "detail": "no unknown state on the 1 touched record(s)"
+      },
+      {
+        "rule": "APPROVAL_BINDING",
+        "outcome": "NEEDS_OWNER",
+        "detail": "ACCEPT_CLAIM is owner tier; the owner approves this exact payload"
+      },
+      {
+        "rule": "INJECTION_GUARD",
+        "outcome": "PASS",
+        "detail": "no prompt-injection flag on the financial proposal"
+      }
+    ],
+    "needs_owner": true,
+    "decision_url": null,
+    "written": false
+  }
+}

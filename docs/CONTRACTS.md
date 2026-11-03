@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.6 (Oct 27, 2026).** 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.7 (Nov 3, 2026).** C48 adds the MCP gateway in section 7; existing dashboard response shapes and their advertised 1.0.6 version remain unchanged. 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -11,6 +11,7 @@ Sections:
 4. Core engine interface (`countersign.harness`, used by eval and the demo bar)
 5. `mock_paypal`
 6. Evaluation: scenario format, system interface, metrics output
+7. MCP gateway (C48, additive)
 
 ---
 
@@ -995,3 +996,84 @@ or confirmed/resolved findings, kept separate from mock scores. `limitations`
 retains honest scope caveats. The bundle includes no keys, emails or provider
 output and does not rerun experiments. Zero measured invariant counts are not
 a universal safety claim.
+
+<!-- C48: additive MCP boundary; dashboard contracts above retain their shapes. -->
+## 7. MCP gateway
+
+Official Python SDK `mcp==2.3.0`. Stdio entry point:
+`python -m countersign.gateway`. Streamable HTTP: `/mcp` (same-origin redirect
+to `/mcp/`), mounted only when `playground_allowed` permits demo + loopback mock.
+SDK host/origin protection remains enabled. Trusted deployment configuration may
+extend it with `COUNTERSIGN_GATEWAY_PUBLIC_ORIGIN` (HTTPS origin only), or Render's
+external hostname. No credentials, approvals or execution capabilities are issued
+by the MCP initialize handshake. Its client name supplies bounded attribution.
+
+The **exact** tools and arguments are below. `?` denotes optional. Unknown
+arguments are refused. `list_actions` supplies the existing section 1 action
+specifications, required/optional parameter names and plain-English shape details;
+it does not introduce new actions.
+
+| Tool | Arguments | Result / source |
+| --- | --- | --- |
+| `list_incidents` | `state?`, `kind?`, `limit?` | `v_dash_incidents` summaries |
+| `get_incident` | `incident_id` | Same summary view, not private incident storage |
+| `list_makers` | `limit?` | Masked `v_dash_makers` summaries |
+| `get_cash` | none | `v_dash_cash`, including available, unreserved, reserved and stale flags |
+| `get_proposal` | `proposal_id` | `v_dash_proposals`: ID, incident, action, state, verdict, rule results, expected effect, creation time and flag type/source only |
+| `list_actions` | none | Section 1 action names and parameter shapes |
+| `propose` | `incident_id`, `action`, `params`, `rationale`, `evidence_refs` | Generic validated proposal on an existing incident |
+| `propose_refund` | `paypal_dispute_id`, `rationale`, `refund_to?` | `ACCEPT_CLAIM`; alternate destination reaches the shield and is blocked |
+| `propose_payout_run` | `week_start`, `rationale` | `SCHEDULE_PAYOUT_RUN` using the exact existing non-cancelled planned manifest for the ISO date |
+| `propose_cancel_unclaimed` | `payout_item_id`, `rationale` | `CANCEL_UNCLAIMED_PAYOUT` |
+| `propose_evidence` | `paypal_dispute_id`, `rationale`, `evidence_refs`, `evidences?` | `PROVIDE_EVIDENCE`; matching stored tracking and a `tracking:` reference required |
+
+Read tools return bounded `{"items": [...]}` (including singleton reads), without
+pagination cursors. List limit defaults to 50 and is 1..100. Missing IDs return an
+empty list. Each query uses a read-only transaction and `countersign_agent_ro`.
+The gateway never accepts SQL. Shared `sanitize` applies the 128 KiB, 10,000-node,
+16-level JSON limits and masks emails/private assignments. Proposal status reads
+omit rationale, parameter payloads, raw output and flag excerpts.
+
+Every proposal passes `StructuredProposal.parse`, including exact action shapes,
+integer minor-unit money, bounded nonempty rationale (maximum 4096 characters),
+and permitted evidence references. Injection detection examines original caller
+text before masking and attaches flags with `source="external_agent"`. A per-process
+non-queueing lock limits proposal judging; an occupied gateway returns
+`GATEWAY_BUSY`. No tool approves, rejects, executes, changes payees or directly
+calls PayPal. Convenience wrappers do not create a payout plan or change the
+staged week.
+
+Successful proposal-tool results are:
+
+```json
+{"verdict":"NEEDS_OWNER","rule_results":[],"needs_owner":true,
+ "decision_url":null,"written":false}
+```
+
+`rule_results` contains the actual shield results, not the empty example. Modes:
+
+- **Preview (default):** `ApprovalService.preview` judges inside a rolled-back
+  transaction. No proposal, incident, reservation, approval, operation or audit
+  writes survive. `decision_url` is null, `written` false. Demo mode uses the
+  staged mock clock; an unavailable clock produces a fixed error.
+- **Record:** opt in with `COUNTERSIGN_GATEWAY_MODE=record`, on non-hosted stdio.
+  Hosted environment markers refuse this mode; HTTP always forces preview.
+  The gateway and internal engine call the same locked `bind_agent_proposal`.
+  The model is `external-agent:<sanitized initialize client name>` (label capped
+  at 64 characters). Existing incident version/deduplication checks are retained;
+  convenience requests receive a separate `RECONCILIATION` incident rather than
+  reopening internal incidents. Same audit kinds as the internal agent, with
+  `details.source="external_agent"`. Return `written:true` and
+  `decision_url="#decision/<proposal-id>"`, including for a stored BLOCK.
+  NEEDS_OWNER appears in the existing dashboard and owner endpoints. The normal
+  approval binding, expiry and executor recheck remain authoritative.
+
+Tool failures use MCP `isError:true` and fixed text codes (the SDK may prefix its
+fixed tool name): `INVALID_REQUEST`,
+`INVALID_PROPOSAL`, `GATEWAY_BUSY`, `TARGET_NOT_FOUND`, `RUN_NOT_FOUND`,
+`INCIDENT_NOT_FOUND`, `INCIDENT_NOT_READY`, `PROPOSAL_UNAVAILABLE`, or
+`GATEWAY_UNAVAILABLE`. Transport JSON-RPC protocol errors remain SDK-owned.
+Startup errors never expose configuration values. SDK validation does not coerce
+proposal values or reflect rejected arguments: raw tool arguments are bounded
+before dispatch, then the existing strict parser validates them.
+<!-- /C48 -->
