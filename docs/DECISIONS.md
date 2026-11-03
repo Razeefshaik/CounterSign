@@ -584,3 +584,15 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Map theme tokens on AG Grid's nested popup theme as well as the main grid | C49 native filter-popup screenshot | Accept | The vendor's nested Quartz class otherwise resets popup surfaces and focus colours, especially in dark mode |
 | Update the smoke test's kept-contract count from three to four | C49 full-suite verification | Accept | C48 added the gateway import contract; the assertion must reflect that boundary without changing any import rules |
 | Finish C49 with its focused tests and the web suite; defer full suites until all features are merged | Owner follow-up, Nov 3 | Accept | Integrated validation belongs after the parallel features land; no separate PostgreSQL instance or further full run is needed for C49 |
+
+## Nov 3 C51 passkey countersignatures
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Pin py_webauthn 3.0.1 and add owner-only credentials and random two-minute challenges in migration 0007 | C51 task | Accept | Real device signatures require verified challenge, origin, RP, presence, user verification and increasing counters; the agent gets no grants |
+| Wrap unchanged ApprovalService.approve with challenge/counter/audit changes on one connection under the same owner lock | C51 task | Accept | Passkeys supplement the state, hash, version, expiry, single-use and executor checks rather than replacing them; any refusal rolls everything back |
+| Keep challenge proposal IDs as checked logical bindings without a foreign key | C51 full-suite reset check | Accept | The facade intentionally truncates a fixed set of financial tables; old UUID-bound challenges fail closed after reset without deleting owner credentials or changing reset logic |
+| Default RP/origin from request host and forwarded scheme only in the guarded hosted-demo factory | C51 task | Accept | Render needs HTTPS host defaults while live deployments must explicitly pin their relying party |
+| Add OWNER_COUNTERSIGNED audit fingerprints and a scoped accent-blue primary action; keep plain approval unchanged | C51 task | Accept | The timeline must show verified signatures without storing assertions or keys, and counterless/unsupported devices still need a fallback |
+| Bump written contracts to 1.0.8, retaining dashboard response shapes and their 1.0.6 metadata | C51 task | Accept | New owner endpoints are additive and require no consumer shape changes |
+| The plain approve endpoint refuses an `approved_by` beginning with `owner:passkey` (422 INVALID_REQUEST) | C51 review (P2), Nov 3 | Accept | Only the verified passkey route may record that identity; otherwise a plain approval could show "Countersigned with passkey" without any signature |

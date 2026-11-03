@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.7 (Nov 3, 2026).** C48 adds the MCP gateway in section 7; existing dashboard response shapes and their advertised 1.0.6 version remain unchanged. 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.8 (Nov 3, 2026).** C51 adds owner passkey endpoints in section 3. C48 adds the MCP gateway in section 7; existing dashboard response shapes and their advertised 1.0.6 version remain unchanged. 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -328,7 +328,7 @@ This example is Friday morning of the demo week, before the run is approved.
 ```
 
 - `actor` is one of `agent`, `owner`, `shield`, `executor` or `system`.
-- `kind` is one of: `PROPOSAL_CREATED`, `SHIELD_VERDICT`, `OWNER_APPROVED`, `OWNER_REJECTED`, `APPROVAL_VOIDED`, `OPERATION_PREPARED`, `PAYPAL_CALL`, `PAYPAL_RESPONSE`, `OPERATION_UNKNOWN`, `REPLAY_RESOLVED`, `WEBHOOK_RECEIVED`, `WEBHOOK_REJECTED`, `STATE_TRANSITION`, `INCIDENT_OPENED`, `INCIDENT_RESOLVED`, `INJECTION_FLAGGED`, `RECONCILE_MISMATCH`, `RUN_REQUEST_REFRESHED`.
+- `kind` is one of: `PROPOSAL_CREATED`, `SHIELD_VERDICT`, `OWNER_APPROVED`, `OWNER_REJECTED`, `APPROVAL_VOIDED`, `OPERATION_PREPARED`, `PAYPAL_CALL`, `PAYPAL_RESPONSE`, `OPERATION_UNKNOWN`, `REPLAY_RESOLVED`, `WEBHOOK_RECEIVED`, `WEBHOOK_REJECTED`, `STATE_TRANSITION`, `INCIDENT_OPENED`, `INCIDENT_RESOLVED`, `INJECTION_FLAGGED`, `RECONCILE_MISMATCH`, `RUN_REQUEST_REFRESHED`, `OWNER_COUNTERSIGNED` (C51).
 - `details` never contains a full email, a token or a secret.
 
 ### 2.10 Money graph
@@ -364,6 +364,52 @@ In live mode these endpoints require the header `X-Owner-Token` (the value comes
 - **`POST /api/v1/proposals/{id}/reject`** with body `{"reason": "..."}`. Returns 200 with the updated Proposal.
 - **`POST /api/v1/payout-runs`** with body `{"week_start": "2026-11-02"}`. Returns 201 with the run. This plans the run and creates a `SCHEDULE_PAYOUT_RUN` proposal.
 - **`POST /api/v1/makers/{id}/payout-email`** with body `{"payout_email": "...", "confirm": true}`. Returns 200 with the Maker. This is the only way a payee email changes.
+
+<!-- C51: additive owner countersignatures; existing approve checks stay authoritative. -->
+### Passkey countersignatures (1.0.8)
+
+All four endpoints use the existing owner guard: `X-Owner-Token` in live mode,
+unauthenticated simulation in demo mode. Public demo registration is a demonstration,
+not account enrollment or a replacement for live owner authentication. No agent
+or MCP tool receives these capabilities.
+
+- `POST /api/v1/owner/passkeys/register/options`, no body: 200
+  `{"challenge_id":"<uuid>","publicKey":<WebAuthn creation options>}`.
+- `POST /api/v1/owner/passkeys/register/verify` with
+  `{"challenge_id":"<uuid>","credential":<registration JSON>,"label":"Owner passkey"}`
+  (label optional, maximum 80 characters): 201 `{"registered":true}`.
+- `POST /api/v1/owner/proposals/{id}/passkey/options` with `{"payload_hash":"sha256:..."}`:
+  200 `{"registered":false}` when setup is needed, otherwise
+  `{"registered":true,"challenge_id":"<uuid>","publicKey":<WebAuthn request options>}`.
+  Only the current NEEDS_OWNER proposal/hash is eligible.
+- `POST /api/v1/owner/proposals/{id}/passkey/approve` with
+  `{"challenge_id":"<uuid>","payload_hash":"sha256:...","credential":<assertion JSON>}`:
+  201 `{"approval":<same shape as plain approve>}`. Credential binary fields use
+  unpadded base64url. The server sets `approved_by` to
+  `owner:passkey:<12-character SHA256 credential fingerprint>`.
+
+Random challenges expire after two minutes, bind purpose, RP ID/origin and, for
+approval, proposal ID/hash, and are single use. Verification requires user presence,
+user verification, a registered key, correct signature and a strictly increasing
+signature counter. Counterless authenticators must use plain approval. Credential
+JSON is bounded to 64 KiB; cross-origin HTTP requests are refused.
+
+Verification refusals return 409 with fixed `PASSKEY_INVALID`,
+`PASSKEY_CHALLENGE_EXPIRED`, `PASSKEY_CHALLENGE_USED`, or `PASSKEY_HASH_MISMATCH`.
+Existing approval refusals retain their codes. Malformed bodies return fixed 422
+INVALID_REQUEST; database errors return 503 OWNER_STORAGE_UNAVAILABLE. Nothing is
+approved on failure. The UI invalidates old controls after an unconfirmed response;
+Refresh and a new user decision are required, with no automatic retry or fallback.
+
+Challenge consumption, credential counter/last-use update, unchanged
+`ApprovalService.approve`, and audit insertion commit together under the existing
+owner-decision lock. Refusal rolls back all changes. Original state/hash/version/
+expiry/single-use checks and executor rechecks still run. `OWNER_COUNTERSIGNED` is
+an additive owner audit kind with only `credential_short_id`, `sign_count`,
+`user_verified`, `user_present`, `signature_verified`, `origin_verified`, and
+`rp_id_verified`. Never audit raw assertions, public keys, full credential IDs or
+owner tokens. Existing proposal approval fields supply the signed timeline.
+<!-- /C51 -->
 
 **Demo control bar.** Mate implements it in `dashboard.py`, and it is enabled only when `mode = "demo"`:
 

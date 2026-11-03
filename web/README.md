@@ -40,6 +40,25 @@ Browser evidence is in `design-demos/reference/c49/`; its scale sample is explic
 browser-only contract fixture data, not a real marketplace or financial run.
 <!-- /C49 -->
 
+<!-- C51 -->
+## Nov 3 C51 passkey countersignatures
+
+The decision view offers an accent-blue **Countersign with passkey** action before
+plain approval, showing the exact payload hash. First use registers a credential
+with user verification, then signs a fresh challenge for this proposal. Recorded
+passkey approvals read “Countersigned with passkey · …abcd” in the timeline.
+`passkey.mjs` implements base64url conversion and same-origin WebAuthn without a
+frontend library; `passkey.css` uses the existing glass tokens.
+
+Browsers without WebAuthn show only the existing plain controls. Plain and scripted
+approval remain unchanged. Both flows share busy state and invalidate controls on
+unconfirmed results. Navigation during a prompt prevents posting from an old view.
+Owner tokens are cleared from the input and never saved. The simulation banner
+is unchanged. RP/origin setup, public-demo scope and the strict signature-counter
+limitation are in [the hosting walkthrough](../docs/walkthrough/c27-hosting.md#passkey-countersigning).
+Screenshots: [C51 reference](../design-demos/reference/c51/).
+<!-- /C51 -->
+
 ## Nov 3 compact demo controls (C46)
 
 The staged-week dock is now two small bottom-right buttons, **Next step** and

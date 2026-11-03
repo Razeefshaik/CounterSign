@@ -174,3 +174,31 @@ Stage explicit files; one-line `C47: lowercase summary` commits, no attribution.
 Push only the C47 branch after verification; owner approves merge. No cloud
 actions. Ask before shield/executor/approvals/migrations/contracts/visual changes.
 Consult matching sections of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).
+
+## Nov 3 C51 passkey countersignatures
+
+- Restored local `CounterSign-c51`, branch `razeef/c51-passkey-countersign`,
+  tested source `93f0e35`, feature `38877ef`, base `454d2cc`. No runtime,
+  migration or test-assertion changes during resumed validation.
+- Migration 0007 and WebAuthn 3.0.1 add bound, two-minute owner challenges and
+  real signature checks around unchanged ApprovalService.approve. Contract
+  1.0.8; plain fallback and original shield/executor checks remain.
+- Final full Python run: **4065 passed, 5 skipped in 2035.32s**, exit 0,
+  4070 collected. Dedicated pinned dev/llm venv plus explicit legacy toolkit
+  interpreter; genuine child and Gemini stub checks passed. Five skips require
+  legacy toolkit installed in the parent. **81 Node**, Ruff, four import
+  contracts and pip check also passed on unchanged source.
+- Own PostgreSQL 16 `countersign-c51-validation`, port 55434/database
+  countersign_c51, used a 1GB tmpfs and bounded WAL. Earlier failed local run
+  (3963 passed, 19 skipped, 3 failed, 86 errors) is retained: shared 55433 ran
+  out of WAL space and parent LLM prerequisites were missing. Fresh full pass
+  supersedes it. Raw evidence: `S:\flutter\temp\countersign-c51-validation-20261103-195029`;
+  public summary/addendum in `design-demos/reference/c51/`.
+- **Unfixed P2 review finding:** arbitrary plain approved_by with a passkey
+  prefix produces a signed UI label without a credential or countersign audit.
+  Reproduced HTTP 201 with zero keys/signed audits; financial approval checks
+  still run. See REVIEW.md. Validation success is not unconditional merge readiness.
+- Existing six Chrome virtual-authenticator screenshots cover light/dark/390px
+  registration/signing without overflow or JS exceptions; this resume did not
+  rerun them. No environment-file reads or real PayPal/model calls. Owner opens
+  the PR; no PR creation, merge or deployment. Final docs commit/push pending.

@@ -241,7 +241,9 @@ def create_hosted_app(**overrides) -> FastAPI:
         overrides["settings"] = load_hosted_settings()
     require_hosted_demo(overrides["settings"])
     overrides.setdefault("static_dir", WEB_DIR)
-    return create_app(start_worker=False, **overrides)
+    result = create_app(start_worker=False, **overrides)
+    result.state.passkey_hosted_demo = True  # C51: host defaults only in this guarded factory.
+    return result
 
 
 def main():
