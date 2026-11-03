@@ -1,4 +1,5 @@
 import {createClient, submitDecision} from "./api.mjs";
+import {countersign} from "./passkey.mjs"; // C51
 import {decisionView, runView, auditView, cashView, graphView, esc, canDecide} from "./views.mjs";
 import {isStaged} from "./data.mjs";
 import {createReplay} from "./replay.mjs";
@@ -21,7 +22,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
   const notice = (message = "") => {$("view-notice").textContent = message; $("view-notice").hidden = !message;};
   const invalidate = () => {
     proposal = null;
-    for (const id of ["approve", "reject"]) if ($(id)) $(id).disabled = true;
+    for (const id of ["approve", "reject", "passkey-approve"]) if ($(id)) $(id).disabled = true;
   };
   async function render() {
     if (!workspace) return;
@@ -109,6 +110,24 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
     }
   }
   function bindDecision() {
+    // C51: share the plain decision's busy/invalidation state; never retry a signature.
+    if ($("passkey-approve")) $("passkey-approve").onclick = async () => {
+      if (busy || !canDecide(proposal, workspace.meta.clock)) return;
+      const selected = proposal, ticket = serial, token = $("owner-token")?.value || "";
+      if (workspace.meta.mode === "live" && !token) {notice("Enter your owner token for this request."); return;}
+      busy = true;
+      for (const id of ["approve", "reject", "passkey-approve"]) if ($(id)) $(id).disabled = true;
+      if ($("owner-token")) $("owner-token").value = "";
+      try {
+        await countersign(selected, {token, fetcher, isCurrent: () => ticket === serial,
+          onSetup: () => {if (ticket === serial) {$("passkey-approve").textContent = "Set up a passkey"; notice("Set up a passkey on your device, then countersign the displayed payload.");}}});
+        if (ticket === serial) {invalidate(); await render(); notice("Your countersignature was recorded. The latest proposal is shown.");}
+      } catch (error) {
+        if (ticket === serial) {invalidate(); notice(error.status === 409
+          ? "The proposal or passkey challenge changed or expired. Refresh and review it again."
+          : "The countersignature could not be confirmed. Refresh before trying again, or use plain approval.");}
+      } finally {busy = false;}
+    };
     for (const decision of ["approve", "reject"]) if ($(decision)) $(decision).onclick = async () => {
       if (busy || !canDecide(proposal, workspace.meta.clock)) return;
       const selected = proposal, token = $("owner-token")?.value || "", reason = $("reject-reason").value;
@@ -116,7 +135,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
       if (decision === "reject" && !reason.trim()) {notice("Enter a reason for rejection."); return;}
       busy = true;
       const ticket = serial;
-      for (const id of ["approve", "reject"]) $(id).disabled = true;
+      for (const id of ["approve", "reject", "passkey-approve"]) if ($(id)) $(id).disabled = true;
       if ($("owner-token")) $("owner-token").value = "";
       try {
         const result = await submitDecision(client, selected, decision, {reason, token},

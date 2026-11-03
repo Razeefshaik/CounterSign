@@ -495,6 +495,7 @@ def test_dashboard_role_reads_only_views_and_fixed_graph(db_schema):
             assert conn.execute("SELECT dash_money_graph(NULL,%s,NULL) AS doc",
                                 (ids["maker"],)).fetchone()["doc"]["nodes"]
             for statement in ("SELECT * FROM makers", "SELECT * FROM operations",
+                              "SELECT * FROM owner_passkeys", "SELECT * FROM passkey_challenges",  # C51
                               "SELECT * FROM webhook_inbox", ("INSERT INTO makers(id,display_name) "
                               "VALUES ('00000000-0000-0000-0000-000000000001','Denied')"),
                               "UPDATE v_dash_reservations SET kind='RUN_CASH'",

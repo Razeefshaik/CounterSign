@@ -1,0 +1,7 @@
+/* C51: scoped countersign action; no global theme overrides. */
+.passkey-action { margin: 16px 0 12px; display: grid; gap: 8px; min-width: 0; }
+.passkey-action button { background: var(--accent); color: var(--on-accent, #fff); width: 100%; }
+.passkey-action .passkey-hash { font-size: .75rem; overflow-wrap: anywhere; color: var(--ink-3); }
+.passkey-action button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.passkey-action button:disabled { opacity: .55; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .passkey-action * { transition: none; animation: none; } }

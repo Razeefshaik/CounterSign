@@ -1,4 +1,5 @@
 import {money, label} from "./data.mjs";
+import {passkeySupported} from "./passkey.mjs"; // C51
 import {rule, action, state as stateWord, kind as kindWord, tone, when, shortId, summarize} from "./words.mjs";
 
 // All API strings, including untrusted buyer text, are escaped and emails masked.
@@ -75,7 +76,7 @@ function traceView(proposal) {
         ? `<p>Cited records</p><ul class="refs">${proposal.evidence_refs.map(ref => `<li>${esc(ref)}</li>`).join("")}</ul>`
         : "<p>No records cited.</p>";
   const owner = proposal.approval
-    ? `<p>Approved by ${esc(proposal.approval.approved_by)} ${time(proposal.approval.approved_at)}.</p>`
+    ? `<p>${String(proposal.approval.approved_by).startsWith("owner:passkey:") ? `Countersigned with passkey · …${esc(proposal.approval.approved_by.slice(-4))}` : `Approved by ${esc(proposal.approval.approved_by)}`} ${time(proposal.approval.approved_at)}.</p>` // C51
     : proposal.state === "NEEDS_OWNER" ? "<p>Waiting for you.</p>"
     : proposal.tier === "AUTONOMOUS" ? "<p>Not needed: a low-risk action the policy lets the agent take.</p>" : "<p>No approval recorded.</p>";
   const steps = [
@@ -104,6 +105,7 @@ export function decisionView(proposal, meta, staged = false, context = {}) {
       <p>${eligible ? "Approve this exact proposal once. The executor checks it again before sending." : "This proposal is not waiting for a valid owner decision."}</p>
       ${request ? `<div class="signature" style="margin-top:12px"><span title="${esc(hash)}">${esc(hash.slice(0, 13))}…${esc(hash.slice(-6))}</span><button type="button" class="copy" data-copy="${esc(hash)}" aria-label="Copy payload hash">${icon("copy")}</button></div><p class="muted" style="margin-top:8px">Valid until ${time(request.expires_at)}</p>` : ""}
       ${meta.mode === "live" ? '<label>Owner token<input id="owner-token" type="password" autocomplete="off" placeholder="Used for this request only"></label>' : ""}
+      ${request && passkeySupported(context.passkeyScope || globalThis) ? `<div class="passkey-action"><button type="button" id="passkey-approve" class="primary" ${eligible ? "" : "disabled"}>Countersign with passkey</button><span class="passkey-hash">Signing payload <code>${esc(hash)}</code></span><small>First use: set up a passkey, then countersign.</small></div>` : ""}
       <label>Reason if you reject<textarea id="reject-reason" rows="2" maxlength="2000" ${eligible ? "" : "disabled"}></textarea></label>
       <div class="actions"><button type="button" id="approve" class="primary" ${eligible ? "" : "disabled"}>Approve exact proposal</button><button type="button" id="reject" class="secondary" ${eligible ? "" : "disabled"}>Reject proposal</button></div>
       ${!eligible ? '<p class="muted" style="margin-top:10px">Refresh to check its current state.</p>' : ""}</section>`;

@@ -554,3 +554,14 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Read dashboard views under the read-only role; proposal status omits rationale, payloads and flag excerpts | C48 boundary review | Accept | External reads need verdicts and rules without replaying untrusted agent instructions |
 | Keep SDK DNS-rebinding checks and extend only the trusted deployment HTTPS origin; redirect exact /mcp before static routing | C48 HTTP verification | Accept | The hosted static catch-all otherwise returns 405 before the mounted transport receives an exact-path POST |
 | Payout convenience proposals reuse an existing planned manifest; gateway never creates a plan | C48 integration | Accept | Planning and the staged week stay in their existing owner workflows |
+
+## Nov 3 C51 passkey countersignatures
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Pin py_webauthn 3.0.1 and add owner-only credentials and random two-minute challenges in migration 0007 | C51 task | Accept | Real device signatures require verified challenge, origin, RP, presence, user verification and increasing counters; the agent gets no grants |
+| Wrap unchanged ApprovalService.approve with challenge/counter/audit changes on one connection under the same owner lock | C51 task | Accept | Passkeys supplement the state, hash, version, expiry, single-use and executor checks rather than replacing them; any refusal rolls everything back |
+| Keep challenge proposal IDs as checked logical bindings without a foreign key | C51 full-suite reset check | Accept | The facade intentionally truncates a fixed set of financial tables; old UUID-bound challenges fail closed after reset without deleting owner credentials or changing reset logic |
+| Default RP/origin from request host and forwarded scheme only in the guarded hosted-demo factory | C51 task | Accept | Render needs HTTPS host defaults while live deployments must explicitly pin their relying party |
+| Add OWNER_COUNTERSIGNED audit fingerprints and a scoped accent-blue primary action; keep plain approval unchanged | C51 task | Accept | The timeline must show verified signatures without storing assertions or keys, and counterless/unsupported devices still need a fallback |
+| Bump written contracts to 1.0.8, retaining dashboard response shapes and their 1.0.6 metadata | C51 task | Accept | New owner endpoints are additive and require no consumer shape changes |

@@ -107,7 +107,11 @@ async def owner_document(database: Database, resource: str, row_id: UUID) -> dic
 
 
 def build_router(database: Database, settings: Settings) -> APIRouter:
+    # C51: additive owner-guarded routes; the existing decisions below are unchanged.
+    from countersign.api.passkeys import build_router as passkey_router
+
     router = APIRouter(route_class=OwnerRoute, dependencies=[Depends(owner_guard(settings))])
+    router.include_router(passkey_router(database, settings))
     service = ApprovalService(database, behavior=settings.paypal.behavior)
 
     @router.post("/proposals/{id}/approve", status_code=201)

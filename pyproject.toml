@@ -9,7 +9,7 @@ description = "AI proposes, code countersigns: safe marketplace money operations
 readme = "README.md"
 requires-python = ">=3.12"
 # C48: official SDK; verified against PyPI and installed in the isolated gateway venv.
-dependencies = ["mcp==2.3.0"]
+dependencies = ["mcp==2.3.0", "webauthn==3.0.1"]  # C51: verified owner countersignatures
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 

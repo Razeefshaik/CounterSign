@@ -41,7 +41,7 @@ def test_migration_roundtrip_restores_constraint_and_never_discards_history(sche
         schema.migrate("0005", downgrade=True)
     with schema.connect() as conn:
         assert conn.execute("SELECT count(*) AS n FROM payout_runs").fetchone()["n"] == 2
-        assert conn.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"] == "0006"
+        assert conn.execute("SELECT version_num FROM alembic_version").fetchone()["version_num"] == "0007"  # C51
         conn.execute("DELETE FROM payout_runs WHERE id=%s", (live,))
     schema.migrate("0005", downgrade=True)
     with schema.connect() as conn:

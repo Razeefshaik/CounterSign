@@ -233,6 +233,8 @@ the decision and safety layer.
 
 ## Hard rules
 
+<!-- C51 --> Owners can countersign an exact proposal with a verified passkey; the original approval binding and execution-time checks still apply, and plain approval remains available.
+
 - The AI agent never calls money-moving PayPal APIs. Only the adapter writes,
   after the shield allows it. Import contracts enforce this: the agent package
   cannot import the write adapter, the sandbox controls, the executor or the

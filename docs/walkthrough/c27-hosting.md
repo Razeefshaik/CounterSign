@@ -12,6 +12,35 @@ One Docker container runs the whole demo:
 
 The mock is in-memory, so the database is disposable too. After every restart or wake-up, both start clean together and always match.
 
+<!-- C51 -->
+## Passkey countersigning
+
+The decision view offers **Countersign with passkey** above plain approval in a
+WebAuthn-capable browser. First use registers a key, then signs a new challenge
+bound to the displayed proposal/hash. The signed timeline names its short fingerprint.
+Cancellation or an error never silently uses plain approval.
+
+Set both `COUNTERSIGN_PASSKEY_RP_ID` (hostname without scheme/port) and
+`COUNTERSIGN_PASSKEY_ORIGIN` (exact browser origin without a trailing slash).
+Locally use `localhost` and `http://localhost:8194` and browse that hostname, not
+127.0.0.1. WebAuthn permits HTTP localhost. Outside the hosted demo factory both
+settings are required; live mode never trusts request-host defaults.
+
+Only `create_hosted_app` in demo mode on the loopback mock can default to the
+request host and `X-Forwarded-Proto` scheme. Render's edge must provide the
+canonical host and trusted HTTPS forwarding header. Explicit settings can pin
+the Render/custom hostname, e.g. `demo.example.com` and `https://demo.example.com`.
+Registration and approval must keep the same pair. Public demo registration uses
+the existing unauthenticated demo guard; it does not prove a visitor is the real
+marketplace owner. Live mode requires the owner token for every passkey request.
+
+The hosted database is disposable: credentials disappear on restart or wake-up,
+so visitors must register again. Normal financial demo resets retain credentials;
+old challenges cannot approve missing/changed proposals. Counterless or
+non-incrementing authenticators are refused; plain approval remains the fallback.
+Passkeys need no real model or PayPal calls.
+<!-- /C51 -->
+
 It needs **no secrets**. The database password is random on every boot and is never printed. The mock takes the fake `mock-client` / `mock-secret` credentials. There are no PayPal sandbox keys, model keys or `.env` file in the image (`.dockerignore` excludes `.env*`).
 
 ## Options compared (checked Oct 27, 2026)

@@ -103,6 +103,9 @@ class Settings:
     mode: str = "demo"
     paypal: PayPalSettings = field(default_factory=PayPalSettings, repr=False)
     owner_token: str = field(default="", repr=False)
+    # C51: explicit outside the hosted demo; never inferred in live mode.
+    passkey_rp_id: str = ""
+    passkey_origin: str = ""
 
     def __post_init__(self):
         try:
@@ -150,7 +153,9 @@ def load_settings() -> Settings:
         ),
     )
     return Settings(
-        database, mode=mode, paypal=paypal, owner_token=os.environ.get("OWNER_TOKEN", "")
+        database, mode=mode, paypal=paypal, owner_token=os.environ.get("OWNER_TOKEN", ""),
+        passkey_rp_id=os.environ.get("COUNTERSIGN_PASSKEY_RP_ID", ""),
+        passkey_origin=os.environ.get("COUNTERSIGN_PASSKEY_ORIGIN", ""),
     )
 
 
