@@ -23,7 +23,8 @@ const date = fact => typeof value(fact) === "string" && /^\d{4}-\d{2}-\d{2}T/.te
   ? value(fact).slice(0, 10) : "—";
 
 function checkView(check) {
-  const different = value(check.verdict)?.includes("DIFFERENT") && !value(check.verdict)?.startsWith("CONFIRMED");
+  const changed = value(check.verdict)?.includes("DIFFERENT");
+  const different = changed && !value(check.verdict)?.startsWith("CONFIRMED");
   const rows = (check.resources || []).map(resource => `<tr>
     <td>${esc(resource.kind?.replaceAll("_", " ") || "—")}</td>
     <td><code>${text(resource.id)}</code>${sourceLink(resource.id, "Source")}</td>
@@ -38,7 +39,7 @@ function checkView(check) {
     <p class="proof-finding">${inline(check.finding)} ${sourceLink(check.finding, "Finding")}</p>
     <p class="proof-meta">${number(check.exchanges)} exchange attempts <span aria-hidden="true">·</span> ${esc(date(check.date_start))} to ${esc(date(check.date_end))} (UTC)
       ${sourceLink(check.debug_ids?.[0] || check.exchanges)}</p>
-    ${different ? `<div class="proof-impact"><strong>What we changed</strong><p>${inline(check.design_impact)} ${sourceLink(check.design_impact, "Design impact")}</p></div>` : ""}
+    ${changed ? `<div class="proof-impact"><strong>What we changed</strong><p>${inline(check.design_impact)} ${sourceLink(check.design_impact, "Design impact")}</p></div>` : ""}
     ${verification}<p class="proof-debug">Sample PayPal debug IDs ${check.debug_ids?.length ? check.debug_ids.map(id => `<code>${text(id)}</code> ${sourceLink(id, "Source")}`).join(" ") : "—"}</p>
     ${rows ? `<details class="proof-resources"><summary>${check.resources.length} recorded resource IDs and latest observed statuses${check.id === "D7" ? " (negative-test fixtures)" : ""}</summary>
       <div class="proof-table"><table><thead><tr><th scope="col">Resource</th><th scope="col">PayPal ID</th><th scope="col">Recorded status / outcome</th></tr></thead><tbody>${rows}</tbody></table></div></details>` : ""}

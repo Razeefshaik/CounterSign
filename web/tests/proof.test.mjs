@@ -13,6 +13,7 @@ test("proof renders all recorded checks and separates sandbox from actual model 
   assert.match(html, /1,041/); assert.match(html, /1,007/);
   assert.match(html, /34 transport errors/); assert.match(html, /simulator event/);
   assert.match(html, /What we changed/); assert.match(html, /UNCLAIMED/);
+  assert.equal((html.match(/class="proof-impact"/g) || []).length, 5); // Includes D11's F11 difference.
   assert.match(html, /RETURNED/); assert.match(html, /RESOLVED_BUYER_FAVOUR/);
   assert.match(html, /gemini-3.5-flash-lite/); assert.match(html, /COMPLETE_WITH_GAPS/);
   assert.match(html, /local mock, not the sandbox/); assert.match(html, /Chose WAIT/);

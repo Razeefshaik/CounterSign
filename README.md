@@ -510,3 +510,14 @@ refund destination and owner decision flow. SDK transports are exercised in test
 the Claude Desktop configuration is a setup recipe, not a claim of a tested
 Claude Desktop connection.
 <!-- /C48 -->
+
+<!-- C50 -->
+## Proof it's real
+
+Open **Sandbox proof** (`#proof`) in the dashboard for 13 recorded PayPal sandbox
+checks, source-linked HTTP/debug IDs and observed payout/dispute statuses.
+The [recordings index](recordings/sandbox/INDEX.md) maps the Oct 23–26 evidence.
+The page separately shows the real Gemini week on the **mock**, including its
+gaps. These are committed recordings; the running demo remains labelled simulated.
+See the [proof build notes](docs/walkthrough/c50-sandbox-proof.md) to reproduce it.
+<!-- /C50 -->
