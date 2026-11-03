@@ -45,10 +45,13 @@ export function createDemoBar(document, {fetcher = fetch, onChange = async () =>
     if (notice) status.textContent = notice;
     status.className = "demo-status" + (notice || state.last_result?.ok === false ? "" : " sr-only");
     document.getElementById("demo-step").onclick = () => send("step");
-    document.getElementById("demo-reset").onclick = () => {
-      if (!confirm || confirm("Restart the staged week? The mock marketplace starts again from Monday.")) return send("reset");
-    };
-    onState(state);
+    document.getElementById("demo-reset").onclick = reset; // C57: one confirmed restart for both surfaces.
+    onState(state, notice); // C57: share fixed errors with the guide too.
+  }
+  // C57: public restart must keep the compact control's confirmation and guard.
+  function reset() {
+    if (!state || state.running || sending) return;
+    if (!confirm || confirm("Restart the staged week? The mock marketplace starts again from Monday.")) return send("reset");
   }
   async function follow() {
     if (polling) return;
@@ -72,6 +75,7 @@ export function createDemoBar(document, {fetcher = fetch, onChange = async () =>
     if (!state || state.running || sending) return;
     sending = true;
     for (const id of ["demo-step", "demo-reset"]) document.getElementById(id).disabled = true;
+    onState({...state, running:true, action}); // C57: guide gets immediate shared busy feedback.
     try {
       const response = await fetcher(`/api/v1/demo/${action}`, {method: "POST", cache: "no-store"});
       if (response.status === 202) {show(await response.json()); return follow();}
@@ -90,11 +94,12 @@ export function createDemoBar(document, {fetcher = fetch, onChange = async () =>
       } catch {
         // No demo bar in live mode or when the server does not provide one.
         bar.hidden = true; bar.innerHTML = ""; state = null;
+        onState(null); // C57: clear stale guidance when the demo API disappears.
         return null;
       }
     },
     step: () => send("step"),
-    reset: () => send("reset"),
+    reset, // C57: reuse confirmation, request handling and polling.
     get state() {return state;},
   };
 }

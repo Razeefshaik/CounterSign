@@ -4,6 +4,7 @@ import {incidentTable, incidentTitle, ownerCallout, esc} from "./views.mjs";
 import {action as actionWord, state as stateWord, tone, when} from "./words.mjs";
 import {createWorkspaceViews} from "./workspace.mjs";
 import {createDemoBar} from "./demo.mjs";
+import {createGuide} from "./guide.mjs"; // C57
 // C49: loaded on demand when the incident desk is opened.
 import {mountGrid, incidentRows} from "./grid.mjs";
 
@@ -68,9 +69,11 @@ $("theme").addEventListener("click", () => {
   try {localStorage.setItem("countersign-theme", theme);} catch {}
 });
 const demo = createDemoBar(document, {
-  onState: state => {demoState = state; document.body.classList.toggle("demo-running", Boolean(state?.running)); showClock(); showBanner();},
+  onState: (state, notice) => {demoState = state; document.body.classList.toggle("demo-running", Boolean(state?.running)); showClock(); showBanner(); guide.update(state, notice);}, // C57
   onChange: () => refresh(),
 });
+// C57: shared guarded commands; guidance never sends its own requests.
+const guide = createGuide(document, {step:() => demo.step(), reset:() => demo.reset()});
 // Every route starts at the top; #incidents also names a section, which would scroll.
 window.addEventListener("hashchange", () => {window.scrollTo({top: 0}); views.render();});
 if (location.hash === "#incidents") requestAnimationFrame(() => window.scrollTo({top: 0}));
