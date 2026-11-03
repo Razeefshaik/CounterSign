@@ -2,12 +2,12 @@
   "checks": [
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-23/D1/02_balance_snapshot.json",
         "value": "2026-10-23T13:40:37.966389Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-23/D1/01_oauth_token.json",
         "value": "2026-10-23T13:40:36.547626Z"
       },
@@ -56,12 +56,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D2/62_money_in_balance.json",
         "value": "2026-10-24T09:23:48.938594Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-23/D2/01_oauth_token.json",
         "value": "2026-10-23T21:29:55.946495Z"
       },
@@ -255,12 +255,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D3/03_payout_balance.json",
         "value": "2026-10-24T06:58:02.890182Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-23/D3/01_oauth_token.json",
         "value": "2026-10-23T22:16:12.445380Z"
       },
@@ -359,12 +359,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D4/49_unclaimed_balance.json",
         "value": "2026-10-24T08:27:49.249199Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D4/01_oauth_token.json",
         "value": "2026-10-24T06:58:06.186013Z"
       },
@@ -544,12 +544,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-26/D5/03_uncancelled_control.json",
         "value": "2026-10-26T11:55:56.130794Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D5/01_oauth_token.json",
         "value": "2026-10-24T12:15:37.782117Z"
       },
@@ -788,12 +788,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D6/70_e_confirm_linked_batch.json",
         "value": "2026-10-24T12:18:24.634059Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D6/01_oauth_token.json",
         "value": "2026-10-24T07:00:35.981441Z"
       },
@@ -1046,12 +1046,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D7/17_create_errpyo039.json",
         "value": "2026-10-24T06:58:29.953625Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D7/01_oauth_token.json",
         "value": "2026-10-24T06:58:13.388119Z"
       },
@@ -1251,12 +1251,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D8/167_hold_capture_spare_25.json",
         "value": "2026-10-24T09:40:20.512395Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-23/D8/01_oauth_token.json",
         "value": "2026-10-23T22:04:26.317481Z"
       },
@@ -1592,12 +1592,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D9/03_balance_snapshot.json",
         "value": "2026-10-24T12:15:39.245030Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D9/01_oauth_token.json",
         "value": "2026-10-24T12:15:37.792619Z"
       },
@@ -1666,12 +1666,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-26/D10/06_release_balance.json",
         "value": "2026-10-26T11:55:45.792780Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D10/01_oauth_token.json",
         "value": "2026-10-24T12:17:02.777939Z"
       },
@@ -1911,12 +1911,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-26/D11/54_verify_signature.json",
         "value": "2026-10-26T15:15:43.492271Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-23/D11/01_oauth_token.json",
         "value": "2026-10-23T21:28:47.379727Z"
       },
@@ -2318,12 +2318,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-26/D12/37_balance_snapshot.json",
         "value": "2026-10-26T14:51:13.764060Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-23/D12/01_oauth_token.json",
         "value": "2026-10-23T22:04:26.265655Z"
       },
@@ -2608,12 +2608,12 @@
     },
     {
       "date_end": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D13/02_balance_snapshot.json",
         "value": "2026-10-24T06:58:34.052795Z"
       },
       "date_start": {
-        "pointer": "/t_recv or /t_sent",
+        "pointer": "/t_recv",
         "source": "recordings/sandbox/2026-10-24/D13/01_oauth_token.json",
         "value": "2026-10-24T06:58:33.596559Z"
       },

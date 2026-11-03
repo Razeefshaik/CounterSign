@@ -202,7 +202,7 @@ def build(root=ROOT):
             ).append(source)
             timestamp = record.get("t_recv") or record.get("t_sent")
             if timestamp:
-                dates.append((timestamp, source))
+                dates.append((timestamp, source, "/t_recv" if record.get("t_recv") else "/t_sent"))
             debug = record.get("response_headers", {}).get("paypal-debug-id")
             if debug and len(debug_ids) < 3 and debug not in [f["value"] for f in debug_ids]:
                 debug_ids.append(fact(debug, source, "/response_headers/paypal-debug-id"))
@@ -248,8 +248,8 @@ def build(root=ROOT):
         }
         if dates:
             first, last = min(dates), max(dates)
-            check["date_start"] = fact(first[0], first[1], "/t_recv or /t_sent")
-            check["date_end"] = fact(last[0], last[1], "/t_recv or /t_sent")
+            check["date_start"] = fact(first[0], first[1], first[2])
+            check["date_end"] = fact(last[0], last[1], last[2])
         if check_id == "D11":
             check["verification_results"] = verified
             check["verification_counts"] = aggregate(
