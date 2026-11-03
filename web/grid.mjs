@@ -83,6 +83,8 @@ export function makerRows(makers, model) {
   });
 }
 
+export const makerFilter = (rows, requested) => rows.some(row => row.state === requested) ? requested : "all";
+
 const incidentCell = p => `<strong>${esc(p.value)}</strong><span class="cs-grid-sub">${esc(p.data.kind)}${p.data.goal ? ' <span class="staged">demo goal</span>' : ""}${p.data.staged ? ' <span class="staged">staged</span>' : ""}</span>`;
 const decisionLink = p => {
   const id = p.data?.decision_id;

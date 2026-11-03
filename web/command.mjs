@@ -7,7 +7,7 @@ import {weekDays} from "./words.mjs";
 import {esc} from "./views.mjs";
 import {bannerText} from "./data.mjs";
 // C49: keep four-maker cards; enhance only the larger maker table.
-import {mountGrid, makerRows} from "./grid.mjs";
+import {mountGrid, makerRows, makerFilter as activeMakerFilter} from "./grid.mjs";
 
 const optional = promise => promise.catch(() => null);
 
@@ -108,12 +108,13 @@ export function createCommand(document, fetcher = fetch) {
     if (host) {
       host.dataset.c49Grid = "makers";
       const rows = makerRows(data.makers, model);
+      const active = activeMakerFilter(rows, makerFilter); // C49: match makerList's empty-filter reset.
       mountGrid(host, "makers", rows, {onOpen:row => openDialog("maker:" + row.id)}).then(handle => {
         if (!host.isConnected) {handle?.destroy(); return;}
         makerGrid = handle;
         if (handle?.api) {
           table.querySelector(".table-footer").hidden = true;
-          if (makerFilter !== "all") {handle.api.setFilterModel({state:{filterType:"text", type:"equals", filter:makerFilter}});}
+          if (active !== "all") {handle.api.setFilterModel({state:{filterType:"text", type:"equals", filter:active}});}
         }
       });
     }
@@ -180,7 +181,7 @@ export function createCommand(document, fetcher = fetch) {
     drawDialog();
     if (!dialog.open) dialog.showModal();
     // C49: only the selected extra maker needs another graph read.
-    if (!Object.hasOwn(data.graphs, maker.id) && currentClient) {
+    if (!ownGraph && currentClient) {
       const ticket = serial;
       dlg.loading = true; drawDialog();
       optional(currentClient.singleton("money-graph", {maker_id:maker.id})).then(graph => {

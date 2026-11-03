@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {readFile} from "node:fs/promises";
-import {incidentRows, auditRows, runRows, runTotal, makerRows, columnDefs, gridOptions, stateTone, moneyText, loadVendor, mountGrid, auditToolbar} from "../grid.mjs";
+import {incidentRows, auditRows, runRows, runTotal, makerRows, makerFilter, columnDefs, gridOptions, stateTone, moneyText, loadVendor, mountGrid, auditToolbar} from "../grid.mjs";
 import {sceneModel} from "../scene.mjs";
 import {isStaged} from "../data.mjs";
 const fixture = async name => JSON.parse(await readFile(new URL(`../fixtures/${name}.json`, import.meta.url)));
@@ -84,6 +84,9 @@ test("makers use all API records, preserve state keys for filters, and never for
   const many = Array.from({length:22}, (_, i) => ({...makers[1], id:"m" + i}));
   assert.equal(makerRows(many, sceneModel({makers:many})).length, 22);
   assert.equal(makerRows([{...makers[0], reserved:null}], sceneModel({makers:[makers[0]]}))[0].held_minor, null);
+  assert.equal(makerFilter(rows, "ask"), "ask");
+  assert.equal(makerFilter(rows.map(row => ({...row, state:"paid"})), "ask"), "all");
+  assert.equal(makerFilter(rows, "unknown-filter"), "all");
 });
 
 test("untrusted API text and link ids are escaped and emails masked by every custom renderer", () => {

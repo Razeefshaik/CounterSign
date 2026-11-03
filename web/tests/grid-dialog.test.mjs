@@ -16,7 +16,7 @@ function documentDouble() {
   return {getElementById:id => elements.get(id) || null, querySelectorAll:() => [], querySelector:() => null};
 }
 const workspace = {fixture:true, meta:{mode:"demo", simulated:true, simulation_label:"Simulated: mock PayPal"}};
-const open = doc => doc.getElementById("folios").onclick({target:{closest:selector => selector === "[data-node]" ? {dataset:{node:"maker:maker-6"}} : null}});
+const open = (doc, id = "maker-6") => doc.getElementById("folios").onclick({target:{closest:selector => selector === "[data-node]" ? {dataset:{node:"maker:" + id}} : null}});
 
 test("a maker outside the first six loads its own graph, rejects a wrong root and can retry", async () => {
   const doc = documentDouble(), reads = []; let resolveGraph;
@@ -42,4 +42,21 @@ test("a maker outside the first six loads its own graph, rejects a wrong root an
   resolveGraph(graph("maker-6")); await new Promise(resolve => setImmediate(resolve));
   assert.match(doc.getElementById("md-stage").innerHTML, /<svg/);
   assert.equal(reads.filter(id => id === "maker-6").length, 2);
+});
+
+test("a failed initial graph read for one of the first six is retried when its dialog opens", async () => {
+  const doc = documentDouble(), calls = new Map();
+  const client = {
+    list:async resource => resource === "makers" ? makers : [],
+    singleton:async (resource, params) => {
+      if (resource !== "money-graph") return null;
+      const count = (calls.get(params.maker_id) || 0) + 1; calls.set(params.maker_id, count);
+      return count === 1 ? null : graph(params.maker_id);
+    },
+  };
+  await createCommand(doc).show(workspace, client);
+  open(doc, "maker-0");
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(calls.get("maker-0"), 2);
+  assert.match(doc.getElementById("md-stage").innerHTML, /<svg/);
 });
