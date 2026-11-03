@@ -337,6 +337,13 @@ async def test_approval_uses_its_own_cash_reservation_once(world):
 async def test_demo_owner_reject_returns_public_proposal_and_stale_http_code(world):
     database, _, _, _ = world
     _, proposal, _ = await planned(world)
+    # The API uses the real clock, so keep this request unexpired whatever today's date
+    # is; the wrong payload hash below must be what refuses it.
+    async with database.tx() as conn:
+        repo = Repositories(conn).proposals
+        details = (await repo.get(proposal["id"]))["verdict_details"]
+        details["approval_request"]["expires_at"] = (datetime.now(UTC) + timedelta(days=1)).isoformat()
+        await repo.update(proposal["id"], verdict_details=details)
     app = FastAPI()
     app.include_router(
         owner.build_router(database, Settings("postgresql://fake:fake@localhost/fake")),
