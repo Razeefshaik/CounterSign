@@ -85,7 +85,11 @@ injection and blocked), and a valid-looking proposal to pay an already settled l
 - **MCP gateway** on the official MCP Python SDK; **passkeys** with WebAuthn,
   verified server-side.
 - **Dashboard:** plain ES modules with **AG Grid Community** for the incident desk,
-  execution history, payout runs and makers, in a light and dark glass theme.
+  execution history, payout runs and makers, in a light and dark glass theme. An AG
+  Grid explorer slices all 480 evaluation runs: presets, system filters, multi-column
+  sort, totals for the current filter and CSV export.
+- **A guided start** for first-time visitors: one button plays the staged week, and a
+  hint after each step says what happened and where to look.
 - **Evaluation:** 48 fault scenarios × 5 runs, comparing CounterSign with a rules-only
   workflow on the mock.
 
@@ -137,7 +141,7 @@ webauthn, ag-grid, docker, render, javascript
 
 ## Try it out (links)
 
-- Live demo: ‹HOSTED URL› (press **Next step** to play the week)
+- Live demo: ‹HOSTED URL› (press **Start the week**, then **Next step**)
 - Source code: https://github.com/Razeefshaik/CounterSign
 - Sandbox proof: ‹HOSTED URL›/#proof
 
@@ -152,11 +156,12 @@ From `docs/media/submission/`:
 1. `01-command-center-light.png`: the weekly run waits for the owner's signature.
 2. `02-decision-passkey.png`: 10 named checks, the exact payload hash, Countersign with passkey.
 3. `04-sandbox-proof.png`: 13 checks on the real PayPal sandbox, each linked to its recording.
-4. `03-incident-desk-ag-grid.png`: the incident desk in AG Grid.
-5. `05-maker-dialog.png`: one maker's money map.
-6. `06-execution-history-ag-grid.png`: what the AI proposed and what the shield said.
-7. `01-command-center-dark.png`: the dark theme.
-8. `07-phone.png`: phone layout.
+4. `08-evaluation-explorer-ag-grid.png`: all 480 evaluation runs in AG Grid, zero in every invariant.
+5. `03-incident-desk-ag-grid.png`: the incident desk in AG Grid.
+6. `05-maker-dialog.png`: one maker's money map.
+7. `06-execution-history-ag-grid.png`: what the AI proposed and what the shield said.
+8. `01-command-center-dark.png`: the dark theme.
+9. `07-phone.png`: phone layout.
 
 ## If the form asks
 
@@ -178,8 +183,9 @@ separately.
 its first commit is dated Oct 23, 2026. AI coding agents helped write the code under
 written rules; every change was reviewed and tested before merging.
 
-**Testing instructions for judges.** Open the live demo, press **Next step** until step
-6, then open **Review and sign** to see the shield's checks and countersign with a
-passkey. Or run it locally with one Docker command (README, "Try it in a minute"). No
+**Testing instructions for judges.** Open the live demo and press **Start the week**,
+then **Next step** until step 6; a hint after each step says where to look. At step 6
+open **Review and sign** to see the shield's checks and countersign with a passkey.
+**Evaluation replay** lets you slice all 480 evaluation runs in AG Grid. Or run it locally with one Docker command (README, "Try it in a minute"). No
 accounts or keys are needed; the demo runs on a bundled PayPal mock and says so on
 every screen.

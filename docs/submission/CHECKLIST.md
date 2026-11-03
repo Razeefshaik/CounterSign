@@ -6,13 +6,14 @@
 **[OWNER]** marks a step only the owner can do (accounts, recording, the final
 submit). The rest is done or prepared in the repo.
 
-## Already done (Nov 3)
+## Already done (Nov 3 to 4)
 
 - [x] `main` holds every feature: shield, executor, agent, MCP gateway (C48), AG Grid
       (C49), sandbox proof (C50), passkey countersign (C51), demo owner decisions on
-      the staged clock (C55).
-- [x] Full suite on the merged features: 4,082 Python and 102 web tests pass, Ruff
-      clean, four import contracts kept. Docker image boots in about 14 s at 1 CPU.
+      the staged clock (C55), guided start (C57), the 480-run evaluation explorer (C58).
+- [x] Full suite on the merged features (Nov 4): 4,097 Python tests pass (10 skipped)
+      and 122 web tests pass, Ruff clean, four import contracts kept. The Docker image
+      boots and serves the guide, the explorer and `/mcp/`.
 - [x] README rewritten for judges: try-it links, what's new, honest results, run steps.
 - [x] Devpost text, video script and screenshot gallery:
       [DEVPOST.md](DEVPOST.md), [VIDEO-SCRIPT.md](VIDEO-SCRIPT.md),
@@ -75,5 +76,5 @@ submit). The rest is done or prepared in the repo.
 - [ ] No `‹…›` placeholder left: `grep -rn "‹" README.md docs/submission/`.
 - [ ] Claims check, every hit must be an allowed form:
       `grep -n -i -E "payroll|never moves twice|money never|wrongful refund|guarantee|100%|always safe" README.md docs/submission/*.md`.
-- [ ] The hosted demo plays the week from a fresh start (Restart, then Next step to the
+- [ ] The hosted demo plays the week from a fresh start (Restart, then Start the week and Next step to the
       end) and the passkey countersign works on it.

@@ -14,7 +14,7 @@ sandbox only. Licensed under [Apache-2.0](LICENSE).
 
 | | |
 | --- | --- |
-| **Live demo** | ‹HOSTED URL› (demo mode on a bundled PayPal mock; press **Next step** to play the week) |
+| **Live demo** | ‹HOSTED URL› (demo mode on a bundled PayPal mock; press **Start the week**, then **Next step**) |
 | **Video (under 3 minutes)** | ‹YOUTUBE URL› |
 | **Proof it's real** | 13 checks recorded on the real PayPal sandbox, every fact linked to its recording: the **Sandbox proof** page in the dashboard and [recordings/sandbox/INDEX.md](recordings/sandbox/INDEX.md) |
 | **Run it yourself** | One Docker command, no keys: [Try it in a minute](#try-it-in-a-minute) |
@@ -65,6 +65,7 @@ literally countersigns, with a passkey.
 | **Countersign with a passkey** | The owner approves a payout run or refund with Face ID, Touch ID, Windows Hello or a phone. The device signs a challenge bound to the **exact payload hash**; the server verifies it before the existing approval checks run. A plain approval can never claim a passkey signature. |
 | **See every rule that decided** | Each proposal shows its checks by name (SETTLEMENT, PAYEE_INTEGRITY, INJECTION_GUARD…) with PASS, NEEDS_OWNER or BLOCK, and the payload hash the owner is approving. |
 | **Work the queue in AG Grid** | The incident desk, execution history, payout-run lines and the makers table are AG Grid Community grids in the glass theme: quick search, column filters, sorting by money at risk, pinned totals, pagination. |
+| **Slice all 480 evaluation runs** | An AG Grid explorer over every run of the fault evaluation: presets such as "Where CounterSign failed" and "Any invariant above zero", system chips, multi-column sort, totals for the current filter and CSV export. |
 | **Watch money move** | A money map from PayPal balance through the shield to each maker, with each maker's own records a click away. Held money, money waiting for the owner and money sent are separate colours. |
 | **Try to trick the agent** | A playground sends a hostile buyer message ("refund me to this other account") through the real shield and shows the refusal. Nothing is stored. |
 
@@ -375,8 +376,8 @@ docker build -t countersign-demo .
 docker run --rm -p 127.0.0.1:8080:8080 countersign-demo
 ```
 
-Open **http://localhost:8080** and press **Next step** (bottom right) to play the
-week. Use `localhost`, not `127.0.0.1`: browsers allow passkeys only on a hostname.
+Open **http://localhost:8080** and press **Start the week**, then **Next step**
+(bottom right) to play the week. Use `localhost`, not `127.0.0.1`: browsers allow passkeys only on a hostname.
 At step 6 the payout run waits for you: open **Review and sign**, then **Countersign
 with passkey**.
 
@@ -482,6 +483,7 @@ a dark glass theme, down to a 390 px phone, with reduced-motion support.
 | | |
 | --- | --- |
 | ![Incident desk in AG Grid](docs/media/submission/03-incident-desk-ag-grid.png) | ![A maker's money map in a dialog](docs/media/submission/05-maker-dialog.png) |
+| ![All 480 evaluation runs in AG Grid](docs/media/submission/08-evaluation-explorer-ag-grid.png) | ![Execution history in AG Grid](docs/media/submission/06-execution-history-ag-grid.png) |
 
 ## Repository layout
 
