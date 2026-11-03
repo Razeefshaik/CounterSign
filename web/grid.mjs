@@ -158,6 +158,7 @@ export async function mountGrid(host, view, rows, options = {}) {
   host.dataset.gridState = "loading";
   const library = await vendorLoader(document);
   if (disposed || !host.isConnected || mounted.get(host)?.token !== token) return null;
+  if (settings.isActive?.() === false) {handle.destroy(); host.dataset.gridState = "idle"; return null;}
   if (!library?.createGrid) {
     host.dataset.gridState = "fallback";
     note = document.createElement("p"); note.className = "source-note";

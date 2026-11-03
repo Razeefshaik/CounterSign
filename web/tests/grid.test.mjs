@@ -140,3 +140,12 @@ test("a vendor initialization exception restores the original table", async () =
   const handle = await mountGrid(host, "incidents", [], {vendorLoader:async () => ({createGrid:() => {throw Error("Unavailable renderer");}})});
   assert.equal(handle, null); assert.equal(original.hidden, false); assert.equal(host.dataset.gridState, "fallback");
 });
+
+test("a still-connected incident host left during loading is not enhanced off route", async () => {
+  const {host, original} = fakeHost(); let release, active = true, created = false;
+  const pending = new Promise(resolve => {release = resolve;});
+  const mounting = mountGrid(host, "incidents", [], {isActive:() => active, vendorLoader:() => pending});
+  active = false; release({createGrid:() => {created = true;}});
+  assert.equal(await mounting, null); assert.equal(created, false);
+  assert.equal(original.hidden, false); assert.equal(host.dataset.gridState, "idle");
+});

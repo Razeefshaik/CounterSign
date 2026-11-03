@@ -21,7 +21,8 @@ async function showIncidentGrid() {
   const filtered = filterIncidents(source.incidents, {state: $("state").value, kind: $("kind").value});
   const host = $("incident-list"); host.dataset.c49Grid = "incidents";
   incidentGrid?.destroy();
-  incidentGrid = await mountGrid(host, "incidents", incidentRows(filtered, {makers, disputes:source.disputes, staged:row => isStaged(row, source.disputes)}), {
+  const handle = await mountGrid(host, "incidents", incidentRows(filtered, {makers, disputes:source.disputes, staged:row => isStaged(row, source.disputes)}), {
+    isActive:() => ticket === incidentGridSerial && location.hash.split("/")[0] === "#incidents",
     quickFilterText:$("search").value, onOpen:row => inspect(source.incidents.find(item => item.id === row.id)),
     onFilterChanged:event => {
       const count = event.api.getDisplayedRowCount(); $("result-count").textContent = count; $("table-note").textContent = `${count} of ${source.incidents.length} incidents`;
@@ -32,6 +33,9 @@ async function showIncidentGrid() {
       else {$("detail-title").textContent = "No incidents match these filters"; $("detail-text").textContent = "Clear a filter or try another search."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
     },
   });
+  // C49: navigation can happen while the vendor bundle is still loading.
+  if (ticket !== incidentGridSerial || location.hash.split("/")[0] !== "#incidents") handle?.destroy();
+  else incidentGrid = handle;
 }
 window.addEventListener("hashchange", () => {
   if (location.hash.split("/")[0] === "#incidents") showIncidentGrid();
