@@ -489,6 +489,7 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | Give the owner HTTP approval test the same frozen clock as its staged fixture | C47 full-suite failure | Accept | Wall time expired the November 2 approval before the intended stale-hash and public-rejection assertions; production expiry checks stay unchanged |
+| Serve dashboard WebP files explicitly as image/webp | C47 image asset probes | Accept | The slim Linux image returned application/octet-stream for all seven WebPs despite serving their bytes correctly; asset headers must not depend on the host MIME database |
 
 ## Nov 3 C46 compact demo controls
 

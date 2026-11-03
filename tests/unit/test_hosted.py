@@ -120,3 +120,30 @@ async def test_hosted_app_serves_dashboard_and_api_without_workers():
         assert missing.json() == {"error": {"code": "NOT_FOUND", "message": "Resource not found"}}
     # Lifespan exit restores the original routes, including the static mount.
     assert not any(getattr(route, "name", None) == "web" for route in app.router.routes)
+
+
+@pytest.mark.asyncio
+async def test_hosted_webp_headers_do_not_depend_on_the_platform_mime_table(monkeypatch):
+    # The slim Linux image can lack WebP entries in its system MIME database.
+    monkeypatch.setattr("starlette.responses.guess_type", lambda _: (None, None))
+    fake = NoNetwork()
+    app = create_hosted_app(
+        settings=Settings(DATABASE),
+        database=SimpleNamespace(),
+        http=fake,
+        reader=fake,
+        verifier=fake,
+    )
+    assets = (
+        "backdrop-blue.webp", "backdrop-night.webp", "hero-blue.webp", "hero-pink.webp",
+        "hero-loop-blue.webp", "hero-loop-pearl.webp", "milestone-blue.webp",
+    )
+    async with (
+        app.router.lifespan_context(app),
+        httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+    ):
+        responses = [(asset, await client.get(f"/assets/{asset}")) for asset in assets]
+    for asset, response in responses:
+        assert response.status_code == 200, asset
+        assert response.headers["content-type"] == "image/webp", asset
+        assert response.content[:4] == b"RIFF" and response.content[8:12] == b"WEBP"
