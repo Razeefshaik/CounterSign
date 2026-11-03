@@ -35,6 +35,54 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C58 evaluation explorer (Nov 3)
+
+Source: owner-invoked Downloads `CODEX-PROMPT-C58-EVAL-EXPLORER.md`. Work only in
+`CounterSign-c58`, branch `razeef/c58-eval-explorer`, from upstream/main `97a464b`.
+Code commits `01656d3` (bundle/tests) and `dae163b` (explorer/integration).
+Evidence/docs commit, push and PR pending; integration/full pytest belong to Claude. Do not
+touch original checkout, other worktrees/databases, or ports 8180/8196.
+
+`scripts/bundle_eval_runs.py` publishes only its exact field allowlist from
+`eval/results/2026-10-27-model-none-c31/runs.jsonl` into
+`web/results/eval-runs.json`: exactly 480 cells, two systems, 48 scenarios each,
+five unique k values each. It validates before replacement, reuses C50's public
+guard plus known API-key patterns, and writes deterministic LF bytes protected
+by the appended local attributes rule. No new experiments or source result edits.
+Keep mock/model-none labels; CounterSign 170/240 and 34/48 pass^5, rules-only
+215/240 and 43/48; four measured invariant counters zero, not universal safety.
+
+New `web/eval-explorer.mjs`/`.css` reuse C49 `loadVendor` and vendored Community
+32.3.9, without Enterprise/dependencies. Explorer above existing `#replay` lanes
+has 14 columns, native filters, multi-column sorting, quick search, system chips,
+failing toggle, presets, filtered pinned totals, pagination25, movable/resizable
+columns and real filtered CSV export. Presets: failed CounterSign70; comparison30
+(both systems for two stale-approval cases and F_triage_buyer_declines_refund);
+invariant0 with explicit empty copy. Missing step traces open a metrics panel;
+existing replay selection/provenance remain separate. Shared inserts are minimal
+and fenced in root/web README, index, replay and workspace. Never edit styles.css.
+Scoped replay banner stacking uses z-index50, consistent with C50.
+
+Primary verified 18 new Python tests, all109 Node tests, Ruff clean and four
+import contracts kept/zero broken using the new C58 venv. No full
+pytest per explicit task instruction; do not relabel integration coverage as
+completed. Own `%TEMP%/countersign-c58-venv` supplies approved existing dev tools
+after old venv entrypoints were missing; no repository dependency/config changes.
+`scripts/c58_capture.mjs` follows C50's dependency-free headless CDP approach.
+Fixture preview8197 needs no DB and is deliberately left running, PID13108,
+for the owner's supplied URL; do not stop it. Actual browser evidence:
+`design-demos/reference/c58/browser.json`, 24 PNGs and downloads under
+`downloads/{light,dark,phone}/export.csv`. Light1440/dark1440/phone390 all use
+reduced motion, verify preset counts/pinned totals, metrics detail, existing trace
+and genuine70-row CSV downloads; the header excludes the pinned total row.
+No horizontal overflow, runtime exceptions,
+console warnings or non-GET requests. Primary reviewed screenshots and recaptured
+after final product code and the scoped banner fix (uncovered after all presets).
+`design-demos/reference/c58/README.md` records the full report and shared-file
+insertions. This is local historical fixture evidence, not a deployment,
+real-model evaluation or sandbox run. No .env/PayPal/model/DB access; original
+checkout unchanged except the owner-authorized Git fetch.
+
 ## C50 sandbox proof (Nov 3; ready for integration)
 
 Source: parent `prompts/codex/active/CODEX-PROMPT-C50-SANDBOX-PROOF.md` and

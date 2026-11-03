@@ -11,7 +11,37 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## Current state (Nov 3, after cleanup)
+## Current feature: C58 evaluation explorer (Nov 3)
+
+- Isolated worktree `CounterSign-c58`, branch `razeef/c58-eval-explorer`, base
+  upstream/main `97a464b`. Code commits: `01656d3` bundle/tests and `dae163b`
+  explorer/integration. Evidence/docs commit, push and PR are pending. The history
+  below describes earlier work; it does not establish current integration status.
+- Historical 480-run explorer is implemented above the existing `#replay` lanes,
+  using C49's vendored AG Grid Community 32.3.9. Deterministic allowlisted bundle
+  comes only from published `2026-10-27-model-none-c31/runs.jsonl`; labels say mock,
+  model disabled, and not real-model or sandbox evidence. Existing trace selection
+  remains separate; unavailable traces show metrics without invented steps.
+- Scores remain CounterSign **170/240**, **34/48 at 5/5**; rules-only **215/240**,
+  **43/48 at 5/5**; four measured invariant counts zero. Presets return 70 failed
+  CounterSign rows, 30 comparison rows and an honest empty invariant view.
+- Primary verified **18 focused Python passed**, **109 Node passed**, Ruff clean,
+  and **four import contracts kept, zero broken** in the dedicated C58 venv.
+  Full pytest is explicitly deferred to Claude integration. Actual fixture
+  browser evidence at `design-demos/reference/c58/`: light/dark 1440px and phone
+  390px, reduced motion, 24 PNGs, three genuine 70-row CSV downloads; no overflow,
+  runtime exceptions, console warnings or non-GET requests in `browser.json`.
+  Final Chrome capture follows final product code; the scoped banner stays
+  uncovered after every preset. CSV headers exclude the pinned total row.
+- Preview is deliberately **running on 8197, PID 13108** for the owner's URL;
+  leave it running. No database needed. No environment-file reads,
+  PayPal/model calls, dependencies or `styles.css` changes; 8180/8196 and other
+  databases/worktrees remain untouched; original checkout had only the authorized
+  Git fetch. Next: primary commits evidence/docs, pushes and records the PR, then
+  hands off for integration. Evidence README has the full report/shared inserts.
+  See C58 future notes.
+
+## Earlier integrated state (Nov 3, after cleanup)
 
 - `main` is `97ceea7` plus this note: C47 release check, C48 MCP gateway, C49 AG
   Grid, C50 sandbox proof and C51 passkey countersign are all merged. Full suite on
