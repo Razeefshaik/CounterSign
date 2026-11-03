@@ -1,0 +1,351 @@
+1
+00:00:00,560 --> 00:00:01,000
+Friday.
+
+2
+00:00:01,600 --> 00:00:02,040
+Nine A.M.
+
+3
+00:00:02,860 --> 00:00:05,480
+An AI agent has the keys to a marketplace's
+
+4
+00:00:05,540 --> 00:00:06,340
+PayPal account.
+
+5
+00:00:07,020 --> 00:00:09,320
+It's about to send fifteen hundred dollars...
+
+6
+00:00:10,020 --> 00:00:11,560
+and four hundred and fourteen of it...
+
+7
+00:00:11,980 --> 00:00:13,000
+is UNDER DISPUTE.
+
+8
+00:00:13,460 --> 00:00:15,780
+AI agents can now refund buyers...
+
+9
+00:00:16,200 --> 00:00:17,140
+accept disputes...
+
+10
+00:00:17,560 --> 00:00:18,720
+and send payouts.
+
+11
+00:00:19,480 --> 00:00:22,140
+Nothing in PayPal makes them ask a human first.
+
+12
+00:00:22,660 --> 00:00:24,780
+And a prompt that says "please confirm"...
+
+13
+00:00:25,200 --> 00:00:26,300
+is NOT a lock.
+
+14
+00:00:27,220 --> 00:00:28,640
+So we built the lock.
+
+15
+00:00:29,280 --> 00:00:29,980
+CounterSign.
+
+16
+00:00:30,580 --> 00:00:31,860
+The AI proposes.
+
+17
+00:00:32,280 --> 00:00:33,700
+The code countersigns.
+
+18
+00:00:34,927 --> 00:00:37,887
+Every proposal goes through a shield of sixteen named
+
+19
+00:00:37,987 --> 00:00:38,407
+rules.
+
+20
+00:00:38,826 --> 00:00:39,227
+Allow.
+
+21
+00:00:39,627 --> 00:00:40,007
+Block.
+
+22
+00:00:40,387 --> 00:00:41,367
+Or wait for the owner.
+
+23
+00:00:41,867 --> 00:00:42,547
+Only then...
+
+24
+00:00:42,827 --> 00:00:44,427
+does the executor call PayPal.
+
+25
+00:00:44,920 --> 00:00:47,840
+One staged week, on a PayPal mock built from
+
+26
+00:00:47,980 --> 00:00:49,420
+real sandbox recordings.
+
+27
+00:00:50,180 --> 00:00:50,560
+Monday.
+
+28
+00:00:51,140 --> 00:00:53,440
+A buyer disputes a four hundred dollar order.
+
+29
+00:00:53,980 --> 00:00:55,240
+PayPal freezes the money...
+
+30
+00:00:55,680 --> 00:00:57,880
+and CounterSign holds back the maker's share.
+
+31
+00:00:58,640 --> 00:00:59,160
+Thursday.
+
+32
+00:00:59,720 --> 00:01:01,500
+A payout is stuck on a typo.
+
+33
+00:01:01,960 --> 00:01:03,980
+The AI cancels it, on its own...
+
+34
+00:01:04,480 --> 00:01:06,200
+and waits for PayPal to confirm.
+
+35
+00:01:06,913 --> 00:01:07,373
+Friday.
+
+36
+00:01:07,933 --> 00:01:09,833
+The naive agent pays everyone...
+
+37
+00:01:10,253 --> 00:01:11,673
+disputed shares included.
+
+38
+00:01:12,493 --> 00:01:15,393
+CounterSign holds back four hundred and fourteen dollars...
+
+39
+00:01:15,833 --> 00:01:18,213
+and asks the owner for one exact run.
+
+40
+00:01:18,813 --> 00:01:20,693
+One thousand and eighty-six dollars.
+
+41
+00:01:21,107 --> 00:01:22,247
+Ten named checks.
+
+42
+00:01:22,887 --> 00:01:23,967
+One payload hash.
+
+43
+00:01:24,527 --> 00:01:26,207
+The owner signs it with a passkey...
+
+44
+00:01:26,667 --> 00:01:27,867
+on their own device.
+
+45
+00:01:28,387 --> 00:01:31,007
+A plain click can NEVER fake that signature.
+
+46
+00:01:31,527 --> 00:01:32,827
+Then we cut the network...
+
+47
+00:01:33,487 --> 00:01:35,386
+right after PayPal accepts the payout.
+
+48
+00:01:35,907 --> 00:01:38,487
+The executor retries, with the same keys.
+
+49
+00:01:38,987 --> 00:01:41,047
+PayPal points back to the original batch.
+
+50
+00:01:41,507 --> 00:01:42,307
+Exactly.
+
+51
+00:01:42,867 --> 00:01:43,127
+One.
+
+52
+00:01:43,627 --> 00:01:44,047
+Payment.
+
+53
+00:01:44,380 --> 00:01:45,920
+And it isn't just our agent.
+
+54
+00:01:46,480 --> 00:01:48,400
+CounterSign is an MCP server...
+
+55
+00:01:48,780 --> 00:01:50,620
+so any AI agent can plug in.
+
+56
+00:01:51,240 --> 00:01:53,960
+Here, one is tricked into refunding a buyer to
+
+57
+00:01:54,000 --> 00:01:55,120
+a stranger's account.
+
+58
+00:01:55,680 --> 00:01:56,060
+Blocked.
+
+59
+00:01:56,540 --> 00:01:57,960
+Three rules, named.
+
+60
+00:01:58,400 --> 00:01:59,080
+Nothing sent.
+
+61
+00:01:59,380 --> 00:02:00,800
+And this is no mockup.
+
+62
+00:02:01,120 --> 00:02:02,520
+This is the real build,
+
+63
+00:02:02,780 --> 00:02:04,760
+on PayPal's real APIs.
+
+64
+00:02:05,220 --> 00:02:05,700
+Payouts.
+
+65
+00:02:05,880 --> 00:02:06,480
+Disputes.
+
+66
+00:02:06,740 --> 00:02:07,140
+Orders.
+
+67
+00:02:07,360 --> 00:02:07,880
+Webhooks.
+
+68
+00:02:08,280 --> 00:02:09,640
+PayPal's Agent Toolkit...
+
+69
+00:02:09,940 --> 00:02:11,780
+with every write tool switched off.
+
+70
+00:02:12,200 --> 00:02:13,820
+Google Gemini reads the mess.
+
+71
+00:02:14,160 --> 00:02:15,180
+The code decides.
+
+72
+00:02:15,580 --> 00:02:16,720
+And every single run...
+
+73
+00:02:16,980 --> 00:02:19,320
+is yours to slice, in AG Grid.
+
+74
+00:02:19,880 --> 00:02:23,060
+Every PayPal assumption was tested on the real sandbox
+
+75
+00:02:23,160 --> 00:02:23,540
+first.
+
+76
+00:02:24,140 --> 00:02:25,100
+Thirteen checks.
+
+77
+00:02:25,580 --> 00:02:27,380
+Over a thousand recorded calls.
+
+78
+00:02:28,140 --> 00:02:29,440
+Four assumptions were wrong...
+
+79
+00:02:29,960 --> 00:02:32,100
+so the design changed to match PayPal.
+
+80
+00:02:32,480 --> 00:02:34,020
+Forty-eight fault scenarios.
+
+81
+00:02:34,440 --> 00:02:35,300
+Five runs each.
+
+82
+00:02:35,920 --> 00:02:37,260
+Zero duplicate settlements.
+
+83
+00:02:37,760 --> 00:02:39,460
+Zero refunds without the owner.
+
+84
+00:02:39,920 --> 00:02:42,200
+Zero payments to an unverified payee.
+
+85
+00:02:42,787 --> 00:02:44,487
+AI can move money now.
+
+86
+00:02:45,427 --> 00:02:47,367
+CounterSign makes sure it asks first.
+
+87
+00:02:47,927 --> 00:02:49,127
+The AI proposes.
+
+88
+00:02:49,507 --> 00:02:50,927
+The code countersigns.

@@ -12,7 +12,7 @@ submit). The rest is done or prepared in the repo.
       (C49), sandbox proof (C50), passkey countersign (C51), demo owner decisions on
       the staged clock (C55), guided start (C57), the 480-run evaluation explorer (C58).
 - [x] Full suite on the merged features (Nov 4): 4,097 Python tests pass (10 skipped)
-      and 122 web tests pass, Ruff clean, four import contracts kept. The Docker image
+      and 124 web tests pass, Ruff clean, four import contracts kept. The Docker image
       boots and serves the guide, the explorer and `/mcp/`.
 - [x] README rewritten for judges: try-it links, what's new, honest results, run steps.
 - [x] Devpost text, video script and screenshot gallery:
@@ -49,9 +49,8 @@ submit). The rest is done or prepared in the repo.
 
 ## 3. Video [OWNER]
 
-- [ ] Record from [VIDEO-SCRIPT.md](VIDEO-SCRIPT.md): under 3:00 (target 2:45),
-      "Simulated: mock PayPal" visible on every demo shot, no unlicensed music.
-- [ ] Upload to YouTube as **Public**; open the link while logged out.
+- [ ] Watch the final cut (2:52) and approve it: "Simulated" labels on demo scenes, no unlicensed music.
+- [ ] Upload to YouTube as **Public** using [YOUTUBE.md](YOUTUBE.md), with [countersign-captions.srt](countersign-captions.srt) as the captions; open the link while logged out.
 - [ ] Replace `‹YOUTUBE URL›` in `README.md` and `DEVPOST.md` (Claude can do this).
 
 ## 4. Devpost form [OWNER]

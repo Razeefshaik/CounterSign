@@ -115,7 +115,7 @@ injection and blocked), and a valid-looking proposal to pay an already settled l
   wait rather than act on both the "refund to another account" bait and the
   settled-retry bait.
 - **A design shaped by recorded sandbox evidence**, with every design change logged with
-  a one-line reason, and **4,082 automated tests** passing.
+  a one-line reason, and **4,097 Python and 124 web tests** passing.
 
 ### What we learned
 
@@ -132,6 +132,25 @@ injection and blocked), and a valid-looking proposal to pay an already settled l
 - Policies the owner can tune (refund limits, autonomy per action), partial refunds and
   more dispute types, multi-currency.
 - Publish the gateway as a drop-in "approval layer" for PayPal's hosted MCP server.
+
+## Tools used, and how
+
+- **PayPal Payouts, Disputes, Orders v2, Payments v2, shipment tracking, Reporting and Webhooks (sandbox):** everything the product reads and, through one write adapter only the executor may import, everything it writes.
+- **PayPal Agent Toolkit:** the agent's five read-only tools behind an exact allowlist. Write tools are never enabled.
+- **Google Gemini, through LangChain:** the Incident Commander. It reads buyer messages, dispute details and tracking, flags injection and returns one structured proposal. It never executes anything. A real Gemini week is recorded on the mock; the demo uses a labelled scripted model.
+- **Model Context Protocol (official Python SDK):** the gateway that lets any AI agent read and propose under the same rules.
+- **AG Grid Community:** the incident desk, execution history, payout runs, makers and an explorer over all 480 evaluation runs.
+- **Render:** the one-click `render.yaml` blueprint for the hosted demo.
+- **WebAuthn (py_webauthn):** passkey countersigns, verified on the server.
+- **AI coding agents:** helped write the code under written rules; every change was reviewed and tested before merging.
+
+## Evidence against each judging criterion
+
+- **Technological implementation:** 16 pure-function rules, a write-ahead executor, state machines with compare-and-swap, four import contracts, and 4,097 Python and 124 web tests.
+- **Design:** a light and dark glass dashboard, a guided start, plain-English decisions and a phone layout.
+- **Potential impact:** PayPal does not make an agent ask a human before merchant-side money actions. This gives any merchant or marketplace using agents a boundary, and any MCP agent can connect to it.
+- **Innovation:** model output is treated as untrusted input, and the owner signs the exact payload with a passkey.
+- **Presentation:** a video under 3 minutes, a guided demo, and every figure traceable to a committed result or recording.
 
 ## Built with
 
