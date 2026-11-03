@@ -35,6 +35,42 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C50 sandbox proof (Nov 3; ready for integration)
+
+Source: parent `prompts/codex/active/CODEX-PROMPT-C50-SANDBOX-PROOF.md` and
+parallel rules. Worktree CounterSign-c50, branch `razeef/c50-sandbox-proof`, base
+`454d2cc`; preview port 8193, reserved database countersign_c50 (unused).
+Commits `24a47c0` builder/bundle/tests, `88c1ead` proof UI/capture and `27076c8`
+docs/screenshots are pushed. Preview stopped; no merge to main. Final context
+handoff is in branch history. The artifact's local attributes preserve LF bytes.
+
+`scripts/build_sandbox_proof.py` deterministically builds the committed
+`web/results/sandbox-proof.json` from redacted recordings and findings. Facts
+carry source paths/pointers, with a refusal guard for credentials/emails. Counts:
+13 checks, 1041 numbered attempts = 1007 HTTP responses + 34 transport errors;
+47 SUCCESS signature verifications = 46 delivery checks + simulator; six unique
+SUCCESS payout items (exclude D7 negative fixtures) and three settled disputes.
+The real Gemini week is mock evidence, COMPLETE_WITH_GAPS; injection and settled
+retry chose WAIT, so do not invent shield BLOCKs. Tracking is merchant-uploaded;
+already-available capture disputes remain untested, transaction-search lag blocked.
+
+New proof.mjs/proof.css render `#proof` in the existing glass theme, with fixed
+GitHub source links and keyboard disclosures. Actual routing lives in
+web/workspace.mjs, not app.mjs; integration is minimal and fenced. Proof-scoped
+stacking fixes inherited sticky-header overlap; styles.css is untouched.
+
+Primary verification: **14 Python passed in 11.26s** (13 builder tests plus one
+existing results-bundle regression), **81 Node passed**, Ruff clean, four import
+contracts kept. Nine screenshots in `design-demos/reference/c50/` cover light,
+dark and 390px top/D6-expanded/model views. Three viewport checks confirmed no
+horizontal overflow/runtime exceptions, native keyboard Enter disclosure, fixed
+source URLs, visible h1 and an uncovered simulation banner after scrolling.
+Generic inspector flags inherited glass/chrome and its first-hidden-h1 probe;
+the targeted visible-heading assertion passes. Do not claim a universal inspector
+pass. No full pytest per explicit owner preference for fast targeted checks.
+No environment-file reads, PayPal/model/database calls, backend/shield/executor,
+contract or dependency changes. Finish docs/evidence commit, push and hand off.
+
 ## C48 MCP gateway (Nov 3; ready for Claude review)
 
 Source: parent PayPalDevPost `prompts/codex/active/CODEX-PROMPT-C48-MCP-GATEWAY.md`

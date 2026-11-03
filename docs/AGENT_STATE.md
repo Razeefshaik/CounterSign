@@ -62,6 +62,27 @@ staged, sandbox and real-model evidence stay distinct.
   validate the combined main, then Render **New > Blueprint** as documented.
   Do not deploy combined main on C47-only proof. No rebase/new suite performed.
 
+### C50 sandbox proof (Nov 3; ready for integration)
+
+- Worktree `CounterSign-c50`, branch `razeef/c50-sandbox-proof`, base `454d2cc`.
+  Commits `24a47c0` (builder/bundle/tests), `88c1ead` (proof UI/capture).
+  Docs/evidence commit `27076c8` is pushed with both feature commits; no merge
+  to main. Preview stopped. Final context handoff is in this branch's history.
+- Deterministic source-linked bundle powers `#proof`: 13 checks, 1041 recorded
+  attempts, 1007 responses, 34 transport errors, 47 successful signature checks
+  (46 delivery checks plus simulator), six unique SUCCESS payout items and three
+  settled disputes. Real Gemini week is separately labelled mock, with WAIT
+  choices and missing shield-block moments retained.
+- Primary verified **14 Python passed** (13 builder plus existing bundle
+  regression), **81 Node passed**, Ruff clean, four import contracts kept.
+  Nine screenshots and three viewport checks cover light/dark/390px, keyboard
+  disclosure, source links, visible heading/banner, no overflow/runtime errors.
+  Evidence: `design-demos/reference/c50/`. No universal inspector pass claimed.
+- Routing uses `web/workspace.mjs`; scoped proof CSS fixes sticky-header overlap.
+  Existing glass theme retained. No backend/contracts/dependencies changes or
+  environment-file, PayPal, model or database calls. No full pytest, per owner's
+  explicit preference for fast feature/important checks.
+
 ### C48 MCP gateway (Nov 3; ready for Claude review)
 
 - Isolated worktree `CounterSign-c48`, branch `razeef/c48-mcp-gateway`, base
