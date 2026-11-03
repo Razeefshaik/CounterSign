@@ -1,0 +1,74 @@
+/* C50: evidence report within the owner's existing glass system. */
+body[data-route="proof"] .simulation{z-index:50}
+.proof-page{display:grid;gap:28px;min-width:0;color:var(--ink)}
+.proof-heading{display:grid;gap:12px;max-width:760px}
+.proof-heading h2{font-size:clamp(24px,2.5vw,32px);line-height:1.2}
+.proof-heading p{color:var(--ink-2);font-size:15px;max-width:68ch}
+.proof-heading>a{font-size:13px;justify-self:start}
+.proof-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border-radius:22px;padding:22px 8px;margin:0;gap:0}
+.proof-summary>div{padding:0 18px;border-left:1px solid var(--line);min-width:0}
+.proof-summary>div:first-child{border-left:0}
+.proof-summary dt{color:var(--ink-2);font-size:12px;line-height:1.4;min-height:34px}
+.proof-summary dd{margin:4px 0;font-size:32px;font-weight:500;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.proof-summary span{font-size:12px}
+.proof-scope{font-size:13px;line-height:1.65;color:var(--ink-2);max-width:95ch}
+.proof-jump{display:flex;flex-wrap:wrap;gap:6px}
+.proof-jump a{display:inline-flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;border:1px solid var(--line);border-radius:10px;text-decoration:none;font:500 12px var(--mono);color:var(--ink-2)}
+.proof-jump a:hover{background:var(--card);color:var(--ink)}
+.proof-checks{display:grid;gap:28px}
+.proof-check{display:grid;gap:14px;margin:0!important;padding:26px!important;scroll-margin-top:110px;min-width:0}
+.proof-check-head{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}
+.proof-check-head h3{font-size:18px;line-height:1.45}
+.proof-check-head h3>span{font:500 13px var(--mono);color:var(--ink-2);margin-right:12px}
+.proof-stamp{flex-shrink:0;max-width:46%;border-radius:6px;padding:5px 9px;font:500 11px/1.5 var(--mono);text-align:right}
+.proof-confirmed{color:var(--accent-ink);background:var(--accent-soft)}
+.proof-different{color:var(--ink-2);background:var(--sunken);border:1px solid var(--line)}
+.proof-finding{font-size:16px;max-width:85ch;line-height:1.65}
+.proof-finding a,.proof-impact a{font-size:12px;margin-left:6px;white-space:nowrap}
+.proof-meta{font-size:12px;color:var(--ink-2);display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.proof-impact{border-left:2px solid var(--ink-3);padding:12px 16px;background:var(--sunken);border-radius:0 10px 10px 0}
+.proof-impact>strong{font-size:13px;font-weight:600}
+.proof-impact p{margin-top:4px;font-size:14px;line-height:1.65;color:var(--ink-2)}
+.proof-debug{display:flex;gap:8px 12px;align-items:center;flex-wrap:wrap;color:var(--ink-2);font-size:12px;line-height:1.7}
+.proof-debug code{font-size:12px;color:var(--ink);overflow-wrap:anywhere}
+.proof-debug a{font-size:11px}
+.proof-signatures{font-size:13px;color:var(--ink-2)}
+.proof-resources{border-top:1px solid var(--line);padding-top:12px;min-width:0}
+.proof-resources summary{font-size:13px;color:var(--ink-2);cursor:pointer;min-height:32px;align-content:center}
+.proof-table{max-width:100%;overflow:auto;margin-top:14px}
+.proof-table table{width:100%;border-collapse:collapse;font-size:13px}
+.proof-table th{font-size:12px;text-align:left;color:var(--ink-2);font-weight:500}
+.proof-table th,.proof-table td{padding:12px 14px 12px 0;vertical-align:top;border-bottom:1px solid var(--line)}
+.proof-table td{overflow-wrap:anywhere}
+.proof-table td:nth-child(2)>a{display:block;font-size:11px;margin-top:5px}
+.proof-state,.proof-outcome{display:block;font-family:var(--mono);font-size:11px;line-height:1.7;overflow-wrap:anywhere}
+.proof-outcome{color:var(--ink-2);margin-top:4px}
+.proof-model{display:grid;gap:14px;padding:26px!important;margin:0!important;min-width:0;scroll-margin-top:110px}
+.proof-model>header{display:flex;justify-content:space-between;align-items:baseline;gap:16px;flex-wrap:wrap}
+.proof-model h3{font-size:22px}
+.proof-model>header span{font-size:13px;color:var(--ink-2)}
+.proof-model>p{font-size:14px;color:var(--ink-2)}
+.proof-model-status{font:500 11px var(--mono);margin-left:12px;overflow-wrap:anywhere}
+.proof-model ol{list-style:none;padding:0;margin:0}
+.proof-model li{display:grid;grid-template-columns:minmax(0,1fr) 160px;gap:24px;padding:18px 0;border-top:1px solid var(--line);min-width:0}
+.proof-model li strong{font-size:14px;font-weight:500}
+.proof-model li p{font-size:13px;color:var(--ink-2);margin-top:6px}
+.proof-model-result{display:grid;align-content:start;justify-items:end;gap:8px;font-size:12px}
+.proof-model-result>span{font:500 12px var(--mono)}
+.proof-footer{font-size:13px;color:var(--ink-2);line-height:1.8;overflow-wrap:anywhere}
+.proof-footer p{margin-top:8px}
+.brand-proof{display:inline-block;margin-top:12px;font-size:12px;color:var(--ink-2);text-underline-offset:4px;position:relative}
+@media(max-width:1100px){.proof-summary>div{padding:0 12px}.proof-summary dd{font-size:28px}.proof-check-head{flex-wrap:wrap}.proof-stamp{max-width:100%;text-align:left}}
+@media(max-width:640px){
+  .proof-page,.proof-checks{gap:24px}.proof-heading h2{font-size:24px}.proof-heading p{font-size:14px}
+  .proof-summary{grid-template-columns:repeat(2,minmax(0,1fr));padding:10px 8px;gap:0}
+  .proof-summary>div{padding:14px 12px;border-left:0;border-bottom:1px solid var(--line)}
+  .proof-summary>div:last-child{grid-column:1/-1;border-bottom:0;display:grid;grid-template-columns:1fr auto;align-items:center}
+  .proof-summary>div:last-child dt{min-height:0}.proof-summary>div:last-child span{grid-column:1/-1}
+  .proof-summary dd{font-size:28px}.proof-summary dt{font-size:12px;min-height:34px}
+  .proof-check,.proof-model{padding:20px!important}.proof-check-head{gap:10px}.proof-check-head h3{font-size:17px}
+  .proof-finding{font-size:14px}.proof-meta{font-size:12px}.proof-model li{grid-template-columns:minmax(0,1fr);gap:10px}
+  .proof-model-result{justify-items:start;display:flex;gap:14px;align-items:center}.proof-model-status{display:block;margin:10px 0 0}
+  .proof-table table{font-size:12px;min-width:470px}.proof-debug code{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){.proof-page *{scroll-behavior:auto;animation:none;transition:none}}

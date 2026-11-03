@@ -554,3 +554,16 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Read dashboard views under the read-only role; proposal status omits rationale, payloads and flag excerpts | C48 boundary review | Accept | External reads need verdicts and rules without replaying untrusted agent instructions |
 | Keep SDK DNS-rebinding checks and extend only the trusted deployment HTTPS origin; redirect exact /mcp before static routing | C48 HTTP verification | Accept | The hosted static catch-all otherwise returns 405 before the mounted transport receives an exact-path POST |
 | Payout convenience proposals reuse an existing planned manifest; gateway never creates a plan | C48 integration | Accept | Planning and the staged week stay in their existing owner workflows |
+
+## Nov 3 C50 sandbox proof
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Generate a deterministic static proof bundle from committed findings and redacted recordings | C50 task | Accept | The image excludes recordings, while judges need traceable evidence inside the product |
+| Link every fact to its source path and keep latest resource status scoped to each check | C50 evidence audit | Accept | Historical observations must not be presented as live PayPal state |
+| Label 1041 exchange attempts separately from 1007 responses and 34 transport errors | C50 recording count | Accept | A captured transport error is evidence of an attempted exchange, not a received HTTP response |
+| Count 47 successful signature responses including the simulator, six unique successful payout items excluding D7 fixtures and three settled disputes including buyer close | C50 evidence audit | Accept | Avoids inflating delivery, payout or settlement counts through duplicates and negative tests |
+| Keep the Gemini week on mock and preserve COMPLETE_WITH_GAPS and both WAIT choices | C50 real-model recording | Accept | The actual model did not propose the two unsafe actions, so no shield BLOCK is invented |
+| Refuse private-looking output before replacing the generated artifact | C50 task | Accept | Public historical recordings still need a fail-closed publishing guard |
+| Add proof to the existing workspace router and glass tokens; preserve the simulated banner | C50 integration | Accept | Keeps navigation and theme behavior consistent without changing command-center layout or payment paths |
+| Preserve LF for sandbox-proof.json in its local attributes file | C50 deterministic build | Accept | Windows Git newline conversion must not change the generated artifact bytes |

@@ -10,6 +10,9 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="styles.css">
 <link rel="stylesheet" href="hero.css">
+<!-- C50: recorded sandbox evidence -->
+<link rel="stylesheet" href="proof.css">
+<!-- /C50 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap">
 <script type="module" src="app.mjs"></script>
 </head>
@@ -58,6 +61,9 @@
 <p class="nav-group">Records</p>
 <a href="#audit" data-view="audit"><svg class="icon" aria-hidden="true"><use href="#i-audit"/></svg><span>Execution history</span></a>
 <a href="#replay" data-view="replay"><svg class="icon" aria-hidden="true"><use href="#i-replay"/></svg><span>Evaluation replay</span></a>
+<!-- C50 -->
+<a href="#proof" data-view="proof"><svg class="icon" aria-hidden="true"><use href="#i-decision"/></svg><span>Sandbox proof</span></a>
+<!-- /C50 -->
 <p class="nav-group" id="nav-lab" hidden>Lab</p>
 <a href="#trick" data-view="trick" id="nav-trick" hidden><svg class="icon" aria-hidden="true"><use href="#i-trick"/></svg><span>Try to trick the agent</span></a>
 </nav>
@@ -73,6 +79,7 @@
 <div class="brand-title"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M4 12V4h11M28 20v8H17M4 21h9m3-5 4 4L28 8"/></svg><h1 id="command-title" data-brand="true">CounterSign</h1></div>
 <p class="brand-purpose">Disputes and payouts, managed together.</p>
 <p class="brand-policy">Review AI proposals, track disputes, and approve payments and refunds from one workspace.</p>
+<!-- C50 --><a class="brand-proof" href="#proof">Verified on PayPal sandbox →</a><!-- /C50 -->
 </div>
 <button id="hero-motion" class="brand-motion" type="button" aria-pressed="false">Pause animation</button>
 </div>

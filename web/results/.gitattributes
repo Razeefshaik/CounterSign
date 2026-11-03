@@ -1,0 +1,2 @@
+# C50: preserve the deterministic artifact bytes on Windows and Linux checkouts.
+sandbox-proof.json text eol=lf

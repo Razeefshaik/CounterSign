@@ -4,9 +4,12 @@ import {isStaged} from "./data.mjs";
 import {createReplay} from "./replay.mjs";
 import {createTrick} from "./trick.mjs";
 import {createCommand} from "./command.mjs";
+// C50: the report shares the existing routing/lifecycle; no API changes.
+import {createProof} from "./proof.mjs";
 import {action as actionWord, state as stateWord, when} from "./words.mjs";
 
 const titles = {overview: "Command center", incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
+titles.proof = "Sandbox proof"; // C50
 export function route(hash) {
   const [name, id] = hash.replace(/^#/, "").split("/");
   return {name: Object.hasOwn(titles, name) ? name : "overview", id: id || ""};
@@ -18,6 +21,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
   const replay = createReplay(document, fetcher);
   const trick = createTrick(document, fetcher);
   const command = createCommand(document, fetcher);
+  const proof = createProof(document, fetcher); // C50
   const notice = (message = "") => {$("view-notice").textContent = message; $("view-notice").hidden = !message;};
   const invalidate = () => {
     proposal = null;
@@ -44,9 +48,18 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
       catch {if (ticket === serial) $("stage").innerHTML = '<p class="scene-loading">The constellation could not be loaded. Use Refresh.</p>'; return false;}
     }
     $("view-title").textContent = titles[current.name];
+    // C50: the historical proof has its own provenance note, independent of live records.
+    if ($("view-source-note")) $("view-source-note").hidden = current.name === "proof";
     $("view-picker").hidden = true;
     $("view-body").innerHTML = '<p class="empty">Loading records…</p>';
     try {
+      // C50: a static source-linked report, independent of dashboard record writes.
+      if (current.name === "proof") {
+        await proof.load();
+        if (ticket !== serial) return;
+        proof.draw(current.id);
+        return true;
+      }
       if (current.name === "replay" || current.name === "trick") {
         const page = current.name === "replay" ? replay : trick;
         await page.load();

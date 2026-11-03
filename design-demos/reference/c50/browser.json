@@ -1,0 +1,52 @@
+{
+  "evidence": "Actual local dashboard over TCP 8193; committed sandbox proof bundle; fixture workspace labelled simulated",
+  "checks": [
+    {
+      "name": "proof-light",
+      "width": 1440,
+      "height": 1080,
+      "theme": "light",
+      "banner": "Simulated: mock PayPal",
+      "bannerVisible": true,
+      "overflow": false,
+      "route": "#proof",
+      "checks": 13,
+      "visibleTitle": true,
+      "bannerUncoveredAfterScroll": true,
+      "keyboardDisclosure": true,
+      "sourceLinks": true
+    },
+    {
+      "name": "proof-dark",
+      "width": 1440,
+      "height": 1080,
+      "theme": "dark",
+      "banner": "Simulated: mock PayPal",
+      "bannerVisible": true,
+      "overflow": false,
+      "route": "#proof",
+      "checks": 13,
+      "visibleTitle": true,
+      "bannerUncoveredAfterScroll": true,
+      "keyboardDisclosure": true,
+      "sourceLinks": true
+    },
+    {
+      "name": "proof-phone",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "banner": "Simulated: mock PayPal",
+      "bannerVisible": true,
+      "overflow": false,
+      "route": "#proof",
+      "checks": 13,
+      "visibleTitle": true,
+      "bannerUncoveredAfterScroll": true,
+      "keyboardDisclosure": true,
+      "sourceLinks": true
+    }
+  ],
+  "runtime_exceptions": 0,
+  "owner_actions_sent": 0
+}
