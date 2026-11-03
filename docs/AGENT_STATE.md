@@ -62,6 +62,50 @@ staged, sandbox and real-model evidence stay distinct.
   validate the combined main, then Render **New > Blueprint** as documented.
   Do not deploy combined main on C47-only proof. No rebase/new suite performed.
 
+### C49 AG Grid (Nov 3; validation in progress)
+
+- Worktree `CounterSign-c49`, branch `razeef/c49-ag-grid`, base `454d2cc`
+  (C47 merged). Commits `8fab59c` foundation, `b5ef25a` integration/docs and
+  `2b28f70` filtered selection/lazy maker graph verification, `a6abd0b` delayed
+  incident-mount navigation guard; `eca2b52` refresh/retry fixes and `fd09a09`
+  nested-popup theme fix (final runtime source).
+  `2b3034c` corrects the C48-stale import-count assertion (test only).
+  Push branch when complete; Claude merges. Shared edits are fenced C49 inserts;
+  no index/styles.css, backend, contract or dependency changes.
+- New grid.mjs/grid.css use vendored AG Grid Community 32.3.9 (MIT): incidents,
+  audit history, run lines/resends with API pinned total, and maker lists over
+  four with pagination 10. Small maker cards remain unchanged. HTML fallback
+  stays visible until successful mount; vendor failure shows a notice.
+- Money stays integer minor units; missing values unavailable, statuses require
+  identified items, and operation links require actual proposal bindings. Escaped
+  text/masked email, keyboard incident detail, filtering/sorting and lazy maker
+  dialog graphs retain genuine API meaning; light/dark/phone/reduced motion supported.
+- Verified so far: **90 Node tests** (15 beyond base), syntax, hosted vendor asset **1
+  passed**, Ruff clean, **four import contracts kept** (C48 added the fourth).
+  Final browser: **31 checks passed**, zero JS errors/exceptions/warnings/POSTs,
+  18 PNGs: four grids x two themes x 390/1440, plus two native filter popups.
+  verification.json records source `fd09a09`, the capture-start commit and LF
+  normalized hashes proving all six tested runtime files match that commit.
+  Preview uses contract fixtures plus 21 extra makers/two audit rows, explicitly
+  labelled fixtures, not live financial evidence. Screenshots: tracked worktree
+  `design-demos/reference/c49/`.
+- Aman integration: small event/mount wrappers in app/command/views/workspace,
+  new grid CSS only; raw HTML fallback and up-to-four cards remain. Tests cover
+  actual seventh-maker lazy GET, mismatched/loading/retry graph states, vendor
+  initialization throw, sort/detail/quick-filter preservation and pinned API totals.
+  Delayed incident grid mounting aborts after navigation, even if its old host
+  remains connected but hidden; the actual asynchronous mount regression passes.
+- Initial full pytest finished: **4041 passed, 5 skipped, 2 failed**, both stale
+  smoke assertions expecting three import contracts instead of C48's four.
+  After the test-only fix, **15 smoke tests passed**, Ruff clean/four contracts kept.
+  Final rerun was interrupted after the shared 55433 PostgreSQL exhausted its
+  512 MB tmpfs and exited. Only C49's test processes were stopped; no shared
+  container/database was restarted. Owner approval for a separate C49 PostgreSQL
+  on 55449 is pending. Logs/results under ignored `.venv/c49-tools`; no full-green
+  claim. Final own preview PID 25720
+  stopped at 19:08; 8192 confirmed not listening, no own container created. Other task
+  ports/8180 untouched. No .env/real services.
+
 ### C48 MCP gateway (Nov 3; ready for Claude review)
 
 - Isolated worktree `CounterSign-c48`, branch `razeef/c48-mcp-gateway`, base

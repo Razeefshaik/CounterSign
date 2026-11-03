@@ -521,3 +521,66 @@ privacy scan, 15-cell code identity and all three original scenario hashes pass.
 No web/src/mock changes relative to base; upstream/main remains f330b3f.
 Validation is complete; PR #15 is ready for owner review. Core FAILED replacement
 repair remains reserved for Razeef/Claude.
+
+## C49 AG Grid (Nov 3)
+
+Self-contained parallel task: CounterSign-c49, branch razeef/c49-ag-grid from
+fresh origin/main 454d2cc (C47 merged). Commits 8fab59c foundation and b5ef25a
+integration/docs, 2b28f70 filtered-selection/lazy-graph verification, a6abd0b
+delayed-incident-mount navigation guard, eca2b52 empty-filter reset/graph retry,
+fd09a09 native filter popup theme mapping (final runtime source). Read
+CODEX-PARALLEL-RULES.md and C49 prompt in sibling prompts.
+Push the completed branch, no merge; Claude integrates. Preserve all C47/C48
+history/shared work; use small fenced C49 insertions only. No web/index.html or
+styles.css edits, backend/contract/dependency changes. Primary appends DECISIONS.
+
+New web/grid.mjs and grid.css use vendored AG Grid Community 32.3.9, MIT, no CDN
+or dependencies. Four grids: incident desk; audit history; payout lines/resends
+with API pinned total; maker list above four with pagination 10. Up to four maker
+cards stay unchanged. Thin lazy mount keeps existing HTML visible until success,
+with a notice on vendor failure. Map theme variables for light/dark; internal
+horizontal scrolling at 390, reduced motion, incident click/Enter/quick filter/
+sort, audit actor/verdict filters, maker dialog rows with lazy graph beyond six.
+Pure row projections retain integer money/missing-unavailable semantics, require
+identified PayPal item status, avoid old resend state as current, escape text/
+mask email, and link an operation only through a bound actual proposal.
+
+New tests: web/tests/grid.test.mjs, grid-dialog.test.mjs and
+tests/dashboard/test_grid_assets.py. Actual controller cases cover seventh-maker
+lazy graph GET, loading/mismatched graph unavailable/retry success; vendor init
+throw restores fallback; incident quick filter preserves sort/detail without
+refetch. Aman should keep small event/mount wrappers in app/command/views/workspace,
+new grid CSS only, raw HTML fallback and four-card path unchanged. Delayed mount
+checks active incident route after vendor load; connected-but-hidden old host
+must abort, covered by an actual asynchronous mount test.
+Verified so far: 90 Node tests (15 beyond base), syntax pass, hosted asset 1 passed, Ruff
+clean, FOUR import contracts kept (C48 added fourth; prompt's three is stale).
+Final browser 31 checks pass/zero JS errors/exceptions/warnings/no POSTs; 18 PNGs cover four
+grids x light/dark x 390/1440 plus native filter popups at tracked CounterSign-c49/design-demos/reference/c49.
+This is inside the C49 worktree, not the sibling historical C47 evidence folder. Static fixture
+preview 8192 includes 21 extra makers with varied states/two audit rows, explicitly
+contract fixtures, never live financial evidence. Native popup CSS was tested in the working
+tree then committed unchanged as fd09a09; verification.json records the capture-start
+commit and LF-normalized hashes checking all six runtime files against fd09a09.
+Actual browser proof covers blocked vendor fallback,
+no vendor load for three-maker overview, sort/Enter/detail/quick filter, native
+actor/verdict filters, pinned API run total108600, pagination10, seventh-maker
+dialog/Esc and native column-filter typing/theme tokens. Empty maker state filters reset
+to All consistently with makerList; failed initial graphs retry when opened, including
+the first six.
+
+Initial full pytest finished: 4041 passed, five optional toolkit/LangChain skips,
+two stale assertions in tests/test_smoke.py expecting three kept import contracts;
+C48 actually added a fourth. Test-only commit 2b3034c updates the count. Focused
+smoke rerun: 15 passed; Ruff clean/four import contracts kept. The next full run
+was interrupted at 234 completed cases after shared PostgreSQL on 55433 exited
+with "No space left on device" in pg_wal (its tmpfs is limited to 512 MB).
+Only C49's pytest processes 25392/18764 were stopped, avoiding long connection
+timeouts against the failed server. No shared container/database was restarted.
+Owner approval requested for isolated PostgreSQL 16 on 55449. No full-green claim.
+Runs use Windows Selector and COUNTERSIGN_TEST_TOOLKIT_PYTHON pointing to original
+CounterSign/.venv/toolkit/Scripts/python.exe. Logs/results under ignored
+.venv/c49-tools; initial-* retains the completed first-run evidence.
+Final own static preview PID 25720 was stopped at 19:08; 8192 confirmed not listening.
+No own container was created; owner 8180/other task ports remain untouched.
+No .env reads, real PayPal/model calls.
