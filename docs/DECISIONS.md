@@ -624,3 +624,9 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Keep historical metrics and replay traces separately labelled; select only existing scenario/system samples and otherwise show graded metrics with trace unavailable | C58 evidence review | Accept | The full experiment contains no action traces; a separately bundled sample must never masquerade as the selected historical run |
 | Scope explorer styling and banner stacking to replay, retaining glass tokens, phone scrolling and reduced motion | C58 browser verification | Accept | The simulation disclosure must remain uncovered while the analysis grid scrolls, without editing shared styles.css |
 | Keep the mounted explorer across replay redraws instead of rebuilding it on every replay step | C58 integration review | Accept | Rebuilding the 480-row grid on each Back or Next click reset its page, sort and moved columns |
+
+## Nov 4 C61 passkey on a second device
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| When a passkey prompt fails with NotAllowedError, the decision view offers **Set up a passkey on this device**; that click registers this device's own passkey (skipping setup if the device already holds one) and then countersigns. The server is unchanged | Video capture review, Nov 4 | Accept | The server keeps one shared list of owner passkeys, so on the shared hosted demo every visitor after the first was sent straight to a signing prompt for another visitor's passkey and could never countersign |
