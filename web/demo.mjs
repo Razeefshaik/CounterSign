@@ -54,11 +54,15 @@ export function createDemoBar(document, {fetcher = fetch, onChange = async () =>
     if (polling) return;
     polling = true;
     try {
-      while (state?.running) {
-        await wait(1500);
-        show(await read());
-      }
-      await onChange(state);
+      do {
+        while (state?.running) {
+          await wait(1500);
+          show(await read());
+        }
+        await onChange(state);
+        // An enabled control can start another command during the refresh.
+        // Keep this poller responsible for it until its state is confirmed too.
+      } while (state?.running);
     } catch {
       if (state) show({...state, running: false}, "The staged step status could not be read. Use Refresh.");
     } finally {polling = false;}
