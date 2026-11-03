@@ -30,6 +30,24 @@ staged, sandbox and real-model evidence stay distinct.
   text and the video script.
 - Passkeys need a hostname: use `localhost`, not `127.0.0.1`, locally.
 
+## C57 guided start: ready for integration
+
+- Own `CounterSign-c57` worktree, branch `razeef/c57-guided-start`, fresh base
+  `97a464b`; runtime commit `16ffe85`. No merge or other worktree edits.
+- New guide.mjs/guide.css add step-zero Start, native explainer, dismissible API-label
+  hints for steps 1–11, final Restart/proof links and one reduced-motion-safe pulse.
+  Small C57 inserts in index/app/demo reuse the existing guarded request/poller;
+  both restart surfaces share confirmation. Only owner moments use matte rose.
+- Verified: 115 Node tests (13 C57), hosted asset test 1 passed in 5.00 s, syntax
+  and Ruff clean. No full pytest, per owner; no database needed for these checks.
+  Twelve light/dark/390/1440 screenshots cover steps 0/6/11. Layout, API-label,
+  banner, keyboard Start, click-burst, dismissal and reduced-motion checks passed;
+  extended browser automation hit local CDP timeouts, so no universal pass claim.
+  Evidence: design-demos/reference/c57/. Own 8196 preview stopped; push C57 only.
+- Actual step labels distinguish setup from maker loading and reserve release
+  from payment. No .env reads, real LLM/PayPal calls, contracts/dependencies,
+  styles.css, financial logic or ports 8180/8197 changes. Claude integrates.
+
 ## Completed Nov 3: C47 release check (merged `454d2cc`)
 
 - Worktree `CounterSign-release-check`, branch `razeef/c47-release-check`, from
