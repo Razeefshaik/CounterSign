@@ -1,5 +1,7 @@
 # C28: submission checklist
 
+> **Superseded on Nov 3, 2026** by [docs/submission/](../submission/): the Devpost text, video script and checklist there cover C47 to C55. This file is kept as history.
+
 The deadline is **Nov 12, 2026, 12:00 PM PT = Nov 13, 1:30 AM IST**. Aim to
 submit at least a few hours early. Devpost forms and YouTube processing can be
 slow.

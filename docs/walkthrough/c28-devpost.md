@@ -1,5 +1,7 @@
 # C28: Devpost text, ready to paste
 
+> **Superseded on Nov 3, 2026** by [docs/submission/](../submission/): the Devpost text, video script and checklist there cover C47 to C55. This file is kept as history.
+
 This is the text for the Devpost form, one section per field. It reuses the README's wording, so the two never disagree.
 
 - **Results:** never type a number that is not in a results file. Each `‹PENDING …›` marker names the file the number comes from. If it doesn't exist by submission day, delete the sentence.

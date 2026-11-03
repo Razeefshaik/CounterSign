@@ -1,5 +1,7 @@
 # C28: video script (under 3 minutes)
 
+> **Superseded on Nov 3, 2026** by [docs/submission/](../submission/): the Devpost text, video script and checklist there cover C47 to C55. This file is kept as history.
+
 A narration plus click plan for the demo video, recorded from the dashboard with the M17 demo bar.
 
 **Setup** [OWNER]:
