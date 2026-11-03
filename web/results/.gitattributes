@@ -1,2 +1,4 @@
 # C50: preserve the deterministic artifact bytes on Windows and Linux checkouts.
 sandbox-proof.json text eol=lf
+# C58: preserve the deterministic historical run bundle.
+eval-runs.json text eol=lf

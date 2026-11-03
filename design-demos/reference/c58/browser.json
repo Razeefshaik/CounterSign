@@ -1,0 +1,69 @@
+{
+  "origin": "http://127.0.0.1:8197",
+  "evidence": "Actual fixture dashboard with committed 480-run historical bundle; reduced motion; no operational writes",
+  "checks": [
+    {
+      "name": "light",
+      "width": 1440,
+      "height": 1080,
+      "theme": "light",
+      "overflow": false,
+      "banner": "Simulated: mock PayPal",
+      "summary": "CounterSign\n    170/240 runs passing34/48 scenarios at 5/5Rules-only\n    215/240 runs passing43/48 scenarios at 5/5\n    0Duplicate settlement0Paid on disputed order without approval0Refund without owner approval0Paid unverified payee",
+      "columns": 6,
+      "reduced": true,
+      "label": true,
+      "presets": {
+        "failed": 70,
+        "comparison": 30,
+        "invariants": 0
+      },
+      "csv_rows": 70,
+      "metrics_detail": true,
+      "existing_trace": true
+    },
+    {
+      "name": "dark",
+      "width": 1440,
+      "height": 1080,
+      "theme": "dark",
+      "overflow": false,
+      "banner": "Simulated: mock PayPal",
+      "summary": "CounterSign\n    170/240 runs passing34/48 scenarios at 5/5Rules-only\n    215/240 runs passing43/48 scenarios at 5/5\n    0Duplicate settlement0Paid on disputed order without approval0Refund without owner approval0Paid unverified payee",
+      "columns": 6,
+      "reduced": true,
+      "label": true,
+      "presets": {
+        "failed": 70,
+        "comparison": 30,
+        "invariants": 0
+      },
+      "csv_rows": 70,
+      "metrics_detail": true,
+      "existing_trace": true
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "overflow": false,
+      "banner": "Simulated: mock PayPal",
+      "summary": "CounterSign\n    170/240 runs passing34/48 scenarios at 5/5Rules-only\n    215/240 runs passing43/48 scenarios at 5/5\n    0Duplicate settlement0Paid on disputed order without approval0Refund without owner approval0Paid unverified payee",
+      "columns": 2,
+      "reduced": true,
+      "label": true,
+      "presets": {
+        "failed": 70,
+        "comparison": 30,
+        "invariants": 0
+      },
+      "csv_rows": 70,
+      "metrics_detail": true,
+      "existing_trace": true
+    }
+  ],
+  "runtime_exceptions": [],
+  "console_warnings": [],
+  "non_get_requests": []
+}

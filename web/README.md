@@ -1,5 +1,29 @@
 # CounterSign dashboard
 
+<!-- C58 -->
+## C58 evaluation explorer
+
+Evaluation replay (`#replay`) opens with **All 480 runs**, the historical C31
+model-disabled mock experiment. `python scripts/bundle_eval_runs.py` regenerates
+`results/eval-runs.json` deterministically from the published JSONL, projecting
+only public metrics and refusing private-looking values before writing.
+The C49 vendored Community loader and theme mapping power a 25-row paginated
+grid with native column filters, multi-sort, quick search, external system/failure
+filters, three presets, filtered pinned totals, movable/resizable columns and
+CSV export of filtered/sorted rows. Summary numbers are computed from the rows.
+
+The comparison preset shows both systems for scenarios where every CounterSign
+sample passes and every rules-only sample fails. The zero-invariant preset
+honestly shows no rows. Clicking or pressing Enter on a row opens an existing
+matching scenario/system action trace if available (with its actual sample k
+disclosed); otherwise a metrics panel explains the graded failure without
+inventing the missing action. Historical metrics and action traces remain
+separately labelled. Load failure offers Retry; vendor failure retains the source
+link and existing replay lanes. New styles live in `eval-explorer.css`, using
+glass tokens, phone column scrolling and reduced-motion handling.
+No backend, model, PayPal or live financial data call is added.
+<!-- /C58 -->
+
 <!-- C49 -->
 ## Nov 3 AG Grid working tables (C49)
 

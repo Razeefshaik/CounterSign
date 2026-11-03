@@ -53,6 +53,9 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
     $("view-title").textContent = titles[current.name];
     // C50: the historical proof has its own provenance note, independent of live records.
     if ($("view-source-note")) $("view-source-note").hidden = current.name === "proof";
+    // C58: replay metrics are historical evidence, independent of live workspace records.
+    if (current.name === "replay" && $("view-source-note")) $("view-source-note").hidden = true;
+    // /C58
     $("view-picker").hidden = true;
     $("view-body").innerHTML = '<p class="empty">Loading records…</p>';
     try {

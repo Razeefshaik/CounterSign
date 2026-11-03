@@ -1,5 +1,8 @@
 import {esc, status} from "./views.mjs";
 import {label, money} from "./data.mjs";
+// C58: historical run analysis stays independent of imported replay evidence.
+import {createEvalExplorer} from "./eval-explorer.mjs";
+// /C58
 
 export const scenarios = {
   F01_timeout_after_payout_created: "F01 · Lost payout response",
@@ -100,6 +103,20 @@ export function replayView({rows = [], evidence = [], scenario = Object.keys(sce
 export function createReplay(document, fetcher = fetch) {
   let rows = [], evidence = [], loaded = false, scenario = Object.keys(scenarios)[0], baseline = "rules_only", key = "", position = 0;
   const $ = id => document.getElementById(id);
+  // C58: select an existing trace only; never manufacture missing action evidence.
+  const explorer = createEvalExplorer(document, fetcher, row => {
+    const available = rows.filter(r => r.scenario_id === row.scenario_id && r.system === row.system && findEvidence(r, evidence));
+    const match = available.find(r => r.k === row.k) || available[0];
+    if (!match) return false;
+    scenario = match.scenario_id; baseline = "rules_only"; key = sampleKey(match); position = 0;
+    draw();
+    $("view-notice").textContent = `Loaded the available ${systemNameForReplay(row.system)} replay sample (k=${match.k}). The explorer uses the historical 480-run experiment; action traces are a separate bundled source.`;
+    $("view-notice").hidden = false;
+    document.querySelector?.(".replay-lanes")?.scrollIntoView({block:"start", behavior:"instant"});
+    return true;
+  });
+  const systemNameForReplay = value => value === "countersign" ? "CounterSign" : "Rules-only";
+  // /C58
   async function load() {
     if (loaded) return;
     const result = await fetcher("replays/runs.jsonl", {cache:"no-store"});
@@ -110,7 +127,15 @@ export function createReplay(document, fetcher = fetch) {
     loaded = true;
   }
   function draw() {
+    const kept = $("c58-eval-explorer"); // C58: replay steps keep the grid's page, sort and columns.
     $("view-body").innerHTML = replayView({rows,evidence,scenario,baseline,key,position});
+    // C58: place the complete experiment above the existing, unchanged replay lanes.
+    if (kept) $("view-body").prepend(kept);
+    else {
+      $("view-body").insertAdjacentHTML?.("afterbegin", '<div id="c58-eval-explorer"></div>');
+      void explorer.mount($("c58-eval-explorer"));
+    }
+    // /C58
     const bind = (id, handler) => {$(id).onclick = handler;};
     for (const [id, update] of [["replay-scenario", value => {scenario=value;}], ["replay-baseline", value => {baseline=value;}], ["replay-sample", value => {key=value;}]]) $(id).onchange = event => {update(event.target.value); position=0; draw();};
     bind("replay-start", () => {position=0; draw();});

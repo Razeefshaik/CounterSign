@@ -612,3 +612,15 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Keep stage 1 setup distinct from maker loading and stage 10 reserve release distinct from stage 11 payment | C57 actual DEMO_STEPS | Accept | Orders exist before makers are loaded, and releasing a reserve does not mean the maker was paid |
 | Share immediate busy/error feedback and restart confirmation through demo.mjs; clear guidance if the demo API disappears | C57 integration | Accept | Start, Next and Restart need one guarded POST path, with no stale guide or confirmation bypass |
 | Add one accent-blue pulse to the compact strip after step 1, disabled under reduced motion | Owner C57 prompt | Accept | Help viewers find Next without moving or resizing it; rose remains reserved for owner decisions |
+
+## Nov 4 C58 evaluation explorer
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Publish only allowlisted metrics from the original 480 C31 runs in a deterministic LF bundle, refusing private-looking input before writing | Owner C58 prompt | Accept | The hosted image excludes eval sources; historical evidence must remain accessible without exposing credentials, traces or later rerun overlays |
+| Compute scoreboards, paired scenario presets and filtered pinned totals from the bundled rows | Owner C58 prompt | Accept | Judges can reproduce 170/240 and 34/48 versus 215/240 and 43/48, including every failure and zero invariant count, without hard-coded UI scores |
+| Use the C49 Community loader/theme for filters, multi-sort, movable/resizable columns, pagination 25 and filtered CSV export | Owner C58 prompt | Accept | Analytical interaction belongs in the existing vendored grid without new dependencies or Enterprise features |
+| Show both systems for the three scenarios whose CounterSign repetitions all pass and rules-only repetitions all fail | C58 source audit | Accept | A paired comparison must expose both outcomes rather than hide baseline failures or claim an unrun model experiment |
+| Keep historical metrics and replay traces separately labelled; select only existing scenario/system samples and otherwise show graded metrics with trace unavailable | C58 evidence review | Accept | The full experiment contains no action traces; a separately bundled sample must never masquerade as the selected historical run |
+| Scope explorer styling and banner stacking to replay, retaining glass tokens, phone scrolling and reduced motion | C58 browser verification | Accept | The simulation disclosure must remain uncovered while the analysis grid scrolls, without editing shared styles.css |
+| Keep the mounted explorer across replay redraws instead of rebuilding it on every replay step | C58 integration review | Accept | Rebuilding the 480-row grid on each Back or Next click reset its page, sort and moved columns |
