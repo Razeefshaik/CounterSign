@@ -492,6 +492,7 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Serve dashboard WebP files explicitly as image/webp | C47 image asset probes | Accept | The slim Linux image returned application/octet-stream for all seven WebPs despite serving their bytes correctly; asset headers must not depend on the host MIME database |
 | Keep the existing demo poller following a new command accepted during a dashboard refresh | C47 real-browser control check | Accept | A quick Next step after Restart could advance the backend while the refresh still owned the poller, leaving the controls stale; preserve the single POST guard and polling interval |
 | Repeat the server-derived simulation label inside the maker dialog using its existing eyebrow style | Owner approval during C47 manual screenshot review | Accept | The native modal backdrop obscures the global banner; the mock label must remain readable inside the dialog and disappear for live or unavailable metadata |
+| Record local resource-capped release evidence and refresh the owner Render click list with current plan names and prices | C47 owner request | Accept | Separate measured Docker readiness from the owner's later cloud deployment, with a repeatable post-deploy smoke command |
 
 ## Nov 3 C46 compact demo controls
 

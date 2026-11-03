@@ -1,6 +1,6 @@
 # C27: hosting the demo
 
-**Status:** M21 local image and public-HTTP smoke verified; not deployed yet. **Render (free) is the owner's selected host as of Oct 28**, replacing the Oct 27 Cloud Run choice. The owner deploys with the Render steps below; no cloud resources or credentials were used for these checks.
+**Status:** C47 Nov 3 local image, full tests, resource-sized HTTP smokes and browser checks verified; not deployed yet. **Render (free) is the owner's selected host as of Oct 28**, replacing the Oct 27 Cloud Run choice. The owner deploys with the Render steps below; no cloud resources or credentials were used for these checks.
 
 ## What gets hosted
 
@@ -34,12 +34,12 @@ Sources (all read Oct 27, 2026): [Render free](https://render.com/docs/free), [R
 
 Why Render:
 
-- It is free with no card, and it builds the repository's `Dockerfile` from `render.yaml`, which takes a few clicks.
+- Its Free plan costs $0, and it builds the repository's `Dockerfile` from `render.yaml`, which takes a few clicks.
 - 750 free instance hours a month cover one service running all month, so judges can open the URL days after Nov 13.
 - Embedding PostgreSQL avoids the free Render database's 30-day expiry. A database made on Nov 10 would be deleted soon after judging.
-- The container fits in 512 MB with room to spare (about 115 MB measured).
+- The container fits within 512 MB; the Nov 3 release check below records memory after the complete week.
 
-The cost is speed. At 0.1 CPU, the first visit after 15 idle minutes waits for Render's wake (about 1 minute) plus our boot (about 85 seconds measured with `docker run --cpus=0.1 --memory=512m`). Warm requests are quick: 6 to 25 ms for API calls and 0.3 s for the page, measured locally. To avoid the wait during judging, the owner may point a free uptime pinger (for example cron-job.org) at `/api/v1/meta` every 10 minutes. Render's community forum suggests this, and one service running all month stays within the 750 hours. Check Render's current terms before relying on it.
+The cost is speed. Free's 0.1 CPU makes the staged week slower; use the Nov 3 measurements below when choosing Free or Starter. After 15 idle minutes, Render also needs to wake the service (about a minute), on top of the container's boot. The owner can optionally point an uptime pinger at `/api/v1/meta` every 10 minutes during judging; the click list below includes the current Free limits. Restarts always create a fresh disposable week.
 
 Why Cloud Run is the runner-up: it starts about ten times faster (1 vCPU) and its free tier is permanent, but it needs a Google Cloud billing account with a card, plus `gcloud` setup. Choose it if the cold start on Render is unacceptable. The same image works there, because the start script reads `$PORT`.
 
@@ -65,16 +65,22 @@ Why Cloud Run is the runner-up: it starts about ten times faster (1 vCPU) and it
 
 ## Owner steps (Render)
 
-1. Deploy from `main`; it already holds `render.yaml`, the `Dockerfile` and the start script.
-2. Create a free account at <https://render.com>. Sign in with GitHub and give Render access to the CounterSign repository only.
-3. In the Render dashboard, choose **New > Blueprint**, select the repository and branch `main`, and confirm. Render reads `render.yaml` and creates `countersign-demo` on the **Free** plan.
-4. Environment variables. The Blueprint sets the only one:
-   - `COUNTERSIGN_HOSTED_SEED` = `none` (default).
+Allow about five minutes for these clicks; the image build and boot take extra time.
 
-   Do **not** add `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`, `PAYPAL_WEBHOOK_ID`, `GOOGLE_API_KEY`, `OWNER_TOKEN` or `DATABASE_URL`. The container sets or refuses them itself. Render sets `PORT`.
-5. Wait for the first build (about 5 minutes) and the first boot. The log shows `[hosted] dashboard ready`.
-6. Optional: add an uptime pinger for `https://<service>.onrender.com/api/v1/meta` every 10 minutes during judging.
-7. Auto deploy is off. After later merges, use **Manual Deploy > Deploy latest commit**.
+1. After approving and merging C47 to `main`, sign in to the [Render dashboard](https://dashboard.render.com/) with GitHub. Choose **New > Blueprint > Connect** for the CounterSign repository. Select branch **main** and keep Blueprint Path **render.yaml**. See [Render's Blueprint setup](https://render.com/docs/infrastructure-as-code).
+2. Review the single `countersign-demo` web service. The committed Blueprint selects **Free: $0/month, 0.1 CPU, 512 MB**. For faster judging, the paid **0.5c-512mb (formerly Starter): $7/month, 0.5 CPU, 512 MB** is available. Prices checked Nov 3 on [Render pricing](https://render.com/pricing); [compute plans](https://render.com/docs/compute-plans) lists the specs. To upgrade after creation, open the service's **Compute > Edit**, choose that plan and **Save**. Keep `render.yaml`'s `plan` in sync with that owner choice before the next Blueprint sync, or its `free` setting can restore Free.
+3. Keep **COUNTERSIGN_HOSTED_SEED=none** as the only application variable, then click **Deploy Blueprint**. Add no PayPal keys, model keys, `OWNER_TOKEN` or `DATABASE_URL`; the container supplies its local mock/database settings and Render supplies `PORT`.
+4. Open **Logs**. Boot should show, in order: `[hosted] starting PostgreSQL 16`, `[hosted] starting the PayPal mock on loopback`, `[hosted] starting the app on port ...`, `[hosted] dashboard ready`. Open the service URL and confirm **Simulated: mock PayPal**. Optionally configure an uptime pinger to GET `https://YOUR-SERVICE.onrender.com/api/v1/meta` every 10 minutes during judging. Free sleeps after 15 idle minutes and shares 750 monthly hours per workspace; see [Free limits](https://render.com/docs/free). A pinger is optional and does not preserve data across restarts.
+5. Auto deploy is off. After later code merges, open the service's **Deploys > Manual Deploy > Deploy latest commit**. Blueprint configuration syncs are separate from code auto deploy; review them before applying. See [manual deploys](https://render.com/docs/deploys).
+
+After the first deploy, replace `YOUR-SERVICE` with the actual hostname and run this
+from the repository root, while nobody is presenting (it resets the shared week):
+
+```powershell
+.venv\Scripts\python.exe scripts/hosted_smoke.py https://YOUR-SERVICE.onrender.com --timeout 900
+```
+
+Success ends with `Hosted smoke passed: 11 steps, Friday paid once, cash $354, B reserve $54, playground BLOCK`.
 
 ### Google Cloud Run (fallback)
 
@@ -120,6 +126,90 @@ docker build -t countersign-demo .
 docker run --rm --cpus=0.1 --memory=512m -p 127.0.0.1:8080:8080 countersign-demo
 # then open http://127.0.0.1:8080/
 ```
+
+## Nov 3 release check
+
+Final runtime image: `countersign-c47`, built from **`e661516`** on
+`razeef/c47-release-check` (base `origin/main` **`1303ad2`**). Image manifest:
+`sha256:cc0c3d9d57f81729e7a6244c4193b190df70e65a7551e10bf7169fccee34ae3a`.
+The later handoff commit changes documentation only.
+
+During verification, `main` advanced to **`02a4a47` (C48 MCP gateway)**. These
+results cover base `1303ad2` plus the C47 fixes, not that newer C48 code. After
+reviewing/merging C47, verify the combined main before deploying it to Render.
+
+Both resource limits use a fresh container, seed `none`, and loopback port 8190.
+Boot is measured immediately before `docker run -d` to the first HTTP 200 from
+`/api/v1/meta`, polled every 250 ms. It includes Docker launch, excludes image
+build/download, and is **local warm-image evidence, not a Render cloud cold start**.
+The final resource checks run after pytest and Chrome have finished. The owner's
+container on 8180 was untouched.
+
+| Check | Free size: 0.1 CPU, 512 MiB | Starter size: 0.5 CPU, 512 MiB |
+| --- | --- | --- |
+| First meta HTTP 200 | **128.984 s** | **40.328 s** |
+| Full public HTTP smoke, `--timeout 900` | **PASS, 1168.407 s** | **PASS, 168.390 s** |
+| Docker memory after the completed week | **133.3 MiB / 512 MiB** | **133.3 MiB / 512 MiB** |
+
+The smoke checks reset and all 11 staged steps, Friday's $1,086 paid exactly once,
+$354 final available cash, Maker B's $54 non-cash reserve, four playground attacks,
+and refund-to-other-account BLOCK with `written=false`. `--timeout 900` limits the
+wait for each staged command, not the entire week.
+
+Both resource runs serve all **10** checked files with HTTP 200 and the
+correct MIME: `hero.css` (`text/css`), both backdrop WebPs, four hero WebPs and the
+milestone WebP (`image/webp`), `countersign-mark.svg` (`image/svg+xml`) and `demo.mjs`
+(`text/javascript`). Each invented PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET and
+GOOGLE_API_KEY probe exits **64**, naming only the variable and never its value.
+Free cgroup memory.current/peak are **189788160 / 244346880 bytes**; Starter's are
+**190435328 / 243662848 bytes**. Unlike Docker's displayed memory, these include
+file cache. Neither completed run was OOM-killed.
+
+Verification on Windows with SelectorEventLoop and explicit test DB 55433 plus
+`COUNTERSIGN_TEST_TOOLKIT_PYTHON`: **4,019 Python passed, 0 failed, 5 skipped** in
+2132.33 s. All five skips require optional Toolkit/LangChain packages in the main
+interpreter; the separate toolkit child setting was supplied. **75 Node tests
+passed**, Ruff is clean and all **3 import contracts** are kept. After the final
+UI addition, **36 focused hosted/demo-bar Python checks passed** in 29.49 s;
+backend Python code remained unchanged.
+
+The final image passed **57 browser checks**: eight routes (overview, decision,
+runs, cash, graph, audit, replay, trick), 390/1440/1870 px, light/dark, maker dialogs
+and Esc, restart confirmation/cancel, and a quick Next step after restart. Exactly
+one reset and one step POST reached the disposable 8190 app. No JavaScript console
+errors, page exceptions or unexpected network errors occurred. Four automatic
+browser network-log entries for the contract-required cash-unavailable 503 after
+reset are recorded separately; the UI correctly shows unavailable before a
+balance exists. The simulation banner stayed visible across routed pages; manual
+review found that the maker dialog backdrop obscures it while the dialog is open.
+The owner approved an in-dialog server-derived label in `e661516`; manual review
+confirms it is readable above the backdrop at phone width. The final browser
+matrix also checks its position and hit visibility inside the modal.
+**54 screenshots** and
+`verification.json` are in sibling `PayPalDevPost/design-demos/reference/c47/`.
+
+C47 fixes three release checks: the owner HTTP test now shares its fixture's
+frozen clock; WebP headers no longer depend on the platform MIME database; and a
+single demo poller follows a new command accepted during the previous dashboard
+refresh. The last case was reproduced in the real browser and a failing Node
+regression before being fixed. A fourth fix, approved by the owner after manual
+review, repeats the simulation label inside the maker dialog using the existing
+eyebrow style. Financial code and contracts did not change.
+
+An earlier `88ba5ee` Free run concurrent with pytest stopped after step 5 with
+`Hosted smoke FAILED: HTTP failure or unexpected API shape`; a subsequent state
+GET timed out. It booted in 157.422 s, failed after 338.797 s and used 165.5 MiB
+at that point (not after a completed week), with no OOM. This failed attempt is
+preserved alongside the final measurements. Evidence logs/JSON are in sibling
+`design-demos/.impeccable/c47/`.
+
+The first final-image browser pass also recorded a meta 503 on Decision during
+rapid route changes, before any POST. The harness could advance from Overview
+while its optional API reads were unfinished. The final visual matrix waits for
+local requests to complete and 500 ms of network idle before capturing each
+route; it is not a load test. The original failure is retained in
+`reference/c47/first-final-meta-503.json`. The mock-clock read's existing 3 s
+deadline was not changed.
 
 ## What was measured locally (Oct 27)
 

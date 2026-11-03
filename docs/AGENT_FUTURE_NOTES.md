@@ -35,12 +35,74 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C47 release check (Nov 3)
+
+Worktree CounterSign-release-check, branch `razeef/c47-release-check`, based on
+tested base `1303ad2` (C46 merged), validated source `e661516`. Final fetch found
+main/origin/main advanced concurrently to `02a4a47` (Merge C48 MCP gateway).
+C48 changes main.py/harness/approval bindings/gateway/contracts 1.1 and is not
+integrated or covered by C47's completed suite/image/browser evidence. Original
+main remains clean and untouched. No rebase or new combined suite was performed.
+Owner reviews/merges C47, retains C48/resolves shared notes, and validates combined
+main before Render New > Blueprint. C47-only proof is not combined-main proof.
+No cloud deploy/accounts, environment-file reads or real LLM/PayPal calls.
+Original checkout and owner countersign-c45:8180 remain untouched.
+
+Four fixes, each separately committed: `73ab781` aligns owner HTTP fixture clock;
+`88ba5ee` serves WebP explicitly when system MIME entries are absent; `3d3d844`
+keeps one poller following a new Next command during Restart refresh; owner-approved
+`e661516` puts the existing server-derived simulation label inside maker dialogs
+using textContent/hidden and existing styling. No approval rules/palette change.
+
+Final full suite finished normally: 4019 passed, 0 failed, 5 skipped in 2132.33 s,
+exit 0; JUnit 4024 cases/errors 0/failures 0/skipped 5. Windows SelectorEventLoop,
+DB 55433 and COUNTERSIGN_TEST_TOOLKIT_PYTHON=original CounterSign/.venv/toolkit/Scripts/python.exe
+were supplied. Optional skips require toolkit/LangChain in main; child checks ran.
+Backend Python unchanged since 88ba5ee. Follow-up hosted/demo-bar tests 36 passed
+in 29.49 s; all 75 Node tests, syntax, Ruff and three import contracts pass.
+
+Final image source e661516, id
+sha256:cc0c3d9d57f81729e7a6244c4193b190df70e65a7551e10bf7169fccee34ae3a.
+Both fresh local sizes used seed none, 512 MiB and loopback8190 only:
+Free 0.1 CPU: first meta 128.984 s, full smoke PASS 1168.407 s, Docker memory
+133.3 MiB; cgroup current/peak 189788160/244346880 bytes.
+Starter 0.5 CPU: first meta 40.328 s, full smoke PASS 168.390 s, Docker memory
+133.3 MiB; cgroup 190435328/243662848 bytes. Both OOM false; ten assets return
+200/correct MIME; all three invented-credential probes exit64/values absent.
+These are local launch-to-meta warm-image timings, not Render cloud cold starts.
+Evidence: sibling design-demos/.impeccable/c47/image-measurements-final-{free,starter}.json
+and logs. Smoke --timeout900 is per command, not a total run limit.
+
+Final design-demos/reference/c47/verification.json confirms 57 checks/54 PNGs:
+eight routes x widths390/1440/1870 x two themes, six physical modal-label hit tests
+and maker Esc, Restart cancel/accept, Next burst one POST/UI1/11. Zero JS console
+errors/page exceptions/unexpected network errors. Four expected contract-required
+cash503 network entries after reset are separate. Exactly two POSTs, only8190.
+
+Preserve historical diagnostic evidence: baseline4017pass/1fail/5skip1907.34s
+found the frozen-clock test; baseline images found generic WebP MIME. An88ba5ee
+Free smoke failed338.797s after step5 during concurrent full pytest, with GET
+timeouts/noOOM; image-measurements.json remains intact. Quiet pre-dialog3d3d844
+Free later passed970.812s (boot99.578s/memory134.1MiB), Starter passed282.750s
+(boot27.079s/135.2MiB); archives are pre-dialog-image-measurements-final-*.json,
+pre-dialog logs and pre-dialog-verification.json. First control failure exposed
+the real polling race. Manual screenshots exposed blur over the global modal
+label, then approved e661516 fixed it. First final-browser meta503 is preserved
+in first-final-meta-503.json; external helper had advanced using hidden previous
+route HTML before network reads completed. Waiting for all local requests plus
+500ms idle resolved readiness; no application clock/API change was made.
+
+No pending approvals or release blockers in the completed C47-only local checks;
+combined C47/C48 main still requires validation after integration.
+Primary owns hosting runbook/Render click list; do not infer a cloud deployment.
 ## C46 compact demo controls (Nov 3)
 
 Owner requested two small demo buttons instead of the huge floating dock, and
 restoration of the earlier normal pink hero rim while all other UI stays matte.
 Active checkout CounterSign, branch `razeef/c46-compact-demo-controls` from main
-`91eb0f0`; feature commit `3c4a4f7`. No push/merge for this task, no attribution.
+`91eb0f0`; feature commit `3c4a4f7`, later merged into main as `1303ad2`.
+The original C46 turn did not push/merge; later integration supersedes that status.
+No attribution.
 
 `web/demo.mjs` renders exactly Next step and Restart, a tiny real step/total,
 next-step/context tooltips, normal status for screen readers and a small visible
