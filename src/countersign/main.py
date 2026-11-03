@@ -143,6 +143,20 @@ def create_app(
             # C32: read-only shield playground, demo mode on the mock only.
             if playground.playground_allowed(runtime):
                 app.include_router(playground.build_router(db, runtime), prefix="/api/v1")
+                # C48: HTTP always previews, including on hosted instances.
+                from countersign.gateway.server import (
+                    build_server,
+                    check_tools,
+                    http_app,
+                    mount_http,
+                )
+                from countersign.gateway.service import Gateway
+
+                gateway = build_server(Gateway(db, runtime, hosted=True))
+                gateway_app = http_app(gateway)
+                await check_tools(gateway)
+                await stack.enter_async_context(gateway.session_manager.run())
+                mount_http(app, gateway_app)
             if static_dir is not None:
                 # Mounted last so every API and webhook route above keeps priority.
                 app.mount(

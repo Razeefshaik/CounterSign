@@ -448,3 +448,65 @@ first commit is dated Oct 23, 2026; the submission period opened on Oct 1.
 ## Licence
 
 [Apache License 2.0](LICENSE).
+
+<!-- C48: MCP gateway -->
+## Use CounterSign as the safety layer for any agent
+
+Connect an MCP client to CounterSign to read marketplace facts and propose actions.
+The shield judges every proposal; the existing owner dashboard countersigns money
+decisions and the normal executor rechecks them. The July 2026
+[Vorp Labs PayPal review](https://vorplabs.com/agent-tools/paypal-agent-toolkit)
+identifies the gap: "Merchant-side destructive actions need application-level
+approval controls." That quotation is also available in its
+[field-guide index](https://vorplabs.com/agent-tools). CounterSign implements that
+application boundary with deterministic rules and bound approvals.
+
+The official [MCP Python SDK](https://py.sdk.modelcontextprotocol.io/) is pinned to
+`mcp==2.3.0`. For Claude Desktop, replace the paths and private database placeholder
+in your **local** MCP configuration:
+
+```json
+{
+  "mcpServers": {
+    "countersign": {
+      "command": "C:\\path\\to\\CounterSign\\.venv\\Scripts\\python.exe",
+      "args": ["-m", "countersign.gateway"],
+      "env": {
+        "DATABASE_URL": "<your private PostgreSQL URL>",
+        "COUNTERSIGN_MODE": "demo",
+        "PAYPAL_BASE_URL": "http://127.0.0.1:8099",
+        "COUNTERSIGN_GATEWAY_MODE": "preview"
+      }
+    }
+  }
+}
+```
+
+Use an initialized local mock and migrated database. The entry point reads process
+configuration; keep private connection details out of recordings and Git.
+`preview` is the default: proposals return `written:false` and store nothing.
+Set `COUNTERSIGN_GATEWAY_MODE=record` explicitly for a **local, non-hosted stdio**
+session to store shield-judged proposals. A recorded request returns
+`decision_url: "#decision/<id>"`; open that route in your local dashboard connected
+to the same database. MCP initialize client names are bounded attribution only.
+
+The hosted Streamable HTTP endpoint is `https://<render-url>/mcp` and is **always
+preview**, even if the record environment variable is set. It is mounted only for
+demo mode using a loopback mock. Render's `RENDER_EXTERNAL_HOSTNAME` extends the
+SDK's host/origin allowlist; other HTTPS deployments set
+`COUNTERSIGN_GATEWAY_PUBLIC_ORIGIN=https://<your-host>`. DNS-rebinding checks stay on.
+
+The exact tools are:
+
+- Reads: `list_incidents`, `get_incident`, `list_makers`, `get_cash`,
+  `get_proposal`, `list_actions`.
+- Proposals: `propose`, `propose_refund`, `propose_payout_run`,
+  `propose_cancel_unclaimed`, `propose_evidence`.
+
+`propose_payout_run` uses an existing planned run for the requested week; it does
+not create a new plan. No tool approves, rejects or executes a proposal. See the
+[gateway demo script](docs/walkthrough/c48-mcp-gateway.md) for the blocked alternate
+refund destination and owner decision flow. SDK transports are exercised in tests;
+the Claude Desktop configuration is a setup recipe, not a claim of a tested
+Claude Desktop connection.
+<!-- /C48 -->

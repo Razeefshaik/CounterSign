@@ -35,6 +35,51 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C48 MCP gateway (Nov 3; ready for Claude review)
+
+Source: parent PayPalDevPost `prompts/codex/active/CODEX-PROMPT-C48-MCP-GATEWAY.md`
+and `CODEX-PARALLEL-RULES.md`. Work only in CounterSign-c48 on
+`razeef/c48-mcp-gateway`, base `1303ad2`; database `countersign_c48` on 55433,
+preview port 8191. The owner authorized the MCP dependency and contract bump;
+shield/executor changes and behavioral changes to binding still require approval.
+
+The implementation pins official `mcp==2.3.0`, adds the
+exact 11-tool gateway and fourth import boundary. Preview calls the existing
+rolled-back ApprovalService preview; demo/mock HTTP always previews, regardless
+of the record setting. Stdio record uses the same extracted approvals/binding.py
+path as Engine, with initialized client-name attribution and external_agent audit
+source. Every proposal uses StructuredProposal.parse and caller text is screened
+for injection. Reads use bounded sanitized dashboard views under the read-only
+role. The payout convenience wrapper reuses an existing planned run; it does not
+plan or approve one. No tool grants owner approval or direct execution.
+
+Commits `610ccaf` (binding extraction), `6f1a30f` (gateway) and `abe5bc8`
+(README/contracts/decisions/walkthrough and public evidence) are pushed to
+`origin/razeef/c48-mcp-gateway`. Feature merge `60a41d9` then included upstream
+main `9eefa6e`, including C52's test-only clock fix `c32d16c`. No merge to main;
+final verification/context commit and push remain pending.
+Primary-agent verification: final focused **23 passed in 78.78s** (19 gateway
+and four persisted-row characterization cases against the frozen original),
+earlier **43 unchanged engine/harness passed**, **28 approval tests passed in
+28.00s** after the upstream clock fix, **70 Node passed**, Ruff clean and four
+import contracts kept. Runtime code is unchanged since the focused pass.
+Real SDK legacy sessions cover stdio preview/record
+and TCP8191 HTTP, including blocked injection and plain NEEDS_OWNER results.
+Actual dashboard HTTP and owner approval are tested. Normal executor recheck
+refuses a changed approved record with no mock refund; successful approved refund
+execution is not claimed.
+
+Public transcripts and real decision screenshots are in
+`design-demos/reference/c48/`: light, dark and 390px phone, no overflow/runtime
+errors, simulation banner visible, reduced motion. Evidence explicitly labels
+the $540 fixture; the walkthrough's staged $60 claim is separate. At the owner's
+request, broad pytest was intentionally stopped at 21%; no full-suite pass is
+claimed. The independently reproduced approval error was a frozen-fixture versus
+wall-clock mismatch; upstream C52 fixed only the test clock, and the entire
+affected approval file now passes. Feature and important checks are complete.
+No environment-file reads or real PayPal/LLM calls. Commit/push final verification
+notes and leave agent-boundary review/integration to Claude.
+
 ## C46 compact demo controls (Nov 3)
 
 Owner requested two small demo buttons instead of the huge floating dock, and

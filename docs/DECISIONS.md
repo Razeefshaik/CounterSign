@@ -530,3 +530,17 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Keep the original 8px glass rims and use 28px gaps for adjacent decision, split, replay and overview figure cards | Owner, Nov 2 | Accept | Two rims consumed the previous 14–16px gaps; spacing, rather than replacing the rim, prevents them from touching |
 | Use subtle warm cream light surfaces with less saturated backdrop blur; retain the blue palette and dark surfaces | Owner, Nov 2 | Accept | Pure white cards looked too bright; the warmer finish should read matte without changing the design |
 | Let grid tracks shrink and place the sticky decision column below the desktop header | C43 browser check | Accept | Long content and scrolled controls must not collide with adjacent cards or the header |
+
+## Nov 3 C48 MCP gateway
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Pin the official MCP Python SDK at verified version 2.3.0; expose exactly six read and five proposal tools | C48 task | Accept | External clients receive bounded read/propose capabilities without an owner or money-moving tool |
+| Extract the internal agent's locked binding into approvals/binding.py; both callers use it | C48 task | Accept | One authoritative transaction path preserves incident version checks, deduplication, reservations, expiry and audits rather than duplicating policy |
+| Default stdio to preview and force HTTP to preview behind the existing demo/loopback guard | C48 task | Accept | Public clients must not disturb the staged week or create owner decisions |
+| Record convenience requests on their own reconciliation incident without reopening internal incidents | C48 integration | Accept | The original binding only accepts OPEN or INVESTIGATING incidents and its lifecycle behavior must stay unchanged |
+| Treat sanitized MCP initialize names as attribution only; attach external_agent to gateway audit details | C48 task | Accept | Client-controlled labels identify proposal origin but confer no authority |
+| Bound raw arguments before SDK dispatch, reject extra keys and use the existing strict proposal parser | C48 boundary review | Accept | SDK coercion or diagnostic echoes must not bypass existing validation or expose rejected caller text |
+| Read dashboard views under the read-only role; proposal status omits rationale, payloads and flag excerpts | C48 boundary review | Accept | External reads need verdicts and rules without replaying untrusted agent instructions |
+| Keep SDK DNS-rebinding checks and extend only the trusted deployment HTTPS origin; redirect exact /mcp before static routing | C48 HTTP verification | Accept | The hosted static catch-all otherwise returns 405 before the mounted transport receives an exact-path POST |
+| Payout convenience proposals reuse an existing planned manifest; gateway never creates a plan | C48 integration | Accept | Planning and the staged week stay in their existing owner workflows |

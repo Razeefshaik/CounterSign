@@ -8,6 +8,8 @@ version = "0.1.0"
 description = "AI proposes, code countersigns: safe marketplace money operations."
 readme = "README.md"
 requires-python = ">=3.12"
+# C48: official SDK; verified against PyPI and installed in the isolated gateway venv.
+dependencies = ["mcp==2.3.0"]
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 
@@ -74,3 +76,10 @@ name = "The shield stays pure: no database, PayPal, executor or agent imports"
 type = "forbidden"
 source_modules = ["*.shield"]
 forbidden_modules = ["*.db", "*.paypal", "*.executor", "*.agent"]
+
+# C48: external agents have no path to financial execution or sandbox controls.
+[[tool.importlinter.contracts]]
+name = "Gateway cannot reach PayPal writes or execution"
+type = "forbidden"
+source_modules = ["*.gateway"]
+forbidden_modules = ["*.paypal.write", "*.executor", "*.paypal.sandbox_controls"]
