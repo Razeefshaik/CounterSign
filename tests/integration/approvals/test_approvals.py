@@ -334,9 +334,15 @@ async def test_approval_uses_its_own_cash_reservation_once(world):
     assert (await service.approve(proposal["id"], pending["payload_hash"]))["used_at"] is None
 
 
-async def test_demo_owner_reject_returns_public_proposal_and_stale_http_code(world):
+async def test_demo_owner_reject_returns_public_proposal_and_stale_http_code(world, monkeypatch):
     database, _, _, _ = world
     _, proposal, _ = await planned(world)
+    # The HTTP service must use the same staged clock as the pending approval.
+    monkeypatch.setattr(
+        owner,
+        "ApprovalService",
+        lambda db, **options: ApprovalService(db, clock=lambda: NOW, **options),
+    )
     app = FastAPI()
     app.include_router(
         owner.build_router(database, Settings("postgresql://fake:fake@localhost/fake")),

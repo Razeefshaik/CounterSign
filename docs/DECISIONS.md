@@ -484,6 +484,12 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The deck reorders on click and "See details" opens the front maker in the money map; nothing on the hero moves money | C39 design | Accept | The owner's signature still happens on the decision view, bound to the payload hash |
 | Journey takes the owner's reference look: a light grey glass room, two blues (cornflower #6b9fe4 for the maker deck, main button, headline amount and glass orbs; folio blue #2a56c9 for data and navigation), frosted glass coins, a navy held-back sticker, pink only for highlights; navigation becomes a floating glass icon rail and a glass pill header with a bell for waiting decisions | Owner, Oct 31 | Accept | Owner rejected C38, C40 and C41 and asked for the reference blues and glass on the Journey layout |
 
+## Nov 3 C47 release check
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Give the owner HTTP approval test the same frozen clock as its staged fixture | C47 full-suite failure | Accept | Wall time expired the November 2 approval before the intended stale-hash and public-rejection assertions; production expiry checks stay unchanged |
+
 ## Nov 3 C46 compact demo controls
 
 | Change | Source | Decision | Reason |
