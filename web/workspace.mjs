@@ -5,6 +5,8 @@ import {createReplay} from "./replay.mjs";
 import {createTrick} from "./trick.mjs";
 import {createCommand} from "./command.mjs";
 import {action as actionWord, state as stateWord, when} from "./words.mjs";
+// C49: projections and lazy Community mounts, no financial writes.
+import {mountGrid, mountAuditGrid, runRows, runTotal} from "./grid.mjs";
 
 const titles = {overview: "Command center", incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
 export function route(hash) {
@@ -55,6 +57,8 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
         return true;
       }
       let html;
+      // C49: keep the API documents alongside their untouched HTML fallbacks.
+      let gridRun = null, gridAudit = null;
       if (current.name === "decision" || current.name === "runs") {
         const resource = current.name === "decision" ? "proposals" : "payout-runs";
         const items = await client.list(resource);
@@ -80,8 +84,8 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
             if (ticket !== serial) return;
           }
           html = decisionView(doc, workspace.meta, staged, {run});
-        } else html = runView(doc);
-      } else if (current.name === "audit") html = auditView(await client.list("audit-log"));
+        } else {html = runView(doc); gridRun = doc;} // C49
+      } else if (current.name === "audit") {gridAudit = await client.list("audit-log"); html = auditView(gridAudit);} // C49
       else if (current.name === "cash") html = cashView(await client.singleton("cash"));
       else {
         const disputes = [...workspace.disputes].sort((a, b) => a.paypal_dispute_id.localeCompare(b.paypal_dispute_id));
@@ -93,6 +97,9 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
       }
       if (ticket !== serial) return;
       $("view-body").innerHTML = html;
+      // C49: DOM-capable clients enhance only the view currently being shown.
+      if (gridRun) mountGrid(document.querySelector?.('[data-c49-grid="runs"]'), "runs", runRows(gridRun), {total:runTotal(gridRun)});
+      if (gridAudit) mountAuditGrid(document.querySelector?.('[data-c49-grid="audit"]'), gridAudit, {onOpen:row => {if (row.decision_id) location.hash = "#decision/" + encodeURIComponent(row.decision_id);}});
       if (current.name === "decision") bindDecision();
       for (const button of document.querySelectorAll("[data-copy]")) button.onclick = async () => {
         try {await navigator.clipboard.writeText(button.dataset.copy); notice("Payload hash copied.");} catch {notice("Copy is unavailable in this browser.");}

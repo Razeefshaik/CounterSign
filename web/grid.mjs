@@ -54,8 +54,9 @@ export function auditRows(entries, proposals = []) {
 export function runRows(run) {
   const rows = (run?.lines || []).map(line => {
     const latest = [...(line.attempts || [])].sort((a, b) => b.attempt_no - a.attempt_no)[0];
+    const paypalState = latest?.paypal_item_id && ["SUCCESS", "FAILED", "PENDING", "UNCLAIMED", "RETURNED", "ONHOLD", "BLOCKED", "REFUNDED", "REVERSED"].includes(latest.state) ? latest.state : null;
     return {id:line.id, maker:line.maker?.display_name, state:line.state, attempt:latest?.attempt_no ?? null,
-      item_status:latest?.state ?? null, item_id:latest?.paypal_item_id || null, replacement:false, ...moneyFields(line.amount)};
+      item_status:paypalState, item_id:latest?.paypal_item_id || null, replacement:false, ...moneyFields(line.amount)};
   });
   for (const replacement of run?.replacements || []) {
     // The replacement summary describes the PREVIOUS attempt, not the new item's status.
@@ -164,6 +165,7 @@ export async function mountGrid(host, view, rows, options = {}) {
   }
   try {
     viewport = document.createElement("div"); viewport.className = "ag-theme-quartz cs-grid";
+    viewport.style.height = Math.min(584, Math.max(244, Math.min(rows.length, 10) * (view === "incidents" ? 64 : 52) + 102 + (settings.total ? 52 : 0))) + "px";
     viewport.setAttribute("aria-label", {incidents:"Incident desk", audit:"Execution history", runs:"Payout run lines", makers:"Makers"}[view]);
     host.append(viewport);
     motionQuery = document.defaultView.matchMedia?.("(prefers-reduced-motion: reduce)");

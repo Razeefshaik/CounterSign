@@ -6,6 +6,8 @@ import {plotSvg, scanSvg, scanTally, stands, activity, finding, progress, makerA
 import {weekDays} from "./words.mjs";
 import {esc} from "./views.mjs";
 import {bannerText} from "./data.mjs";
+// C49: keep four-maker cards; enhance only the larger maker table.
+import {mountGrid, makerRows} from "./grid.mjs";
 
 const optional = promise => promise.catch(() => null);
 
@@ -15,6 +17,8 @@ export function createCommand(document, fetcher = fetch) {
   const motion = () => !view?.matches;
   let data = null, model = null, previous = null, selected = "", focus = "", category = "", item = "", fm = null, shown = false, serial = 0;
   let makerFilter = "all", makerMore = false;
+  // C49: the dialog can fetch a maker beyond the map's six on demand.
+  let makerGrid = null, currentClient = null;
   // The maker dialog keeps its own selection, so the money map below stays where it was.
   let dlg = null;
 
@@ -95,9 +99,24 @@ export function createCommand(document, fetcher = fetch) {
   // Optional pieces: a layout that leaves one out simply has no element for it.
   const fill = (id, html) => {const el = $(id); if (el) el.innerHTML = html;};
   function makers() {
+    makerGrid?.destroy(); makerGrid = null; // C49
     const count = (model.all || model.makers).length;
     fill("makers-count", count ? esc(count) : "");
     fill("folios", makerList(model, {filter: makerFilter, expanded: makerMore}));
+    // C49: preserve the pure makerList HTML contract as the fallback.
+    const table = $("folios")?.querySelector?.(".mtable"), host = table?.querySelector(".table-scroll");
+    if (host) {
+      host.dataset.c49Grid = "makers";
+      const rows = makerRows(data.makers, model);
+      mountGrid(host, "makers", rows, {onOpen:row => openDialog("maker:" + row.id)}).then(handle => {
+        if (!host.isConnected) {handle?.destroy(); return;}
+        makerGrid = handle;
+        if (handle?.api) {
+          table.querySelector(".table-footer").hidden = true;
+          if (makerFilter !== "all") {handle.api.setFilterModel({state:{filterType:"text", type:"equals", filter:makerFilter}});}
+        }
+      });
+    }
   }
 
   function pieces() {
@@ -138,7 +157,7 @@ export function createCommand(document, fetcher = fetch) {
 
   // A maker card opens that maker's money map in a dialog over the page.
   function drawDialog() {
-    const maker = dlg && model.makers.find(m => m.id === dlg.id);
+    const maker = dlg && (model.all || model.makers).find(m => m.id === dlg.id); // C49
     if (!maker) return;
     $("md-title").textContent = maker.name;
     $("md-sub").textContent = makerState(maker, model).what;
@@ -152,12 +171,20 @@ export function createCommand(document, fetcher = fetch) {
   }
 
   function openDialog(id) {
-    const dialog = $("maker-dialog"), maker = model.makers.find(m => "maker:" + m.id === id);
+    const dialog = $("maker-dialog"), maker = (model.all || model.makers).find(m => "maker:" + m.id === id); // C49
     if (!maker || !dialog?.showModal) return false;
     const fm = focusModel(data.graphs[maker.id], maker);
     dlg = {id: maker.id, fm, category: defaultCategory(fm), item: ""};
     drawDialog();
     if (!dialog.open) dialog.showModal();
+    // C49: only the selected extra maker needs another graph read.
+    if (!Object.hasOwn(data.graphs, maker.id) && currentClient) {
+      const ticket = serial;
+      optional(currentClient.singleton("money-graph", {maker_id:maker.id})).then(graph => {
+        if (ticket !== serial || dlg?.id !== maker.id) return;
+        data.graphs[maker.id] = graph; dlg.fm = focusModel(graph, maker); dlg.category = defaultCategory(dlg.fm); drawDialog();
+      });
+    }
     return true;
   }
 
@@ -249,6 +276,7 @@ export function createCommand(document, fetcher = fetch) {
       const next = await load(workspace, client);
       if (ticket !== serial) return;
       data = next;
+      currentClient = client; // C49
       previous = model;
       model = sceneModel(data);
       if (focus) {
@@ -257,7 +285,7 @@ export function createCommand(document, fetcher = fetch) {
       }
       if (selected && !nodePanel(model, selected, {cash: data.cash})) selected = "";
       if (dlg) {
-        const maker = model.makers.find(m => m.id === dlg.id);
+        const maker = (model.all || model.makers).find(m => m.id === dlg.id); // C49
         if (maker) {dlg.fm = focusModel(data.graphs[maker.id], maker); if (!dlg.fm.categories.some(c => c.type === dlg.category)) dlg.category = defaultCategory(dlg.fm);}
         else {dlg = null; $("maker-dialog").close();}
       }

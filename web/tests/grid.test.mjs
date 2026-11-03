@@ -54,7 +54,7 @@ test("pink stamp classes mean needs-owner only, never held or approved money", (
 test("run grid includes resends once, latest attempt and an authoritative pinned total", () => {
   const rows = runRows(run);
   assert.equal(rows.length, 3); assert.equal(rows.reduce((n, row) => n + row.amount_minor, 0), run.total.minor);
-  assert.equal(rows[0].attempt, 1); assert.equal(rows[0].item_status, "PENDING");
+  assert.equal(rows[0].attempt, 1); assert.equal(rows[0].item_status, null);
   const resend = rows.find(r => r.replacement);
   assert.equal(resend.attempt, 2); assert.equal(resend.item_status, null); assert.equal(resend.state, null);
   const total = runTotal(run);
@@ -63,6 +63,7 @@ test("run grid includes resends once, latest attempt and an authoritative pinned
   assert.equal(runRows(duplicated).length, run.lines.length);
   const later = {...run, lines:[{...run.lines[0], attempts:[{attempt_no:2, state:"SUCCESS", paypal_item_id:"ITEM2"}, ...run.lines[0].attempts]}]};
   assert.equal(runRows(later)[0].item_id, "ITEM2");
+  assert.equal(runRows(later)[0].item_status, "SUCCESS");
 });
 
 test("audit rows preserve absent money and bind operation links to actual proposal ids", () => {
@@ -105,7 +106,7 @@ test("row click and Enter open the bound record, pinned totals and native links 
 });
 
 function fakeHost() {
-  const make = () => ({hidden:false, dataset:{}, children:[], setAttribute() {}, append(node) {this.children.push(node);}, prepend(node) {this.children.unshift(node);}, remove() {this.removed = true;}});
+  const make = () => ({hidden:false, dataset:{}, style:{}, children:[], setAttribute() {}, append(node) {this.children.push(node);}, prepend(node) {this.children.unshift(node);}, remove() {this.removed = true;}});
   const doc = {createElement:make, defaultView:{}, body:make()}, host = make(), original = make();
   host.ownerDocument = doc; host.isConnected = true; host.children = [original];
   return {host, original, doc};

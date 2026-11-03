@@ -1,5 +1,45 @@
 # CounterSign dashboard
 
+<!-- C49 -->
+## Nov 3 AG Grid working tables (C49)
+
+AG Grid Community **32.3.9**, already vendored with its MIT license, enhances
+the incident desk, execution history, payout run lines and maker lists above
+four makers. No dependency or CDN was added. `grid.mjs` owns pure column/row
+projections plus the lazy loader and mount; `grid.css` maps the existing light
+and dark tokens to `--ag-*`. Theme changes need no reload. Reduced motion disables
+row animation. Phones scroll columns inside the grid, not the page.
+
+- Incidents: sort numeric minor-unit risk amounts, search all row fields with
+  the existing quick search, filter columns, and click a row or press Enter to
+  open the same incident detail. Makers and disputes are joined by API IDs.
+- History: filter verdict and actor, search action/rule/references, and follow
+  proposal/operation references to the associated decision. An operation link
+  requires a proposal association from the API's audit rows; orphan references
+  remain plain text. The original detail timeline remains the fallback.
+- Runs: new lines and referenced resends share one grid; the API's exact run
+  total is pinned below. A planned resend does not borrow the previous item's
+  status. PayPal item status needs an item ID. Full idempotency references and
+  held-back shares remain available below the grid.
+- Makers: up to four cards stay unchanged. Above four, the existing state
+  controls drive a paginated grid (10 rows per page); owner-needed cards remain
+  above it. Any row can open its maker dialog, with a graph read on demand for
+  makers beyond the map's first six. No extra makers are added to the money map.
+
+Money stays integer minor units in row data and is formatted only by cells;
+missing/invalid values display a dash. Renderers escape API text and mask emails.
+Only owner-needed states use rose stamps. Each grid is destroyed when its host
+is replaced. The vendor script/styles load on the first relevant view only;
+while loading or on script failure the existing accessible HTML stays available,
+with a standard-table notice on failure. Approval and payment logic are unchanged.
+
+Node tests cover column contracts, mapping, escaping, numeric formatting, state
+colours, pinned totals, activation, asynchronous mounting and missing-vendor
+fallback. `tests/dashboard/test_grid_assets.py` checks the real static mount.
+Browser evidence is in `design-demos/reference/c49/`; its scale sample is explicitly
+browser-only contract fixture data, not a real marketplace or financial run.
+<!-- /C49 -->
+
 ## Nov 3 compact demo controls (C46)
 
 The staged-week dock is now two small bottom-right buttons, **Next step** and
@@ -110,7 +150,7 @@ Tests: `node --test web/tests/*.test.mjs` (54, including `scene.test.mjs`).
 The dashboard was rebuilt for a first-time reader who has about a minute:
 
 - **Every page leads with one plain-English sentence** built only from API records (for example "Pay Maker B $486.00 and Maker C $300.00, and resend Maker C's returned $300.00 payout. Total $1,086.00."). Contract codes, hashes and IDs stay on the page, in titles and in "Technical details".
-- **Incident desk:** a quiet four-figure ledger (open incidents, decisions waiting, held back from disputes, unreserved cash), one callout when something waits for the owner (payout runs included), and a keyboard-reachable incident table. AG Grid is no longer loaded; its vendor files remain in `vendor/` and are unused.
+- **Incident desk:** a quiet four-figure ledger (open incidents, decisions waiting, held back from disputes, unreserved cash), one callout when something waits for the owner (payout runs included), and a keyboard-reachable incident table. <!-- C49 --> The vendored Community grid now enhances this table; see the C49 section above. <!-- /C49 -->
 - **Demo bar:** the staged week as a day-grouped stepper.
 - **Decision:** the summary sentence, the shield's checks with plain names (`words.mjs`), the owner's signature and approval, and "How this was decided" (read, proposed, shield, owner, sent).
 - **Try to trick the agent** (`trick.mjs`, demo mode on the mock only): runs the proposal a fooled agent would make through the real shield via `POST /api/v1/playground/attempts`. The server rolls every attempt back.
