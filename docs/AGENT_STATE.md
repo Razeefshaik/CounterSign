@@ -11,7 +11,26 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## Current work: C47 release check
+## Current state (Nov 3, after cleanup)
+
+- `main` is `97ceea7` plus this note: C47 release check, C48 MCP gateway, C49 AG
+  Grid, C50 sandbox proof and C51 passkey countersign are all merged. Full suite on
+  `97ceea7`: **4,082 passed, 0 failed, 5 skipped** (toolkit tests on, private 1 GB
+  PostgreSQL). Image `countersign-main:97ceea7` boots in about 14 s at 1 CPU and
+  serves the dashboard, proof data, AG Grid files, `/mcp` and passkey routes.
+- C51 merge includes `1ce7c64`: the plain approve endpoint refuses an
+  `approved_by` starting with `owner:passkey` (422), so only a verified passkey can
+  produce the "Countersigned with passkey" label.
+- Branch cleanup: every branch and worktree except `main` was backed up to
+  `PayPalDevPost/archive/2026-11-03-branch-cleanup/` (bundle plus README with the
+  restore command) and removed locally. Deleting the old branches on GitHub is an
+  owner step.
+- Next: owner deploys `main` on Render (New > Blueprint, Starter preferred), then a
+  hosted smoke test plus `/mcp` and passkey checks over HTTPS; then README, Devpost
+  text and the video script.
+- Passkeys need a hostname: use `localhost`, not `127.0.0.1`, locally.
+
+## Completed Nov 3: C47 release check (merged `454d2cc`)
 
 - Worktree `CounterSign-release-check`, branch `razeef/c47-release-check`, from
   tested base `1303ad2` (C46 merged), image source `e661516`. During the run,
@@ -62,7 +81,7 @@ staged, sandbox and real-model evidence stay distinct.
   validate the combined main, then Render **New > Blueprint** as documented.
   Do not deploy combined main on C47-only proof. No rebase/new suite performed.
 
-### C50 sandbox proof (Nov 3; ready for integration)
+### C50 sandbox proof (Nov 3; merged `51191b7`)
 
 - Worktree `CounterSign-c50`, branch `razeef/c50-sandbox-proof`, base `454d2cc`.
   Commits `24a47c0` (builder/bundle/tests), `88c1ead` (proof UI/capture).
@@ -83,7 +102,7 @@ staged, sandbox and real-model evidence stay distinct.
   environment-file, PayPal, model or database calls. No full pytest, per owner's
   explicit preference for fast feature/important checks.
 
-### C49 AG Grid (Nov 3; focused validation complete)
+### C49 AG Grid (Nov 3; merged `3bb26d3`)
 
 - Worktree `CounterSign-c49`, branch `razeef/c49-ag-grid`, base `454d2cc`
   (C47 merged). Commits `8fab59c` foundation, `b5ef25a` integration/docs and
@@ -131,7 +150,7 @@ staged, sandbox and real-model evidence stay distinct.
   stopped at 19:08; 8192 confirmed not listening, no own container created. Other task
   ports/8180 untouched. No .env/real services.
 
-### C48 MCP gateway (Nov 3; ready for Claude review)
+### C48 MCP gateway (Nov 3; merged `02a4a47`)
 
 - Isolated worktree `CounterSign-c48`, branch `razeef/c48-mcp-gateway`, base
   `1303ad2`. Commits `610ccaf` (binding), `6f1a30f` (gateway), `abe5bc8`
@@ -175,7 +194,7 @@ Push only the C47 branch after verification; owner approves merge. No cloud
 actions. Ask before shield/executor/approvals/migrations/contracts/visual changes.
 Consult matching sections of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).
 
-## Nov 3 C51 passkey countersignatures
+## Completed Nov 3: C51 passkey countersignatures (merged `97ceea7`)
 
 - Restored local `CounterSign-c51`, branch `razeef/c51-passkey-countersign`,
   tested source `93f0e35`, feature `38877ef`, base `454d2cc`. No runtime,
