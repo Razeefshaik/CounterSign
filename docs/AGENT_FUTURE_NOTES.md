@@ -745,3 +745,26 @@ integration, while Node covers shared reset confirmation and request paths.
 Evidence under design-demos/reference/c57/. Own preview 8196 stopped. Commit and
 push C57 only; Claude integrates, no merge. Primary updated notes because the
 Professor Pickle context-keeper session was unavailable.
+
+## C62 Friday checkpoint
+
+Branch `razeef/c62-friday-checkpoint`, base75c95cb. New runtime files:
+api/friday.py (restore/idle/gate), friday_data.py (trusted bundle + constrained
+transaction), friday_clock.py (staged dashboard age windows), mock checkpoint.py
+(data-only object graph/timers), scripts/friday_checkpoint.py (real replay builder).
+Mock codec preserves shared references; unknown pending callbacks fail closed.
+Owner payee changes invalidate freshness. Idle rechecks recent activity after
+awaits. An uncertain DB commit closes APIs until restart even if mock rollback works.
+
+Final verification: 20 new focused Python tests including 4 live PostgreSQL16
+integration tests; 127 Node; Ruff clean; import contracts4 kept. Integration file
+is test_friday_replay_restore.py: distinct basename from mock test_friday_checkpoint.py.
+Real clock +45days passes plain/P-256 approvals; challenges keep real2minute expiry.
+Staged cash can legitimately be stale on original Friday: preserve that truth.
+
+Single final Docker build: unrestricted/oneCPU restore0.734/0.985s, boot17.188/12.032s;
+Monday same-image0 passed; size238402125→250255901 bytes (inspect Size). Actual
+step7 and plain201 passed. Six guide/end light/dark/390px screenshots, browser.json,
+measurements and shared line starts: design-demos/reference/c62/README.md.
+No full suite; leave merge/full integration to Claude. Preview8198 own oneCPU
+container; protect other ports/worktrees/DBs. No.env, real API/model or styles.css.

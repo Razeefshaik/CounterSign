@@ -1,0 +1,104 @@
+[
+  {
+    "moment": "story",
+    "theme": "light",
+    "text": "The story so far · Simulated: mock PayPal\n\nIt's Friday. The weekly payout run is waiting for you.\n\nMonday to Thursday already happened: two buyers disputed orders, so Maker A's and Maker B's shares are held back, and the AI cancelled Maker C's stuck payout on its own.\n\nReview and sign\n→\nUse your passkey, or plain approval.\nHeld back\nExecution history\nWatch from Monday",
+    "visible": true,
+    "overflow": false,
+    "guide": {
+      "x": 300,
+      "y": 377,
+      "width": 1116,
+      "height": 246.25
+    },
+    "simulation": [],
+    "width": 1440,
+    "height": 1000,
+    "exceptions": []
+  },
+  {
+    "moment": "story",
+    "theme": "dark",
+    "text": "The story so far · Simulated: mock PayPal\n\nIt's Friday. The weekly payout run is waiting for you.\n\nMonday to Thursday already happened: two buyers disputed orders, so Maker A's and Maker B's shares are held back, and the AI cancelled Maker C's stuck payout on its own.\n\nReview and sign\n→\nUse your passkey, or plain approval.\nHeld back\nExecution history\nWatch from Monday",
+    "visible": true,
+    "overflow": false,
+    "guide": {
+      "x": 300,
+      "y": 377,
+      "width": 1116,
+      "height": 246.25
+    },
+    "simulation": [],
+    "width": 1440,
+    "height": 1000,
+    "exceptions": []
+  },
+  {
+    "moment": "story",
+    "theme": "light",
+    "text": "The story so far · Simulated: mock PayPal\n\nIt's Friday. The weekly payout run is waiting for you.\n\nMonday to Thursday already happened: two buyers disputed orders, so Maker A's and Maker B's shares are held back, and the AI cancelled Maker C's stuck payout on its own.\n\nReview and sign\n→\nUse your passkey, or plain approval.\nHeld back\nExecution history\nWatch from Monday",
+    "visible": true,
+    "overflow": false,
+    "guide": {
+      "x": 12,
+      "y": 185,
+      "width": 366,
+      "height": 474.625
+    },
+    "simulation": [],
+    "width": 390,
+    "height": 844,
+    "exceptions": []
+  },
+  {
+    "moment": "end",
+    "theme": "light",
+    "text": "The story so far · Simulated: mock PayPal\n\nIt's Friday. The weekly payout run is waiting for you.\n\nMonday to Thursday already happened: two buyers disputed orders, so Maker A's and Maker B's shares are held back, and the AI cancelled Maker C's stuck payout on its own.\n\nReview and sign\n→\nUse your passkey, or plain approval.\nHeld back\nExecution history\nWatch from Monday",
+    "visible": true,
+    "overflow": false,
+    "guide": {
+      "x": 300,
+      "y": 377,
+      "width": 1116,
+      "height": 246.25
+    },
+    "simulation": [],
+    "width": 1440,
+    "height": 1000,
+    "exceptions": []
+  },
+  {
+    "moment": "end",
+    "theme": "dark",
+    "text": "The story so far · Simulated: mock PayPal\n\nIt's Friday. The weekly payout run is waiting for you.\n\nMonday to Thursday already happened: two buyers disputed orders, so Maker A's and Maker B's shares are held back, and the AI cancelled Maker C's stuck payout on its own.\n\nReview and sign\n→\nUse your passkey, or plain approval.\nHeld back\nExecution history\nWatch from Monday",
+    "visible": true,
+    "overflow": false,
+    "guide": {
+      "x": 300,
+      "y": 377,
+      "width": 1116,
+      "height": 246.25
+    },
+    "simulation": [],
+    "width": 1440,
+    "height": 1000,
+    "exceptions": []
+  },
+  {
+    "moment": "end",
+    "theme": "light",
+    "text": "The story so far · Simulated: mock PayPal\n\nIt's Friday. The weekly payout run is waiting for you.\n\nMonday to Thursday already happened: two buyers disputed orders, so Maker A's and Maker B's shares are held back, and the AI cancelled Maker C's stuck payout on its own.\n\nReview and sign\n→\nUse your passkey, or plain approval.\nHeld back\nExecution history\nWatch from Monday",
+    "visible": true,
+    "overflow": false,
+    "guide": {
+      "x": 12,
+      "y": 185,
+      "width": 366,
+      "height": 474.625
+    },
+    "simulation": [],
+    "width": 390,
+    "height": 844,
+    "exceptions": []
+  }
+]

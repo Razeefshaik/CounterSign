@@ -1,0 +1,19 @@
+{
+  "full": {
+    "boot_seconds": 17.188,
+    "plain_approval_status": 201,
+    "step7": true,
+    "restore_seconds": 0.734
+  },
+  "image_before_bytes": 238402125,
+  "image_after_bytes": 250255901,
+  "1": {
+    "boot_seconds": 12.032,
+    "plain_approval_status": 201,
+    "restore_seconds": 0.985
+  },
+  "monday": {
+    "step": 0,
+    "boot_seconds": 19.078
+  }
+}

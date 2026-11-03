@@ -643,3 +643,6 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Idle and binding | Use monotonic time since demo/owner POST, wait for active commands/decisions/challenges, and invalidate fresh-Friday status after a verified-payee edit so stale bindings are not mistaken for an unsigned fresh run. |
 | Staged expiry | Retain C55 staged approvals and real-time passkey challenges; clear cached mock authentication after restore and project cash age and maker 30-day sums at the staged clock, without changing live views or schema. |
 | Written contract 1.0.9 | Owner approved documenting the fixed no-input Friday API and additive checkpoint state fields; keep the dashboard's existing advertised 1.0.6 metadata. |
+
+| Hosted checkpoint measurements | One final image build; inspect Size 238,402,125 → 250,255,901 bytes (+11,853,776); restore 0.734 s unrestricted and 0.985 s at one CPU, so visitors return to the unsigned run without replay. |
+| Friday guide | Show the story only for the API-confirmed unsigned Friday checkpoint; reuse the guarded demo controller for Back to Friday and confirmed Monday restart. |
