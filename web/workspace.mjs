@@ -132,8 +132,11 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
       return false;
     }
   }
+  // C61: a shared demo can already hold another visitor's passkey; this device may need its own.
+  let newDevice = false;
   function bindDecision() {
     // C51: share the plain decision's busy/invalidation state; never retry a signature.
+    if (newDevice && $("passkey-approve")) $("passkey-approve").textContent = "Set up a passkey on this device";
     if ($("passkey-approve")) $("passkey-approve").onclick = async () => {
       if (busy || !canDecide(proposal, workspace.meta.clock)) return;
       const selected = proposal, ticket = serial, token = $("owner-token")?.value || "";
@@ -142,13 +145,24 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
       for (const id of ["approve", "reject", "passkey-approve"]) if ($(id)) $(id).disabled = true;
       if ($("owner-token")) $("owner-token").value = "";
       try {
-        await countersign(selected, {token, fetcher, isCurrent: () => ticket === serial,
+        await countersign(selected, {token, fetcher, isCurrent: () => ticket === serial, newDevice,
           onSetup: () => {if (ticket === serial) {$("passkey-approve").textContent = "Set up a passkey"; notice("Set up a passkey on your device, then countersign the displayed payload.");}}});
+        newDevice = false;
         if (ticket === serial) {invalidate(); await render(); notice("Your countersignature was recorded. The latest proposal is shown.");}
       } catch (error) {
+        // C61: the device had no usable passkey (or the prompt was closed): offer this device its own.
+        const offerDevice = !error.status && error.name === "NotAllowedError" && !newDevice;
         if (ticket === serial) {invalidate(); notice(error.status === 409
           ? "The proposal or passkey challenge changed or expired. Refresh and review it again."
-          : "The countersignature could not be confirmed. Refresh before trying again, or use plain approval.");}
+          : offerDevice
+            ? "No passkey on this device was used. Set up a passkey on this device, then countersign."
+            : "The countersignature could not be confirmed. Refresh before trying again, or use plain approval.");}
+        if (offerDevice && ticket === serial) {
+          newDevice = true;
+          busy = false;
+          const message = $("view-notice").textContent;
+          if (await render()) notice(message);
+        }
       } finally {busy = false;}
     };
     for (const decision of ["approve", "reject"]) if ($(decision)) $(decision).onclick = async () => {

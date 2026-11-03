@@ -55,6 +55,33 @@ test("first use registers then signs the same displayed hash with same-origin re
   assert.ok(calls.every(([url, , headers]) => url.startsWith("/api/v1/owner/") && headers["X-Owner-Token"] === "test-only"));
 });
 
+test("C61: a new device registers its own passkey even when another is registered", async () => {
+  const urls = [], replies = [{registered: true, challenge_id: "stale", publicKey: options},
+    {challenge_id: "register", publicKey: {...options, user: {id: "AQID"}}}, {registered: true},
+    {registered: true, challenge_id: "approve", publicKey: options}, {approval: {}}];
+  const result = await countersign(proposal, {scope, newDevice: true, fetcher: async url => {
+    urls.push(url); return {ok: true, json: async () => replies.shift()};
+  }});
+  assert.deepEqual(result, {approval: {}});
+  assert.deepEqual(urls.map(url => url.split("/").slice(-2).join("/")),
+    ["passkey/options", "register/options", "register/verify", "passkey/options", "passkey/approve"]);
+});
+
+test("C61: a device that already holds a registered passkey skips setup and signs", async () => {
+  const held = {...scope, navigator: {credentials: {get: scope.navigator.credentials.get,
+    create: async () => {throw Object.assign(new Error("excluded"), {name: "InvalidStateError"});}}}};
+  const urls = [], replies = [{registered: true}, {challenge_id: "register", publicKey: {...options, user: {id: "AQID"}}},
+    {registered: true, challenge_id: "approve", publicKey: options}, {approval: {}}];
+  await countersign(proposal, {scope: held, newDevice: true, fetcher: async url => {
+    urls.push(url); return {ok: true, json: async () => replies.shift()};
+  }});
+  assert.ok(!urls.some(url => url.endsWith("register/verify")));
+  assert.ok(urls.at(-1).endsWith("passkey/approve"));
+  // Without newDevice, a refused registration is still an error.
+  await assert.rejects(countersign(proposal, {scope: held, fetcher: async () =>
+    ({ok: true, json: async () => ({registered: false, challenge_id: "r", publicKey: {...options, user: {id: "AQID"}}})})}), /excluded/);
+});
+
 test("cancellation, server refusal, and navigation never retry or call plain approve", async () => {
   let posts = 0;
   const cancel = {...scope, navigator: {credentials: {create: scope.navigator.credentials.create, get: async () => {throw new Error("cancelled");}}}};

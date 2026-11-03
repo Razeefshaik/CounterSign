@@ -28,8 +28,9 @@ export function encodeCredential(credential) {
   return {id: credential.id, rawId: toBase64url(credential.rawId), type: credential.type, response};
 }
 
+// C61: newDevice registers this device's own passkey even when another one is already registered.
 export async function countersign(proposal, {token = "", fetcher = fetch, scope = globalThis,
-  isCurrent = () => true, onSetup = () => {}} = {}) {
+  isCurrent = () => true, onSetup = () => {}, newDevice = false} = {}) {
   if (!passkeySupported(scope)) throw new Error("PASSKEY_UNAVAILABLE");
   const payload_hash = proposal.approval_request?.payload_hash;
   const base = `/api/v1/owner/proposals/${encodeURIComponent(proposal.id)}/passkey`;
@@ -45,14 +46,22 @@ export async function countersign(proposal, {token = "", fetcher = fetch, scope 
     return response.json();
   }
   let options = await post(base + "/options", {payload_hash});
-  if (!options.registered) {
+  if (!options.registered || newDevice) {
     onSetup();
     const registration = await post("/api/v1/owner/passkeys/register/options");
     if (!isCurrent()) throw new Error("PASSKEY_VIEW_CHANGED");
-    const credential = await scope.navigator.credentials.create({publicKey: decodeOptions(registration.publicKey)});
-    await post("/api/v1/owner/passkeys/register/verify", {
-      challenge_id: registration.challenge_id, credential: encodeCredential(credential),
-    });
+    let credential = null;
+    try {
+      credential = await scope.navigator.credentials.create({publicKey: decodeOptions(registration.publicKey)});
+    } catch (error) {
+      // This device already holds a registered passkey (excluded); sign with it instead.
+      if (!(newDevice && error?.name === "InvalidStateError")) throw error;
+    }
+    if (credential) {
+      await post("/api/v1/owner/passkeys/register/verify", {
+        challenge_id: registration.challenge_id, credential: encodeCredential(credential),
+      });
+    }
     options = await post(base + "/options", {payload_hash});
   }
   if (!isCurrent()) throw new Error("PASSKEY_VIEW_CHANGED");
