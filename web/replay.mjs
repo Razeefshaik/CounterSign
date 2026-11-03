@@ -127,10 +127,14 @@ export function createReplay(document, fetcher = fetch) {
     loaded = true;
   }
   function draw() {
+    const kept = $("c58-eval-explorer"); // C58: replay steps keep the grid's page, sort and columns.
     $("view-body").innerHTML = replayView({rows,evidence,scenario,baseline,key,position});
     // C58: place the complete experiment above the existing, unchanged replay lanes.
-    $("view-body").insertAdjacentHTML?.("afterbegin", '<div id="c58-eval-explorer"></div>');
-    void explorer.mount($("c58-eval-explorer"));
+    if (kept) $("view-body").prepend(kept);
+    else {
+      $("view-body").insertAdjacentHTML?.("afterbegin", '<div id="c58-eval-explorer"></div>');
+      void explorer.mount($("c58-eval-explorer"));
+    }
     // /C58
     const bind = (id, handler) => {$(id).onclick = handler;};
     for (const [id, update] of [["replay-scenario", value => {scenario=value;}], ["replay-baseline", value => {baseline=value;}], ["replay-sample", value => {key=value;}]]) $(id).onchange = event => {update(event.target.value); position=0; draw();};
