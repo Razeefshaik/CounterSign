@@ -1018,7 +1018,7 @@ it does not introduce new actions.
 | `list_incidents` | `state?`, `kind?`, `limit?` | `v_dash_incidents` summaries |
 | `get_incident` | `incident_id` | Same summary view, not private incident storage |
 | `list_makers` | `limit?` | Masked `v_dash_makers` summaries |
-| `get_cash` | none | `v_dash_cash`, including available, unreserved, reserved and stale flags |
+| `get_cash` | none | `v_dash_cash`: `paypal.available`, `unreserved`, `cash_reservations.total`, `paypal.stale` and refresh times |
 | `get_proposal` | `proposal_id` | `v_dash_proposals`: ID, incident, action, state, verdict, rule results, expected effect, creation time and flag type/source only |
 | `list_actions` | none | Section 1 action names and parameter shapes |
 | `propose` | `incident_id`, `action`, `params`, `rationale`, `evidence_refs` | Generic validated proposal on an existing incident |

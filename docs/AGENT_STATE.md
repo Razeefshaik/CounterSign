@@ -33,6 +33,33 @@ Money is integer minor units. Mock, staged, sandbox and real-model evidence stay
   without posting any staged actions. No reset, environment-file reads, real LLM or
   real PayPal calls for C46. C45's full-backend limitation below still applies.
 
+### C48 MCP gateway (Nov 3; ready for Claude review)
+
+- Isolated worktree `CounterSign-c48`, branch `razeef/c48-mcp-gateway`, base
+  `1303ad2`. Commits `610ccaf` (binding), `6f1a30f` (gateway), `abe5bc8`
+  (docs/evidence) are pushed. Feature merge `60a41d9` includes upstream main
+  `9eefa6e` and C52's test-only clock fix `c32d16c`; no merge to main.
+  Final verification/context commit and push remain pending.
+- Official MCP SDK gateway exposes exactly six reads and five proposal tools.
+  Preview defaults to rollback; guarded demo/mock HTTP forces preview. Local
+  stdio record mode uses the extracted internal-agent binding with external
+  client attribution and audit source. No shield or executor changes.
+- Verified by the primary agent: final focused run **23 passed** (19 gateway,
+  four persisted-row characterization), earlier **43 unchanged agent/harness
+  passed**, **28 approval tests passed** after the upstream fix, **70 Node
+  passed**, Ruff clean and four import contracts kept. Runtime code is unchanged
+  since the focused pass.
+  SDK stdio preview/record and HTTP transcripts include BLOCK and plain
+  NEEDS_OWNER; actual dashboard HTTP and owner approval are tested. A stale
+  approved record is refused at execution with no mock refund.
+- Decision screenshots in `design-demos/reference/c48/` cover light, dark and
+  390px phone; checks found no overflow/runtime errors, retained the simulation
+  banner and used reduced motion. Fixture is explicitly $540, versus the $60
+  walkthrough. At the owner's request, broad pytest was intentionally stopped
+  at 21%; no full-suite pass is claimed. Feature and important checks are done.
+- Use only `countersign_c48` on PostgreSQL 55433 and preview port 8191. No
+  environment-file reads or real PayPal/model calls. See the C48 future note.
+
 ## Completed: C45 overview integration
 
 - Owner explicitly authorized integrating the selected design to main and
