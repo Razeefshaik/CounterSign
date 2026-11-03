@@ -484,6 +484,13 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | The deck reorders on click and "See details" opens the front maker in the money map; nothing on the hero moves money | C39 design | Accept | The owner's signature still happens on the decision view, bound to the payload hash |
 | Journey takes the owner's reference look: a light grey glass room, two blues (cornflower #6b9fe4 for the maker deck, main button, headline amount and glass orbs; folio blue #2a56c9 for data and navigation), frosted glass coins, a navy held-back sticker, pink only for highlights; navigation becomes a floating glass icon rail and a glass pill header with a bell for waiting decisions | Owner, Oct 31 | Accept | Owner rejected C38, C40 and C41 and asked for the reference blues and glass on the Journey layout |
 
+## Nov 3 C46 compact demo controls
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Replace the wide staged-week dock with Next step and Restart plus a small step count; keep normal status accessible and show failures in a compact notice | Owner, Nov 3 | Accept | The large overlay repeated the week timeline and obscured the dashboard; the persistent simulation banner and staged clock already provide context |
+| Restore the earlier pink colour only on the hero's flowing 3px rim | Owner, Nov 3 | Accept | Owner requested the previous rim accent while retaining muted matte-rose attention colours elsewhere |
+
 ## Nov 2 C45 selected design integration
 
 | Change | Source | Decision | Reason |

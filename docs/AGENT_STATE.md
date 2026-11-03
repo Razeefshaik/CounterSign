@@ -11,6 +11,28 @@ The model reads and proposes; the deterministic shield and executor authorize
 and perform financial writes. PostgreSQL owns state, reservations and the inbox.
 Money is integer minor units. Mock, staged, sandbox and real-model evidence stay distinct.
 
+## Current work: C46 compact demo controls
+
+- Active branch `razeef/c46-compact-demo-controls`, based on main `91eb0f0`.
+  Feature commit `3c4a4f7`. No push or merge for this task.
+- `web/demo.mjs` replaces the large floating dock with exactly Next step and
+  Restart, a small genuine step/total, next-step/context tooltips and screen-reader
+  status. Errors remain visible as a small popup. One POST per click, busy and
+  complete states, restart confirmation and polling retain their existing logic.
+  Bottom-right strip stays below 320x60; the simulation banner remains visible.
+- Hero's flowing 3px rim returns to normal pink #ec4899. The rest of the interface
+  keeps C45's matte rose accents. Tests updated in views/redesign/brand.
+- Verified: **70 Node tests passed**, **23 Python demo-bar dashboard tests passed**
+  (`tests/dashboard/test_demo_bar.py`), syntax and Ruff passed; all three import
+  contracts kept. **22 browser checks passed** across five widths, both themes
+  and overview/decision routes, with zero writes or runtime exceptions. The
+  checker waits for live maker data; owner-operated step changes are allowed.
+- Local Docker `countersign-c45` at loopback 8180 was started after the stale
+  runtime socket folder was backed up. Full 11-stage hosted smoke passed before
+  this UI update; new dock files were copied into that same running container,
+  without posting any staged actions. No reset, environment-file reads, real LLM or
+  real PayPal calls for C46. C45's full-backend limitation below still applies.
+
 ## Completed: C45 overview integration
 
 - Owner explicitly authorized integrating the selected design to main and
@@ -66,8 +88,8 @@ Money is integer minor units. Mock, staged, sandbox and real-model evidence stay
 ## Continuation
 
 Use explicit file staging. One-line commits with the task prefix, no attribution.
-C45 owner authorization includes integration to main and push after verified
-checks; do not claim either complete before checking Git. Full tests require
+C45 integration/push authorization was task-specific; C46 has no push or merge
+authorization. Full tests require
 the explicit database URL on 55433 and the toolkit test setting. On Windows use
 SelectorEventLoop. Consult the matching section of
 [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md); older entries are history, not status.

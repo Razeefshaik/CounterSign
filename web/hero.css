@@ -17,7 +17,7 @@
 .brand-policy{font-size:14px;line-height:1.8;color:var(--ink-2);margin-top:22px;max-width:56ch;text-wrap:balance}
 .brand-motion{position:absolute;right:22px;top:16px;border:0;border-radius:8px;min-height:36px;padding:4px 9px;background:transparent;color:var(--ink-2);font-size:11px;cursor:pointer}
 @property --brand-rim-angle{syntax:'<angle>';initial-value:0deg;inherits:false}
-.brand-pane::after{content:'';position:absolute;inset:-5px;padding:3px;border-radius:25px;pointer-events:none;background:conic-gradient(from var(--brand-rim-angle),transparent 0deg 242deg,color-mix(in srgb,var(--highlight) 0%,transparent) 249deg,color-mix(in srgb,var(--highlight) 45%,transparent) 275deg,color-mix(in srgb,var(--highlight) 75%,transparent) 303deg,#fff4faad 311deg,transparent 324deg 360deg);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;animation:brand-rim 12s linear infinite}
+.brand-pane::after{content:'';position:absolute;inset:-5px;padding:3px;border-radius:25px;pointer-events:none;background:conic-gradient(from var(--brand-rim-angle),transparent 0deg 242deg,#ec489900 249deg,#edc3d799 275deg,#ec4899c9 303deg,#fff4faed 311deg,#ec489900 324deg,transparent 360deg);mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);mask-composite:exclude;-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;animation:brand-rim 12s linear infinite}
 @keyframes brand-float{from{translate:0 -10px}to{translate:8px 13px}}
 @keyframes brand-drift{from{translate:0 12px}to{translate:-12px -15px}}
 @keyframes brand-rim{to{--brand-rim-angle:360deg}}

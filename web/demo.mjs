@@ -2,13 +2,6 @@
 // mode on the local mock); a 404 keeps it hidden. Each button sends one POST with
 // no body: the server replays the next step of the fixed staged week.
 import {esc} from "./views.mjs";
-import {weekDays} from "./words.mjs";
-
-const staged = on => on ? ' <span class="staged">staged</span>' : "";
-const when = value => {
-  const time = Date.parse(value);
-  return Number.isFinite(time) ? new Date(time).toLocaleString("en-GB", {weekday: "short", day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit", timeZone: "UTC"}) + " UTC" : "—";
-};
 const messages = {
   DEMO_BUSY: "A staged step is already running. Wait for it to finish.",
   DEMO_WEEK_COMPLETE: "The staged week is complete. Restart the week to replay it.",
@@ -25,34 +18,15 @@ export function resultText(state) {
   return "Step complete. The dashboard shows the new records.";
 }
 
-// The week as day groups with one tick per step: done, next, or still to come.
-function stepper(steps) {
-  const next = steps.find(s => !s.done);
-  return `<ol class="stepper" aria-label="Week progress">${weekDays(steps).map(day => {
-    const current = next && day.steps.includes(next);
-    return `<li class="${current ? "current" : ""}" style="--n:${day.steps.length}"><span class="day">${esc(day.name)}</span><span class="ticks">${day.steps.map(s =>
-      `<span class="tick${s.done ? " done" : s === next ? " next" : ""}" title="${esc(s.label)}"></span>`).join("")}</span></li>`;
-  }).join("")}</ol>`;
-}
-
 export function demoBarView(state) {
-  const steps = state.steps || [];
-  const done = steps.filter(s => s.done);
-  const last = done.at(-1), next = steps.find(s => !s.done);
+  const next = (state.steps || []).find(s => !s.done);
   const busy = Boolean(state.running);
-  return `<div class="demo-top"><div class="demo-head"><span class="small-label">Staged demo week${staged(true)}</span>
-      <span>Step <strong>${esc(state.step)}</strong> of ${esc(state.total)}</span>
-      <span>Staged clock: <strong>${esc(state.clock ? when(state.clock) : "not started")}</strong></span>
-      <span>${state.model === "scripted" ? "Scripted model · mock PayPal" : "Mock PayPal"}</span></div>
-    <div class="demo-actions"><button type="button" id="demo-step" class="primary" ${busy || state.complete ? "disabled" : ""}>${busy ? "Running…" : "Run next staged step"}<svg class="icon" aria-hidden="true"><use href="#i-step"/></svg></button>
-      <button type="button" id="demo-reset" class="secondary" ${busy ? "disabled" : ""}><svg class="icon" aria-hidden="true"><use href="#i-restart"/></svg>Restart week</button></div></div>
-    ${stepper(steps)}
-    <div class="demo-steps">
-      <p><span class="small-label">Last</span> <span>${last ? esc(last.label) + staged(last.staged) : "Nothing yet"}</span></p>
-      <p><span class="small-label">Next</span> ${next ? esc(next.label) + staged(next.staged) : "Week complete"}</p>
-    </div>
-    <p id="demo-status" class="demo-status" role="status" aria-live="polite">${esc(resultText(state))}</p>
-    <details class="demo-list"><summary>All ${esc(steps.length)} steps · ${esc(state.staged_note || "")}</summary><ol>${steps.map(s => `<li class="${s.done ? "done" : ""}">${s.done ? "Done: " : ""}${esc(s.label)}${staged(s.staged)}${s.interrupted ? ' <span class="pill bad">stopped</span>' : ""}</li>`).join("")}</ol></details>`;
+  const label = state.complete ? "Week complete" : next?.label || "Next staged step";
+  const context = state.model === "scripted" ? "Scripted model · mock PayPal" : "Mock PayPal";
+  return `<span class="demo-progress" aria-label="${esc(`Step ${state.step} of ${state.total}`)}" title="${esc(context)}">${esc(state.step)}/${esc(state.total)}</span>
+    <div class="demo-actions"><button type="button" id="demo-step" class="primary" title="${esc(label)}" aria-label="${esc(`Next step: ${label}`)}" ${busy || state.complete ? "disabled" : ""}>${busy ? "Running…" : "Next step"}<svg class="icon" aria-hidden="true"><use href="#i-step"/></svg></button>
+      <button type="button" id="demo-reset" class="secondary" title="Restart the staged week" ${busy ? "disabled" : ""}><svg class="icon" aria-hidden="true"><use href="#i-restart"/></svg>Restart</button></div>
+    <p id="demo-status" class="demo-status sr-only" role="status" aria-live="polite">${esc(resultText(state))}</p>`;
 }
 
 export function createDemoBar(document, {fetcher = fetch, onChange = async () => {}, onState = () => {}, confirm = globalThis.confirm, wait = ms => new Promise(resolve => setTimeout(resolve, ms))} = {}) {
@@ -67,7 +41,9 @@ export function createDemoBar(document, {fetcher = fetch, onChange = async () =>
     state = value;
     bar.innerHTML = demoBarView(state);
     bar.hidden = false;
-    if (notice) document.getElementById("demo-status").textContent = notice;
+    const status = document.getElementById("demo-status");
+    if (notice) status.textContent = notice;
+    status.className = "demo-status" + (notice || state.last_result?.ok === false ? "" : " sr-only");
     document.getElementById("demo-step").onclick = () => send("step");
     document.getElementById("demo-reset").onclick = () => {
       if (!confirm || confirm("Restart the staged week? The mock marketplace starts again from Monday.")) return send("reset");

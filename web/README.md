@@ -1,5 +1,20 @@
 # CounterSign dashboard
 
+## Nov 3 compact demo controls (C46)
+
+The staged-week dock is now two small bottom-right buttons, **Next step** and
+**Restart**, with an exact step count. The next step and scripted/mock context
+remain in accessible labels/tooltips; the persistent simulation banner, header
+clock and overview timeline retain their roles. Busy/completed disabling,
+single-request clicks, restart confirmation and polling are unchanged. Normal
+status is announced to screen readers; errors appear in a small notice above
+the controls. The hero's 3px flowing rim uses its earlier pink colour; other
+owner-attention accents remain muted matte rose.
+
+Checks: 70 frontend tests, 23 Python demo-control tests, and 22 read-only browser
+checks across five widths, both themes and overview/decision routes. Browser
+checks used the real local backend without posting any demo actions.
+
 ## Nov 2 selected hero and integration (C45)
 
 The approved Combined study now opens the real overview: Porcelain's frame and

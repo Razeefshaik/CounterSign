@@ -35,6 +35,33 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C46 compact demo controls (Nov 3)
+
+Owner requested two small demo buttons instead of the huge floating dock, and
+restoration of the earlier normal pink hero rim while all other UI stays matte.
+Active checkout CounterSign, branch `razeef/c46-compact-demo-controls` from main
+`91eb0f0`; feature commit `3c4a4f7`. No push/merge for this task, no attribution.
+
+`web/demo.mjs` renders exactly Next step and Restart, a tiny real step/total,
+next-step/context tooltips, normal status for screen readers and a small visible
+error popup. Keep the existing one-POST-per-click guard, disabled busy/complete
+states, restart confirmation, polling and live-mode hiding. Compact bottom-right
+strip is below 320x60 on all screens; visible simulation banner is unchanged.
+Hero CSS restores #ec4899 in the flowing 3px rim, keeping matte rose elsewhere.
+Tests updated in web/tests/views, redesign and brand.
+
+Verified: 70 Node tests passed, syntax/Ruff passed, three import contracts kept,
+and 23 Python tests in tests/dashboard/test_demo_bar.py passed. All 22 read-only
+live browser checks passed across five widths, both themes and overview/decision
+routes, with zero writes/runtime exceptions. Browser checks wait for live maker
+data and permit owner-operated step changes. Evidence is in sibling
+design-demos/reference/compact-controls. Docker countersign-c45 on loopback8180 was
+started after backing up its stale runtime socket folder. Full 11-stage hosted
+smoke passed before C46 files were copied into the same running container,
+without posting staged actions; that smoke is not a fresh C46 replay. No reset,
+.env reads, real LLM or real PayPal calls. C45's incomplete full-backend suite
+remains historical context, not a new C46 full-suite result.
+
 ## C45 selected overview integration (Nov 2–3)
 
 Owner explicitly authorized integration to main and push, then selected the

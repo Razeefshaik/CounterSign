@@ -309,15 +309,15 @@ function barDouble() {
   return {bar, getElementById: id => id === "demo-bar" ? bar : elements.get(id) || null};
 }
 
-test("demo bar is never empty on first load and labels every staged step", () => {
+test("compact demo controls expose two buttons and progress without the large week dock", () => {
   const html = demoBarView(demoState(0));
-  assert.match(html, /Step <strong>0<\/strong> of 3/);
-  assert.match(html, /Next<\/span> Monday: stage orders <span class="staged">staged<\/span>/);
-  assert.match(html, /Nothing yet/);
-  assert.equal((html.match(/class="staged">staged/g) || []).length, 1 + 1 + 2);
+  assert.match(html, /aria-label="Step 0 of 3"/);
+  assert.match(html, /class="demo-progress"[^>]*>0\/3/);
+  assert.equal((html.match(/<button/g) || []).length, 2);
+  assert.match(html, /aria-label="Next step: Monday: stage orders"/);
+  assert.ok(!/<details|class="demo-steps"|class="stepper"|Staged clock:/.test(html));
   assert.match(html, /Scripted model · mock PayPal/);
-  assert.match(html, /Mon, 02 Nov 2026, 09:00 UTC/);
-  assert.match(html, /id="demo-step" class="primary" >Run next staged step/);
+  assert.match(html, /id="demo-step"[^>]*>Next step/);
   const done = demoBarView(demoState(3, {last_result:{action:"step", ok:true, code:"DEMO_STEP_DONE"}}));
   assert.match(done, /Week complete/);
   assert.match(done, /id="demo-step"[^>]*disabled/);
