@@ -602,3 +602,14 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | In demo mode on the loopback mock, owner approve, reject and passkey approvals are judged at the mock's staged clock (as the playground and MCP gateway already are); live mode, or a demo whose mock clock can't be read, keeps the real clock. Passkey challenges keep real time | Submission review, Nov 3 | Accept | At staged Friday the dashboard's Approve returned SHIELD_BLOCKED, because judging at the real date (Nov 3) refused facts already true in the staged week (C's payout RETURNED on Thursday); judges clicking Review and sign would have hit an error |
+
+## Nov 4 C58 evaluation explorer
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Publish only allowlisted metrics from the original 480 C31 runs in a deterministic LF bundle, refusing private-looking input before writing | Owner C58 prompt | Accept | The hosted image excludes eval sources; historical evidence must remain accessible without exposing credentials, traces or later rerun overlays |
+| Compute scoreboards, paired scenario presets and filtered pinned totals from the bundled rows | Owner C58 prompt | Accept | Judges can reproduce 170/240 and 34/48 versus 215/240 and 43/48, including every failure and zero invariant count, without hard-coded UI scores |
+| Use the C49 Community loader/theme for filters, multi-sort, movable/resizable columns, pagination 25 and filtered CSV export | Owner C58 prompt | Accept | Analytical interaction belongs in the existing vendored grid without new dependencies or Enterprise features |
+| Show both systems for the three scenarios whose CounterSign repetitions all pass and rules-only repetitions all fail | C58 source audit | Accept | A paired comparison must expose both outcomes rather than hide baseline failures or claim an unrun model experiment |
+| Keep historical metrics and replay traces separately labelled; select only existing scenario/system samples and otherwise show graded metrics with trace unavailable | C58 evidence review | Accept | The full experiment contains no action traces; a separately bundled sample must never masquerade as the selected historical run |
+| Scope explorer styling and banner stacking to replay, retaining glass tokens, phone scrolling and reduced motion | C58 browser verification | Accept | The simulation disclosure must remain uncovered while the analysis grid scrolls, without editing shared styles.css |
