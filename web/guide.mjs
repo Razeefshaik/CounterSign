@@ -18,6 +18,8 @@ export const STEP_HINTS = Object.freeze({
   10: {name:"following_week_settle", text:"A's reserve is released after settlement. Payment is the next step.", links:[local("Where the money stands", "stands-title")]},
   11: {name:"following_week_pay_a", text:"See A's payment after the release, then explore the recorded sandbox proof.", links:[local("Where the money stands", "stands-title")]},
 });
+// C65: writes keep their existing guidance and gain an evidence destination.
+for (const index of [1,5,7,8,11]) STEP_HINTS[index].links.push(route("See the PayPal calls", "#paypal-calls"));
 
 export function guideModel(state) {
   if (!state || state.simulated !== true || !Number.isInteger(state.step) || state.step < 0 || !Number.isInteger(state.total) || state.total < 1 || state.step > state.total) return null;

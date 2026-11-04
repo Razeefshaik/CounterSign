@@ -7,12 +7,14 @@ import {createTrick} from "./trick.mjs";
 import {createCommand} from "./command.mjs";
 // C50: the report shares the existing routing/lifecycle; no API changes.
 import {createProof} from "./proof.mjs";
+import {createPaypalCalls} from "./paypal-calls.mjs"; // C65
 import {action as actionWord, state as stateWord, when} from "./words.mjs";
 // C49: projections and lazy Community mounts, no financial writes.
 import {mountGrid, mountAuditGrid, runRows, runTotal} from "./grid.mjs";
 
 const titles = {overview: "Command center", incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
 titles.proof = "Sandbox proof"; // C50
+titles["paypal-calls"] = "PayPal calls"; // C65
 export function route(hash) {
   const [name, id] = hash.replace(/^#/, "").split("/");
   return {name: Object.hasOwn(titles, name) ? name : "overview", id: id || ""};
@@ -25,6 +27,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
   const trick = createTrick(document, fetcher);
   const command = createCommand(document, fetcher);
   const proof = createProof(document, fetcher); // C50
+  const paypalCalls = createPaypalCalls(document, fetcher); // C65
   const notice = (message = "") => {$("view-notice").textContent = message; $("view-notice").hidden = !message;};
   const invalidate = () => {
     proposal = null;
@@ -32,6 +35,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
   };
   async function render() {
     if (!workspace) return;
+    paypalCalls.dispose(); // C65: stop polling and destroy grids when this route exits.
     const ticket = ++serial, current = route(location.hash);
     invalidate(); notice();
     $("breadcrumb").textContent = titles[current.name];
@@ -55,10 +59,13 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
     if ($("view-source-note")) $("view-source-note").hidden = current.name === "proof";
     // C58: replay metrics are historical evidence, independent of live workspace records.
     if (current.name === "replay" && $("view-source-note")) $("view-source-note").hidden = true;
+    if (current.name === "paypal-calls" && $("view-source-note")) $("view-source-note").hidden = true; // C65
     // /C58
     $("view-picker").hidden = true;
     $("view-body").innerHTML = '<p class="empty">Loading records…</p>';
     try {
+      // C65: independent read-only mock/recording sources, sharing the existing shell.
+      if (current.name === "paypal-calls") {await paypalCalls.mount($("view-body")); return ticket === serial;}
       // C50: a static source-linked report, independent of dashboard record writes.
       if (current.name === "proof") {
         await proof.load();

@@ -648,3 +648,14 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Friday guide | Show the story only for the API-confirmed unsigned Friday checkpoint; reuse the guarded demo controller for Back to Friday and confirmed Monday restart. |
 - At merge: a boot with `COUNTERSIGN_HOSTED_START=monday` defaults idle return to off, because an owner who chose Monday should not be moved to Friday after 20 minutes; setting the idle variable still turns it on.
 - At merge: the Friday freshness check caches the waiting proposal's id, because the image's files never change and each state poll was hashing them all again.
+
+
+## Nov 5 C65 PayPal calls
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Observe PayPal requests outside the mock fault middleware and add outbound webhook deliveries | C65 | Accept | Lost responses and their duplicate-400 retries must both appear; control calls are excluded |
+| Retain 500 safe rows plus cumulative product counters, with template routes and 12-character key hashes only | C65 | Accept | Show real weekly counts without retaining bodies, credentials, emails or resource IDs; all fields survive Friday snapshots |
+| Build route coverage from every numbered public exchange and verify all 13 check counts and 1041 attempts against the index | C65 | Accept | Recorded sandbox evidence stays reproducible and separate from simulation |
+| Add a read-only demo proxy with an exact public schema, no parameters and the existing demo guard | Owner-approved contract 1.0.10 | Accept | The browser cannot reach mock control or accidentally proxy new private fields; metadata remains 1.0.6 |
+| Reuse the glass shell and Community grids, with source labels, retry markers, polling only on the active page and CSV exports | C65 | Accept | Judges can inspect the integration without new visual conventions or background polling after navigation |

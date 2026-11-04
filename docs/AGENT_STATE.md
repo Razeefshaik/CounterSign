@@ -11,7 +11,33 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## Current feature: C62 Friday checkpoint (ready for review)
+## Current feature: C65 PayPal calls (validated; owner review next)
+
+- Own `CounterSign-c65`, branch `razeef/c65-paypal-calls`, base `745c9b4`
+  (C62 merged). Commits: `aaefb84`, `f558e40`, `d017adc`, `29df3c7`, `050b566`.
+  Written contract 1.0.10 approved; advertised metadata remains 1.0.6.
+- Safe 500-row mock request/webhook log with cumulative product counts,
+  guarded read-only proxy, two Community grids and separate source labels.
+  Coverage derives from **1,041 recorded sandbox attempts**, including **34
+  transport errors**; mock calls are explicitly simulated.
+- Verified **13 focused Python passed** across three new files, **132 Node
+  passed**, Ruff clean and **four import contracts kept**. No broad/full pytest.
+- One final Docker build reused installed C62 dependencies and baked a fresh
+  C65 Friday artifact: **91 calls** on boot; step 7 shows incomplete 201 and
+  same-key duplicate 400 linked to the original batch. Exact Friday log restore
+  took **1.765 s**. Full week: **231 calls** (Payouts 81, Disputes 61, Orders 0,
+  Payments 2, Tracking 1, Reporting 19, Webhooks 52, OAuth 15).
+- Actual hosted light/dark 1440x1000 and phone 390x844 captures show eight tiles,
+  two grids and 1,041 coverage attempts, with no horizontal overflow or runtime
+  exceptions. Evidence: `design-demos/reference/c65/`. One initial transient
+  client disconnect resolved by read retry; step 7 completed, no OOM/restarts.
+- Own validation container on 8199 used one CPU/768 MB; it was stopped and
+  removed after validation to save RAM. Other worktrees/services, including C67 PostgreSQL, are untouched.
+  No .env reads, real PayPal/LLM calls, styles.css/grid.mjs/README/submission
+  changes or merge. Evidence/report is complete; integrate only after owner review.
+  Verify the published feature tip before integration; push is the handoff step.
+
+## Earlier feature: C62 Friday checkpoint (feature handoff)
 
 - Own `CounterSign-c62`, branch `razeef/c62-friday-checkpoint`, base `75c95cb`.
   Code: `6b1ddfd`, `68b3de6`, `27b012b`, `5c1d657`. No merge. Written contract

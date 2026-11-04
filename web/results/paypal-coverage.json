@@ -1,0 +1,5682 @@
+{
+  "source": "Recorded: real PayPal sandbox",
+  "index": "recordings/sandbox/INDEX.md",
+  "total_attempts": 1041,
+  "rows": [
+    {
+      "product": "Disputes",
+      "method": "GET",
+      "route": "/v1/customer/disputes",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 6,
+      "status_codes": [
+        200,
+        400
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D8"
+      ],
+      "recordings": [
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/07_find_inr_400_list.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/09_find_snad_60_list.json",
+          "status": 400
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/10_find_snad_60_list.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/11_find_snad_60_list.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/13_find_spare_25_list.json",
+          "status": 400
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/14_find_spare_25_list.json",
+          "status": 200
+        }
+      ],
+      "id": 1
+    },
+    {
+      "product": "Disputes",
+      "method": "GET",
+      "route": "/v1/customer/disputes/{id}",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 20,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D8",
+        "D9",
+        "D10"
+      ],
+      "recordings": [
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/08_find_inr_400_detail.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/12_find_snad_60_detail.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/15_find_spare_25_detail.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/16_inspect_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/17_inspect_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/18_inspect_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D9",
+          "path": "recordings/sandbox/2026-10-24/D9/02_before_evidence.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/02_inr_400_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/05_inr_400_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/06_inr_400_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/07_inr_400_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/08_snad_60_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/10_snad_60_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/11_snad_60_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/12_snad_60_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/13_spare_25_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/15_spare_25_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-26/D10/03_buyer_close_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-26/D10/04_buyer_close_poll.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-26/D10/05_buyer_close_poll.json",
+          "status": 200
+        }
+      ],
+      "id": 2
+    },
+    {
+      "product": "Disputes",
+      "method": "POST",
+      "route": "/v1/customer/disputes",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        400
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D8"
+      ],
+      "recordings": [
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/04_api_create_dispute.json",
+          "status": 400
+        }
+      ],
+      "id": 3
+    },
+    {
+      "product": "Disputes",
+      "method": "POST",
+      "route": "/v1/customer/disputes/{id}/accept-claim",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D10"
+      ],
+      "recordings": [
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/09_snad_60_accept_claim_json.json",
+          "status": 200
+        }
+      ],
+      "id": 4
+    },
+    {
+      "product": "Disputes",
+      "method": "POST",
+      "route": "/v1/customer/disputes/{id}/adjudicate",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D10"
+      ],
+      "recordings": [
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/04_inr_400_adjudicate.json",
+          "status": 200
+        }
+      ],
+      "id": 5
+    },
+    {
+      "product": "Disputes",
+      "method": "POST",
+      "route": "/v1/customer/disputes/{id}/provide-evidence",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D10"
+      ],
+      "recordings": [
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/14_spare_25_evidence_multipart.json",
+          "status": 200
+        }
+      ],
+      "id": 6
+    },
+    {
+      "product": "OAuth",
+      "method": "POST",
+      "route": "/v1/oauth2/token",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 31,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9",
+        "D10",
+        "D11",
+        "D12",
+        "D13"
+      ],
+      "recordings": [
+        {
+          "check_id": "D1",
+          "path": "recordings/sandbox/2026-10-23/D1/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/09_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/13_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-24/D3/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/07_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/140_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-26/D5/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/67_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/69_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D9",
+          "path": "recordings/sandbox/2026-10-24/D9/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/123_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-26/D10/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-23/D11/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-24/D11/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/03_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/111_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/01_oauth_token.json",
+          "status": 200
+        },
+        {
+          "check_id": "D13",
+          "path": "recordings/sandbox/2026-10-24/D13/01_oauth_token.json",
+          "status": 200
+        }
+      ],
+      "id": 7
+    },
+    {
+      "product": "Orders",
+      "method": "GET",
+      "route": "/v2/checkout/orders/{id}",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 7,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D2"
+      ],
+      "recordings": [
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/08_approved_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/12_approved_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/17_approved_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/18_approved_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/19_before_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/21_before_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/23_before_capture_spare_25.json",
+          "status": 200
+        }
+      ],
+      "id": 8
+    },
+    {
+      "product": "Orders",
+      "method": "POST",
+      "route": "/v2/checkout/orders",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 3,
+      "status_codes": [
+        201
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D2"
+      ],
+      "recordings": [
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/04_create_inr_400.json",
+          "status": 201
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/05_create_snad_60.json",
+          "status": 201
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/06_create_spare_25.json",
+          "status": 201
+        }
+      ],
+      "id": 9
+    },
+    {
+      "product": "Orders",
+      "method": "POST",
+      "route": "/v2/checkout/orders/{id}/capture",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 3,
+      "status_codes": [
+        201
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D2"
+      ],
+      "recordings": [
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/20_capture_inr_400.json",
+          "status": 201
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/22_capture_snad_60.json",
+          "status": 201
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/24_capture_spare_25.json",
+          "status": 201
+        }
+      ],
+      "id": 10
+    },
+    {
+      "product": "Payments",
+      "method": "GET",
+      "route": "/v2/payments/captures/{id}",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 111,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D8"
+      ],
+      "recordings": [
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/20_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/21_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/22_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/25_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/26_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/27_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/30_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/31_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/32_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/35_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/36_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/37_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/04_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/05_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/07_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/100_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/101_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/102_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/105_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/106_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/107_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/10_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/110_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/111_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/112_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/115_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/116_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/117_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/11_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/120_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/121_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/122_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/125_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/126_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/127_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/12_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/130_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/131_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/132_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/135_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/136_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/137_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/140_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/141_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/142_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/145_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/146_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/147_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/150_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/151_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/152_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/155_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/156_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/157_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/15_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/160_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/161_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/162_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/165_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/166_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/167_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/16_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/17_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/20_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/21_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/22_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/25_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/26_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/27_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/30_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/31_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/32_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/35_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/36_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/37_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/40_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/41_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/42_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/45_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/46_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/47_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/50_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/51_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/52_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/55_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/56_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/57_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/60_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/61_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/62_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/65_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/66_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/67_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/70_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/71_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/72_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/75_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/76_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/77_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/80_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/81_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/82_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/85_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/86_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/87_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/90_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/91_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/92_hold_capture_spare_25.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/95_hold_capture_inr_400.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/96_hold_capture_snad_60.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/97_hold_capture_spare_25.json",
+          "status": 200
+        }
+      ],
+      "id": 11
+    },
+    {
+      "product": "Payouts",
+      "method": "GET",
+      "route": "/v1/payments/payouts-item/{id}",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 21,
+      "status_codes": [
+        200,
+        404
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7"
+      ],
+      "recordings": [
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/06_maker_a_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/08_maker_a_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/10_unreg_1_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/12_unreg_2_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/14_unreg_3_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/04_before_cancel.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/06_cancel_get.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/07_before_cancel_again.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/09_before_cancel_success.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-26/D5/03_uncancelled_control.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/07_a_base_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/09_a_base_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/13_b_base_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/15_b_base_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/19_c_base_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/21_c_base_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/25_d_concurrent_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/27_d_concurrent_item.json",
+          "status": 200
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/07_get_item_errpyo015.json",
+          "status": 404
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/08_get_item_errpyo047.json",
+          "status": 200
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/09_get_item_errpyo052.json",
+          "status": 200
+        }
+      ],
+      "id": 12
+    },
+    {
+      "product": "Payouts",
+      "method": "GET",
+      "route": "/v1/payments/payouts/{id}",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 19,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D3",
+        "D4",
+        "D6",
+        "D7"
+      ],
+      "recordings": [
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/05_maker_a_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/07_maker_a_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/09_unreg_1_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/11_unreg_2_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/13_unreg_3_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/06_a_base_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/08_a_base_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/12_b_base_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/14_b_base_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/18_c_base_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/20_c_base_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/24_d_concurrent_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/26_d_concurrent_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/68_e_confirm_linked_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/70_e_confirm_linked_batch.json",
+          "status": 200
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/03_get_batch_errpyob002.json",
+          "status": 200
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/04_get_batch_errpyob003.json",
+          "status": 200
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/05_get_batch_errpyob004.json",
+          "status": 200
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/06_get_batch_errpyo015.json",
+          "status": 200
+        }
+      ],
+      "id": 13
+    },
+    {
+      "product": "Payouts",
+      "method": "POST",
+      "route": "/v1/payments/payouts",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 19,
+      "status_codes": [
+        201,
+        400,
+        422,
+        500,
+        504
+      ],
+      "transport_errors": 1,
+      "check_ids": [
+        "D3",
+        "D4",
+        "D6",
+        "D7"
+      ],
+      "recordings": [
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/04_maker_a.json",
+          "status": 201
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/04_unreg_1.json",
+          "status": 201
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/05_unreg_2.json",
+          "status": 201
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/06_unreg_3.json",
+          "status": 201
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/04_a_base.json",
+          "status": 201
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/05_a_replay.json",
+          "status": 400
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/10_b_base.json",
+          "status": 201
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/11_b_new_request.json",
+          "status": 400
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/16_c_base.json",
+          "status": 201
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/17_c_changed_body.json",
+          "status": 400
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/22_d_concurrent.json",
+          "status": 201
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/23_d_concurrent.json",
+          "status": 400
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/29_e_lost_response.json",
+          "status": null
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/30_e_replay.json",
+          "status": 400
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/13_create_errpyo005.json",
+          "status": 422
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/14_create_errpyo006.json",
+          "status": 500
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/15_create_errpyo014.json",
+          "status": 400
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/16_create_errpyo036.json",
+          "status": 504
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/17_create_errpyo039.json",
+          "status": 400
+        }
+      ],
+      "id": 14
+    },
+    {
+      "product": "Payouts",
+      "method": "POST",
+      "route": "/v1/payments/payouts-item/{id}/cancel",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 6,
+      "status_codes": [
+        200,
+        400
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D5",
+        "D7"
+      ],
+      "recordings": [
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/05_cancel_unreg_1.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/08_cancel_again.json",
+          "status": 400
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/10_cancel_success.json",
+          "status": 400
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/10_cancel_errpyo007.json",
+          "status": 400
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/11_cancel_errpyo008.json",
+          "status": 400
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/12_cancel_errpyo009.json",
+          "status": 400
+        }
+      ],
+      "id": 15
+    },
+    {
+      "product": "Reporting",
+      "method": "GET",
+      "route": "/v1/reporting/balances",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 728,
+      "status_codes": [
+        200,
+        503
+      ],
+      "transport_errors": 33,
+      "check_ids": [
+        "D1",
+        "D2",
+        "D3",
+        "D4",
+        "D5",
+        "D6",
+        "D7",
+        "D8",
+        "D9",
+        "D10",
+        "D11",
+        "D12",
+        "D13"
+      ],
+      "recordings": [
+        {
+          "check_id": "D1",
+          "path": "recordings/sandbox/2026-10-23/D1/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/02_baseline_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/07_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/10_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/11_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/14_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/15_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/27_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/28_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/29_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/30_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/31_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/32_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/33_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/34_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/35_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/36_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/37_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/38_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/39_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/40_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/03_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/04_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/05_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/06_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/07_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/08_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/09_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/10_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/11_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/12_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/13_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/14_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/15_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/17_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/18_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/19_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/20_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/21_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/22_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/23_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/24_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/25_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/26_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/27_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/28_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/29_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/30_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/31_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/32_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/33_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/34_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/35_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/36_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/37_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/38_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/39_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/40_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/41_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/42_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/43_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/44_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/45_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/46_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/47_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/48_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/49_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/50_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/51_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/52_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/53_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/54_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/55_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/56_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/57_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/58_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/59_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/60_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/61_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-24/D2/62_money_in_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/02_baseline_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/09_payout_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/10_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/11_payout_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/12_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/13_payout_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/14_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/15_payout_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-23/D3/17_payout_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-24/D3/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D3",
+          "path": "recordings/sandbox/2026-10-24/D3/03_payout_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/02_baseline_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/08_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/15_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/17_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/18_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/19_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/20_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/21_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/22_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/23_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/24_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/25_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/26_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/27_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/28_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/29_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/30_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/31_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/32_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/33_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/34_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/35_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/36_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/37_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/38_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/39_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/40_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/41_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/42_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/43_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/44_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/45_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/46_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/47_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/48_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D4",
+          "path": "recordings/sandbox/2026-10-24/D4/49_unclaimed_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/02_baseline_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/100_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/101_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/102_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/103_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/104_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/105_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/106_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/107_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/108_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/109_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/110_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/111_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/112_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/113_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/114_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/115_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/116_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/117_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/118_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/119_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/11_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/120_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/121_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/122_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/123_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/124_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/125_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/126_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/127_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/128_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/129_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/12_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/130_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/131_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/132_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/133_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/134_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/135_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/136_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/137_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/138_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/139_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/13_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/141_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/142_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/143_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/144_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/14_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/15_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/17_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/18_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/19_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/20_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/21_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/22_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/23_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/24_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/25_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/26_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/27_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/28_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/29_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/30_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/31_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/32_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/33_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/34_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/35_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/36_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/37_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/38_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/39_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/40_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/41_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/42_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/43_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/44_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/45_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/46_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/47_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/48_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/49_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/50_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/51_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/52_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/53_cancel_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/54_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/55_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/56_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/57_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/58_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/59_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/60_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/61_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/62_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/63_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/64_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/65_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/66_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/67_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/68_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/69_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/70_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/71_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/72_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/73_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/74_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/75_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/76_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/77_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/78_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/79_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/80_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/81_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/82_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/83_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/84_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/85_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/86_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/87_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/88_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/89_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/90_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/91_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/92_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/93_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/94_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/95_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/96_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/97_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/98_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-24/D5/99_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D5",
+          "path": "recordings/sandbox/2026-10-26/D5/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/02_baseline_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/28_lost_baseline.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/31_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/32_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/33_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/34_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/35_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/36_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/37_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/38_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/39_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/40_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/41_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/42_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/43_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/44_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/45_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/46_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/47_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/48_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/49_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/50_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/51_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/52_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/53_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/54_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/55_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/56_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/57_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/58_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/59_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/60_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/61_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/62_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/63_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/64_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/65_lost_response_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D6",
+          "path": "recordings/sandbox/2026-10-24/D6/66_final_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D7",
+          "path": "recordings/sandbox/2026-10-24/D7/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/02_baseline_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/05_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/06_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/19_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/23_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/24_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/28_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/29_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/33_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/34_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-23/D8/38_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/03_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/06_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/08_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/09_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/103_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/104_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/108_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/109_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/113_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/114_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/118_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/119_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/123_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/124_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/128_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/129_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/133_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/134_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/138_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/139_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/13_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/143_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/144_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/148_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/149_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/14_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/153_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/154_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/158_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/159_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/163_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/164_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/18_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/19_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/23_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/24_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/28_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/29_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/33_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/34_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/38_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/39_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/43_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/44_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/48_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/49_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/53_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/54_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/58_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/59_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/63_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/64_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/68_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/69_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/73_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/74_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/78_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/79_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/83_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/84_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/88_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/89_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/93_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/94_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/98_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D8",
+          "path": "recordings/sandbox/2026-10-24/D8/99_hold_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D9",
+          "path": "recordings/sandbox/2026-10-24/D9/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/100_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/101_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/102_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/103_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/104_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/105_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/106_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/107_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/108_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/109_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/110_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/111_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/112_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/113_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/114_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/115_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/116_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/117_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/118_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/119_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/120_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/121_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/122_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/124_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/125_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/126_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/127_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/17_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/18_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/19_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/20_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/21_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/22_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/23_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/24_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/25_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/26_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/27_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/28_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/29_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/30_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/31_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/32_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/33_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/34_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/35_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/36_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/37_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/38_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/39_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/40_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/41_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/42_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/43_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/44_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/45_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/46_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/47_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/48_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/49_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/50_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/51_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/52_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/53_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/54_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/55_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/56_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/57_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/58_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/59_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/60_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/61_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/62_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/63_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/64_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/65_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/66_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/67_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/68_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/69_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/70_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/71_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/72_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/73_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/74_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/75_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/76_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/77_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/78_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/79_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/80_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/81_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/82_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/83_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/84_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/85_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/86_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/87_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/88_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/89_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/90_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/91_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/92_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/93_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/94_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/95_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/96_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/97_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/98_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-24/D10/99_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-26/D10/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D10",
+          "path": "recordings/sandbox/2026-10-26/D10/06_release_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/05_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/02_fresh_balance.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/05_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/08_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/09_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/11_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/13_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/04_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/05_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/06_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/07_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/08_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/09_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/100_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/101_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/102_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/103_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/104_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/105_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/106_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/107_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/108_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/109_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/10_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/110_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/112_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/113_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/114_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/115_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/116_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/117_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/118_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/119_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/11_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/120_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/121_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/122_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/123_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/124_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/125_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/126_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/127_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/128_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/129_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/12_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/130_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/131_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/132_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/133_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/134_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/135_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/136_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/137_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/138_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/139_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/13_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/140_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/141_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/142_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/143_balance_snapshot.json",
+          "status": null
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/144_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/145_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/146_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/147_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/148_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/149_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/14_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/150_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/151_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/152_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/153_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/154_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/155_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/156_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/157_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/158_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/159_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/15_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/160_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/161_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/162_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/163_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/164_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/165_balance_snapshot.json",
+          "status": 503
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/166_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/167_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/168_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/169_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/170_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/171_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/172_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/173_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/174_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/175_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/176_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/177_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/178_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/179_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/17_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/180_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/18_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/19_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/20_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/21_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/22_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/23_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/24_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/25_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/26_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/27_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/28_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/29_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/30_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/31_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/32_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/33_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/34_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/35_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/36_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/37_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/38_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/39_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/40_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/41_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/42_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/43_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/44_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/45_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/46_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/47_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/48_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/49_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/50_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/51_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/52_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/53_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/54_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/55_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/56_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/57_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/58_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/59_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/60_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/61_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/62_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/63_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/64_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/65_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/66_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/67_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/68_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/69_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/70_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/71_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/72_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/73_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/74_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/75_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/76_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/77_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/78_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/79_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/80_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/81_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/82_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/83_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/84_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/85_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/86_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/87_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/88_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/89_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/90_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/91_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/92_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/93_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/94_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/95_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/96_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/97_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/98_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/99_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/02_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/03_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/04_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/05_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/06_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/07_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/08_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/09_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/10_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/11_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/12_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/13_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/14_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/15_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/16_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/17_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/18_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/19_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/20_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/21_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/22_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/23_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/24_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/25_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/26_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/27_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/28_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/29_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/30_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/31_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/32_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/33_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/34_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/35_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/36_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-26/D12/37_balance_snapshot.json",
+          "status": 200
+        },
+        {
+          "check_id": "D13",
+          "path": "recordings/sandbox/2026-10-24/D13/02_balance_snapshot.json",
+          "status": 200
+        }
+      ],
+      "id": 16
+    },
+    {
+      "product": "Reporting",
+      "method": "GET",
+      "route": "/v1/reporting/transactions",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 8,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D12"
+      ],
+      "recordings": [
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/04_transaction_search.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/06_transaction_search.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/07_transaction_search.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/10_transaction_search.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/12_transaction_search.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/14_transaction_search.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-23/D12/15_transaction_search.json",
+          "status": 200
+        },
+        {
+          "check_id": "D12",
+          "path": "recordings/sandbox/2026-10-24/D12/03_transaction_search.json",
+          "status": 200
+        }
+      ],
+      "id": 17
+    },
+    {
+      "product": "Tracking",
+      "method": "GET",
+      "route": "/v1/shipping/trackers",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D2"
+      ],
+      "recordings": [
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/26_get_tracking.json",
+          "status": 200
+        }
+      ],
+      "id": 18
+    },
+    {
+      "product": "Tracking",
+      "method": "POST",
+      "route": "/v2/checkout/orders/{id}/track",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        201
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D2"
+      ],
+      "recordings": [
+        {
+          "check_id": "D2",
+          "path": "recordings/sandbox/2026-10-23/D2/25_track_inr_400.json",
+          "status": 201
+        }
+      ],
+      "id": 19
+    },
+    {
+      "product": "Webhooks",
+      "method": "GET",
+      "route": "/v1/notifications/webhooks-events",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D11"
+      ],
+      "recordings": [
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/04_list_events.json",
+          "status": 200
+        }
+      ],
+      "id": 20
+    },
+    {
+      "product": "Webhooks",
+      "method": "PATCH",
+      "route": "/v1/notifications/webhooks/{id}",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 2,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D11"
+      ],
+      "recordings": [
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-24/D11/02_update_webhook_url.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/02_update_webhook_url.json",
+          "status": 200
+        }
+      ],
+      "id": 21
+    },
+    {
+      "product": "Webhooks",
+      "method": "POST",
+      "route": "/v1/notifications/simulate-event",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        202
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D11"
+      ],
+      "recordings": [
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/06_simulate_event.json",
+          "status": 202
+        }
+      ],
+      "id": 22
+    },
+    {
+      "product": "Webhooks",
+      "method": "POST",
+      "route": "/v1/notifications/verify-webhook-signature",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 47,
+      "status_codes": [
+        200
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D11"
+      ],
+      "recordings": [
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/07_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/09_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/10_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/11_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/12_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/13_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/14_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/15_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/16_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/17_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/18_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/19_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/20_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/21_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/22_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/23_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/24_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/25_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/26_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/27_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/28_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/29_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/30_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/31_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/32_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/33_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/34_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/35_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/36_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/37_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/38_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/39_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/40_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/41_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/42_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/43_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/44_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/45_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/46_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/47_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/48_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/49_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/50_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/51_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/52_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/53_verify_signature.json",
+          "status": 200
+        },
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/54_verify_signature.json",
+          "status": 200
+        }
+      ],
+      "id": 23
+    },
+    {
+      "product": "Webhooks",
+      "method": "POST",
+      "route": "/v1/notifications/webhooks",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        201
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D11"
+      ],
+      "recordings": [
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-23/D11/02_register_webhook.json",
+          "status": 201
+        }
+      ],
+      "id": 24
+    },
+    {
+      "product": "Webhooks",
+      "method": "POST",
+      "route": "/v1/notifications/webhooks-events/{id}/resend",
+      "source": "Recorded: real PayPal sandbox",
+      "attempts": 1,
+      "status_codes": [
+        202
+      ],
+      "transport_errors": 0,
+      "check_ids": [
+        "D11"
+      ],
+      "recordings": [
+        {
+          "check_id": "D11",
+          "path": "recordings/sandbox/2026-10-26/D11/08_resend_event.json",
+          "status": 202
+        }
+      ],
+      "id": 25
+    }
+  ]
+}

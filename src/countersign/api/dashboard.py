@@ -1115,6 +1115,9 @@ def configured_demo_bar(runtime):
 def build_demo_router(bar: DemoBar):
     """GET state, POST step, POST reset. Bodies are ignored; nothing is parameterised."""
     result = APIRouter()
+    # C65: read-only, guarded demo route; the browser never contacts mock control.
+    from countersign.api.paypal_calls import build_router as call_router
+    result.include_router(call_router(bar.runtime))
 
     def refused():
         return error(404, "NOT_FOUND", "Resource not found")
