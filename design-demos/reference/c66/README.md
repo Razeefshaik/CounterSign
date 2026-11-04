@@ -4,7 +4,7 @@ Verified Nov 4, 2026, in isolated `CounterSign-c66`, branch
 `razeef/c66-ag-grid`, based on integration `upstream/main` **745c9b4**
 (includes C62 merge134c610). The local `origin` fork is behind integration;
 no original-checkout files or other worktrees were changed. Runtime commit
-**6835338**. PR: pending creation, base main. No merge.
+**6835338**. Evidence commit **1b664f4**. [PR #18](https://github.com/Razeefshaik/CounterSign/pull/18) targets main, open and non-draft. No merge.
 
 ## Delivered Community features
 
@@ -79,11 +79,11 @@ No universal accessibility or every-record-detail claim is made.
 
 ## Shared integration edits
 
-Runtime edits outside grid.mjs/css and new helpers are limited to app.mjs:21
+Runtime edits outside grid.mjs/css and new helpers are limited to app.mjs:21/102/181
 (preserve incident API/update callbacks and clear native search), command.mjs:102
-(preserve maker API and support every list size), workspace.mjs:12/24/61/122
+(preserve maker API and support every list size), workspace.mjs:12/24/61/121/133
 (preserve same-route run/audit grids and update surrounding run facts). Decision
-append: docs/DECISIONS.md, `Nov 5 C66 AG Grid` (heading requested by owner).
+append: docs/DECISIONS.md:653, `Nov 5 C66 AG Grid` (heading requested by owner).
 Professor Pickle updates only the two context note files. No API/contracts,
 root README, submission docs, styles.css or vendor changes.
 

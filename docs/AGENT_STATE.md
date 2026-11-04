@@ -11,11 +11,45 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## Current feature: C62 Friday checkpoint (ready for review)
+## Current feature: C66 operational AG Grid (ready for review)
+
+- Own `CounterSign-c66`, branch `razeef/c66-ag-grid`, from upstream/main
+  `745c9b4` (includes merged C62). Runtime `6835338`, evidence `1b664f4`.
+  [PR #18](https://github.com/Razeefshaik/CounterSign/pull/18) is open,
+  non-draft, targeting main; pushed to upstream and origin. No merge.
+- Four operational Community 32.3.9 grids retain their mounted API across
+  same-route refreshes, using stable-ID row transactions. Saved filter/sort views
+  show live counts; floating date/number/text filters, per-browser column layouts
+  with reset, filtered currency-separated pinned totals and safe formatted CSV
+  are implemented. Enter/click reuses existing detail surfaces; reserved
+  obligations appear separately in run rows; every maker-list size uses the grid.
+- Primary reports **136 Node tests passed** (nine new), plus actual fixture
+  browser checks across all four grids: saved-view counts, CSV, Enter detail,
+  same API and sort after refresh, light/dark/390px, and no runtime errors.
+  These are mock/fixture checks, not sandbox or model evidence. No Python changed;
+  no pytest or Ruff was run, per the owner's C66 instruction.
+- Single final Docker build from `6835338` passed; image
+  `countersign-c66:verified`, size **255,259,045 bytes**. Own container
+  `countersign-c66-preview` on **8200** booted at Friday step 6; exactly five
+  browser demo-step POSTs reached step 11. Same incident API and genuine change
+  flash verified; storage-denied fresh load/reset passed. Six reviewed PNGs,
+  four downloaded CSVs and `browser.json`: `design-demos/reference/c66/`.
+- Browser reported zero runtime exceptions/warnings and no page overflow at
+  390px across all four grids. Audit rows without a bound decision have no
+  fabricated detail link. Existing desktop sticky chrome partly covers the
+  simulation banner on scroll; phone banner is fully visible. Owner reviews PR #18;
+  integrated validation and merge remain with the owner/integrator.
+- Browser-only scope: no API/contracts/dependency/vendor/styles.css/README or
+  submission changes. No environment-file reads or real PayPal/model calls.
+  Main and other worktrees remain unchanged except the authorized fetch.
+  See C66 future notes; earlier sections below retain their historical evidence.
+
+## Earlier feature: C62 Friday checkpoint (merged in C66 base)
 
 - Own `CounterSign-c62`, branch `razeef/c62-friday-checkpoint`, base `75c95cb`.
-  Code: `6b1ddfd`, `68b3de6`, `27b012b`, `5c1d657`. No merge. Written contract
-  1.0.9 approved; advertised dashboard version remains 1.0.6.
+  Code: `6b1ddfd`, `68b3de6`, `27b012b`, `5c1d657`; subsequently merged as
+  `134c610` before C66. Written contract 1.0.9 approved; advertised dashboard
+  version remains 1.0.6.
 - Hosted default is a baked unsigned Friday from real scripted steps 1–6.
   Atomic constrained DB restore retains passkeys, clears challenges, restores
   mock timers/random/signatures, rebinds trusted identity and clears auth cache.
@@ -260,9 +294,9 @@ staged, sandbox and real-model evidence stay distinct.
 
 ## Continuation
 
-Stage explicit files; one-line `C47: lowercase summary` commits, no attribution.
-Push only the C47 branch after verification; owner approves merge. No cloud
-actions. Ask before shield/executor/approvals/migrations/contracts/visual changes.
+For C66, stage only explicit authorized files on `razeef/c66-ag-grid`; the primary
+handles the final context commit and push after verification. Do not reuse historical
+C47 branch instructions as current authorization. No cloud actions or merge.
 Consult matching sections of [AGENT_FUTURE_NOTES.md](AGENT_FUTURE_NOTES.md).
 
 ## Completed Nov 3: C51 passkey countersignatures (merged `97ceea7`)

@@ -768,3 +768,56 @@ step7 and plain201 passed. Six guide/end light/dark/390px screenshots, browser.j
 measurements and shared line starts: design-demos/reference/c62/README.md.
 No full suite; leave merge/full integration to Claude. Preview8198 own oneCPU
 container; protect other ports/worktrees/DBs. No.env, real API/model or styles.css.
+
+
+## C66 operational AG Grid (Nov 5; ready for review)
+
+- Worktree `CounterSign-c66`, branch `razeef/c66-ag-grid`, fresh upstream/main
+  base `745c9b4` containing C62 merge `134c610`; runtime `6835338`, evidence
+  `1b664f4`. [PR #18](https://github.com/Razeefshaik/CounterSign/pull/18) is
+  open, non-draft and targets main; pushed to upstream and origin. No merge. C62's earlier notes describe its feature-time evidence, not current
+  integration status.
+- `grid-showcase.mjs` owns pure saved filter/sort models, source-row counts,
+  multi-currency filtered totals, safe CSV formatting and layout storage helpers.
+  `grid.mjs` keeps the four operational grids mounted across same-route refresh,
+  applies stable-ID transactions, preserves native state and disables cell flash
+  for reduced motion. Small integration changes are in app/command/workspace.
+- Saved views use Community text/number filters; timestamps use native floating
+  date filters. Viewer column layout is local browser state, resettable and
+  storage-failure safe. Counts/totals cover filtered loaded rows, not a full
+  server dataset or payout manifest. Currency totals remain separate and money
+  stays in integer minor units until formatting.
+- Run grid includes observed reserved obligations, with distinct Held back and
+  Paid views; missing/item-less status remains unavailable. All maker-list sizes
+  use the grid. Enter/click opens existing incident/decision/run-reference/maker
+  surfaces; known audit rules link to existing decision explanations. CSV omits
+  pinned rows, follows filter/sort, formats money/date and neutralizes formula
+  prefixes. No new financial write path.
+- Primary verification so far: 136 Node passed (nine C66 additions). Actual
+  contract-fixture browser checks pass saved-view counts/CSV/Enter for all four
+  grids and exact mounted API plus sort retention on refresh; light/dark/390px
+  checks have no runtime errors. This is fixture evidence only.
+- Final primary-confirmed single Docker build from runtime `6835338` passed:
+  `countersign-c66:verified`, SHA256
+  `b3add1c08ae2dc690f25374a6811b6642a177da0dbe808759598b2892c9afdd7`,
+  inspect Size 255,259,045 bytes. Own `countersign-c66-preview` on 8200 uses
+  private internal PostgreSQL; no external database was touched.
+- Actual Friday boot reported step 6/checkpoint Friday. Browser issued exactly
+  five demo-step POSTs for steps 7 through 11 and finished the week. Same incident
+  API remained mounted and genuine changed-cell flash was observed. All four
+  grids passed saved counts, native filters, pinned summaries, actual filtered
+  formatted CSV downloads, bound-record Enter detail and API/sort retention.
+  Initial rows: incidents 5, audit 49, runs 5 (including 2 held), makers 3.
+- Six personally reviewed PNGs, four CSVs and `browser.json` are under
+  `design-demos/reference/c66/`. Light 1440px, dark incident and all four 390px
+  views passed no horizontal page overflow and important pinned-column checks;
+  storage-denied fresh load/reset passed. Zero runtime exceptions or warnings.
+  No Python changed and no pytest/Ruff was run, per the explicit C66 prompt.
+- Scope limits: audit rows without a bound decision have no existing detail
+  route, so no link is invented; bound-row Enter was verified. Existing desktop
+  sticky chrome partly covers the simulation banner on scroll; the phone banner
+  is fully visible. No shared styles.css change was permitted. PR metadata pending.
+- No API/contracts/new dependencies/vendor/styles.css/README/submission changes,
+  environment-file reads, real PayPal/model calls, merge or cloud deployment.
+  Protect other ports/worktrees; original checkout changed only by authorized
+  fetch. Professor Pickle edits only these two notes; primary stages/commits.
