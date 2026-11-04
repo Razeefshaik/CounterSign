@@ -161,6 +161,49 @@ async def test_client_without_zero_tool_proof_cannot_start_process():
         await client.ainvoke([])
 
 
+@pytest.mark.asyncio
+async def test_metadata_clears_before_local_serialization_failure():
+    client = CodexCLIClient(binary="unused", model="test", catalog={}, proof=True)
+    client.last_event_metadata = {"startup_warning_count": 2, "rejected_item_type": "error"}
+    with pytest.raises(AttributeError):
+        await client.ainvoke([object()])
+    assert client.last_event_metadata == {}
+
+
+@pytest.mark.parametrize("usage,expected", [
+    ({"input_tokens": 7, "output_tokens": 3}, {"input_tokens": 7, "output_tokens": 3, "total_tokens": 10}),
+    ({"output_tokens": 3}, {"input_tokens": 0, "output_tokens": 3, "total_tokens": 3}),
+    ({}, {"input_tokens": 0, "output_tokens": 0, "total_tokens": 0}),
+])
+def test_client_returns_serializable_ai_message_with_normalized_usage(monkeypatch, usage, expected):
+    from langchain_core.messages import AIMessage
+
+    from countersign.agent import codex_cli
+
+    class Process:
+        def __init__(self, *_args, **_kwargs):
+            reply = json.dumps({"tool_calls": [], "proposal_json": "{}"})
+            events = [{"type": "turn.started"},
+                {"type": "item.completed", "item": {"type": "agent_message", "text": reply}},
+                {"type": "turn.completed", "usage": usage}]
+            self.stdout = io.BytesIO("".join(json.dumps(e) + "\n" for e in events).encode())
+            self.stderr, self.stdin = io.BytesIO(), io.BytesIO()
+            self.returncode = 0
+        def kill(self):
+            self.returncode = -9
+        def poll(self):
+            return self.returncode
+        def wait(self, **_kwargs):
+            return self.returncode
+    monkeypatch.setattr(codex_cli.subprocess, "Popen", Process)
+    client = CodexCLIClient(binary="unused", model="test", catalog={"models": [{"slug": "test"}]}, proof=True)
+    message = client.invoke("offline unit test")
+    assert isinstance(message, AIMessage) and message.content == "{}" and message.tool_calls == []
+    assert message.usage_metadata == expected
+    assert json.loads(json.dumps(message.model_dump(mode="json")))["usage_metadata"] == expected
+    assert set(message.response_metadata["missing_usage_counts"]) == {"input_tokens", "output_tokens"} - usage.keys()
+
+
 @pytest.mark.parametrize("item,forbidden,expected", [
     ({"type": "command_execution", "command": "read outside"}, None, "MODEL_NATIVE_TOOL_FORBIDDEN"),
     ({"type": "agent_message", "text": "invented-unit-canary-value"},

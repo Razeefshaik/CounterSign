@@ -10,7 +10,6 @@ import tempfile
 import threading
 from functools import lru_cache
 from pathlib import Path
-from types import SimpleNamespace
 
 from countersign.agent.codex_cli_schema import decode_calls, strict_parameters
 from countersign.agent.models import ModelError
@@ -167,6 +166,7 @@ class CodexCLIClient:
         self.finish_step()
 
     async def ainvoke(self, messages, config=None):
+        self.last_event_metadata = {}
         if not self.proof:
             raise ModelError("MODEL_TOOL_DISABLE_PROOF_REQUIRED")
         serial = [message if isinstance(message, tuple) else message.model_dump(mode="json")
@@ -226,9 +226,15 @@ class CodexCLIClient:
                 calls, proposal = decode_calls(response["tool_calls"], self.tools), response["proposal_json"]
                 if bool(calls) == bool(proposal):
                     raise ModelError("INVALID_MODEL_RESPONSE")
+                from langchain_core.messages import AIMessage
+
+                counts = {name: events.usage.get(name) for name in ("input_tokens", "output_tokens")}
+                missing = [name for name, count in counts.items() if type(count) is not int or count < 0]
+                usage = {name: 0 if name in missing else count for name, count in counts.items()}
+                usage["total_tokens"] = usage["input_tokens"] + usage["output_tokens"]
                 self.last_events = events.types
-                return SimpleNamespace(tool_calls=calls, content=proposal,
-                    usage_metadata=events.usage, invalid_tool_calls=[])
+                return AIMessage(tool_calls=calls, content=proposal, usage_metadata=usage,
+                                 response_metadata={"missing_usage_counts": missing})
             except ModelError:
                 proc.kill()
                 raise

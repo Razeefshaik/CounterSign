@@ -14,8 +14,9 @@ from countersign.agent.codex_cli import CLI_VERSION, create_client, find_binary
 from countersign.agent.models import ChatModelConfig, LangChainModel, ModelError
 
 ROOT = Path(__file__).resolve().parents[1]
-PREVIOUS_RECORD = "recordings/real_model/2026-11-04-c67-cli-stage1/run.json"
-RECORD = ROOT / "recordings/real_model/2026-11-04-c67-cli-stage1-repeat/run.json"
+PREVIOUS_RECORDS = ["recordings/real_model/2026-11-04-c67-cli-stage1/run.json",
+                    "recordings/real_model/2026-11-04-c67-cli-stage1-repeat/run.json"]
+RECORD = ROOT / "recordings/real_model/2026-11-04-c67-cli-stage1-rehearsed/run.json"
 TOOL = {"type": "function", "function": {"name": "get_payout_item",
     "description": "Read the recorded payout-item status through the application's read-only boundary.",
     "parameters": {"type": "object", "additionalProperties": False,
@@ -124,7 +125,7 @@ def main():
         "cli_adds_own_system_instructions": True, "stage": 1, "model_turn_cap": 3,
         "cost": "Existing CLI login usage; no API key; dollar cost unavailable",
         "status": "started", "round_trip": "not_run", "canary": {"status": "not_run"},
-        "previous_attempt": PREVIOUS_RECORD, "attempt": "owner-approved single repeat",
+        "previous_attempts": PREVIOUS_RECORDS, "attempt": "owner-approved attempt after offline rehearsal",
         "turns": [], "week_run": False, "pilot_run": False, "evaluation_run": False}
     save(record)
     try:
