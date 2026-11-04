@@ -106,7 +106,7 @@ export function createCommand(document, fetcher = fetch) {
     makerGrid?.destroy(); makerGrid=null;
     fill("folios", makerList(model, {filter: makerFilter, expanded: makerMore}));
     // C49: preserve the pure makerList HTML contract as the fallback.
-    const table = $("folios")?.querySelector?.(".mtable"), host = count ? $("folios") : null; // C66: every maker list, including three-maker Friday
+    const table = $("folios")?.querySelector?.(".mtable"), host = table?.querySelector(".table-scroll"); // Owner: Friday keeps its maker cards; only long lists become a grid
     if (host) {
       host.dataset.c49Grid = "makers";
       const rows = makerRows(data.makers, model);
