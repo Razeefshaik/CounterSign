@@ -63,9 +63,7 @@ def test_required_flags_and_capabilities_are_explicit():
         assert flag in args
     assert "-C" in args and args[-1] == "-"
     assert 'web_search="disabled"' in args and 'mcp_servers={}' in args
-    assert 'model_providers.c67_no_retry.request_max_retries=0' in args
-    assert 'model_providers.c67_no_retry.stream_max_retries=0' in args
-    assert 'model_providers.c67_no_retry.requires_openai_auth=true' in args
+    assert not any("model_provider=" in arg or "model_providers." in arg for arg in args)
     assert all(f"features.{name}=false" in args for name in DISABLED)
     assert not {"--worktree", "--approve-for-me", "--dangerously-bypass-approvals-and-sandbox"} & set(args)
     assert "exec_permission_approvals" in DISABLED

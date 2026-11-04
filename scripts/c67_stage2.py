@@ -20,7 +20,7 @@ from scripts.c67_week_recording import MAX_TURNS
 from scripts.mock_rehearsal import prepare
 
 ROOT = Path(__file__).resolve().parents[1]
-RECORD_ROOT = ROOT / "recordings/real_model/2026-11-04-c67-cli-week"
+RECORD_ROOT = ROOT / "recordings/real_model/2026-11-04-c67-cli-week-fix"
 DATABASE = "postgresql://postgres@127.0.0.1:55433/countersign_c67_demo"
 APP = "http://127.0.0.1:8201"
 MOCK = "http://127.0.0.1:8099"
@@ -50,6 +50,8 @@ def main():
     preflight = json.loads((RECORD_ROOT / "offline-rehearsal.json").read_text())
     if preflight["status"] != "passed" or preflight["model_calls"] != 0:
         raise RuntimeError("C67_OFFLINE_REHEARSAL_REQUIRED")
+    if json.loads((RECORD_ROOT / "preflight.json").read_text())["status"] != "passed":
+        raise RuntimeError("C67_LIVE_SCHEMA_PREFLIGHT_REQUIRED")
     for port in (8099, 8201):
         with socket.socket() as probe:
             if probe.connect_ex(("127.0.0.1", port)) == 0:
@@ -99,6 +101,8 @@ def main():
         metadata = {"stage": 2, "status": "started", "date": datetime.now(UTC).isoformat(),
             "provider": "codex_cli", "model": accepted["model"], "cli_version": CLI_VERSION,
             "cli_adds_own_system_instructions": True, "model_turn_cap": MAX_TURNS, "retries": 0,
+            "retry_scope": "application never reruns a turn; accepted stage-one CLI handling unchanged",
+            "previous_week": "recordings/real_model/2026-11-04-c67-cli-week/",
             "environment_file": "new empty temporary file", "main_environment_file_used": False,
             "sandbox_paypal_credentials_loaded": False, "mock_credentials_only": True,
             "database_name": "countersign_c67_demo", "database_port": 55433,
@@ -109,7 +113,7 @@ def main():
             "--record-model-decisions", "--env-file", str(empty), "--app-url", APP,
             "--root", str(RECORD_ROOT), "--date", date]
         started = time.monotonic()
-        result = subprocess.run(args, cwd=ROOT, env=live, capture_output=True, encoding="utf-8", check=False)
+        result = subprocess.run(args, cwd=ROOT, env=live, capture_output=True, check=False)
         metadata.update(status="completed" if result.returncode == 0 else "stopped", exit_code=result.returncode,
                         wall_seconds=round(time.monotonic() - started, 3))
         # Raw diagnostics are never exported; the checkpoint and turn records contain fixed codes.

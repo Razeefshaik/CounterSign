@@ -217,7 +217,7 @@ class RecordedModel:
                 turn["usage"]["total_tokens"] = sum(turn["usage"].values())
             client = getattr(self.inner, "_client", None)
             meta = getattr(client, "last_event_metadata", {})
-            turn.update({k: meta[k] for k in ("startup_warning_count", "rejected_item_type") if k in meta})
+            turn.update({k: meta[k] for k in ("startup_warning_count", "rejected_item_type", "provider_error_code") if k in meta})
             selected = [t for t in recorder.turns if t["number"] in row["turns"]]
             row["seconds"] = round(sum(t["seconds"] for t in selected), 3)
             row["usage"] = ({k: sum(t["usage"][k] for t in selected)

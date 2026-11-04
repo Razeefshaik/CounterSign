@@ -1,0 +1,40 @@
+{
+  "stage": "week preflight",
+  "status": "passed",
+  "turn_cap": 3,
+  "turns": [
+    {
+      "number": 1,
+      "status": "passed",
+      "output_schema_sha256": "3a74bd957010a5da0473c9f7591e6721383c4d8fe3e2bd827c41b6a753c07c9c",
+      "usage": {
+        "input_tokens": 11947,
+        "output_tokens": 26,
+        "total_tokens": 11973
+      },
+      "native_tool_events": 0,
+      "startup_warning_count": 2,
+      "rejected_item_type": null,
+      "seconds": 11.656
+    }
+  ],
+  "model": "gpt-6.1-sol",
+  "provider": "codex_cli",
+  "cli_version": "codex-cli 0.160.0",
+  "date": "2026-11-04T13:27:03.736835+00:00",
+  "cli_adds_own_system_instructions": true,
+  "exact_stage_one_command": true,
+  "hostile_or_scenario_text": false,
+  "previous_week": "recordings/real_model/2026-11-04-c67-cli-week/",
+  "tool_executions": 0,
+  "offered_tools": [
+    "get_dispute",
+    "get_order_details",
+    "get_payout_item",
+    "get_shipment_tracking",
+    "list_disputes",
+    "list_transactions",
+    "query_money_graph",
+    "simulate"
+  ]
+}

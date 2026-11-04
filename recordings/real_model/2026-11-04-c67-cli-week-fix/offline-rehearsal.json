@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "model_calls": 0,
+  "export_rehearsal_source": "recordings/real_model/2026-11-04-c67-cli-week/offline-rehearsal.json",
+  "export_business_flow_unchanged": true,
+  "current_provider_diagnostics_checks": "73 focused checks passed; 12 detailed-failure checks passed after embedded-provider-code coverage was added (overlapping counts)",
+  "cli_command": "AST matches accepted stage-one command at 0990638",
+  "failed_diagnostic_storage": ".venv/c67-diagnostics (gitignored); redacted, maximum 500 characters; not copied into results",
+  "schema_adapter_changed": false,
+  "ruff": "passed",
+  "import_contracts_kept": 4
+}

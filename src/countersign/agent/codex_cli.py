@@ -11,6 +11,12 @@ import threading
 from functools import lru_cache
 from pathlib import Path
 
+from countersign.agent.codex_cli_diagnostics import (
+    CLIFailure,
+    provider_code,
+    provider_error,
+    save_failure,
+)
 from countersign.agent.codex_cli_schema import decode_calls, strict_parameters
 from countersign.agent.models import ModelError
 from countersign.agent.tools import ALLOWED_TOOLS
@@ -78,12 +84,6 @@ def command(binary, model, cwd, schema, catalog):
         "-C", str(cwd), "--model", model, "--json", "--color", "never",
         "--output-schema", str(schema)]
     overrides = ['web_search="disabled"', 'mcp_servers={}', 'plugins={}',
-        'model_provider="c67_no_retry"', 'model_providers.c67_no_retry.name="OpenAI"',
-        'model_providers.c67_no_retry.wire_api="responses"',
-        'model_providers.c67_no_retry.requires_openai_auth=true',
-        'model_providers.c67_no_retry.request_max_retries=0',
-        'model_providers.c67_no_retry.stream_max_retries=0',
-        'model_providers.c67_no_retry.supports_websockets=true',
         'apps._default.enabled=false', 'tools.update_plan.enabled=false',
         'features.skip_host_skill_discovery=true', 'project_doc_max_bytes=0',
         'model_catalog_json=' + json.dumps(str(catalog))]
@@ -103,6 +103,7 @@ class Events:
         self.turn_started = False
         self.startup_warning_count = 0
         self.rejected_item_type = None
+        self.provider_error_code = None
 
     def accept(self, event):
         kind = event.get("type")
@@ -120,7 +121,9 @@ class Events:
                     self.startup_warning_count += 1
                     return
                 self.rejected_item_type = "error"
-                raise ModelError("MODEL_CLI_ERROR_ITEM")
+                self.provider_error_code = provider_code(item.get("code")) or provider_code(
+                    provider_error(item.get("message", "")).get("code"))
+                raise CLIFailure("MODEL_CLI_ERROR_ITEM", item.get("message", ""))
             if not isinstance(item_type, str) or item_type not in {"agent_message", "reasoning"}:
                 self.rejected_item_type = item_type if isinstance(item_type, str) and item_type in ITEM_TYPES else "unknown"
                 raise ModelError("MODEL_NATIVE_TOOL_FORBIDDEN")
@@ -138,12 +141,13 @@ class Events:
             message = event.get("message", "")
             if isinstance(error, dict):
                 message = error.get("message", message)
-            # Inspect only to classify; never copy CLI error text into diagnostics.
+            self.provider_error_code = provider_code(code) or provider_code(provider_error(message).get("code"))
+            # Warning text is never retained. Failed-turn detail is local-only.
             usage_stop = isinstance(message, str) and any(phrase in message.lower() for phrase in
                 ("usage limit", "rate limit", "quota exceeded", "quota exhausted"))
             if usage_stop or code in {"usage_limit_reached", "rate_limit_exceeded", "insufficient_quota"}:
-                raise ModelError("MODEL_QUOTA_EXHAUSTED")
-            raise ModelError("MODEL_CALL_FAILED")
+                raise CLIFailure("MODEL_QUOTA_EXHAUSTED", message)
+            raise CLIFailure("MODEL_CLI_TURN_FAILED", message)
         raise ModelError("MODEL_EVENT_FORBIDDEN")
 
 
@@ -156,6 +160,7 @@ class CodexCLIClient:
         self.last_events = []
         self.last_event_metadata = {}
         self.forbidden_output = None
+        self.last_local_error_path = None
 
     def __repr__(self):
         return "CodexCLIClient(values=<REDACTED>)"
@@ -173,6 +178,7 @@ class CodexCLIClient:
 
     async def ainvoke(self, messages, config=None):
         self.last_event_metadata = {}
+        self.last_local_error_path = None
         if not self.proof:
             raise ModelError("MODEL_TOOL_DISABLE_PROOF_REQUIRED")
         serial = [message if isinstance(message, tuple) else message.model_dump(mode="json")
@@ -192,9 +198,14 @@ class CodexCLIClient:
             schema, catalog = root / "output.json", root / "catalog.json"
             schema.write_text(json.dumps(schema_for(self.tools)), encoding="utf-8")
             catalog.write_text(json.dumps(isolated_catalog(self.catalog, self.model)), encoding="utf-8")
-            proc = subprocess.Popen(command(self.binary, self.model, cwd, schema, catalog),
-                cwd=cwd, env=child_environment(), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+            try:
+                proc = subprocess.Popen(command(self.binary, self.model, cwd, schema, catalog),
+                    cwd=cwd, env=child_environment(), stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE, creationflags=subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0)
+            except OSError as error:
+                failure = CLIFailure("MODEL_CLI_SPAWN_FAILED", str(error))
+                self.last_local_error_path = save_failure(failure, secrets=(self.forbidden_output,))
+                raise failure from None
             timer = threading.Timer(self.timeout, lambda: proc.kill() if proc.poll() is None else None)
             timer.start()
 
@@ -221,17 +232,32 @@ class CodexCLIClient:
                 reader.join(timeout=5)
                 if self.forbidden_output and self.forbidden_output.encode() in stderr:
                     raise ModelError("MODEL_CANARY_DISCLOSED")
-                if proc.returncode != 0 or events.message is None or events.usage is None:
-                    raise ModelError("MODEL_CALL_FAILED")
-                response = json.loads(events.message)
+                if proc.returncode != 0:
+                    detail = next((line for line in reversed(stderr.decode("utf-8", errors="replace").splitlines())
+                                   if line.lower().startswith("error:")), f"CLI exited with status {proc.returncode}")
+                    events.provider_error_code = provider_code(provider_error(detail).get("code"))
+                    raise CLIFailure("MODEL_CLI_EXIT_NONZERO", detail)
+                if events.message is None:
+                    raise CLIFailure("MODEL_CLI_NO_MESSAGE", "CLI emitted no assistant message")
+                if events.usage is None:
+                    raise CLIFailure("MODEL_CLI_TURN_FAILED", "CLI did not emit completed-turn usage")
+                try:
+                    response = json.loads(events.message)
+                except (ValueError, TypeError) as error:
+                    raise CLIFailure("MODEL_OUTPUT_NOT_JSON", str(error)) from None
                 if self.forbidden_output and self.forbidden_output in json.dumps(response):
                     raise ModelError("MODEL_CANARY_DISCLOSED")
-                from jsonschema import validate
+                from jsonschema import ValidationError, validate
 
-                validate(response, schema_for(self.tools))
-                calls, proposal = decode_calls(response["tool_calls"], self.tools), response["proposal_json"]
+                try:
+                    validate(response, schema_for(self.tools))
+                    calls, proposal = decode_calls(response["tool_calls"], self.tools), response["proposal_json"]
+                except ValidationError as error:
+                    raise CLIFailure("MODEL_OUTPUT_SCHEMA_INVALID", error.message) from None
+                except ModelError:
+                    raise CLIFailure("MODEL_OUTPUT_SCHEMA_INVALID", "Decoded arguments violate the original read schema") from None
                 if bool(calls) == bool(proposal):
-                    raise ModelError("INVALID_MODEL_RESPONSE")
+                    raise CLIFailure("MODEL_OUTPUT_SCHEMA_INVALID", "Expected application reads or a proposal, exclusively")
                 from langchain_core.messages import AIMessage
 
                 counts = {name: events.usage.get(name) for name in ("input_tokens", "output_tokens")}
@@ -241,17 +267,22 @@ class CodexCLIClient:
                 self.last_events = events.types
                 return AIMessage(tool_calls=calls, content=proposal, usage_metadata=usage,
                                  response_metadata={"missing_usage_counts": missing})
-            except ModelError:
+            except ModelError as error:
                 proc.kill()
+                self.last_local_error_path = save_failure(error, secrets=(self.forbidden_output,))
                 raise
-            except Exception:  # noqa: BLE001 - CLI/config/OS text can carry private data.
+            except Exception as error:  # noqa: BLE001 - detail is local-only, redacted and bounded.
                 proc.kill()
-                raise ModelError("MODEL_CALL_FAILED") from None
+                failure = CLIFailure("MODEL_CLI_TURN_FAILED", str(error))
+                self.last_local_error_path = save_failure(failure, secrets=(self.forbidden_output,))
+                raise failure from None
             finally:
                 self.last_event_metadata = {
                     "startup_warning_count": events.startup_warning_count,
                     "rejected_item_type": events.rejected_item_type,
                 }
+                if events.provider_error_code is not None:
+                    self.last_event_metadata["provider_error_code"] = events.provider_error_code
                 timer.cancel()
                 proc.wait(timeout=5)
                 reader.join(timeout=5)
