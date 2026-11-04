@@ -61,6 +61,14 @@
 .cs-grid .ag-pinned-left-cols-container .ag-cell{background:var(--card)}
 .cs-grid .ag-row-pinned .ag-cell{white-space:normal;font-size:12px}
 #folios[data-c49-grid=makers]{display:block;min-width:0;max-width:100%}
+/* C69: the desk has no card padding of its own; views and tools share one row on wide screens. */
+#incident-list[data-grid-state=ready]{padding:0 20px 12px}
+.cs-grid-showcase{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:16px;align-items:end}
+.cs-grid-showcase .cs-grid-tools{margin:0}
+.cs-grid-showcase [data-c66-count],.cs-grid-showcase .cs-grid-help{grid-column:1/-1}
+.cs-grid-showcase [data-c66-count]{margin-top:12px}
+@media(max-width:900px){.cs-grid-showcase{grid-template-columns:minmax(0,1fr)}.cs-grid-showcase .cs-grid-tools{margin-top:12px}}
+@media(max-width:600px){#incident-list[data-grid-state=ready]{padding:0 12px 12px}}
 @media(max-width:600px){
   .cs-grid-showcase button{padding:7px 9px;font-size:11px}
   .cs-grid-showcase .cs-grid-tools{gap:8px}

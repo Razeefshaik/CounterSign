@@ -152,3 +152,16 @@ test("a still-connected incident host left during loading is not enhanced off ro
   assert.equal(await mounting, null); assert.equal(created, false);
   assert.equal(original.hidden, false); assert.equal(host.dataset.gridState, "idle");
 });
+
+test("C69: a waiting decision is a Needs owner row and resolved money is not at risk", () => {
+  const usd = minor => ({minor, currency:"USD"});
+  const incidents = [
+    {id:"a", kind:"DISPUTE", state:"WAITING_EXTERNAL", subject:{}, amount_at_risk:usd(6000), updated_at:"2026-11-05T09:00:00Z"},
+    {id:"b", kind:"PAYOUT_ITEM", state:"RESOLVED", subject:{}, amount_at_risk:usd(30000), updated_at:"2026-11-05T09:00:00Z", latest_proposal:{id:"linked"}},
+  ];
+  const proposals = [{id:"run", action:"SCHEDULE_PAYOUT_RUN", state:"NEEDS_OWNER"}, {id:"linked", action:"CANCEL_UNCLAIMED_PAYOUT", state:"NEEDS_OWNER"}, {id:"done", action:"PROVIDE_EVIDENCE", state:"EXECUTED"}];
+  const rows = incidentRows(incidents, {proposals});
+  assert.deepEqual(rows.map(row => row.id), ["decision:run", "a", "b"]);
+  assert.equal(rows[0].state, "AWAITING_OWNER"); assert.equal(rows[0].decision_id, "run"); assert.equal(rows[0].amount_minor, null);
+  assert.equal(rows[1].amount_minor, 6000); assert.equal(rows[2].amount_minor, null);
+});

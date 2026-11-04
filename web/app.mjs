@@ -17,17 +17,19 @@ async function showIncidentGrid() {
   if (!workspace || location.hash.split("/")[0] !== "#incidents") return;
   const ticket = ++incidentGridSerial, source = workspace;
   const client = createClient({fixture: source.fixture});
-  const makers = await client.list("makers").catch(() => []);
+  const [makers, proposals] = await Promise.all([client.list("makers").catch(() => []), client.list("proposals").catch(() => [])]);
   if (ticket !== incidentGridSerial || workspace !== source || location.hash.split("/")[0] !== "#incidents") return;
   const filtered = filterIncidents(source.incidents, {state: $("state").value, kind: $("kind").value});
   const host = $("incident-list"); host.dataset.c49Grid = "incidents";
   // C66: keep the existing grid through demo refreshes; replace only its rows/callbacks.
-  const rows=incidentRows(filtered, {makers,disputes:source.disputes,staged:row => isStaged(row,source.disputes)});
+  const rows=incidentRows(filtered, {makers,disputes:source.disputes,staged:row => isStaged(row,source.disputes),proposals});
+  const showCount = count => {$("result-count").textContent = count; $("table-note").textContent = `${count} of ${rows.length} incidents`;};
   const settings={
     isActive:() => ticket === incidentGridSerial && location.hash.split("/")[0] === "#incidents",
-    quickFilterText:$("search").value, onOpen:row => inspect(source.incidents.find(item => item.id === row.id)),
+    quickFilterText:$("search").value, search:false, onViewChosen:() => {$("search").value = "";}, // C69: the desk already has its own search box
+    onOpen:row => {if (row.decision_id) location.hash = "#decision/" + row.decision_id; else inspect(source.incidents.find(item => item.id === row.id));},
     onFilterChanged:event => {
-      const count = event.api.getDisplayedRowCount(); $("result-count").textContent = count; $("table-note").textContent = `${count} of ${source.incidents.length} incidents`;
+      showCount(event.api.getDisplayedRowCount());
       let first = null, current = null;
       event.api.forEachNodeAfterFilterAndSort(node => {first ||= node.data; if (node.data.id === selected) current = node.data;});
       const visible = current || first;
@@ -35,6 +37,7 @@ async function showIncidentGrid() {
       else {$("detail-title").textContent = "No incidents match these filters"; $("detail-text").textContent = "Clear a filter or try another search."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
     },
   };
+  showCount(rows.length);
   if (incidentGrid?.api && incidentGrid.update(rows,settings)) return;
   incidentGrid?.destroy();
   const handle=await mountGrid(host,"incidents",rows,settings);
@@ -83,6 +86,7 @@ window.addEventListener("hashchange", () => {window.scrollTo({top: 0}); views.re
 if (location.hash === "#incidents") requestAnimationFrame(() => window.scrollTo({top: 0}));
 
 function inspect(row) {
+  if (!row) return; // C69: a waiting decision row has no incident detail
   selected = row.id;
   for (const tr of $("incident-list").querySelectorAll("tr[data-id]")) tr.classList.toggle("selected", tr.dataset.id === row.id);
   const latest = row.latest_proposal;
