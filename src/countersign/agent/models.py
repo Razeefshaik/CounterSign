@@ -98,6 +98,11 @@ def _tracing_disabled():
 
 
 def _langchain_factory(config):
+    # C67: OpenRouter uses the OpenAI integration with private signature replay.
+    if config.provider == "openrouter":
+        from countersign.agent.openrouter import create_client
+
+        return create_client(config)
     try:
         from langchain.chat_models import init_chat_model
     except ImportError:
@@ -183,6 +188,10 @@ class LangChainModel:
         """Discard signed history after a validated proposal or any step failure."""
         self._conversation = None
         self._proposal_turn = None
+        # C67: opaque provider history lives only for this investigation.
+        finish = getattr(self._client, "finish_step", None)
+        if callable(finish):
+            finish()
 
     def _messages(self, clean):
         """Retain original assistant messages, including opaque Gemini signatures.

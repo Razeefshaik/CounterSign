@@ -890,7 +890,8 @@ class ModelConfigurationRequired(RuntimeError):
 
 def _model_environment(env_file):
     """Only the three model settings; process values win. No PayPal value is read."""
-    names = ("COUNTERSIGN_LLM_PROVIDER", "COUNTERSIGN_LLM_MODEL", "GOOGLE_API_KEY")
+    names = ("COUNTERSIGN_LLM_PROVIDER", "COUNTERSIGN_LLM_MODEL", "GOOGLE_API_KEY",
+             "OPEN_ROUTER_API_KEY")
     values = {name: os.environ[name] for name in names if name in os.environ}
     if env_file is not None:
         from dotenv import dotenv_values

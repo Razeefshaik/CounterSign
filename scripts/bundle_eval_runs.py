@@ -35,6 +35,11 @@ TOKEN = re.compile(
 
 def private_guard(value):
     public_guard(value)
+    # C67: an environment-style assignment can appear inside otherwise public text.
+    if isinstance(value, str) and re.search(
+        r"\bOPEN_ROUTER_API_KEY[\"']?\s*[:=]\s*[\"']?\S+", value, re.IGNORECASE
+    ):
+        raise ValueError("EVAL_PRIVATE_VALUE")
     if isinstance(value, str) and TOKEN.search(value):
         raise ValueError("EVAL_PRIVATE_VALUE")
     if isinstance(value, dict):

@@ -7,12 +7,14 @@ import {createTrick} from "./trick.mjs";
 import {createCommand} from "./command.mjs";
 // C50: the report shares the existing routing/lifecycle; no API changes.
 import {createProof} from "./proof.mjs";
+import {createModelWeek} from "./gemini-week.mjs"; // C67
 import {action as actionWord, state as stateWord, when} from "./words.mjs";
 // C49: projections and lazy Community mounts, no financial writes.
 import {mountGrid, mountAuditGrid, runRows, runTotal} from "./grid.mjs";
 
 const titles = {overview: "Command center", incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
 titles.proof = "Sandbox proof"; // C50
+titles["model-week"] = "Recorded model weeks"; // C67
 export function route(hash) {
   const [name, id] = hash.replace(/^#/, "").split("/");
   return {name: Object.hasOwn(titles, name) ? name : "overview", id: id || ""};
@@ -25,6 +27,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
   const trick = createTrick(document, fetcher);
   const command = createCommand(document, fetcher);
   const proof = createProof(document, fetcher); // C50
+  const modelWeek = createModelWeek(document, fetcher); // C67
   const notice = (message = "") => {$("view-notice").textContent = message; $("view-notice").hidden = !message;};
   const invalidate = () => {
     proposal = null;
@@ -55,11 +58,19 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
     if ($("view-source-note")) $("view-source-note").hidden = current.name === "proof";
     // C58: replay metrics are historical evidence, independent of live workspace records.
     if (current.name === "replay" && $("view-source-note")) $("view-source-note").hidden = true;
+    if (current.name === "model-week" && $("view-source-note")) $("view-source-note").hidden = true; // C67
     // /C58
     $("view-picker").hidden = true;
     $("view-body").innerHTML = '<p class="empty">Loading records…</p>';
     try {
       // C50: a static source-linked report, independent of dashboard record writes.
+      // C67: recordings never call a model or financial API.
+      if (current.name === "model-week") {
+        await modelWeek.load();
+        if (ticket !== serial) return;
+        modelWeek.draw();
+        return true;
+      }
       if (current.name === "proof") {
         await proof.load();
         if (ticket !== serial) return;
@@ -101,6 +112,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
             if (ticket !== serial) return;
           }
           html = decisionView(doc, workspace.meta, staged, {run});
+          html = '<p><a href="#model-week">View recorded real model weeks</a></p>' + html; // C67
         } else {html = runView(doc); gridRun = doc;} // C49
       } else if (current.name === "audit") {gridAudit = await client.list("audit-log"); html = auditView(gridAudit);} // C49
       else if (current.name === "cash") html = cashView(await client.singleton("cash"));

@@ -1,6 +1,7 @@
 // C58: historical, model-disabled mock analysis. No operational API or write path.
 import {esc} from "./views.mjs";
 import {loadVendor} from "./grid.mjs";
+import {datasetPickerHTML, mountDatasetPicker} from "./gemini-week.mjs"; // C67
 
 export const SOURCE = "eval/results/2026-10-27-model-none-c31/runs.jsonl";
 export const README = "https://github.com/Razeefshaik/CounterSign/blob/main/eval/results/2026-10-27-model-none-c31/README.md";
@@ -174,7 +175,8 @@ export function createEvalExplorer(document, fetcher = fetch, onReplay = () => f
       return;
     }
     if (!valid()) return;
-    host.innerHTML = explorerHTML(rows);
+    host.innerHTML = datasetPickerHTML() + explorerHTML(rows); // C67
+    mountDatasetPicker(host, fetcher); // C67
     const library = await loadVendor(document);
     if (!valid()) return;
     const $ = selector => host.querySelector(selector), $$ = selector => host.querySelectorAll(selector);

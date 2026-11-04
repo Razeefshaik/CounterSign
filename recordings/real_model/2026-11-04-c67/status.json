@@ -1,0 +1,8 @@
+{
+  "date": "2026-11-04",
+  "model": "google/gemma-4-31b-it:free",
+  "label": "Gemma via OpenRouter",
+  "week_status": "not_run",
+  "evaluation_status": "not_run",
+  "reason": "The free Gemma tool-round-trip smoke received HTTP 429 on all three provider attempts. The required tool-turn proof did not pass, so the new week and evaluation were not started. No result score or new week decisions exist."
+}

@@ -16,9 +16,10 @@ _EMAIL = re.compile(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+\.[A-Za-z]{
 _BEARER = re.compile(r"\b(?:Bearer|Basic)\s+[^\s\"'<>]+", re.IGNORECASE)
 _URL_AUTH = re.compile(r"((?:https?|postgres(?:ql)?)://)[^\s/@]+:[^\s/@]+@", re.IGNORECASE)
 _PRIVATE_ASSIGNMENT = re.compile(
-    r"\b(access_token|refresh_token|client_secret|api_key|password)"
+    r"\b(access_token|refresh_token|client_secret|api_key|open_router_api_key|password)"
     r"([\"']?\s*[:=]\s*[\"']?)[^\s\"'&,;}]+", re.IGNORECASE
 )
+_OPENROUTER_KEY = re.compile(r"\bsk-or-v1-[A-Za-z0-9_-]+\b")
 _SENSITIVE = re.compile(
     r"(?:authorization|access_?token|refresh_?token|client_?(?:id|secret)|"
     r"api_?key|password|secret|private_?key)",
@@ -58,6 +59,7 @@ def sanitize(value, secrets=()):
         for secret in private:
             item = item.replace(secret, REDACTED)
         item = _BEARER.sub(REDACTED, item)
+        item = _OPENROUTER_KEY.sub(REDACTED, item)
         item = _URL_AUTH.sub(r"\1<REDACTED>@", item)
         item = _PRIVATE_ASSIGNMENT.sub(lambda match: match[1] + match[2] + REDACTED, item)
         return _EMAIL.sub(lambda match: match[0][0] + "***@" + match[0].split("@", 1)[1], item)

@@ -28,6 +28,9 @@ _PUBLIC_ERRORS = frozenset(
         "MODEL_CALL_FAILED",
         "INVALID_MODEL_RESPONSE",
         "MODEL_SMOKE_FAILED",
+        "MODEL_ID_MISMATCH",
+        "C67_BUDGET_EXHAUSTED",
+        "MODEL_QUOTA_EXHAUSTED",
     }
 )
 _READ_TOOL = {
@@ -61,8 +64,8 @@ def _quiet_provider():
         logging.disable(previous)
 
 
-async def smoke(config, *, factory=None):
-    """Make exactly one complete()/ainvoke() call and retain only safe metadata."""
+async def smoke(config, *, factory=None, round_trip=False):
+    """One emission check, or an explicit two-call tool-result round trip."""
     if not isinstance(config, ChatModelConfig):
         raise ModelError("MODEL_CONFIGURATION_REQUIRED")
     # Revalidate public identity fields too: a direct caller must not make the
@@ -71,21 +74,39 @@ async def smoke(config, *, factory=None):
         {
             "COUNTERSIGN_LLM_PROVIDER": config.provider,
             "COUNTERSIGN_LLM_MODEL": config.model,
-            "GOOGLE_API_KEY": config.api_key,
+            ("OPEN_ROUTER_API_KEY" if config.provider == "openrouter"
+             else "GOOGLE_API_KEY"): config.api_key,
         }
     )
     try:
         with _quiet_provider():
             model = LangChainModel(config, factory=factory)
             try:
-                result = await model.complete(
-                    {
+                request = {
                         "system": "Use the harmless read_demo_status tool once with no arguments.",
                         "data": {"task": "Check the local demonstration status."},
                         "observations": [],
                         "tools": [_READ_TOOL],
                     }
-                )
+                if round_trip:
+                    request["system"] += (' After its result, return exactly {"status":"ready"}'
+                                          ' as JSON, with no more tool calls.')
+                result = await model.complete(request)
+                if round_trip:
+                    calls = result.get("tool_calls", [])
+                    if (len(calls) != 1 or calls[0]["name"] != "read_demo_status"
+                            or calls[0]["args"] != {}):
+                        raise ModelError("MODEL_SMOKE_FAILED")
+                    first_usage = dict(model.last_usage_metadata)
+                    request["observations"] = [{"tool_call": calls[0],
+                                                "untrusted_result": {"status": "ready"}}]
+                    final = await model.complete(request)
+                    if json.loads(final.get("proposal_json", "null")) != {"status": "ready"}:
+                        raise ModelError("MODEL_SMOKE_FAILED")
+                    model.last_usage_metadata = {key: first_usage.get(key, 0) + value
+                        for key, value in model.last_usage_metadata.items()}
+                    metadata = getattr(model._client, "metadata", {})
+                    reported = sorted(metadata.get("reported_models", []))
             finally:
                 await model.aclose()
     except Exception as exc:  # noqa: BLE001 - neither private exceptions nor raw responses escape.
@@ -95,6 +116,8 @@ async def smoke(config, *, factory=None):
         "model": config.model,
         "tool_call_returned": bool(result.get("tool_calls")),
     }
+    if round_trip:
+        output.update(tool_round_trip=True, model_calls=2, reported_models=reported)
     usage = getattr(model, "last_usage_metadata", None)
     if isinstance(usage, Mapping):
         counts = {
@@ -110,13 +133,23 @@ async def smoke(config, *, factory=None):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--env-file", help="Explicit runtime environment file; existing values win")
+    # C67: this path reads exactly one key without loading any PayPal settings.
+    parser.add_argument("--openrouter-key-file")
+    parser.add_argument("--round-trip", action="store_true")
     args = parser.parse_args(argv)
     try:
+        if args.openrouter_key_file is not None and args.env_file is not None:
+            raise ModelError("MODEL_CONFIGURATION_INVALID")
         if args.env_file is not None:
             from dotenv import load_dotenv
 
             load_dotenv(args.env_file, override=False)
-        config = load_chat_model_config()
+        if args.openrouter_key_file is not None:
+            from scripts.c67_secrets import openrouter_config
+
+            config = openrouter_config(args.openrouter_key_file)
+        else:
+            config = load_chat_model_config()
         if config is None:
             print(
                 "No model configured; set COUNTERSIGN_LLM_PROVIDER, "
@@ -126,7 +159,7 @@ def main(argv=None):
         with asyncio.Runner(
             loop_factory=asyncio.SelectorEventLoop if sys.platform == "win32" else None
         ) as runner:
-            result = runner.run(smoke(config))
+            result = runner.run(smoke(config, round_trip=args.round_trip))
         print(json.dumps(result, sort_keys=True))
     except KeyboardInterrupt:
         return 130

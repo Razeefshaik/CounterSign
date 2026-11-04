@@ -1,0 +1,23 @@
+/* C67: match existing dashboard tokens; all additions scoped to model evidence. */
+.c67-model-page,.c67-week,.c67-smokes {display:grid;gap:20px;min-width:0}
+.c67-model-page h2 {font-size:24px}
+.c67-model-page h3 {font-size:18px;line-height:1.35}
+.c67-disclosure {padding:16px;background:var(--surface);color:var(--ink)}
+.c67-model-page p,.c67-model-page a {overflow-wrap:anywhere}
+.c67-status {font-weight:600;color:var(--ink);margin:0}
+.c67-decision {border-top:1px solid var(--line);padding-top:14px;min-width:0}
+.c67-decision summary {cursor:pointer;display:flex;justify-content:space-between;gap:16px;padding:6px 0}
+.c67-decision summary span {flex-shrink:0;color:var(--ink-2)}
+.c67-decision dl {display:grid;gap:16px;margin:18px 0}
+.c67-decision dl>div {display:grid;grid-template-columns:minmax(150px,1fr) minmax(0,2fr);gap:20px}
+.c67-decision dt {font-weight:600}
+.c67-decision dd {margin:0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.6}
+.c67-datasets {margin-bottom:20px}
+.c67-datasets label {display:grid;gap:8px;max-width:460px}
+.c67-datasets select {width:100%;color:var(--ink);background:var(--surface);padding:10px;border:1px solid var(--line);border-radius:6px}
+.c67-model-page :focus-visible,.c67-datasets :focus-visible {outline:2px solid var(--accent);outline-offset:4px}
+@media(max-width:600px) {
+  .c67-decision summary {flex-direction:column;gap:5px}
+  .c67-decision dl>div {grid-template-columns:minmax(0,1fr);gap:5px}
+  .c67-model-page h2 {font-size:22px}
+}

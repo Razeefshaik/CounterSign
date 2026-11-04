@@ -67,7 +67,7 @@ if [ "${1:-}" = "--build-template" ]; then
   exit 0
 fi
 
-for name in PAYPAL_CLIENT_ID PAYPAL_CLIENT_SECRET GOOGLE_API_KEY; do
+for name in PAYPAL_CLIENT_ID PAYPAL_CLIENT_SECRET GOOGLE_API_KEY OPEN_ROUTER_API_KEY; do
   if [ -n "${!name:-}" ]; then
     log "refusing to start: $name is set; the hosted demo never holds sandbox or model credentials"
     exit 64

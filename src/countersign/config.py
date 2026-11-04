@@ -160,7 +160,9 @@ def load_settings() -> Settings:
 
 
 # The public demo never holds sandbox or model credentials; names only are reported.
-HOSTED_REFUSED_ENVIRONMENT = ("PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET", "GOOGLE_API_KEY")
+HOSTED_REFUSED_ENVIRONMENT = (
+    "PAYPAL_CLIENT_ID", "PAYPAL_CLIENT_SECRET", "GOOGLE_API_KEY", "OPEN_ROUTER_API_KEY",
+)
 
 
 def require_hosted_demo(settings: Settings) -> Settings:

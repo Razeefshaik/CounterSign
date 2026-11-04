@@ -523,6 +523,11 @@ async def _run_week(
         nonlocal cash_observation
         cursor_id = await quota_cursor() if not scripted else None
         observed = await engine.tick()
+        # C67: opt-in read-only export, before any failure can stop this tick.
+        if getattr(store, "c67_record_decisions", False):
+            from scripts.c67_recording import capture_decisions
+
+            await capture_decisions(engine, store)
         if not scripted:
             async with engine.database.tx() as conn:
                 cursor = await conn.execute(
@@ -1633,9 +1638,16 @@ async def run_cli(args):
     from countersign.db import Database
 
     settings, emails = runtime_settings(args.target, args.env_file)
-    if args.target == "mock" and args.model == "configured":
-        load_mock_model_environment(args.env_file)
-    model = runtime_model(args.model)
+    if getattr(args, "openrouter_key_file", None):
+        from scripts.c67_secrets import openrouter_config
+
+        require(args.target == "mock" and args.model == "configured", "C67_MOCK_ONLY")
+        model = openrouter_config(args.openrouter_key_file,
+            model=getattr(args, "openrouter_model", "google/gemini-3.5-flash"))
+    else:
+        if args.target == "mock" and args.model == "configured":
+            load_mock_model_environment(args.env_file)
+        model = runtime_model(args.model)
     options = DemoOptions(
         args.settlement,
         args.evidence_available,
@@ -1672,6 +1684,8 @@ async def run_cli(args):
     if args.pause_after_step:
         require(args.target == "mock", "DEMO_PAUSE_MOCK_ONLY")
         pause_after_new_step(store)
+    # C67: this recorder never affects prompts, decisions or execution.
+    store.c67_record_decisions = bool(getattr(args, "record_model_decisions", False))
     try:
         identity = model_identity(model)
         store.record("DEMO_MODEL", **identity)
@@ -1893,6 +1907,9 @@ def main(argv=None):
     parser.add_argument("--app-url", default="http://127.0.0.1:8000")
     parser.add_argument("--tunnel-url")
     parser.add_argument("--env-file", default=".env")
+    parser.add_argument("--openrouter-key-file", help="C67: read only OPEN_ROUTER_API_KEY")
+    parser.add_argument("--openrouter-model", default="google/gemini-3.5-flash")
+    parser.add_argument("--record-model-decisions", action="store_true")
     parser.add_argument("--root", default="recordings/demo_week")
     parser.add_argument("--date")
     parser.add_argument("--prior-item-id")

@@ -14,6 +14,8 @@ license = "Apache-2.0"
 license-files = ["LICENSE"]
 
 [project.optional-dependencies]
+# C67: owner-approved optional provider; excluded from hosted [dev] image.
+openrouter = ["langchain-openai==1.7.3"]
 llm = [
     "langchain==1.4.7",
     "langchain-core==1.7.0",

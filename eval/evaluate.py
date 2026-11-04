@@ -346,7 +346,8 @@ async def _main(args):
         from countersign.agent.runtime import load_chat_model_config
 
         # Do not pass the whole process environment or open .env.
-        names = ("COUNTERSIGN_LLM_PROVIDER", "COUNTERSIGN_LLM_MODEL", "GOOGLE_API_KEY")
+        names = ("COUNTERSIGN_LLM_PROVIDER", "COUNTERSIGN_LLM_MODEL", "GOOGLE_API_KEY",
+                 "OPEN_ROUTER_API_KEY")
         config = load_chat_model_config(
             {name: os.environ[name] for name in names if name in os.environ}
         )

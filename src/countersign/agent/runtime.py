@@ -22,22 +22,25 @@ def load_chat_model_config(environment=None) -> ChatModelConfig | None:
     try:
         values = [
             source.get(name, "")
-            for name in ("COUNTERSIGN_LLM_PROVIDER", "COUNTERSIGN_LLM_MODEL", "GOOGLE_API_KEY")
+            for name in ("COUNTERSIGN_LLM_PROVIDER", "COUNTERSIGN_LLM_MODEL", "GOOGLE_API_KEY",
+                         "OPEN_ROUTER_API_KEY")
         ]
         if any(type(value) is not str for value in values):
             raise ValueError
-        provider, model, key = (value.strip() for value in values)
+        provider, model, google_key, router_key = (value.strip() for value in values)
+        key = router_key if provider == "openrouter" else google_key
     except Exception:  # noqa: BLE001 - even a custom settings mapping can carry private text.
         raise ModelError("MODEL_CONFIGURATION_INVALID") from None
-    if not any((provider, model, key)):
+    if not any((provider, model, google_key, router_key)):
         return None
     if not provider:
         raise ModelError("MODEL_PROVIDER_AND_ID_REQUIRED")
-    if provider != "google_genai":
+    if provider not in {"google_genai", "openrouter"}:
         raise ModelError("MODEL_PROVIDER_UNSUPPORTED")
     if not key:
         raise ModelError("MODEL_API_KEY_REQUIRED")
-    model = model or DEFAULT_GEMINI_MODEL
+    model = model or ("google/" + DEFAULT_GEMINI_MODEL
+                      if provider == "openrouter" else DEFAULT_GEMINI_MODEL)
     if (
         not _MODEL_ID.fullmatch(model)
         or any(ord(character) < 32 or ord(character) == 127 for character in key)

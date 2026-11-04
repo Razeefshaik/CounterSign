@@ -11,6 +11,7 @@ REDACTED = "[REDACTED]"
 EMAIL = re.compile(r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9.-]+")
 AUTHORIZATION_KEYS = {"authorization", "proxy_authorization"}
 SECRET_KEYS = {
+    "open_router_api_key",  # C67: provider credentials never enter public recordings.
     "access_token",
     "refresh_token",
     "id_token",
