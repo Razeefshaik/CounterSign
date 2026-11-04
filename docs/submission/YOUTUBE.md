@@ -28,6 +28,6 @@ The demo week runs on a PayPal mock built from real sandbox recordings. Evidence
 2:32 Results: 48 fault scenarios
 2:42 The AI proposes. The code countersigns.
 
-Built with: PayPal Payouts, Disputes, Orders v2, Payments v2, Webhooks and the PayPal Agent Toolkit (read-only tools), Google Gemini through LangChain, Model Context Protocol, AG Grid Community, WebAuthn passkeys, Python, FastAPI, PostgreSQL, Docker and Render.
+Built with: PayPal Payouts, Disputes, Orders v2, Payments v2, shipment tracking, Reporting, Webhooks and the PayPal Agent Toolkit (read-only tools), Google Gemini through LangChain, Model Context Protocol, AG Grid Community, WebAuthn passkeys, Python, FastAPI, PostgreSQL, Alembic, Docker, JavaScript and a Render deployment Blueprint.
 
 Voice: ElevenLabs. Music: Eleven Music.
