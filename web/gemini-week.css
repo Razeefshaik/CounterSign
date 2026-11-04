@@ -1,4 +1,5 @@
 /* C67: match existing dashboard tokens; all additions scoped to model evidence. */
+body[data-route="model-week"] .simulation {z-index:50}
 .c67-model-page,.c67-week,.c67-smokes {display:grid;gap:20px;min-width:0}
 .c67-model-page h2 {font-size:24px}
 .c67-model-page h3 {font-size:18px;line-height:1.35}

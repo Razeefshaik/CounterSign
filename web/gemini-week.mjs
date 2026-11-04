@@ -16,12 +16,13 @@ export function parseModelEvidence(value) {
   return value;
 }
 export function decisionHTML(row) {
-  return `<details class="c67-decision"><summary><strong>${esc(row.action)}</strong>
+  return `<details class="c67-decision"><summary><strong>${esc(row.action)}${row.step ? ` · ${esc(row.step)}` : ""}</strong>
     <span>${esc(row.verdict ?? "Verdict not recorded")}</span></summary><dl>
     ${field("Recorded at",row.created_at)}${field("What the model read · tools and arguments",row.reads)}
     ${field("Proposal parameters",row.params)}${field("Rationale",row.rationale)}
-    ${field("Injection / payee-change flags",row.flags)}${field("Shield verdict",row.verdict)}
-    ${field("Shield rule results",row.rule_results)}</dl></details>`;
+    ${field("Injection / payee-change flags",row.flags)}${field("Shield verdict in event log",row.verdict)}
+    ${field("Shield rule results",row.rule_results)}
+    ${row.recorded_outcome ? field("Recorded run README outcome",row.recorded_outcome) : ""}</dl></details>`;
 }
 export function modelWeekHTML(value) {
   const data = parseModelEvidence(value);

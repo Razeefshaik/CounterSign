@@ -54,6 +54,7 @@ try {
     await capture(name+"-model-status");
     await evaluate("{const d=document.querySelector('[data-week=gemini-2026-10-27] .c67-decision'); d.open=true; d.scrollIntoView({block:'center',behavior:'instant'});}");
     await capture(name+"-earlier-decision");
+    check(await evaluate("Boolean(document.elementFromPoint(innerWidth/2,12)?.closest('#simulation'))"),"simulation banner uncovered after scroll");
     check(await evaluate("document.documentElement.scrollWidth<=innerWidth"),"expanded decision no overflow");
     await evaluate("location.hash='replay'");
     await wait("document.querySelector('[data-c67-dataset]')","dataset picker");

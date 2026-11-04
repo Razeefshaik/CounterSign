@@ -48,6 +48,9 @@ def validated_evaluation(rows, *, k, scenario_ids, model):
 def earlier_week(root):
     rows = [json.loads(line) for line in (root / EARLIER / "run.jsonl").read_text().splitlines()]
     identity = next(row for row in rows if row["event"] == "DEMO_MODEL")
+    readme_rows = [line.strip("|").split("|") for line in
+                  (root / EARLIER / "README.md").read_text().splitlines()
+                  if line.startswith("| ")]
     decisions = []
     for number, row in enumerate(rows, 1):
         if row["event"] not in {"AGENT_DECISION", "CONFIGURED_MODEL_ACTED_EARLIER",
@@ -59,6 +62,9 @@ def earlier_week(root):
             "action": row["action"], "step": row.get("step"), "params": None,
             "reads": None, "rationale": None, "flags": None,
             "verdict": row.get("verdict"), "rule_results": row.get("rules"),
+            "recorded_outcome": next((parts[1].strip() for parts in readme_rows
+                if parts[0].strip().startswith({"injection": "Injection bait",
+                    "settled_retry": "Settled-retry bait"}.get(row.get("step"), row["action"]))), None),
             "source": EARLIER + "/run.jsonl", "line": number})
     return {"id": "gemini-2026-10-27", "date": "2026-10-27",
         "label": "Recorded real model run · earlier Gemini week",
