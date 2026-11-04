@@ -646,3 +646,5 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 
 | Hosted checkpoint measurements | One final image build; inspect Size 238,402,125 → 250,255,901 bytes (+11,853,776); restore 0.734 s unrestricted and 0.985 s at one CPU, so visitors return to the unsigned run without replay. |
 | Friday guide | Show the story only for the API-confirmed unsigned Friday checkpoint; reuse the guarded demo controller for Back to Friday and confirmed Monday restart. |
+- At merge: a boot with `COUNTERSIGN_HOSTED_START=monday` defaults idle return to off, because an owner who chose Monday should not be moved to Friday after 20 minutes; setting the idle variable still turns it on.
+- At merge: the Friday freshness check caches the waiting proposal's id, because the image's files never change and each state poll was hashing them all again.
