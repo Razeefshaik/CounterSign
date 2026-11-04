@@ -463,6 +463,11 @@ async def run_week(
             checkpoint.record("CONFIGURED_MODEL_SUMMARY", status="STOPPED", reason=code,
                               safety_moments=configured_safety(checkpoint))
         raise
+    finally:
+        if getattr(checkpoint, "c67_record_decisions", False):
+            from scripts.c67_week_recording import finish_export
+
+            await finish_export(engine, checkpoint)
 
 
 async def _run_week(
@@ -487,6 +492,10 @@ async def _run_week(
     """
     store = checkpoint
     scripted = isinstance(model, DemoModel)
+    if getattr(store, "c67_record_decisions", False):
+        from scripts.c67_week_recording import install
+
+        install(engine, store)
     if target == "sandbox":
         database_name_guard(engine.settings.database_url)
         settlement_mapping_guard(options)
@@ -528,6 +537,8 @@ async def _run_week(
             from scripts.c67_recording import capture_decisions
 
             await capture_decisions(engine, store)
+            if store.c67_recorder.stop_code:
+                raise SliceError(store.c67_recorder.stop_code)
         if not scripted:
             async with engine.database.tx() as conn:
                 cursor = await conn.execute(
@@ -1685,8 +1696,13 @@ async def run_cli(args):
         require(args.target == "mock", "DEMO_PAUSE_MOCK_ONLY")
         pause_after_new_step(store)
     # C67: this recorder never affects prompts, decisions or execution.
-    store.c67_record_decisions = bool(getattr(args, "record_model_decisions", False))
+    cli_model = isinstance(model, ChatModelConfig) and model.provider == "codex_cli"
+    store.c67_record_decisions = bool(getattr(args, "record_model_decisions", False)) or cli_model
     try:
+        require(not store.c67_record_decisions or args.target == "mock", "C67_MOCK_ONLY")
+        if cli_model and store.data.get("c67_model_turns", 0):
+            require(getattr(args, "resume_model_week", False)
+                    and store.data.get("configured_status") == "MODEL_QUOTA_EXHAUSTED", "C67_RESUME_REQUIRES_OWNER")
         identity = model_identity(model)
         store.record("DEMO_MODEL", **identity)
         store.note(
@@ -1910,6 +1926,7 @@ def main(argv=None):
     parser.add_argument("--openrouter-key-file", help="C67: read only OPEN_ROUTER_API_KEY")
     parser.add_argument("--openrouter-model", default="google/gemini-3.5-flash")
     parser.add_argument("--record-model-decisions", action="store_true")
+    parser.add_argument("--resume-model-week", action="store_true", help="Owner-directed quota checkpoint resume only")
     parser.add_argument("--root", default="recordings/demo_week")
     parser.add_argument("--date")
     parser.add_argument("--prior-item-id")

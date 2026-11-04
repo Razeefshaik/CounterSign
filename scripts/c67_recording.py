@@ -19,16 +19,4 @@ def project_decision(doc, trace):
 async def capture_decisions(engine, store):
     if not getattr(store, "c67_record_decisions", False):
         return
-    seen = getattr(store, "c67_seen", set())
-    async with engine.database.tx() as conn:
-        cursor = await conn.execute(
-            "SELECT v.doc,p.raw_output->'agent_trace' AS trace "
-            "FROM proposals p JOIN v_dash_proposals v ON v.id=p.id "
-            "WHERE p.raw_output ? 'agent_trace' ORDER BY p.created_at,p.id")
-        for row in await cursor.fetchall():
-            doc = row["doc"]
-            identity = (doc["id"], doc["state"], doc.get("verdict"))
-            if identity not in seen:
-                store.record("RECORDED_MODEL_DECISION", decision=project_decision(doc, row["trace"]))
-                seen.add(identity)
-    store.c67_seen = seen
+    await store.c67_recorder.capture(engine)

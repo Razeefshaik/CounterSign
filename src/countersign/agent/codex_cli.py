@@ -78,6 +78,12 @@ def command(binary, model, cwd, schema, catalog):
         "-C", str(cwd), "--model", model, "--json", "--color", "never",
         "--output-schema", str(schema)]
     overrides = ['web_search="disabled"', 'mcp_servers={}', 'plugins={}',
+        'model_provider="c67_no_retry"', 'model_providers.c67_no_retry.name="OpenAI"',
+        'model_providers.c67_no_retry.wire_api="responses"',
+        'model_providers.c67_no_retry.requires_openai_auth=true',
+        'model_providers.c67_no_retry.request_max_retries=0',
+        'model_providers.c67_no_retry.stream_max_retries=0',
+        'model_providers.c67_no_retry.supports_websockets=true',
         'apps._default.enabled=false', 'tools.update_plan.enabled=false',
         'features.skip_host_skill_discovery=true', 'project_doc_max_bytes=0',
         'model_catalog_json=' + json.dumps(str(catalog))]

@@ -1,0 +1,121 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "step",
+    "incident_id",
+    "reads",
+    "model",
+    "absent_model_fields",
+    "shield",
+    "turns",
+    "usage",
+    "seconds",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string"
+    },
+    "step": {
+      "type": "string"
+    },
+    "incident_id": {
+      "type": "string"
+    },
+    "proposal_id": {
+      "type": "string"
+    },
+    "reads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "tool",
+          "arguments",
+          "result_summary"
+        ],
+        "properties": {
+          "tool": {
+            "enum": [
+              "get_dispute",
+              "get_order_details",
+              "get_payout_item",
+              "get_shipment_tracking",
+              "list_disputes",
+              "list_transactions",
+              "query_money_graph",
+              "simulate"
+            ]
+          },
+          "arguments": {
+            "type": "object"
+          },
+          "result_summary": {}
+        },
+        "additionalProperties": false
+      }
+    },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "action": {},
+        "params": {},
+        "rationale": {},
+        "flags": {},
+        "evidence_refs": {},
+        "expected_effect": {},
+        "injection_flags": {},
+        "payee_change_flags": {}
+      }
+    },
+    "absent_model_fields": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "shield": {
+      "type": "object",
+      "required": [
+        "verdict",
+        "rules",
+        "flags"
+      ],
+      "properties": {
+        "verdict": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rules": {},
+        "flags": {},
+        "injection_flags": {},
+        "payee_change_flags": {}
+      },
+      "additionalProperties": false
+    },
+    "turns": {
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1
+      }
+    },
+    "usage": {},
+    "seconds": {
+      "type": "number",
+      "minimum": 0
+    },
+    "status": {
+      "type": "string"
+    }
+  }
+}

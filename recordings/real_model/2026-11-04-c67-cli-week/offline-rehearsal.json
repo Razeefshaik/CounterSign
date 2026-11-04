@@ -1,0 +1,41 @@
+{
+  "status": "passed",
+  "model_calls": 0,
+  "full_real_week_flow": true,
+  "model": "scripted; no provider",
+  "database_name": "countersign_c67_test",
+  "target": "mock",
+  "fields_validated": [
+    "step",
+    "actual read tools and arguments",
+    "result summaries",
+    "returned action and params",
+    "rationale",
+    "returned injection/payee flags or absent marker",
+    "separate shield flags",
+    "shield verdict and rule results",
+    "per-decision and per-turn tokens and seconds"
+  ],
+  "planted_key_and_email_redacted": true,
+  "all_rows_validate": true,
+  "unchanged_fixed_event_log": true,
+  "offline_week_final_available_minor": 35400,
+  "currency": "USD",
+  "no_buyer_messages_in_read_summaries": true,
+  "real_cli_loopback_rehearsals": {
+    "passed": true,
+    "normal_requests": 3,
+    "canary_echo_requests": 3,
+    "native_tools": 0,
+    "login_used": false,
+    "echo_result": "MODEL_CANARY_DISCLOSED"
+  },
+  "checks": {
+    "full_week_export": "passed",
+    "cli_provider_and_budget_selection": "47 passed in 16.93 seconds",
+    "final_environment_and_budget_selection": "7 passed; overlapping with the selection above",
+    "ruff": "passed",
+    "import_contracts": 4
+  },
+  "retry_transport": "named provider; request and stream retries zero; original login routing discriminator retained"
+}
