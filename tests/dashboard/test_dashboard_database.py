@@ -5,6 +5,7 @@ import base64
 import json
 import os
 import sys
+from datetime import datetime
 from types import SimpleNamespace
 from urllib.parse import urlencode
 
@@ -116,7 +117,9 @@ def test_query_failure_uses_value_free_envelope(database_client, dashboard_datab
 def test_connection_is_read_only_and_cannot_read_private_tables(dashboard_database):
     async def check():
         runtime = SimpleNamespace(mode="demo", paypal=SimpleNamespace(is_mock=True))
-        source = dashboard.DbSource(dashboard_database.conninfo, runtime=runtime)
+        # C62: demo reads of makers and cash use the staged clock.
+        staged = datetime.fromisoformat("2026-11-06T09:00:00+00:00")
+        source = dashboard.DbSource(dashboard_database.conninfo, runtime=runtime, clock=lambda: staged)
         async with source:
             async with source._read() as conn:
                 row = await (await conn.execute("SHOW transaction_read_only")).fetchone()
