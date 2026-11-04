@@ -1,0 +1,11 @@
+{
+  "at": "2026-11-04T07:03:57.293603+00:00",
+  "label": "Gemma via OpenRouter",
+  "model": "google/gemma-4-31b-it:free",
+  "status": "failed",
+  "ground": "local harmless read stub",
+  "error": "MODEL_QUOTA_EXHAUSTED",
+  "http_requests": 3,
+  "ceiling_charge_usd": "0",
+  "request_cap": 2500
+}

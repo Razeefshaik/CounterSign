@@ -35,6 +35,60 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
+## C67 real-model evidence (Nov 4; quota-stopped, incomplete)
+
+Owner-invoked `CODEX-PROMPT-C67-REAL-GEMINI.md`; own CounterSign-c67 branch
+`razeef/c67-real-gemini`, base745c9b4 including C62, preview8201. Keep other
+worktrees/services untouched. No full pytest; one final Docker build only.
+Never edit README.md, docs/submission, styles.css or grid.mjs for this task.
+
+Optional OpenRouter provider and selective runtime key loading are implemented,
+with hosted key refusal/redaction and private replay of opaque assistant messages;
+existing Google path retained. Runtime loads only OPEN_ROUTER_API_KEY directly
+into the model client, never exports it or loads sandbox credentials. The agent
+does not read .env/key values. No real PayPal calls. Opt-in decision recorder:
+`--record-model-decisions`, `--openrouter-key-file`, `--openrouter-model`.
+
+Paid Gemini smoke was explicitly approved at $0.25/six requests. Exact model
+`google/gemini-3.5-flash` passed its tool round trip: two HTTP requests, 270 input
+and135 output tokens, reported $0.00162. Owner then explicitly chose
+`google/gemma-4-31b-it:free`, accepted truthful Gemma labels and approved
+$0/2500 requests for smoke/week/one evaluation round. Free smoke returned429 on
+all three HTTP requests, MODEL_QUOTA_EXHAUSTED, $0. Stopped immediately; no week
+or evaluation started, no rerun or substitution. Do not present this as completed
+Gemini evaluation or published per-system scores. Any later provider work must
+respect the selected model, authorized budget and retained quota evidence.
+
+The evidence panel/bundle records both smokes plus unchanged Oct27 Gemini week
+(`gemini-3.5-flash-lite` via Google, mock, COMPLETE_WITH_GAPS). Historical read
+traces/rationales/flags are absent and display Not recorded; both baits chose WAIT,
+not invented shield BLOCKs. Historical480 model-disabled runs remain a separate
+dataset. Evidence is in `design-demos/reference/c67/` and
+`recordings/real_model/2026-11-04-c67/`; REPORT holds the pre-call prediction.
+
+Runtime/source commit `6807864`, final visual/source follow-up `529f9bf`;
+evidence/context are committed with this note. Push this branch only; no merge.
+Primary verified **92 focused Python passed**, **132 Node passed**, Ruff clean,
+four import contracts kept and pip check clean. Final source follow-up:
+11 evidence Python and five panel Node passed. No broad/full pytest.
+
+One Docker build completed: `countersign-c67:validation`, image
+`sha256:cc2788781dac087d838b36de3dd25f6800d977c62e9c5c949b893d8ac421dcd2`.
+Actual container8201 serves assets200 and refuses an invented OpenRouter key
+before boot. Nine actual Chrome PNGs cover light/dark1440 and phone390, with no
+runtime exceptions/warnings, overflow or non-GET requests. Dataset separation,
+decision links and missing-field assertions pass. Screenshot review found banner
+stacking, fixed in scoped new CSS; panel includes recorded step names and README
+outcomes. Final three static files were copied into the running container after
+the single build; served hashes match source, but the image was not rebuilt.
+Record that limit. VALIDATION.json/browser.json and PNGs hold public evidence.
+
+Own `countersign-c67-preview` remains running on8201 for owner inspection; leave
+it running. Unused temporary countersign-c67-postgres on55433 was removed after
+the quota stop. Other worktrees/services remain untouched. No new week/evaluation
+or further calls after429; task remains incomplete due quota, not validation.
+Commit/push final notes and report that blocker honestly; do not merge.
+
 ## C58 evaluation explorer (Nov 3)
 
 Source: owner-invoked Downloads `CODEX-PROMPT-C58-EVAL-EXPLORER.md`. Work only in

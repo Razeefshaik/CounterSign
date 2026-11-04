@@ -11,6 +11,40 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
+## C67 real-model evidence (Nov 4; quota-stopped, incomplete)
+
+- Own `CounterSign-c67`, branch `razeef/c67-real-gemini`, base `745c9b4`
+  including C62. Optional OpenRouter integration, selective runtime key loader,
+  hosted refusal and private opaque assistant replay are implemented; existing
+  Google path retained. Runtime/source commit `6807864`, visual/source follow-up
+  `529f9bf`; final evidence/context are committed with this note. Push this branch
+  only, no merge. C67 remains incomplete because the new model runs were stopped.
+- Owner-approved paid smoke passed for exact `google/gemini-3.5-flash`: two
+  HTTP requests, 270 input/135 output tokens, reported cost $0.00162 within the
+  approved $0.25/six-request cap. Owner then selected explicitly labelled
+  `google/gemma-4-31b-it:free`, approving $0/2500 requests for smoke/week/one round.
+  Free smoke made three HTTP requests, all 429/MODEL_QUOTA_EXHAUSTED, at $0.
+  Stopped; no week/evaluation, rerun or substitute model was started.
+- New recorded-evidence panel and bundle preserve Oct 27's unchanged Gemini
+  week and missing fields as Not recorded; historical 480-run dataset stays
+  separate. Optional decision recording is implemented. Evidence/report:
+  `design-demos/reference/c67/` and `recordings/real_model/2026-11-04-c67/`.
+- Primary verified 92 focused Python and 132 Node passed, Ruff clean, four
+  import contracts kept, pip check clean; final follow-up 11 evidence Python
+  and five panel Node passed. No broad/full pytest.
+- One Docker build completed (`countersign-c67:validation`); assets return200
+  and an invented OpenRouter key is refused before boot. Nine real Chrome PNGs
+  cover light/dark1440 and phone390; no runtime exceptions/warnings, overflow
+  or non-GET requests. Dataset separation, links and missing fields verified.
+  Final three static files were copied after the build; served hashes match
+  source, but the image was not rebuilt. Scoped CSS fixes banner stacking.
+  VALIDATION.json/browser.json and screenshots are in the evidence directory.
+- Own `countersign-c67-preview` remains running on8201 for owner inspection;
+  leave it running. New week/evaluation remain unrun after429; no more calls.
+- Own unused temporary PostgreSQL container was removed after the quota stop.
+  No agent .env/key reads, key exports or PayPal calls; runtime loads only the
+  authorized key into the client. Other worktrees/services remain untouched.
+
 ## Current feature: C62 Friday checkpoint (ready for review)
 
 - Own `CounterSign-c62`, branch `razeef/c62-friday-checkpoint`, base `75c95cb`.

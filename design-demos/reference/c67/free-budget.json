@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "model": "google/gemma-4-31b-it:free",
+  "dollar_limit": "0",
+  "request_limit": 2500,
+  "requests": [
+    {
+      "at": "2026-11-04T07:04:03.775601+00:00",
+      "status": 429,
+      "ceiling_charge_usd": "0",
+      "reserved_usd": "0"
+    },
+    {
+      "at": "2026-11-04T07:04:05.231333+00:00",
+      "status": 429,
+      "ceiling_charge_usd": "0",
+      "reserved_usd": "0"
+    },
+    {
+      "at": "2026-11-04T07:04:06.517529+00:00",
+      "status": 429,
+      "ceiling_charge_usd": "0",
+      "reserved_usd": "0"
+    }
+  ],
+  "stops": [],
+  "output_token_limit": 4096
+}

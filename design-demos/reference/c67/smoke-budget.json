@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "model": "google/gemini-3.5-flash",
+  "dollar_limit": "0.25",
+  "request_limit": 6,
+  "requests": [
+    {
+      "at": "2026-11-04T07:01:00.876177+00:00",
+      "status": 200,
+      "ceiling_charge_usd": "0.0009195",
+      "reserved_usd": "0.0440475",
+      "reported_model": "google/gemini-3.5-flash",
+      "prompt_tokens": 85,
+      "completion_tokens": 88,
+      "total_tokens": 173,
+      "reported_cost_usd": "0.0009195"
+    },
+    {
+      "at": "2026-11-04T07:01:03.056493+00:00",
+      "status": 200,
+      "ceiling_charge_usd": "0.0007005",
+      "reserved_usd": "0.0456090",
+      "reported_model": "google/gemini-3.5-flash",
+      "prompt_tokens": 185,
+      "completion_tokens": 47,
+      "total_tokens": 232,
+      "reported_cost_usd": "0.0007005"
+    }
+  ],
+  "stops": [],
+  "output_token_limit": 4096
+}

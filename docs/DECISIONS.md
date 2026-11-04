@@ -648,3 +648,17 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Friday guide | Show the story only for the API-confirmed unsigned Friday checkpoint; reuse the guarded demo controller for Back to Friday and confirmed Monday restart. |
 - At merge: a boot with `COUNTERSIGN_HOSTED_START=monday` defaults idle return to off, because an owner who chose Monday should not be moved to Friday after 20 minutes; setting the idle variable still turns it on.
 - At merge: the Friday freshness check caches the waiting proposal's id, because the image's files never change and each state poll was hashing them all again.
+
+## Nov 6 C67 Real Gemini
+
+Implementation and evidence dated November 4, 2026; heading retained from the owner task.
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Add pinned optional langchain-openai 1.7.3 using init_chat_model with the openai provider and fixed OpenRouter endpoint; retain google_genai | C67 owner task | Accept | Local OpenRouter access must not add model packages or keys to the hosted demo |
+| Replay original private OpenRouter assistant messages at the HTTP boundary and discard them after each investigation | C67 pinned-adapter test | Accept | ChatOpenAI drops reasoning_details and tool extra_content; Gemini's signed tool turns require those opaque fields, which must never enter public evidence |
+| Load only OPEN_ROUTER_API_KEY directly into model configuration, refuse it at hosted boot, and redact assignments and bare OpenRouter keys | C67 security requirements | Accept | The main environment file also contains PayPal credentials that evaluation must never load |
+| Record a prediction before model calls and publish scores only after validating complete raw comparison cells and recomputing totals | C67 evaluation rules | Accept | Historical 170/240 versus 215/240 measures model-disabled paths and cannot predict real-model ranking |
+| Keep the successful two-request Gemini smoke separate from the earlier Gemini week and subsequent free Gemma attempt | Owner chose free models after smoke | Accept | Gemma is not Gemini; access checks and model-disabled results cannot be relabelled as a real Gemini evaluation |
+| Stop after free Gemma returned 429 on all three smoke requests; publish no new week decisions or comparison score | Owner approved free Gemma with quota stop | Accept | The tool round trip prerequisite failed; switching models or rerunning to improve results would misrepresent evidence |
+| Add opt-in proposal/read/rationale/flags/verdict recording and scoped read-only evidence UI with separate dataset selection | Owner C67 follow-up | Accept | New evidence must reflect actual decisions; the unchanged Oct 27 recording must show Not recorded for omitted details |

@@ -1,0 +1,23 @@
+{
+  "at": "2026-11-04T07:00:52.694289+00:00",
+  "provider": "openrouter",
+  "label": "Gemini via OpenRouter",
+  "model": "google/gemini-3.5-flash",
+  "scope": "harmless local read stub; no PayPal or database",
+  "status": "passed",
+  "tool_call_returned": true,
+  "tool_round_trip": true,
+  "model_calls": 2,
+  "reported_models": [
+    "google/gemini-3.5-flash"
+  ],
+  "tokens": {
+    "input_tokens": 270,
+    "output_tokens": 135,
+    "total_tokens": 405
+  },
+  "http_requests": 2,
+  "ceiling_charge_usd": "0.0016200",
+  "budget_usd": "0.25",
+  "request_cap": 6
+}

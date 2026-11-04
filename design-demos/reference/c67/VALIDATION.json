@@ -1,0 +1,59 @@
+{
+  "date": "2026-11-04",
+  "source_commit_before_visual_followup": "6807864",
+  "full_pytest_run": false,
+  "focused_python": {
+    "passed": 92,
+    "failed": 0
+  },
+  "node": {
+    "passed": 132,
+    "failed": 0
+  },
+  "followup": {
+    "python_evidence_passed": 11,
+    "node_panel_passed": 5
+  },
+  "ruff": "passed",
+  "import_contracts": {
+    "kept": 4,
+    "broken": 0
+  },
+  "docker": {
+    "builds": 1,
+    "image": "countersign-c67:validation",
+    "image_id": "sha256:cc2788781dac087d838b36de3dd25f6800d977c62e9c5c949b893d8ac421dcd2",
+    "port": 8201,
+    "credential_refusal": "invented OPEN_ROUTER_API_KEY refused before boot",
+    "static_followup": "Final CSS/banner fix, step labels and source README outcomes copied into the running container after its single image build. Final served assets checked against source hashes; image was not rebuilt.",
+    "assets": [
+      {
+        "path": "web/gemini-week.css",
+        "served_matches_local": true,
+        "sha256": "4d2a5a8a932a1cc1a8c15a309c7ef928c4f878460f7735474813f8ee9ebefcf2"
+      },
+      {
+        "path": "web/gemini-week.mjs",
+        "served_matches_local": true,
+        "sha256": "dbd182cd0c6343e710fb8efdb907a002682a7285a2387d799b1af7bc976c6b89"
+      },
+      {
+        "path": "web/results/real-model-evidence.json",
+        "served_matches_local": true,
+        "sha256": "26d8c78a67a7b5c8757c35784bcecf61bedbb0afc4ae0470b4ee1d41001e6a4b"
+      },
+      {
+        "path": "web/eval-explorer.mjs",
+        "served_matches_local": true,
+        "sha256": "2ef8f9f014a16ec45294713e1da25ef22b12b531c54d0e05a46f8d591ccd7a9b"
+      }
+    ]
+  },
+  "smokes": {
+    "gemini": "passed; two requests; $0.00162 reported",
+    "free_gemma": "three HTTP429; zero cost; round trip not completed"
+  },
+  "new_week": "not_run",
+  "new_evaluation": "not_run",
+  "merge": false
+}
