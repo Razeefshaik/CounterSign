@@ -1,0 +1,198 @@
+[
+  {
+    "cli_turns": 0,
+    "complete_attempts": 0,
+    "error": null,
+    "model_failure": null,
+    "passed": true,
+    "scenario_id": "clean_run_three_makers",
+    "seconds": 1.383,
+    "system": "rules_only",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 0,
+    "error": null,
+    "model_failure": null,
+    "passed": true,
+    "scenario_id": "demo_week",
+    "seconds": 1.852,
+    "system": "rules_only",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 0,
+    "error": null,
+    "model_failure": null,
+    "passed": true,
+    "scenario_id": "F01_timeout_after_payout_created",
+    "seconds": 0.799,
+    "system": "rules_only",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 0,
+    "error": null,
+    "model_failure": null,
+    "passed": true,
+    "scenario_id": "F_blocked_new_payout_not_retried",
+    "seconds": 0.82,
+    "system": "rules_only",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 0,
+    "error": null,
+    "model_failure": null,
+    "passed": true,
+    "scenario_id": "F_blocked_prior_payout_not_replaced",
+    "seconds": 0.635,
+    "system": "rules_only",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 1,
+    "error": "EVALUATION_FAILED",
+    "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+    "passed": false,
+    "scenario_id": "clean_run_three_makers",
+    "seconds": 4.434,
+    "system": "baseline_llm",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 1,
+    "error": "EVALUATION_FAILED",
+    "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+    "passed": false,
+    "scenario_id": "demo_week",
+    "seconds": 0.728,
+    "system": "baseline_llm",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 1,
+    "error": "EVALUATION_FAILED",
+    "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+    "passed": false,
+    "scenario_id": "F01_timeout_after_payout_created",
+    "seconds": 0.462,
+    "system": "baseline_llm",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 1,
+    "error": "EVALUATION_FAILED",
+    "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+    "passed": false,
+    "scenario_id": "F_blocked_new_payout_not_retried",
+    "seconds": 0.512,
+    "system": "baseline_llm",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 1,
+    "error": "EVALUATION_FAILED",
+    "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+    "passed": false,
+    "scenario_id": "F_blocked_prior_payout_not_replaced",
+    "seconds": 0.491,
+    "system": "baseline_llm",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 0,
+    "error": null,
+    "model_failure": null,
+    "passed": true,
+    "scenario_id": "clean_run_three_makers",
+    "seconds": 5.492,
+    "system": "countersign",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 12,
+    "complete_attempts": 12,
+    "error": null,
+    "model_failure": null,
+    "passed": false,
+    "scenario_id": "demo_week",
+    "seconds": 144.546,
+    "system": "countersign",
+    "tokens": {
+      "in": 184221,
+      "out": 1639
+    }
+  },
+  {
+    "cli_turns": 0,
+    "complete_attempts": 0,
+    "error": null,
+    "model_failure": null,
+    "passed": true,
+    "scenario_id": "F01_timeout_after_payout_created",
+    "seconds": 4.483,
+    "system": "countersign",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  },
+  {
+    "cli_turns": 1,
+    "complete_attempts": 1,
+    "error": null,
+    "model_failure": "INVALID_MODEL_RESPONSE",
+    "passed": true,
+    "scenario_id": "F_blocked_new_payout_not_retried",
+    "seconds": 15.342,
+    "system": "countersign",
+    "tokens": {
+      "in": 0,
+      "out": 0
+    }
+  }
+]

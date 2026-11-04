@@ -1,0 +1,33 @@
+{
+  "source": "owned week mock GET after week/pilot; evaluation mocks are separate",
+  "balances": {
+    "available": {
+      "value": "1500.00",
+      "currency_code": "USD"
+    },
+    "withheld": {
+      "value": "0.00",
+      "currency_code": "USD"
+    }
+  },
+  "payout_items": [
+    {
+      "payout_item_id": "DEMO-PRIOR-01a1a6c3-ef9f-7d78-b69e-ca42177930b2",
+      "status": "UNCLAIMED",
+      "amount": {
+        "value": "300.00",
+        "currency": "USD"
+      }
+    }
+  ],
+  "refund_count": 0,
+  "new_week_payout_items": 0,
+  "week_stop": "CONFIGURED_MODEL_DECISION_DIFFERS",
+  "week_security_stop": false,
+  "week_quota_stop": false,
+  "pilot_stop": "INVALID_MODEL_RESPONSE",
+  "pilot_security_stop": false,
+  "pilot_quota_stop": false,
+  "second_fix_attempted": false,
+  "full_round_started": false
+}

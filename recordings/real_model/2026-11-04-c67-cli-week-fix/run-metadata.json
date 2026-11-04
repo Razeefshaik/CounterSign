@@ -1,0 +1,29 @@
+{
+  "stage": 2,
+  "status": "stopped",
+  "date": "2026-11-04T13:33:25.429874+00:00",
+  "provider": "codex_cli",
+  "model": "gpt-6.1-sol",
+  "cli_version": "codex-cli 0.160.0",
+  "cli_adds_own_system_instructions": true,
+  "model_turn_cap": 60,
+  "retries": 0,
+  "retry_scope": "application never reruns a turn; accepted stage-one CLI handling unchanged",
+  "previous_week": "recordings/real_model/2026-11-04-c67-cli-week/",
+  "environment_file": "new empty temporary file",
+  "main_environment_file_used": false,
+  "sandbox_paypal_credentials_loaded": false,
+  "mock_credentials_only": true,
+  "database_name": "countersign_c67_demo",
+  "database_port": 55433,
+  "mock_url": "http://127.0.0.1:8099",
+  "app_url": "http://127.0.0.1:8201",
+  "services": {
+    "mock": 25936,
+    "receiver": 7240
+  },
+  "record_directory": "2026-11-04",
+  "stage_three_started": false,
+  "exit_code": 1,
+  "wall_seconds": 165.125
+}

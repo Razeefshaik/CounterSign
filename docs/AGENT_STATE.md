@@ -11,7 +11,40 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## C67 stage two (stopped, incomplete; no retry)
+## C67 fresh week and partial pilot (stopped; owner direction required)
+
+- Own `CounterSign-c67`, branch `razeef/c67-real-gemini`; fixes `3660f0d`,
+  pilot `b16a65c`. Owner removed the unrequested provider override; exact command
+  matches accepted stage one. App never resends a turn; CLI connection handling
+  remains. Primary verified73 focused then12 detailed-failure tests (overlap),
+  Ruff clean/four import contracts kept. No full pytest or public UI changes.
+- Harmless real eight-read preflight passed unchanged schema, one turn, zero
+  native events,11947 input/26 output tokens,11.656s. Fresh week then stopped
+  CONFIGURED_MODEL_DECISION_DIFFERS: AI chose WAIT for C instead of cancellation.
+  Five proposals, all ALLOW/no rule rows; requests for independent proof/records
+  and WAITs. Model flag fields absent; shield flags empty. Eleven valid turns,
+  162876 input/2127 output,130.031 model seconds/165.125 wall; no code/quota/
+  security failure. No cancellation or later safety moments reached.
+- Money at stop: available$1500/withheld0; prior C$300 UNCLAIMED; A$360+B$54
+  earnings reserved, cash reservations0; no new payouts/refunds/settlements.
+- Conditionally authorized pilot stopped14/15 cells at INVALID_MODEL_RESPONSE.
+  Rules-only5/5, no model calls. Baseline5 configuration failures before CLI,
+  incompatible existing tools/guard: not model-quality results. CounterSign
+  canonical3/4 includes one business-state pass with a failed model turn and
+  two zero-model passes; demo_week task failed. Fifth CounterSign case unrun.
+  Thirteen actual CLI invocations:12 valid+one failed; recorded184221 input/
+  1639 output, failed-turn usage unknown. Latched extra attempt never invoked CLI.
+- Partial/errored timing projection only: CounterSign0.56621h/48 cases, rules
+  0.014637h; baseline/full-three-system estimate unavailable. Not a clean ranking.
+  Specific invalid-response cause remains unknown; no second fix/retry/resume/
+  full round. Evidence: `recordings/real_model/2026-11-04-c67-cli-week-fix/`.
+- Original stopped week unchanged. Own mock8099/PG55433 retained; generated eval
+  DB dropped, temporary receiver stopped, original owned preview8201 restored.
+  Privacy/schema checks passed for all 18 JSON files (118 rows); report retained.
+  Final evidence commit is on this branch. No further model calls or changes
+  without new owner instructions; no merge.
+
+### C67 earlier stage-two history (first week stopped, incomplete)
 
 - Own `CounterSign-c67`, branch `razeef/c67-real-gemini`; source `74fa415`.
   Owner authorized decision export, offline rehearsal and ONE mock week capped
