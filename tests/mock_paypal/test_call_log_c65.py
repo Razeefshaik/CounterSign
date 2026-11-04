@@ -76,6 +76,20 @@ async def test_after_commit_lost_response_and_retry_are_both_observed():
 
 
 @pytest.mark.asyncio
+async def test_malformed_private_error_fields_cannot_break_the_response_or_enter_the_log():
+    app = create_app(control_enabled=True)
+    app.state.store.faults.faults.append(Fault({"id":"c65-error", "match":{
+        "method":"POST", "path":"^/v1/payments/payouts$", "nth":1, "count":1},
+        "action":{"type":"http_error", "status":503, "body":{
+            "name":["private-error"], "message":"private-token buyer@example.test"}}}))
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://localhost:8099") as client:
+        await token(client)
+        assert (await client.post("/v1/payments/payouts", json=payout())).status_code == 503
+        row = document(app.state.store)["rows"][0]
+        assert row["error"] is None and "private" not in json.dumps(row) and "@" not in json.dumps(row)
+
+
+@pytest.mark.asyncio
 async def test_controls_excluded_reset_clears_and_remote_control_is_refused():
     app = create_app(control_enabled=True)
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://localhost:8099") as client:

@@ -22,7 +22,7 @@ def body_json(raw):
     try:
         value = json.loads(raw)
         return value if isinstance(value, dict) else {}
-    except (ValueError, UnicodeError):
+    except (ValueError, UnicodeError, RecursionError):
         return {}
 
 
@@ -37,7 +37,7 @@ def append(store, *, method, route, status, direction="App to PayPal", request_i
         "route":route, "status":status if type(status) is int and 100 <= status <= 599 else None,
         "product":product, "direction":direction, "request_id_hash":short_hash(request_id),
         "sender_batch_id_hash":short_hash(sender_batch_id),
-        "error":error if error in ERRORS else None, "original_batch":bool(original_batch),
+        "error":error if isinstance(error, str) and error in ERRORS else None, "original_batch":bool(original_batch),
         "incomplete":bool(incomplete),
     })
 
