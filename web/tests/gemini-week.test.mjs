@@ -46,6 +46,11 @@ test("failed stage one remains failed and the canary is never presented as passe
   current.stage_one.error='<script>bad()</script>';
   assert.ok(!modelWeekHTML(current).includes("<script>"));
 });
+test("application attempts are not labelled as successful model turns",()=>{
+  const html=modelWeekHTML({...data,stage_one:{...data.stage_one,turns:[{status:"passed"},{status:"failed"}]}});
+  assert.match(html,/2 application turn attempts/);
+  assert.ok(!html.includes("2 AI agent turns"));
+});
 test("source validation refuses sandbox, duplicate runs and unsafe links",()=>{
   for(const change of [v=>v.weeks[0].ground="sandbox",v=>v.weeks[0].source="javascript:alert(1)",
     v=>v.weeks.push(v.weeks[0])]){

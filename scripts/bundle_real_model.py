@@ -12,7 +12,7 @@ EARLIER = "recordings/real_model/2026-10-27"
 CURRENT = "recordings/real_model/2026-11-04-c67"
 RESULTS = "eval/results/2026-11-04-c67-gemma"
 EVIDENCE = "design-demos/reference/c67"
-STAGE_ONE = "recordings/real_model/2026-11-04-c67-cli-stage1/run.json"
+STAGE_ONE = "recordings/real_model/2026-11-04-c67-cli-stage1-repeat/run.json"
 FIELDS = ("system", "scenario_id", "k", "fault_class", "provenance", "passed",
           "correct_final_action", "task_completed", "invariants", "makers_paid_on_time",
           "owner_escalations", "duration_ms", "model", "ground", "llm_calls", "tokens", "error")

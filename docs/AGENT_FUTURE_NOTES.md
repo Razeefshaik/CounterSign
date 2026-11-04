@@ -35,7 +35,41 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
-## C67 stage one (owner Nov 5 addendum; stopped, failed)
+## C67 stage-one repeat (stopped, failed; no further calls)
+
+Current source fix `7a992cc`, own CounterSign-c67 / `razeef/c67-real-gemini`.
+Owner approved one repeat only, max3 turns, stop on failure, push without merge.
+Main/other worktrees/services stay untouched; original failed recording unchanged.
+
+Fixes remove nine deprecated aliases and add exec_permission_approvals; startup
+error items count only before turn.started, later errors abort with fixed code.
+Rejected types use a fixed list or unknown, never item contents. Eight real read
+schemas audited offline: five optional schemas need the strict-output adapter,
+which preserves omission/null and validates against original arguments afterward.
+Offline wire proof still has zero native tools. Primary verified50 parser/runner/
+strict-schema focused tests,11 publication Python and all135 Node; Ruff check .
+clean, all four import contracts kept and whitespace clean. No full pytest or
+new Docker build.
+
+ONE approved live repeat stopped with MODEL_CALL_FAILED. First CLI invocation
+returned expected application read request in10.875s, two startup warnings
+count-only and no native-tool events. Second application complete failed locally
+at0s BEFORE another CLI invocation. Run record has two application slots but only
+one real CLI invocation; second-slot warning metadata is stale from first invoke,
+not evidence of another warning count. Round trip failed; canary NOT RUN.
+
+`recordings/real_model/2026-11-04-c67-cli-stage1-repeat/run.json` links the prior
+attempt; post-run-audit.json records offline synthetic replay with zero model
+calls/subprocesses. It identifies SimpleNamespace lacking model_dump required by
+continuation serialization, failing before invoke. No serializer fix, retry or
+additional model call is authorized after this failure; no week/pilot/evaluation.
+Keep identity/version/date only in run records and linked small Run details.
+STAGE1-REPEAT.md and the repeat README/audit document one actual invocation versus
+two application attempts. Public bundle points to the failed repeat and labels
+application turn attempts truthfully. Primary commits/pushes. Do not claim
+stage-one pass, fix the serializer or repeat without new owner instructions.
+
+### C67 initial stage-one attempt history (stopped, failed)
 
 Current owner addendum supersedes the new-run provider choice below. Stay in
 CounterSign-c67 / `razeef/c67-real-gemini`, resume basee40bc11; preserve other

@@ -1,0 +1,20 @@
+{
+  "offline": true,
+  "model_calls": 0,
+  "subprocesses": 0,
+  "synthetic_replay": {
+    "complete_attempts": 2,
+    "fake_invoke_calls": 1,
+    "second_attempt_error": "MODEL_CALL_FAILED",
+    "second_attempt_reached_invoke": false
+  },
+  "finding": "CLI client returns SimpleNamespace; continuation serialization requires model_dump(). Synthetic replay fails before invoke on the second complete attempt.",
+  "live_record_interpretation": {
+    "application_complete_attempts": 2,
+    "live_cli_invocations": 1,
+    "second_slot_warning_metadata": "stale from first invoke; not a second warning count",
+    "canary": "not_run"
+  },
+  "fix_applied_after_failure": false,
+  "retry_performed": false
+}

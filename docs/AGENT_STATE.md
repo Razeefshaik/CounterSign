@@ -11,7 +11,33 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## C67 stage one (owner Nov 5 addendum; stopped, failed)
+## C67 stage-one repeat (stopped, failed; no further calls)
+
+- Own `CounterSign-c67`, branch `razeef/c67-real-gemini`; source fix `7a992cc`.
+  Owner approved exactly one repeat, at most three turns, then stop on failure.
+  Original failed recording is unchanged; no merge or other worktree edits.
+- Startup fixes remove nine aliases, retain permission-tool disable, count
+  pre-turn warnings only and preserve fixed rejected types. Eight real read
+  schemas audited offline; five need an output-only optional-argument adapter.
+  Original tool argument validation stays authoritative; wire proof has0 native
+  tools. Primary verified50 focused tests,11 publication Python, all135 Node,
+  Ruff clean and all four import contracts kept; whitespace clean. No full
+  pytest or new Docker build.
+- Repeat FAILED with MODEL_CALL_FAILED: first real CLI invocation returned the
+  expected application read request in10.875s, two startup warnings count-only,
+  zero native-tool events. Second complete attempt failed locally at0s before
+  any second CLI invocation. Thus two application slots mean ONE real invocation;
+  second-slot warning metadata is stale from the first, not another warning count.
+- Offline synthetic replay (no process/model calls) identifies missing model_dump
+  on the SimpleNamespace response before continuation serialization. No fix or
+  retry after failure. Round trip NOT PASSED, canary NOT RUN; no week/pilot/eval.
+  Evidence and audit: `recordings/real_model/2026-11-04-c67-cli-stage1-repeat/`.
+  Exact identity remains only in run record/Run details. Report STAGE1-REPEAT.md
+  and repeat README/audit distinguish invocation from application attempts;
+  public bundle points to this failed repeat. Primary handles commit/push;
+  no fix or further repeat without new owner instructions.
+
+### C67 initial stage-one attempt history (stopped, failed)
 
 - Same isolated `CounterSign-c67` / `razeef/c67-real-gemini`; resume base
   `e40bc11`. New local-only codex_cli provider and offline proof are implemented;

@@ -1,0 +1,29 @@
+{
+  "static_preview": "http://127.0.0.1:8201",
+  "build_performed": false,
+  "assets": [
+    {
+      "asset": "gemini-week.mjs",
+      "status": 200,
+      "sha256": "eb1b4a79ebda177d22fbf68e3542cb919d60a7738af083cab853141897181d2d",
+      "served_matches_source": true
+    },
+    {
+      "asset": "results/real-model-evidence.json",
+      "status": 200,
+      "sha256": "b66bf7d68f5b55db7f7d2999f5bc83d713fa0f97808db51e290365c26469bbef",
+      "served_matches_source": true
+    }
+  ],
+  "tests": {
+    "boundary_and_schema_python": 50,
+    "publication_python": 11,
+    "frontend": 135,
+    "ruff": "passed",
+    "import_contracts_kept": 4
+  },
+  "full_pytest": false,
+  "new_browser_captures": false,
+  "old_failed_record_unchanged": true,
+  "earlier_week_unchanged": true
+}

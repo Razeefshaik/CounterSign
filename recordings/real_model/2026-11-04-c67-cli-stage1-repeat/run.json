@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04T10:24:41.600261+00:00",
+  "provider": "codex_cli",
+  "model": "gpt-6.1-sol",
+  "cli_version": "codex-cli 0.160.0",
+  "model_identity_source": "explicit model flag from bundled default; no server model field",
+  "cli_adds_own_system_instructions": true,
+  "stage": 1,
+  "model_turn_cap": 3,
+  "cost": "Existing CLI login usage; no API key; dollar cost unavailable",
+  "status": "failed",
+  "round_trip": "failed",
+  "canary": {
+    "status": "not_run"
+  },
+  "previous_attempt": "recordings/real_model/2026-11-04-c67-cli-stage1/run.json",
+  "attempt": "owner-approved single repeat",
+  "turns": [
+    {
+      "number": 1,
+      "status": "passed",
+      "usage": {
+        "input_tokens": 8836,
+        "output_tokens": 46
+      },
+      "native_tool_events": 0,
+      "startup_warning_count": 2,
+      "rejected_item_type": null,
+      "seconds": 10.875
+    },
+    {
+      "number": 2,
+      "status": "failed",
+      "startup_warning_count": 2,
+      "rejected_item_type": null,
+      "seconds": 0.0,
+      "error": "MODEL_CALL_FAILED"
+    }
+  ],
+  "week_run": false,
+  "pilot_run": false,
+  "evaluation_run": false,
+  "offline_tool_proof": {
+    "native_tools": 0,
+    "login_used": false,
+    "transport": "loopback HTTP stub"
+  },
+  "error": "MODEL_CALL_FAILED",
+  "security_stop": false,
+  "rejected_item_type": null
+}

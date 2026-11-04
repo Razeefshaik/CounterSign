@@ -17,16 +17,30 @@
     "canary": {
       "status": "not_run"
     },
-    "error": "MODEL_NATIVE_TOOL_FORBIDDEN",
+    "error": "MODEL_CALL_FAILED",
     "round_trip": "failed",
-    "run_details": "gpt-6.1-sol \u00b7 codex-cli 0.160.0 \u00b7 2026-11-04T08:57:36.311379+00:00",
-    "source": "recordings/real_model/2026-11-04-c67-cli-stage1/run.json",
+    "run_details": "gpt-6.1-sol \u00b7 codex-cli 0.160.0 \u00b7 2026-11-04T10:24:41.600261+00:00",
+    "source": "recordings/real_model/2026-11-04-c67-cli-stage1-repeat/run.json",
     "status": "failed",
     "turns": [
       {
-        "error": "MODEL_NATIVE_TOOL_FORBIDDEN",
+        "native_tool_events": 0,
         "number": 1,
-        "seconds": 3.469,
+        "rejected_item_type": null,
+        "seconds": 10.875,
+        "startup_warning_count": 2,
+        "status": "passed",
+        "usage": {
+          "input_tokens": 8836,
+          "output_tokens": 46
+        }
+      },
+      {
+        "error": "MODEL_CALL_FAILED",
+        "number": 2,
+        "rejected_item_type": null,
+        "seconds": 0.0,
+        "startup_warning_count": 2,
         "status": "failed"
       }
     ]
