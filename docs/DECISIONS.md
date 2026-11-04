@@ -750,3 +750,9 @@ run is claimed. The throwaway link/wording checker is outside the repository.
 - Owner next: review the C68 branch, integrate later evidence in the named PayPal
   calls, AG Grid and Real Gemini headings, replace the stale/missing captures,
   verify the public deployment and video, then fill the retained placeholders.
+
+## Nov 4 C69 Maker cards
+
+| Decision | Source | Verdict | Reason |
+|---|---|---|---|
+| Friday's short maker list shows its cards again; only long lists become a grid, reversing the C66 change that replaced the cards everywhere | Owner, Nov 4 (saw the hosted page) | Accept | The cards are the owner's chosen design; AG Grid stays on the incident desk, history, payout runs, evaluation replay and long maker lists |
