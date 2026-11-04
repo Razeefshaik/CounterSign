@@ -52,7 +52,7 @@ export function filteredTotal(rows, allCount, format) {
 }
 // Neutralise leading controls/whitespace as well as the four spreadsheet operators.
 export const csvSafe = value => /^[\s\u0000-\u001f]*[=+\-@]|^[\t\r\n]/.test(String(value ?? "")) ? "'"+value : String(value ?? "");
-export function layoutKey(view, viewer = "local-viewer") {return `countersign:c66:layout:${viewer}:${view}`;}
+export function layoutKey(view, viewer = "local-viewer") {return `countersign:c69:layout:${viewer}:${view}`;}
 export function readLayout(storage,key) {
   try {
     const value = JSON.parse(storage?.getItem(key) || "null");

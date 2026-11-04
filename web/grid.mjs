@@ -27,18 +27,24 @@ const textCol = (field, headerName, extra = {}) => ({field, headerName, minWidth
 const moneyCol = (field = "amount_minor", headerName = "Amount") => ({field, headerName, minWidth:125, width:135, flex:0, floatingFilter:true, comparator:minorCompare, filter:"agNumberColumnFilter", cellClass:"cs-grid-money", headerClass:"cs-grid-number", valueFormatter:p => moneyText(p.value, p.data?.[field.replace(/_minor$/, "_currency")]), cellRenderer:p => p.node?.rowPinned ? esc(p.data?.[field === "held_minor" ? "held_total" : "amount_total"]) : safeText(p)});
 const timeCol = (field, headerName) => textCol(field, headerName, {minWidth:195, filter:"agDateColumnFilter", filterParams:{comparator:dateFilterCompare}, valueFormatter:dateText, comparator:dateCompare});
 
-export function incidentRows(incidents, {makers = [], disputes = [], staged = () => false} = {}) {
+export function incidentRows(incidents, {makers = [], disputes = [], staged = () => false, proposals = []} = {}) {
   const names = new Map(makers.map(m => [m.id, m.display_name]));
   const paypalIds = new Map(disputes.map(d => [d.id, d.paypal_dispute_id]));
-  return incidents.map(row => ({
+  // C69: a decision with no incident of its own, such as the weekly run, still needs the owner.
+  const linked = new Set(incidents.map(row => row.latest_proposal?.id));
+  const waiting = proposals.filter(p => p.state === "NEEDS_OWNER" && !linked.has(p.id)).map(p => ({
+    id:"decision:"+p.id, decision_id:p.id, incident:action(p.action), kind:"Decision", state:"AWAITING_OWNER",
+    staged:false, goal:false, maker:null, dispute:null, updated:p.created_at || null, verdict:"NEEDS_OWNER", ...moneyFields(null,"held"), ...moneyFields(null),
+  }));
+  return [...waiting, ...incidents.map(row => ({
     id:row.id, incident:incidentTitle(row).text, kind:kind(row.kind), state:row.state,
     staged:Boolean(staged(row)), goal:incidentTitle(row).goal,
     maker:names.get(row.subject?.maker_id) || null,
     dispute:row.subject?.paypal_dispute_id || paypalIds.get(row.subject?.dispute_id) || null,
     updated:row.updated_at, verdict:row.latest_proposal?.verdict || null,
     ...moneyFields(disputes.find(d => d.id === row.subject?.dispute_id || d.paypal_dispute_id === row.subject?.paypal_dispute_id)?.reserved,"held"),
-    ...moneyFields(row.amount_at_risk),
-  }));
+    ...moneyFields(row.state === "RESOLVED" ? null : row.amount_at_risk), // C69: resolved money is no longer at risk
+  }))];
 }
 
 export function auditRows(entries, proposals = []) {
@@ -100,7 +106,7 @@ const decisionLink = p => {
   return id && p.value ? `<a class="cs-grid-link" href="#decision/${esc(encodeURIComponent(id))}">${esc(p.value)}</a>` : safeText(p);
 };
 export function columnDefs(view) {
-  if (view === "incidents") return [textCol("incident", "Incident", {minWidth:185, width:225, flex:0, pinned:"left", cellRenderer:incidentCell}), textCol("state", "State", {minWidth:150, cellRenderer:stamp}), moneyCol("amount_minor", "At risk"), textCol("maker", "Maker"), textCol("dispute", "Dispute", {minWidth:180}), timeCol("updated", "Updated")];
+  if (view === "incidents") return [textCol("incident", "Incident", {minWidth:185, width:300, flex:0, pinned:"left", cellRenderer:incidentCell}), textCol("state", "State", {minWidth:140, cellRenderer:stamp}), moneyCol("amount_minor", "At risk"), textCol("maker", "Maker", {minWidth:110}), textCol("dispute", "Dispute", {minWidth:160}), timeCol("updated", "Updated")];
   if (view === "audit") return [timeCol("at", "Time"), textCol("actor", "Actor", {minWidth:110}), textCol("action", "Action", {pinned:"left",minWidth:150,width:180,flex:0}), textCol("rule", "Rule", {minWidth:170,cellRenderer:p => {
     const code=p.data?.rule_code, id=p.data?.decision_id;
     return id && code ? `<a class="cs-rule-chip" href="#decision/${esc(encodeURIComponent(id))}" title="Read ${esc(code)} in this decision">${safeText(p)}</a>` : safeText(p);
@@ -128,6 +134,9 @@ export function gridOptions(view, rows, {onOpen = () => {}, onFilterChanged = ()
     getRowClass:p => p.data?.state === "AWAITING_OWNER" || p.data?.verdict === "NEEDS_OWNER" || p.data?.state === "ask" ? "cs-grid-needs-owner" : "",
   };
 }
+
+// C69: rows, the pinned total row, header with floating filters (88) and paging (56).
+const gridHeight = (view,count) => {const row = view === "incidents" ? 64 : 52; return Math.min(584, Math.max(244, (Math.min(count, 10) + 1) * row + 144));};
 
 const loads = new WeakMap();
 export function loadVendor(document) {
@@ -177,7 +186,10 @@ export async function mountGrid(host, view, rows, options = {}) {
     const count=controls?.querySelector?.("[data-c66-count]");
     if (count) count.textContent=`Showing ${visible.length} of ${currentRows.length} \u00b7 ${filteredTotal(visible,currentRows.length,moneyText).amount_total}`;
   };
-  const persist = event => {if (initialized && event?.finished !== false) saveLayout(storage,key,api.getColumnState());};
+  // C69: only a viewer's own drag saves a width; stretching columns keep filling the grid at any window size.
+  const persist = event => {if (initialized && event?.finished !== false) saveLayout(storage,key,api.getColumnState().map(({width,...column}) => column.flex ? column : {...column,width}));};
+  const persistResize = event => {if (event?.source === "uiColumnResized") persist(event);};
+  const fitHeight = count => {if (viewport) viewport.style.height = gridHeight(view,count)+"px";};
   const handle = {
     get api() {return api;},
     setQuickFilter(text) {
@@ -188,7 +200,7 @@ export async function mountGrid(host, view, rows, options = {}) {
       Object.assign(settings,nextSettings);
       if (!api) return false;
       const delta=changedRows(currentRows,next); currentRows=next;
-      api.applyTransaction(delta); summarize();
+      api.applyTransaction(delta); fitHeight(next.length); summarize();
       if(settings.onFilterChanged) settings.onFilterChanged({api});
       return true;
     },
@@ -212,7 +224,7 @@ export async function mountGrid(host, view, rows, options = {}) {
   }
   try {
     viewport = document.createElement("div"); viewport.className = "ag-theme-quartz cs-grid";
-    viewport.style.height = Math.min(584, Math.max(244, Math.min(rows.length, 10) * (view === "incidents" ? 64 : 52) + 196)) + "px";
+    fitHeight(rows.length);
     viewport.setAttribute("aria-label", {incidents:"Incident desk", audit:"Execution history", runs:"Payout run lines", makers:"Makers"}[view]);
     host.append(viewport);
     motionQuery = document.defaultView.matchMedia?.("(prefers-reduced-motion: reduce)");
@@ -221,7 +233,7 @@ export async function mountGrid(host, view, rows, options = {}) {
       onFilterChanged:event => {active="custom"; summarize();settings.onFilterChanged?.(event);},
       reducedMotion:Boolean(motionQuery?.matches)}),
       onModelUpdated:summarize,onSortChanged:event => {active="custom";summarize();persist(event);},
-      onColumnMoved:persist,onColumnResized:persist,onColumnPinned:persist,onColumnVisible:persist});
+      onColumnMoved:persist,onColumnResized:persistResize,onColumnPinned:persist,onColumnVisible:persist});
     // C66: viewer means this browser's local profile; no account/email is persisted.
     try {storage=document.defaultView.localStorage;} catch {}
     key=layoutKey(view,settings.viewer || "local-viewer");
@@ -229,7 +241,7 @@ export async function mountGrid(host, view, rows, options = {}) {
     if (layout) api.applyColumnState?.({state:layout,applyOrder:true});
     controls=document.createElement("div");controls.className="cs-grid-showcase";
     controls.innerHTML=`<div class="cs-grid-views" role="group" aria-label="Saved views">${savedViews(view).map(v => `<button type="button" data-c66-view="${v.id}" aria-pressed="${v.id === active}">${esc(v.label)}</button>`).join("")}</div>
-      <div class="cs-grid-tools"><label>Search records<input type="search" data-c66-search></label><button type="button" data-c66-export>Export view CSV</button><button type="button" data-c66-reset>Reset layout</button></div>
+      <div class="cs-grid-tools">${settings.search === false ? "" : '<label>Search records<input type="search" data-c66-search></label>'}<button type="button" data-c66-export>Export view CSV</button><button type="button" data-c66-reset>Reset layout</button></div>
       <p data-c66-count role="status"></p><p class="cs-grid-help">Shift-click to sort by several columns. Arrow keys move; Enter opens records. Money totals reflect visible loaded records, not a balance.${view === "runs" ? " All includes paid, waiting and held shares; use a saved view to separate them." : ""}</p>`;
     host.prepend(controls);
     for (const chip of controls.querySelectorAll?.("[data-c66-view]") || []) chip.onclick=() => {
@@ -238,7 +250,7 @@ export async function mountGrid(host, view, rows, options = {}) {
       const search=controls.querySelector("[data-c66-search]");if(search)search.value="";
       api.setFilterModel(chosen.filters);
       api.applyColumnState({state:chosen.sort,defaultState:{sort:null}});
-      active=chosen.id;api.paginationGoToFirstPage();summarize();
+      active=chosen.id;api.paginationGoToFirstPage();summarize();settings.onViewChosen?.();
     };
     const search=controls.querySelector?.("[data-c66-search]");
     if(search){search.value=settings.quickFilterText || "";search.oninput=e => handle.setQuickFilter(e.target.value);}

@@ -80,7 +80,7 @@ try {
     await evaluate(`document.querySelector('[data-c49-grid="${view}"] [data-c66-view=all]').click()`);
     // Real native column models, numeric ordering, retained layout and CSV formatting.
     await evaluate(`(() => {const api=window.__c66Grids.get(${JSON.stringify(label)}).api;api.applyColumnState({state:[{colId:'amount_minor',sort:'desc',width:167}],defaultState:{sort:null}});api.dispatchEvent({type:'columnResized',finished:true});})()`);
-    check(await evaluate(`localStorage.getItem('countersign:c66:layout:local-viewer:${view}')?.includes('167')`),view+" layout stored");
+    check(await evaluate(`localStorage.getItem('countersign:c69:layout:local-viewer:${view}')?.includes('167')`),view+" layout stored");
     await evaluate(`window.__c66Grids.get(${JSON.stringify(label)}).api.setFilterModel({amount_minor:{filterType:'number',type:'greaterThan',filter:0}})`);
     const exportedRows=await evaluate(`window.__c66Grids.get(${JSON.stringify(label)}).api.getDisplayedRowCount()`);
     const downloadPath=join(destination,"downloads",view);await mkdir(downloadPath,{recursive:true});
