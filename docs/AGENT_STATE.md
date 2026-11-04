@@ -11,7 +11,36 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## C67 stage one (passed; stopped before stage two)
+## C67 stage two (stopped, incomplete; no retry)
+
+- Own `CounterSign-c67`, branch `razeef/c67-real-gemini`; source `74fa415`.
+  Owner authorized decision export, offline rehearsal and ONE mock week capped
+  at60 turns. Stage one passed earlier; no stage-three authority.
+- Observer writes separate decisions/turns/money evidence; fixed run.jsonl and
+  prompts/shield/executor unchanged. Turn budget reserves before call, failures
+  latch, no retries; only explicit quota resume is possible. Own launcher uses
+  minimal OS/login environment, explicit mock settings and empty temp env file.
+  No application .env/auth reads, sandbox PayPal credentials or real PayPal calls.
+- Offline real-week scripted export passed schema/redaction checks. Primary
+  final47 CLI/wrapper tests and7 environment/wrapper tests passed (overlap);
+  Ruff clean, four import contracts kept. Earlier selection57 passed/two offline
+  CLI configuration failures were fixed before live. No full-suite claim or
+  web/panel/results/publication/browser changes.
+- Authorized week STOPPED on first model turn: MODEL_CALL_FAILED after7.953s,
+  no returned usage, reads, proposal or shield verdict; two count-only startup
+  warnings, no rejected type. Setup/seed succeeded; Monday dispute in progress.
+  Entire child23.391s. Root cause unknown; separate stdout encoding warning
+  documented without attributing the model failure. No fix/retry after failure.
+- Verified Monday: available$1500, cash reserves0, A earnings$360 reserved,
+  old C$300 UNCLAIMED, new payout items/refunds/settled earnings0. No later
+  decisions or safety moments, quota/different-decision/security rejection events.
+  Stage two NOT COMPLETE. Evidence: `recordings/real_model/2026-11-04-c67-cli-week/`.
+- Own database container and frozen Monday mock8099 preserved; temporary receiver
+  stopped and original owned preview8201 restored. Report/audit and checkpoint
+  are preserved for handoff. Commit/push only; no merge. No more model calls or
+  stage three without owner direction.
+
+### C67 accepted stage-one history (passed)
 
 - Own `CounterSign-c67`, branch `razeef/c67-real-gemini`; source `a45caf0`.
   Owner authorized assistant-message/metadata fixes, offline rehearsal and ONE

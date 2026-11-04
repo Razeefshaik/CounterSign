@@ -1,0 +1,1 @@
+{"number": 1, "decision_id": "decision-0001", "step": "monday_dispute", "status": "failed", "at": "2026-11-04T12:47:48.434280+00:00", "usage": null, "seconds": 7.953, "error": "MODEL_CALL_FAILED", "startup_warning_count": 2, "rejected_item_type": null}

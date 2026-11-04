@@ -1,0 +1,62 @@
+{
+  "target": "mock",
+  "identity_hash": "dd1dce78e72a317f2742cbba518029f228a2a7f9d8fad74cb3b71f6e3564af7a",
+  "data": {
+    "monday": "2026-11-02T09:00:00+00:00",
+    "orders": {
+      "A400": {
+        "order_id": "01A1A699E9127C439CBE134425EC0F17",
+        "capture_id": "01A1A699E9127C439CBE134425EC0F18"
+      },
+      "B540": {
+        "order_id": "01A1A699E9127C439CBE134425EC0F19",
+        "capture_id": "01A1A699E9127C439CBE134425EC0F1A"
+      },
+      "B60": {
+        "order_id": "01A1A699E9127C439CBE134425EC0F1B",
+        "capture_id": "01A1A699E9127C439CBE134425EC0F1C"
+      },
+      "C333": {
+        "order_id": "01A1A699E9127C439CBE134425EC0F1D",
+        "capture_id": "01A1A699E9127C439CBE134425EC0F1E"
+      }
+    },
+    "prior_item_id": "DEMO-PRIOR-01a1a699-e912-7c43-9cbe-134425ec0f1f",
+    "mock_seed_sent": true,
+    "batch_ids": [
+      "DEMO-PRIOR-BATCH"
+    ],
+    "item_ids": [
+      "DEMO-PRIOR-01a1a699-e912-7c43-9cbe-134425ec0f1f"
+    ],
+    "configured_cash_evidence": {
+      "start_available_minor": 150000,
+      "baseline_items": {
+        "01a1a699-eafa-7490-939f-b1c830f416d5": "UNCLAIMED"
+      },
+      "baseline_refunds": {},
+      "items": {},
+      "refunds": {},
+      "successes": {}
+    },
+    "mock_now": "2026-11-02T09:00:00+00:00",
+    "dispute_A400_sent": true,
+    "dispute_A400_done": true,
+    "dispute_A400_result": {
+      "dispute_id": "PP-D-0000000CDC15409C38F2"
+    },
+    "dispute_A400": "PP-D-0000000CDC15409C38F2",
+    "evidence_branch_sent": true,
+    "evidence_branch_done": true,
+    "evidence_branch_result": {
+      "dispute_id": "PP-D-0000000CDC15409C38F2"
+    },
+    "c67_model_turns": 1,
+    "configured_status": "MODEL_CALL_FAILED"
+  },
+  "steps": {
+    "setup": "SUCCEEDED",
+    "seed": "SUCCEEDED",
+    "monday_dispute": "IN_PROGRESS"
+  }
+}

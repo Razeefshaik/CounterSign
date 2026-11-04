@@ -35,7 +35,51 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
-## C67 stage one (passed; stopped before stage two)
+## C67 stage two (stopped, incomplete; no retry)
+
+Current source `74fa415`, own CounterSign-c67 / `razeef/c67-real-gemini`.
+Latest owner addendum authorized observation export, offline real-week rehearsal
+and ONE configured mock week, hard60-turn cap, then STOP. Stage one remains passed;
+no pilot/evaluation/stage-three authority. Never read .env/auth values or load
+PayPal credentials. Exact model identity stays only in run metadata/Run details.
+
+scripts/c67_week_recording.py observes actual reads/results, returned fields and
+absence, separate model/shield flags, verdict/rules, tokens/time into separate
+decisions.jsonl and turns.jsonl plus final money. Original fixed run.jsonl,
+prompts, shield and executor are unchanged. Budget checkpoints reserve before
+call; exceptions latch with no retry. Quota resume needs an explicit flag.
+Named login-discriminator provider sets request/stream retries0. Launcher owns
+loopback mock/receiver and disposable guarded demo DB, minimal OS/login-location
+environment, explicit mock settings and empty temporary env file.
+
+Offline full real-week scripted export passed field/schema/redaction checks.
+Earlier59 selection had57 passed/two offline CLI configuration failures, corrected
+before live. Final47 CLI/wrapper tests passed, including both real CLI three-turn
+loopback cases; final7 wrapper/environment tests passed. Counts overlap. Ruff
+check . clean and four import contracts kept. No full pytest, public panel/results,
+publication or browser changes this stage.
+
+ONE authorized live week stopped on first model turn, MODEL_CALL_FAILED,7.953s;
+entire child23.391s. Input/output tokens unknown (usage null), reads empty,
+model fields absent and shield verdict/rules null. Two startup warning counts,
+no text/rejected type. Setup/seed succeeded; monday_dispute IN_PROGRESS.
+Exact root cause unknown; separate launcher cp1252/stdout-versus-UTF8 warning
+is documented, not proven causal. No fix or retry after failure. No quota,
+CONFIGURED_MODEL_DECISION_DIFFERS, security rejection or disclosure reported.
+
+Verified money: available$1500, cash reserves0; A earnings$360 earmarked against
+active$400 dispute; prior C$300 remains UNCLAIMED; new payout items/refunds/settled
+earnings0. No cancel, Friday, lost-response, injection/settled-retry, owner claim,
+draft or following-week moments. Stage two NOT COMPLETE; no stage three.
+Evidence root `recordings/real_model/2026-11-04-c67-cli-week/`, dated child folder
+2026-11-04, preserves empty/absent model facts rather than filling them in.
+
+Own countersign-c67-week-db on55433 and frozen Monday mock8099 preserved;
+temporary receiver8201 stopped; original owned preview8201 restored. Root
+README/audit/money/token report preserved for commit/push; no merge or unrelated service
+edits. No further model calls, fix/retry or stage three without owner direction.
+
+### C67 accepted stage-one history (passed)
 
 Current source `a45caf0`, own CounterSign-c67 / `razeef/c67-real-gemini`.
 Latest owner addendum authorized real AIMessage/metadata fixes, real-CLI offline
