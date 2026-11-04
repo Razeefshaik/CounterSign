@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.9 (Nov 5, 2026).** C62 adds the hosted Friday checkpoint restore below; the dashboard metadata remains 1.0.6. C51 adds owner passkey endpoints in section 3. C48 adds the MCP gateway in section 7; existing dashboard response shapes and their advertised 1.0.6 version remain unchanged. 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.10 (Nov 5, 2026).** C65 adds the demo-only read-only PayPal call log below; dashboard metadata stays 1.0.6. C62 adds the hosted Friday checkpoint restore below; the dashboard metadata remains 1.0.6. C51 adds owner passkey endpoints in section 3. C48 adds the MCP gateway in section 7; existing dashboard response shapes and their advertised 1.0.6 version remain unchanged. 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -470,6 +470,39 @@ active commands/owner decisions and unexpired passkey challenges. Dashboard cash
 age and maker 30-day totals use staged time on the mock; live calculations and
 real-time passkey challenge expiry are unchanged. The checkpoint is simulated,
 never new sandbox or model evidence.
+
+### C65: PayPal call log (written contract 1.0.10)
+
+`GET /api/v1/demo/paypal-calls` is **demo-mode only and read-only**. It is
+allowed exactly where `demo_bar_allowed` is true: a loopback PayPal mock and a
+disposable demo/test database. Other modes return 404 `NOT_FOUND`. No body,
+filters, upstream URL or query parameters are accepted (422 `INVALID_REQUEST`).
+There is no write method on this endpoint. The browser never calls mock control.
+
+The response is `{source, limit, total, counts, rows}`. `source` is always
+`"Simulated: PayPal mock"`; `limit` is 500. `total` and the per-product `counts`
+cover all observed calls since reset; `rows` contains the latest 500, newest
+first. Counts include inbound PayPal API requests and outbound webhook delivery
+attempts; `/_mock/*` is excluded. Friday restores both counters and rows.
+
+Each row has `id` (an ordinal), `at` (staged UTC), `source`, `method`, a fixed
+`route` template, `status` (HTTP status or null), `product`, and `direction`
+(`"App to PayPal"` or `"PayPal to app"`). Only 12-character SHA-256 prefixes of
+keys appear as `request_id_hash` and `sender_batch_id_hash` (or null).
+`incomplete` records a response not fully delivered; a started HTTP status can
+coexist with a lost body. `error` is null or an allowlisted duplicate/in-progress
+code. `original_batch` means the duplicate response linked to the original payout
+batch; no original URL or raw ID is exposed. No bodies, tokens, Authorization,
+client IDs or emails may enter this response. Invalid upstream fields fail closed
+with 503 `DATA_UNAVAILABLE`, as does an unavailable mock.
+
+The separate committed `web/results/paypal-coverage.json` has
+`source: "Recorded: real PayPal sandbox"`, `total_attempts: 1041`, and aggregated
+`rows` keyed by product/method/route. Each row has `attempts`, `status_codes`,
+`transport_errors`, `check_ids` and `recordings` (all contributing public paths
+with their check/status). The builder verifies every check count against
+`recordings/sandbox/INDEX.md`; mismatch stops generation. Simulated and recorded
+rows are never pooled into one count or dataset.
 
 ## 4. Core engine interface: `src/countersign/harness.py`
 
