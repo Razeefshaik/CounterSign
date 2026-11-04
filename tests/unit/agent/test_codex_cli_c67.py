@@ -65,6 +65,9 @@ def test_required_flags_and_capabilities_are_explicit():
     assert 'web_search="disabled"' in args and 'mcp_servers={}' in args
     assert all(f"features.{name}=false" in args for name in DISABLED)
     assert not {"--worktree", "--approve-for-me", "--dangerously-bypass-approvals-and-sandbox"} & set(args)
+    assert "exec_permission_approvals" in DISABLED
+    assert not {"codex_hooks", "collab", "connectors", "web_search_cached", "web_search_request",
+                "imagegenext", "memory_tool", "request_permissions", "web_search"} & set(DISABLED)
 
 
 def test_startup_catalog_retains_instructions_and_disables_file_edit_tools():
@@ -102,6 +105,48 @@ def test_text_and_usage_events_are_accepted_without_exporting_reasoning():
 def test_usage_stop_is_not_retried_or_silently_converted():
     with pytest.raises(ModelError, match="MODEL_QUOTA_EXHAUSTED"):
         Events().accept({"type": "turn.failed", "error": {"code": "usage_limit_reached"}})
+
+
+def test_startup_error_items_are_counted_without_retaining_private_text():
+    events = Events()
+    events.accept({"type": "thread.started"})
+    for _ in range(3):
+        events.accept({"type": "item.completed", "item": {"type": "error",
+            "message": "invented-warning-private-text"}})
+    assert events.startup_warning_count == 3 and events.rejected_item_type is None
+    assert "invented-warning-private-text" not in json.dumps(events.__dict__)
+    events.accept({"type": "turn.started"})
+    events.accept({"type": "item.completed", "item": {"type": "agent_message", "text": "{}"}})
+    assert events.message == "{}"
+
+
+@pytest.mark.parametrize("kind", ["item.started", "item.updated", "item.completed"])
+def test_error_item_after_turn_started_is_fatal(kind):
+    events = Events()
+    events.accept({"type": "turn.started"})
+    with pytest.raises(ModelError, match="^MODEL_CLI_ERROR_ITEM$"):
+        events.accept({"type": kind, "item": {"type": "error", "message": "invented-private-text"}})
+    assert events.rejected_item_type == "error" and events.startup_warning_count == 0
+    assert "invented-private-text" not in json.dumps(events.__dict__)
+
+
+def test_command_before_turn_started_still_aborts_after_startup_warning():
+    events = Events()
+    events.accept({"type": "thread.started"})
+    events.accept({"type": "item.completed", "item": {"type": "error", "message": "ignored"}})
+    with pytest.raises(ModelError, match="^MODEL_NATIVE_TOOL_FORBIDDEN$"):
+        events.accept({"type": "item.started", "item": {"type": "command_execution", "command": "private"}})
+    assert not events.turn_started and events.startup_warning_count == 1
+    assert events.rejected_item_type == "command_execution"
+    assert "private" not in json.dumps(events.__dict__)
+
+
+def test_rejected_item_type_is_fixed_name_or_unknown_only():
+    events = Events()
+    with pytest.raises(ModelError, match="MODEL_NATIVE_TOOL_FORBIDDEN"):
+        events.accept({"type": "item.completed", "item": {"type": "invented-private-type"}})
+    assert events.rejected_item_type == "unknown"
+    assert "invented-private-type" not in json.dumps(events.__dict__)
 
 
 def test_write_tool_schema_cannot_enter_cli_request():
@@ -148,3 +193,6 @@ def test_forbidden_events_kill_child_without_retry_or_private_diagnostic(monkeyp
         client.invoke("Unit test prompt")
     assert len(processes) == 1 and processes[0].killed
     assert "private diagnostic" not in str(error.value)
+    assert client.last_event_metadata["startup_warning_count"] == 0
+    if item["type"] == "command_execution":
+        assert client.last_event_metadata["rejected_item_type"] == "command_execution"

@@ -15,13 +15,17 @@ def test_native_tool_abort_is_saved_as_failed_run(monkeypatch, tmp_path, capsys)
     calls = []
     async def fail(record):
         calls.append(1)
-        record["turns"].append({"number": 1, "status": "started"})
+        record["turns"].append({"number": 1, "status": "started",
+                                "startup_warning_count": 2, "rejected_item_type": "command_execution"})
         raise ModelError("MODEL_NATIVE_TOOL_FORBIDDEN")
     monkeypatch.setattr(stage, "stage_one", fail)
     assert stage.main() == 1 and len(calls) == 1
     record = json.loads(stage.RECORD.read_text())
     assert record["status"] == "failed" and record["error"] == "MODEL_NATIVE_TOOL_FORBIDDEN"
     assert record["turns"][0]["status"] == "failed"
+    assert record["rejected_item_type"] == "command_execution" and record["security_stop"] is True
+    assert record["turns"][0]["startup_warning_count"] == 2
+    assert record["previous_attempt"] == stage.PREVIOUS_RECORD
     assert not record["week_run"] and not record["pilot_run"] and not record["evaluation_run"]
     assert stage.main() == 1 and len(calls) == 1
     assert "private" not in capsys.readouterr().out

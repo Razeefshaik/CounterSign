@@ -14,7 +14,8 @@ from countersign.agent.codex_cli import CLI_VERSION, create_client, find_binary
 from countersign.agent.models import ChatModelConfig, LangChainModel, ModelError
 
 ROOT = Path(__file__).resolve().parents[1]
-RECORD = ROOT / "recordings/real_model/2026-11-04-c67-cli-stage1/run.json"
+PREVIOUS_RECORD = "recordings/real_model/2026-11-04-c67-cli-stage1/run.json"
+RECORD = ROOT / "recordings/real_model/2026-11-04-c67-cli-stage1-repeat/run.json"
 TOOL = {"type": "function", "function": {"name": "get_payout_item",
     "description": "Read the recorded payout-item status through the application's read-only boundary.",
     "parameters": {"type": "object", "additionalProperties": False,
@@ -48,6 +49,7 @@ async def stage_one(record):
                            native_tool_events=0)
             return answer
         finally:
+            current.update(client.last_event_metadata)
             current["seconds"] = round(time.monotonic() - start, 3)
             save(record)
 
@@ -122,6 +124,7 @@ def main():
         "cli_adds_own_system_instructions": True, "stage": 1, "model_turn_cap": 3,
         "cost": "Existing CLI login usage; no API key; dollar cost unavailable",
         "status": "started", "round_trip": "not_run", "canary": {"status": "not_run"},
+        "previous_attempt": PREVIOUS_RECORD, "attempt": "owner-approved single repeat",
         "turns": [], "week_run": False, "pilot_run": False, "evaluation_run": False}
     save(record)
     try:
@@ -133,6 +136,11 @@ def main():
         if not isinstance(code, str) or not re.fullmatch(r"[A-Z_]{2,80}", code):
             code = "MODEL_CALL_FAILED"
         record.update(status="failed", error=code)
+        record["security_stop"] = code in {"MODEL_NATIVE_TOOL_FORBIDDEN", "MODEL_CANARY_DISCLOSED"}
+        if record["round_trip"] == "not_run" and record["turns"]:
+            record["round_trip"] = "failed"
+        if record["turns"]:
+            record["rejected_item_type"] = record["turns"][-1].get("rejected_item_type")
         if len(record["turns"]) >= 3:
             record["canary"] = {"status": "failed", "error": code}
         if record["turns"] and record["turns"][-1]["status"] == "started":

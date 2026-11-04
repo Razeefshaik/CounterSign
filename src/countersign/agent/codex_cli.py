@@ -12,24 +12,28 @@ from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
 
+from countersign.agent.codex_cli_schema import decode_calls, strict_parameters
 from countersign.agent.models import ModelError
 from countersign.agent.tools import ALLOWED_TOOLS
 
 CLI_VERSION = "codex-cli 0.160.0"
 LIMIT = 1024 * 1024
+ITEM_TYPES = frozenset({"agent_message", "reasoning", "error", "command_execution",
+    "file_change", "web_search", "mcp_tool_call", "dynamic_tool_call", "collab_tool_call",
+    "image_generation", "plan", "todo_list"})
 DISABLED = (
     "shell_tool", "shell_snapshot", "shell_snapshot_v2", "apply_patch_freeform",
-    "apps", "connectors", "plugins", "remote_plugin", "enable_mcp_apps",
+    "apps", "plugins", "remote_plugin", "enable_mcp_apps",
     "browser_use", "browser_use_external", "computer_use", "in_app_browser",
-    "image_generation", "imagegenext", "view_image", "js_repl", "js_repl_tools_only",
+    "image_generation", "view_image", "js_repl", "js_repl_tools_only",
     "code_mode", "code_mode_host", "code_mode_only", "multi_agent", "multi_agent_v2",
-    "collab", "goals", "memories", "memory_tool", "search_tool", "tool_search",
-    "tool_suggest", "request_permissions", "request_permissions_tool", "request_rule",
+    "goals", "memories", "search_tool", "tool_search",
+    "tool_suggest", "exec_permission_approvals", "request_permissions_tool", "request_rule",
     "default_mode_request_user_input", "send_message_to_user_async", "sleep_tool",
     "current_time_reminder", "token_budget", "deferred_executor", "remote_control",
-    "hooks", "codex_hooks", "plugin_hooks", "skill_mcp_dependency_install",
+    "hooks", "plugin_hooks", "skill_mcp_dependency_install",
     "skill_search", "skill_env_var_dependency_prompt", "workspace_dependencies",
-    "standalone_web_search", "web_search", "web_search_cached", "web_search_request",
+    "standalone_web_search",
 )
 
 
@@ -48,12 +52,13 @@ def schema_for(tools):
         if function["name"] not in ALLOWED_TOOLS:
             raise ModelError("MODEL_TOOL_NOT_ALLOWED")
         calls.append({"type": "object", "additionalProperties": False,
-            "properties": {"id": {"type": "string"}, "name": {"const": function["name"]},
-                           "args": function["parameters"]}, "required": ["id", "name", "args"]})
+            "properties": {"id": {"type": "string"}, "name": {"type": "string", "enum": [function["name"]]},
+                           "args": strict_parameters(function["parameters"])}, "required": ["id", "name", "args"]})
     # Structured text represents application calls. Native CLI function tools stay absent.
     return {"type": "object", "additionalProperties": False,
-        "properties": {"tool_calls": {"type": "array", "maxItems": 4,
-            "items": {"anyOf": calls} if calls else {"type": "object", "additionalProperties": False}},
+        "properties": {"tool_calls": {"type": "array", "maxItems": 4 if calls else 0,
+            "items": {"anyOf": calls} if calls else {"type": "object", "additionalProperties": False,
+                                                    "properties": {}, "required": []}},
             "proposal_json": {"type": "string"}}, "required": ["tool_calls", "proposal_json"]}
 
 
@@ -90,15 +95,29 @@ class Events:
         self.message = None
         self.usage = None
         self.types = []
+        self.turn_started = False
+        self.startup_warning_count = 0
+        self.rejected_item_type = None
 
     def accept(self, event):
         kind = event.get("type")
         self.types.append(kind)
         if kind in {"thread.started", "turn.started"}:
+            if kind == "turn.started":
+                self.turn_started = True
             return
         if kind in {"item.started", "item.updated", "item.completed"}:
             item = event.get("item", {})
-            if item.get("type") not in {"agent_message", "reasoning"}:
+            item_type = item.get("type")
+            if item_type == "error":
+                # Startup diagnostics are not tools. Never retain their contents.
+                if not self.turn_started:
+                    self.startup_warning_count += 1
+                    return
+                self.rejected_item_type = "error"
+                raise ModelError("MODEL_CLI_ERROR_ITEM")
+            if not isinstance(item_type, str) or item_type not in {"agent_message", "reasoning"}:
+                self.rejected_item_type = item_type if isinstance(item_type, str) and item_type in ITEM_TYPES else "unknown"
                 raise ModelError("MODEL_NATIVE_TOOL_FORBIDDEN")
             if kind == "item.completed" and item["type"] == "agent_message":
                 if self.message is not None:
@@ -130,6 +149,7 @@ class CodexCLIClient:
         self.binary, self.model, self.catalog = Path(binary), model, catalog
         self.timeout, self.tools, self.proof = timeout, list(tools), proof
         self.last_events = []
+        self.last_event_metadata = {}
         self.forbidden_output = None
 
     def __repr__(self):
@@ -158,6 +178,7 @@ class CodexCLIClient:
 
     def invoke(self, prompt):
         events, total, stderr = Events(), 0, bytearray()
+        self.last_event_metadata = {}
         with tempfile.TemporaryDirectory(prefix="c67-cli-") as folder:
             root = Path(folder)
             cwd = root / "empty"
@@ -202,7 +223,7 @@ class CodexCLIClient:
                 from jsonschema import validate
 
                 validate(response, schema_for(self.tools))
-                calls, proposal = response["tool_calls"], response["proposal_json"]
+                calls, proposal = decode_calls(response["tool_calls"], self.tools), response["proposal_json"]
                 if bool(calls) == bool(proposal):
                     raise ModelError("INVALID_MODEL_RESPONSE")
                 self.last_events = events.types
@@ -215,6 +236,10 @@ class CodexCLIClient:
                 proc.kill()
                 raise ModelError("MODEL_CALL_FAILED") from None
             finally:
+                self.last_event_metadata = {
+                    "startup_warning_count": events.startup_warning_count,
+                    "rejected_item_type": events.rejected_item_type,
+                }
                 timer.cancel()
                 proc.wait(timeout=5)
                 reader.join(timeout=5)

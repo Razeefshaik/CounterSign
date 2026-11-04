@@ -1,0 +1,328 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "get_dispute",
+      "parameters": {
+        "properties": {
+          "dispute_id": {
+            "description": "The order id generated during create call",
+            "pattern": "^[A-Za-z0-9_-]{1,255}$",
+            "title": "Dispute Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dispute_id"
+        ],
+        "title": "GetDisputeParameters",
+        "type": "object",
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_order_details",
+      "parameters": {
+        "properties": {
+          "order_id": {
+            "pattern": "^[A-Z0-9]{17,32}$",
+            "title": "Order Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "order_id"
+        ],
+        "title": "OrderIdParameters",
+        "type": "object",
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_shipment_tracking",
+      "parameters": {
+        "properties": {
+          "order_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z0-9]{17,32}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The ID of the order for which to create a shipment.",
+            "title": "Order Id"
+          },
+          "transaction_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9_-]{12,255}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The transaction ID associated with the shipment tracking to retrieve.",
+            "title": "Transaction Id"
+          }
+        },
+        "title": "GetShipmentTrackingParameters",
+        "type": "object",
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "list_disputes",
+      "parameters": {
+        "properties": {
+          "disputed_transaction_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9_-]{12,255}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filters the disputes in the response by a transaction, by ID.",
+            "title": "Disputed Transaction Id"
+          },
+          "dispute_state": {
+            "anyOf": [
+              {
+                "enum": [
+                  "REQUIRED_ACTION",
+                  "REQUIRED_OTHER_PARTY_ACTION",
+                  "UNDER_PAYPAL_REVIEW",
+                  "RESOLVED",
+                  "OPEN_INQUIRIES",
+                  "APPEALABLE"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "OPEN_INQUIRIES",
+            "title": "Dispute State"
+          },
+          "page_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 10,
+            "title": "Page Size"
+          }
+        },
+        "title": "ListDisputesParameters",
+        "type": "object",
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "list_transactions",
+      "parameters": {
+        "properties": {
+          "transaction_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9_-]{12,255}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "The ID of the transaction to retrieve.",
+            "title": "Transaction Id"
+          },
+          "transaction_status": {
+            "anyOf": [
+              {
+                "enum": [
+                  "D",
+                  "P",
+                  "S",
+                  "V"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "S",
+            "description": "Transaction status: D, P, S, or V",
+            "title": "Transaction Status"
+          },
+          "start_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filters the transactions in the response by a start date and time, in ISO8601 format. Seconds required; fractional seconds optional.",
+            "title": "Start Date"
+          },
+          "end_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Filters the transactions in the response by an end date and time, in ISO8601 format. Maximum range is 31 days.",
+            "title": "End Date"
+          },
+          "search_months": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 12,
+            "description": "Number of months to search back for a transaction by ID. Default is 12 months.",
+            "title": "Search Months"
+          },
+          "page_size": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 100,
+            "title": "Page Size"
+          },
+          "page": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": 1,
+            "title": "Page"
+          }
+        },
+        "title": "ListTransactionsParameters",
+        "type": "object",
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "get_payout_item",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "payout_item_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "payout_item_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "query_money_graph",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "enum": [
+              "incident",
+              "dispute",
+              "maker",
+              "run",
+              "cash",
+              "reservations_by_dispute",
+              "reservations_by_run",
+              "proposals_by_incident"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "simulate",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "run_id": {
+            "type": "string"
+          },
+          "respect_reserves": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "run_id"
+        ],
+        "additionalProperties": false
+      }
+    }
+  }
+]

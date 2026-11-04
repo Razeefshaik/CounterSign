@@ -1,0 +1,83 @@
+{
+  "offline": true,
+  "model_calls": 0,
+  "application_tool_executions": 0,
+  "schema_source": {
+    "toolkit": "genuine pinned Agent Toolkit 1.11.0 metadata from isolated interpreter with socket.connect and create_connection denied",
+    "custom": "current custom_tools(None,None) definitions; no tool invoked"
+  },
+  "schemas": [
+    {
+      "tool": "get_dispute",
+      "original_optional_properties": [],
+      "original_strict": true
+    },
+    {
+      "tool": "get_order_details",
+      "original_optional_properties": [],
+      "original_strict": true
+    },
+    {
+      "tool": "get_shipment_tracking",
+      "original_optional_properties": [
+        "order_id",
+        "transaction_id"
+      ],
+      "original_strict": false
+    },
+    {
+      "tool": "list_disputes",
+      "original_optional_properties": [
+        "dispute_state",
+        "disputed_transaction_id",
+        "page_size"
+      ],
+      "original_strict": false
+    },
+    {
+      "tool": "list_transactions",
+      "original_optional_properties": [
+        "end_date",
+        "page",
+        "page_size",
+        "search_months",
+        "start_date",
+        "transaction_id",
+        "transaction_status"
+      ],
+      "original_strict": false
+    },
+    {
+      "tool": "get_payout_item",
+      "original_optional_properties": [],
+      "original_strict": true
+    },
+    {
+      "tool": "query_money_graph",
+      "original_optional_properties": [
+        "id",
+        "limit"
+      ],
+      "original_strict": false
+    },
+    {
+      "tool": "simulate",
+      "original_optional_properties": [
+        "respect_reserves"
+      ],
+      "original_strict": false
+    }
+  ],
+  "output_strict": true,
+  "empty_tool_output_strict": true,
+  "original_tools_unchanged": true,
+  "optional_encoding": "null omits; {value:...} preserves explicit values, including null; decoded args revalidated against original schema",
+  "wire_proof": {
+    "offline": true,
+    "request_count": 1,
+    "native_tools": 0,
+    "authenticated": false,
+    "external_connections": 0
+  },
+  "focused_tests_passed": 50
+}
