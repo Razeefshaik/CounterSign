@@ -10,7 +10,7 @@ _MODEL_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,199}\Z")
 DEFAULT_GEMINI_MODEL = "gemini-3.5-flash"
 
 
-def load_chat_model_config(environment=None) -> ChatModelConfig | None:
+def load_chat_model_config(environment=None, *, hosted=False) -> ChatModelConfig | None:
     """An absent configuration stays disabled; an incomplete one never falls back.
 
     Gemini uses its provider's GOOGLE_API_KEY rather than another copy of that
@@ -19,6 +19,14 @@ def load_chat_model_config(environment=None) -> ChatModelConfig | None:
     source = os.environ if environment is None else environment
     if not isinstance(source, Mapping):
         raise ModelError("MODEL_CONFIGURATION_INVALID")
+    # C67: do not even read API-key entries for the keyless local provider.
+    if source.get("COUNTERSIGN_LLM_PROVIDER") == "codex_cli":
+        if hosted or source.get("COUNTERSIGN_HOSTED_START") or source.get("COUNTERSIGN_HOSTED_STATE"):
+            raise ModelError("MODEL_HOSTED_PROVIDER_REFUSED")
+        model = source.get("COUNTERSIGN_LLM_MODEL", "")
+        if type(model) is not str or not _MODEL_ID.fullmatch(model):
+            raise ModelError("MODEL_PROVIDER_AND_ID_REQUIRED")
+        return ChatModelConfig(provider="codex_cli", model=model)
     try:
         values = [
             source.get(name, "")

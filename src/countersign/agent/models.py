@@ -61,6 +61,10 @@ class ChatModelConfig:
             type(value) is not str or not value.strip() for value in (self.provider, self.model)
         ):
             raise ModelError("MODEL_PROVIDER_AND_ID_REQUIRED")
+        if self.provider == "codex_cli":
+            if self.api_key is not None:
+                raise ModelError("MODEL_CONFIGURATION_INVALID")
+            return
         if type(self.api_key) is not str or not self.api_key.strip():
             raise ModelError("MODEL_API_KEY_REQUIRED")
 
@@ -98,6 +102,11 @@ def _tracing_disabled():
 
 
 def _langchain_factory(config):
+    # C67 stage 1: local login only; hosted use is refused before discovery.
+    if config.provider == "codex_cli":
+        from countersign.agent.codex_cli import create_client
+
+        return create_client(config)
     # C67: OpenRouter uses the OpenAI integration with private signature replay.
     if config.provider == "openrouter":
         from countersign.agent.openrouter import create_client

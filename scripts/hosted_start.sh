@@ -67,6 +67,11 @@ if [ "${1:-}" = "--build-template" ]; then
   exit 0
 fi
 
+# C67: local CLI sessions are never a hosted-demo provider.
+if [ "${COUNTERSIGN_LLM_PROVIDER:-}" = codex_cli ]; then
+  log "refusing to start: local CLI provider is unavailable in the hosted demo"
+  exit 64
+fi
 for name in PAYPAL_CLIENT_ID PAYPAL_CLIENT_SECRET GOOGLE_API_KEY OPEN_ROUTER_API_KEY; do
   if [ -n "${!name:-}" ]; then
     log "refusing to start: $name is set; the hosted demo never holds sandbox or model credentials"

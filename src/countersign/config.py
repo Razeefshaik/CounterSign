@@ -174,6 +174,8 @@ def require_hosted_demo(settings: Settings) -> Settings:
 
 def load_hosted_settings() -> Settings:
     """Refuse live configuration and any sandbox or model credential before loading."""
+    if os.environ.get("COUNTERSIGN_LLM_PROVIDER") == "codex_cli":
+        raise SettingsError("The hosted demo refuses the local CLI provider")
     present = [name for name in HOSTED_REFUSED_ENVIRONMENT if os.environ.get(name, "").strip()]
     if present:
         raise SettingsError("The hosted demo refuses these variables: " + ", ".join(present))
