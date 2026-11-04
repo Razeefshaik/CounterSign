@@ -648,3 +648,14 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Friday guide | Show the story only for the API-confirmed unsigned Friday checkpoint; reuse the guarded demo controller for Back to Friday and confirmed Monday restart. |
 - At merge: a boot with `COUNTERSIGN_HOSTED_START=monday` defaults idle return to off, because an owner who chose Monday should not be moved to Friday after 20 minutes; setting the idle variable still turns it on.
 - At merge: the Friday freshness check caches the waiting proposal's id, because the image's files never change and each state poll was hashing them all again.
+
+
+## Nov 5 C66 AG Grid
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Retain the four operational Community grids on same-route refresh and apply stable-ID row transactions with cell-change flash disabled under reduced motion | Owner C66 prompt | Accept | Demo updates must preserve native sorting, filters, column state and scroll rather than rebuilding the table |
+| Add saved text/number filter and sort models with live source-row counts, floating date/number/text filters, and per-browser viewer column layouts with reset | Owner C66 prompt | Accept | Judges can inspect actual records with Community features and the page still works when storage is unavailable |
+| Compute pinned totals from every filtered loaded row, keep currencies separate, and include observed reserved obligations in run rows with separate Held back and Paid views | C66 data review | Accept | A filtered amount is neither the payout manifest nor a cash balance; held shares and missing values must not become invented payments |
+| Export the filtered sorted view with formatted money and dates, exclude pinned summaries and neutralise spreadsheet formula prefixes | Owner C66 prompt | Accept | Downloads must match what the viewer filtered without exposing executable spreadsheet values |
+| Keep row Enter/click on existing incident, decision, run-reference and maker-dialog surfaces; link known audit rules to their existing decision explanations | Owner C66 prompt | Accept | Operational grids should lead to the same evidence and approval boundaries rather than create a second write path |

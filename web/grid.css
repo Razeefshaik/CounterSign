@@ -46,3 +46,26 @@
 .cs-grid-empty{padding:16px;color:var(--ink-3)}
 @media(max-width:600px){.cs-grid.ag-theme-quartz{max-height:440px}.cs-grid-tools label{flex:1;min-width:120px}.cs-grid .ag-paging-panel{font-size:11px}.cs-grid .ag-paging-page-size{display:none}}
 @media(prefers-reduced-motion:reduce){.cs-grid *{animation:none!important;transition:none!important}}
+
+/* C66: Community operational controls, scoped to existing glass tokens. */
+.cs-grid-showcase{padding:12px 0;min-width:0;max-width:100%;color:var(--ink)}
+.cs-grid-views{display:flex;flex-wrap:wrap;gap:8px}
+.cs-grid-showcase button,.cs-rule-chip{border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:var(--surface);color:var(--ink-2);font:inherit;font-size:12px;cursor:pointer}
+.cs-grid-views button[aria-pressed=true]{background:var(--accent-soft);color:var(--accent-ink);border-color:var(--accent)}
+.cs-grid-showcase [data-c66-count]{font-size:13px;font-variant-numeric:tabular-nums;margin:8px 0}
+.cs-grid-help{color:var(--ink-3);font-size:11px;margin:6px 0;line-height:1.5}
+.cs-rule-chip{padding:4px 8px;text-decoration:underline;text-underline-offset:3px}
+.cs-grid .ag-cell-data-changed{background-color:color-mix(in srgb,var(--accent) 24%,var(--surface))!important}
+.cs-grid .ag-cell-data-changed-animation{transition:background-color .5s!important}
+.cs-grid .ag-floating-filter-input{min-width:0}
+.cs-grid .ag-pinned-left-cols-container .ag-cell{background:var(--card)}
+.cs-grid .ag-row-pinned .ag-cell{white-space:normal;font-size:12px}
+#folios[data-c49-grid=makers]{display:block;min-width:0;max-width:100%}
+@media(max-width:600px){
+  .cs-grid-showcase button{padding:7px 9px;font-size:11px}
+  .cs-grid-showcase .cs-grid-tools{gap:8px}
+  .cs-grid-showcase .cs-grid-tools label{min-width:100%;width:100%}
+  .cs-grid .ag-pinned-left-header,.cs-grid .ag-pinned-left-cols-container{max-width:48vw}
+  .cs-grid .ag-paging-panel{gap:4px;padding:6px}
+}
+@media(prefers-reduced-motion:reduce){.cs-grid .ag-cell-data-changed-animation{transition:none!important}.cs-grid .ag-cell-data-changed{background-color:transparent!important}}

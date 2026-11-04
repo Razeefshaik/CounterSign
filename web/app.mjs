@@ -21,8 +21,9 @@ async function showIncidentGrid() {
   if (ticket !== incidentGridSerial || workspace !== source || location.hash.split("/")[0] !== "#incidents") return;
   const filtered = filterIncidents(source.incidents, {state: $("state").value, kind: $("kind").value});
   const host = $("incident-list"); host.dataset.c49Grid = "incidents";
-  incidentGrid?.destroy();
-  const handle = await mountGrid(host, "incidents", incidentRows(filtered, {makers, disputes:source.disputes, staged:row => isStaged(row, source.disputes)}), {
+  // C66: keep the existing grid through demo refreshes; replace only its rows/callbacks.
+  const rows=incidentRows(filtered, {makers,disputes:source.disputes,staged:row => isStaged(row,source.disputes)});
+  const settings={
     isActive:() => ticket === incidentGridSerial && location.hash.split("/")[0] === "#incidents",
     quickFilterText:$("search").value, onOpen:row => inspect(source.incidents.find(item => item.id === row.id)),
     onFilterChanged:event => {
@@ -33,7 +34,10 @@ async function showIncidentGrid() {
       if (visible) inspect(source.incidents.find(row => row.id === visible.id));
       else {$("detail-title").textContent = "No incidents match these filters"; $("detail-text").textContent = "Clear a filter or try another search."; $("detail-verdict").hidden = true; $("open-decision").hidden = true;}
     },
-  });
+  };
+  if (incidentGrid?.api && incidentGrid.update(rows,settings)) return;
+  incidentGrid?.destroy();
+  const handle=await mountGrid(host,"incidents",rows,settings);
   // C49: navigation can happen while the vendor bundle is still loading.
   if (ticket !== incidentGridSerial || location.hash.split("/")[0] !== "#incidents") handle?.destroy();
   else incidentGrid = handle;
@@ -98,9 +102,10 @@ function inspect(row) {
 function update() {
   if (!workspace) return;
   // C49: destroy before replacing the fallback so late grid loads cannot win.
-  incidentGridSerial++; incidentGrid?.destroy(); incidentGrid = null;
+  incidentGridSerial++;
+  const keepGrid=Boolean(incidentGrid?.api); // C66
   const rows = filterIncidents(workspace.incidents, {state: $("state").value, kind: $("kind").value, query: $("search").value});
-  $("incident-list").innerHTML = incidentTable(rows, {staged: row => isStaged(row, workspace.disputes || []), selected});
+  if (!keepGrid) $("incident-list").innerHTML = incidentTable(rows, {staged: row => isStaged(row, workspace.disputes || []), selected});
   for (const button of $("incident-list").querySelectorAll(".row-title")) {
     button.onclick = () => inspect(workspace.incidents.find(row => row.id === button.dataset.id));
   }
@@ -109,7 +114,7 @@ function update() {
   const current = rows.find(row => row.id === selected) || rows[0];
   if (current) inspect(current);
   else {
-    $("incident-list").innerHTML = `<p class="empty" style="padding:24px 20px">${esc(workspace.incidents.length ? "No incidents match these filters. Clear a filter or try another search." : workspace.meta.mode === "demo" ? "The desk is clear. Run the first staged step above to start the week." : "The desk is clear. New incidents appear after confirmed PayPal observations.")}</p>`;
+    if (!keepGrid) $("incident-list").innerHTML = `<p class="empty" style="padding:24px 20px">${esc(workspace.incidents.length ? "No incidents match these filters. Clear a filter or try another search." : workspace.meta.mode === "demo" ? "The desk is clear. Run the first staged step above to start the week." : "The desk is clear. New incidents appear after confirmed PayPal observations.")}</p>`;
     $("detail-title").textContent = workspace.incidents.length ? "No incidents match these filters" : "Your incident desk is clear";
     $("detail-text").textContent = workspace.incidents.length ? "Clear a filter or try another search." : "Nothing needs attention yet.";
     $("detail-verdict").hidden = true; $("open-decision").hidden = true;
@@ -173,6 +178,7 @@ $("search").addEventListener("input", () => incidentGrid?.api ? incidentGrid.set
 $("refresh").addEventListener("click", refresh);
 $("clear").addEventListener("click", () => {
   $("state").value = ""; $("search").value = ""; $("kind").value = "";
+  incidentGrid?.setQuickFilter("");incidentGrid?.api?.setFilterModel(null); // C66
   for (const button of document.querySelectorAll("#kind-group button")) button.setAttribute("aria-pressed", String(!button.dataset.kind));
   update();
 });

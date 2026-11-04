@@ -9,7 +9,7 @@ import {createCommand} from "./command.mjs";
 import {createProof} from "./proof.mjs";
 import {action as actionWord, state as stateWord, when} from "./words.mjs";
 // C49: projections and lazy Community mounts, no financial writes.
-import {mountGrid, mountAuditGrid, runRows, runTotal} from "./grid.mjs";
+import {mountGrid, mountAuditGrid, runRows, runTotal, auditRows} from "./grid.mjs";
 
 const titles = {overview: "Command center", incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
 titles.proof = "Sandbox proof"; // C50
@@ -21,6 +21,7 @@ export function route(hash) {
 export function createWorkspaceViews(document, location, fetcher = fetch) {
   const $ = id => document.getElementById(id);
   let workspace, client, serial = 0, proposal = null, busy = false;
+  let operationalGrid=null, gridRoute=""; // C66
   const replay = createReplay(document, fetcher);
   const trick = createTrick(document, fetcher);
   const command = createCommand(document, fetcher);
@@ -57,7 +58,11 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
     if (current.name === "replay" && $("view-source-note")) $("view-source-note").hidden = true;
     // /C58
     $("view-picker").hidden = true;
+    // C66: retain the grid through same-route demo refreshes.
+    const keepGrid=operationalGrid?.api && gridRoute === location.hash && ["runs","audit"].includes(current.name);
+    if(!keepGrid){operationalGrid?.destroy();operationalGrid=null;
     $("view-body").innerHTML = '<p class="empty">Loading records…</p>';
+    }
     try {
       // C50: a static source-linked report, independent of dashboard record writes.
       if (current.name === "proof") {
@@ -113,10 +118,24 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
         html = id ? graphView(await client.singleton("money-graph", {dispute_id: id})) : '<p class="empty">No disputes to explore yet.</p>';
       }
       if (ticket !== serial) return;
+      if(keepGrid && (gridRun || gridAudit)) {
+        // C66: refresh surrounding run facts without detaching the focused grid.
+        if(gridRun){
+          const fresh=document.createElement("div");fresh.innerHTML=html;
+          const body=$("view-body"),old=[...body.children],next=[...fresh.children];
+          old.forEach((child,i) => {if(!child.matches('[data-c49-grid="runs"]') && next[i]) child.replaceWith(next[i]);});
+        }
+        operationalGrid.update(gridRun ? runRows(gridRun) : auditRows(gridAudit));return true;
+      }
       $("view-body").innerHTML = html;
+      gridRoute=location.hash; // C66
       // C49: DOM-capable clients enhance only the view currently being shown.
-      if (gridRun) mountGrid(document.querySelector?.('[data-c49-grid="runs"]'), "runs", runRows(gridRun), {total:runTotal(gridRun)});
-      if (gridAudit) mountAuditGrid(document.querySelector?.('[data-c49-grid="audit"]'), gridAudit, {onOpen:row => {if (row.decision_id) location.hash = "#decision/" + encodeURIComponent(row.decision_id);}});
+      if (gridRun) operationalGrid=await mountGrid(document.querySelector?.('[data-c49-grid="runs"]'), "runs", runRows(gridRun), {total:runTotal(gridRun),onOpen:row => {
+        const target=document.querySelector("#view-body details.tech");
+        if(target){target.open=true;target.scrollIntoView({block:"center",behavior:"instant"});target.querySelector("summary")?.focus();}
+      }});
+      if (gridAudit) operationalGrid=await mountAuditGrid(document.querySelector?.('[data-c49-grid="audit"]'), gridAudit, {onOpen:row => {if (row.decision_id) location.hash = "#decision/" + encodeURIComponent(row.decision_id);}});
+      if(ticket !== serial) return;
       if (current.name === "decision") bindDecision();
       for (const button of document.querySelectorAll("[data-copy]")) button.onclick = async () => {
         try {await navigator.clipboard.writeText(button.dataset.copy); notice("Payload hash copied.");} catch {notice("Copy is unavailable in this browser.");}
