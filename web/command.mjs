@@ -99,12 +99,14 @@ export function createCommand(document, fetcher = fetch) {
   // Optional pieces: a layout that leaves one out simply has no element for it.
   const fill = (id, html) => {const el = $(id); if (el) el.innerHTML = html;};
   function makers() {
-    makerGrid?.destroy(); makerGrid = null; // C49
     const count = (model.all || model.makers).length;
     fill("makers-count", count ? esc(count) : "");
+    // C66: stable maker ids preserve filters/scroll on each demo update.
+    if(makerGrid?.api && $("folios")?.querySelector?.(".cs-grid") && makerGrid.update(makerRows(data.makers,model))) return;
+    makerGrid?.destroy(); makerGrid=null;
     fill("folios", makerList(model, {filter: makerFilter, expanded: makerMore}));
     // C49: preserve the pure makerList HTML contract as the fallback.
-    const table = $("folios")?.querySelector?.(".mtable"), host = table?.querySelector(".table-scroll");
+    const table = $("folios")?.querySelector?.(".mtable"), host = count ? $("folios") : null; // C66: every maker list, including three-maker Friday
     if (host) {
       host.dataset.c49Grid = "makers";
       const rows = makerRows(data.makers, model);
@@ -113,7 +115,7 @@ export function createCommand(document, fetcher = fetch) {
         if (!host.isConnected) {handle?.destroy(); return;}
         makerGrid = handle;
         if (handle?.api) {
-          table.querySelector(".table-footer").hidden = true;
+          const footer=table?.querySelector(".table-footer");if(footer)footer.hidden=true;
           if (active !== "all") {handle.api.setFilterModel({state:{filterType:"text", type:"equals", filter:active}});}
         }
       });

@@ -659,3 +659,13 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Build route coverage from every numbered public exchange and verify all 13 check counts and 1041 attempts against the index | C65 | Accept | Recorded sandbox evidence stays reproducible and separate from simulation |
 | Add a read-only demo proxy with an exact public schema, no parameters and the existing demo guard | Owner-approved contract 1.0.10 | Accept | The browser cannot reach mock control or accidentally proxy new private fields; metadata remains 1.0.6 |
 | Reuse the glass shell and Community grids, with source labels, retry markers, polling only on the active page and CSV exports | C65 | Accept | Judges can inspect the integration without new visual conventions or background polling after navigation |
+
+## Nov 5 C66 AG Grid
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Retain the four operational Community grids on same-route refresh and apply stable-ID row transactions with cell-change flash disabled under reduced motion | Owner C66 prompt | Accept | Demo updates must preserve native sorting, filters, column state and scroll rather than rebuilding the table |
+| Add saved text/number filter and sort models with live source-row counts, floating date/number/text filters, and per-browser viewer column layouts with reset | Owner C66 prompt | Accept | Judges can inspect actual records with Community features and the page still works when storage is unavailable |
+| Compute pinned totals from every filtered loaded row, keep currencies separate, and include observed reserved obligations in run rows with separate Held back and Paid views | C66 data review | Accept | A filtered amount is neither the payout manifest nor a cash balance; held shares and missing values must not become invented payments |
+| Export the filtered sorted view with formatted money and dates, exclude pinned summaries and neutralise spreadsheet formula prefixes | Owner C66 prompt | Accept | Downloads must match what the viewer filtered without exposing executable spreadsheet values |
+| Keep row Enter/click on existing incident, decision, run-reference and maker-dialog surfaces; link known audit rules to their existing decision explanations | Owner C66 prompt | Accept | Operational grids should lead to the same evidence and approval boundaries rather than create a second write path |

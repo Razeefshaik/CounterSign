@@ -19,7 +19,7 @@ test("each grid exposes its task columns with Community sorting, filters and mon
   for (const [name, expected] of Object.entries(fields)) {
     const defs = columnDefs(name);
     assert.deepEqual(defs.map(c => c.field), expected);
-    assert.ok(defs.every(c => ["agTextColumnFilter", "agNumberColumnFilter"].includes(c.filter)));
+    assert.ok(defs.every(c => ["agTextColumnFilter", "agNumberColumnFilter", "agDateColumnFilter"].includes(c.filter)));
     for (const c of defs.filter(c => c.field.endsWith("_minor"))) assert.equal(c.cellClass, "cs-grid-money");
     const config = gridOptions(name, [], {reducedMotion:true});
     assert.equal(config.defaultColDef.sortable, true); assert.equal(config.animateRows, false);
@@ -53,14 +53,14 @@ test("pink stamp classes mean needs-owner only, never held or approved money", (
 
 test("run grid includes resends once, latest attempt and an authoritative pinned total", () => {
   const rows = runRows(run);
-  assert.equal(rows.length, 3); assert.equal(rows.reduce((n, row) => n + row.amount_minor, 0), run.total.minor);
+  assert.equal(rows.length, 5); assert.equal(rows.filter(r => !r.held).reduce((n, row) => n + row.amount_minor, 0), run.total.minor);
   assert.equal(rows[0].attempt, 1); assert.equal(rows[0].item_status, null);
   const resend = rows.find(r => r.replacement);
   assert.equal(resend.attempt, 2); assert.equal(resend.item_status, null); assert.equal(resend.state, null);
   const total = runTotal(run);
   assert.equal(total.amount_minor, 108600); assert.equal(gridOptions("runs", rows, {total}).pinnedBottomRowData[0], total);
   const duplicated = {...run, replacements:[{...run.replacements[0], line_id:run.lines[0].id}]};
-  assert.equal(runRows(duplicated).length, run.lines.length);
+  assert.equal(runRows(duplicated).length, run.lines.length + run.reserved.length);
   const later = {...run, lines:[{...run.lines[0], attempts:[{attempt_no:2, state:"SUCCESS", paypal_item_id:"ITEM2"}, ...run.lines[0].attempts]}]};
   assert.equal(runRows(later)[0].item_id, "ITEM2");
   assert.equal(runRows(later)[0].item_status, "SUCCESS");
