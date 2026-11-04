@@ -1,0 +1,59 @@
+[
+  {
+    "heading": "PayPal calls",
+    "products": 8,
+    "sourceLabels": [
+      "Simulated: PayPal mock",
+      "Simulated: PayPal mock · staged time, newest first",
+      "Recorded: real PayPal sandbox · 1,041 recorded attempts"
+    ],
+    "status": "2 calls shown · 231 calls this week. Updates every 3 seconds while this page is open.",
+    "coverage": "1,041 recorded attempts",
+    "overflow": false,
+    "grids": 2,
+    "rows": 2,
+    "theme": "light",
+    "name": "light",
+    "width": 1440,
+    "height": 1000,
+    "exceptions": []
+  },
+  {
+    "heading": "PayPal calls",
+    "products": 8,
+    "sourceLabels": [
+      "Simulated: PayPal mock",
+      "Simulated: PayPal mock · staged time, newest first",
+      "Recorded: real PayPal sandbox · 1,041 recorded attempts"
+    ],
+    "status": "2 calls shown · 231 calls this week. Updates every 3 seconds while this page is open.",
+    "coverage": "1,041 recorded attempts",
+    "overflow": false,
+    "grids": 2,
+    "rows": 2,
+    "theme": "dark",
+    "name": "dark",
+    "width": 1440,
+    "height": 1000,
+    "exceptions": []
+  },
+  {
+    "heading": "PayPal calls",
+    "products": 8,
+    "sourceLabels": [
+      "Simulated: PayPal mock",
+      "Simulated: PayPal mock · staged time, newest first",
+      "Recorded: real PayPal sandbox · 1,041 recorded attempts"
+    ],
+    "status": "2 calls shown · 231 calls this week. Updates every 3 seconds while this page is open.",
+    "coverage": "1,041 recorded attempts",
+    "overflow": false,
+    "grids": 2,
+    "rows": 2,
+    "theme": "light",
+    "name": "phone",
+    "width": 390,
+    "height": 844,
+    "exceptions": []
+  }
+]

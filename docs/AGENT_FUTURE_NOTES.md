@@ -768,3 +768,43 @@ step7 and plain201 passed. Six guide/end light/dark/390px screenshots, browser.j
 measurements and shared line starts: design-demos/reference/c62/README.md.
 No full suite; leave merge/full integration to Claude. Preview8198 own oneCPU
 container; protect other ports/worktrees/DBs. No.env, real API/model or styles.css.
+
+## C65 PayPal calls
+
+Own `CounterSign-c65`, branch `razeef/c65-paypal-calls`, base `745c9b4`
+(C62 merged). Commits: `aaefb84` mock logging, `f558e40` coverage builder,
+`d017adc` guarded proxy, `29df3c7` page/grids, `050b566` malformed-error hardening.
+Owner approved written contract 1.0.10; advertised metadata stays 1.0.6.
+
+The logger sits outside fault middleware, excludes mock controls, templates raw
+resource IDs and stores only short key hashes plus safe error codes. No bodies,
+emails or credentials are retained. Outbound webhook rows omit callback URLs and
+signatures. The 500-row deque and cumulative counters survive C62 snapshots;
+reset clears them. The app proxy requires the demo guard and exact public schema.
+The active-page GET poller aborts/disposes on navigation. Escaped grids retain
+HTML fallback, safe recording links and formula-safe CSV exports.
+
+Coverage is rebuilt from numbered public exchanges, checking all D1–D13 counts
+against INDEX: 1,041 recorded real sandbox attempts, 34 transport errors. This
+historical coverage is labelled separately from the simulated weekly log.
+
+Verified: 13 focused Python tests across three new files, 132 Node tests, Ruff
+clean and four import contracts kept; no broad/full pytest. One final Docker
+build reused C62's installed dependencies but regenerated the Friday artifact:
+an inherited pre-C65 checkpoint would otherwise contain no early-week call log.
+Own image `countersign-c65:validation`, port 8199, one CPU/768 MB, boots Friday
+with 91 calls. Actual step 7 logs incomplete 201 followed by same-key duplicate
+400 with the original batch link. Exact Friday log restore: 1.765 s.
+Full week has 231 calls: Payouts 81, Disputes 61, Orders 0, Payments 2, Tracking 1,
+Reporting 19, Webhooks 52, OAuth 15; all 231 rows retained.
+
+Three actual hosted screenshots cover light/dark 1440x1000 and phone 390x844:
+eight product tiles, two grids, 1,041 coverage attempts, no horizontal overflow
+or runtime exceptions. Evidence JSON/PNGs: `design-demos/reference/c65/`.
+Initial client disconnect is retained as a caveat: read retry confirmed step 7
+had completed; container remained healthy with no OOM or restarts. Own preview
+was stopped and removed after validation to save RAM; no preview remains.
+Evidence/report is complete; feature-branch publication is the handoff step.
+Verify the remote tip before owner integration; no merge. Other services/worktrees, including C67 PostgreSQL, were untouched.
+No .env reads, real provider/model calls, dependencies or forbidden
+styles.css/grid.mjs/README/submission edits.

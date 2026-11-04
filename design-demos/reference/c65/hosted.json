@@ -1,0 +1,27 @@
+{
+  "base_image": "countersign-c62:friday",
+  "image": "countersign-c65:validation",
+  "cpu_limit": 1,
+  "memory_limit_mb": 768,
+  "initial_check": "Friday boot held 91 calls; step 7 completed despite one transient client disconnect",
+  "retry": {
+    "same_key_hash": "7cfe1376de7c",
+    "first_status": 201,
+    "first_incomplete": true,
+    "retry_status": 400,
+    "original_batch_linked": true
+  },
+  "restore_seconds": 1.765,
+  "friday_log_restored_exactly": true,
+  "full_week_total": 231,
+  "full_week_counts": {
+    "OAuth": 15,
+    "Webhooks": 52,
+    "Payouts": 81,
+    "Reporting": 19,
+    "Disputes": 61,
+    "Payments": 2,
+    "Tracking": 1
+  },
+  "retained_rows": 231
+}
