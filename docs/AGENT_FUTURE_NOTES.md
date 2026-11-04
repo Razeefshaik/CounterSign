@@ -35,7 +35,41 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
-## C67 stage-one repeat (stopped, failed; no further calls)
+## C67 stage one (passed; stopped before stage two)
+
+Current source `a45caf0`, own CounterSign-c67 / `razeef/c67-real-gemini`.
+Latest owner addendum authorized real AIMessage/metadata fixes, real-CLI offline
+rehearsal, then one three-turn live attempt. Both earlier failed folders remain
+unchanged; new `2026-11-04-c67-cli-stage1-rehearsed` folder links both attempts
+and retains the no-rerun guard. No stage-two authority follows from this pass.
+
+Client lazily returns AIMessage with content/tool_calls/usage_metadata; total
+tokens computed, missing counts normalized0 with fixed missing_usage_counts
+annotation. last_event_metadata clears at ainvoke start, preventing stale counts
+when continuation fails before subprocess invocation.
+
+Primary verified **56 focused tests in22.86s**, Ruff check . clean, four import
+contracts kept. Real stage.main/stage_one/LangChainModel/client/CLI offline
+rehearsal uses fresh auth-free home and loopback stub: normal three-request flow
+passes and turn2 prompt contains actual ToolMessage UNCLAIMED result; intentional
+canary echo three-request flow fails as expected with MODEL_CANARY_DISCLOSED.
+This rehearsal used no login/external model, records no private canary value,
+and is distinct from real-model evidence. offline-rehearsal.json records it.
+
+ONE live attempt passed all three turns, round trip and canary. Zero native-tool
+events/disclosure; two startup warning counts per turn, no text. One fixed local
+application read, zero PayPal calls. Input/output/total tokens and seconds:
+turn1 8838/46/8884,11.610s; turn2 9020/28/9048,8.469s;
+turn3 8731/69/8800,9.141s. Totals26589 input,143 output,26732 overall;
+subscription dollar cost unavailable. run.json is the exact identity/version/date
+source; do not duplicate model identifiers outside run records/Run details.
+
+No retries, week, pilot or evaluation. No web/panel/results/publication/browser
+changes or Node/full pytest/Docker runs this turn. Primary writes record README,
+token report/links and decisions then commits/pushes; no merge. STOP and obtain
+new owner instruction before stage two; do not rerun successful stage one.
+
+### C67 prior stage-one repeat history (stopped, failed)
 
 Current source fix `7a992cc`, own CounterSign-c67 / `razeef/c67-real-gemini`.
 Owner approved one repeat only, max3 turns, stop on failure, push without merge.

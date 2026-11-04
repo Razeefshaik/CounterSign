@@ -11,7 +11,31 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## C67 stage-one repeat (stopped, failed; no further calls)
+## C67 stage one (passed; stopped before stage two)
+
+- Own `CounterSign-c67`, branch `razeef/c67-real-gemini`; source `a45caf0`.
+  Owner authorized assistant-message/metadata fixes, offline rehearsal and ONE
+  three-turn live attempt. Both earlier failed recording folders are unchanged.
+- Client now returns a lazy real AIMessage with tool calls and normalized usage;
+  total tokens computed, missing counts0 with a fixed annotation. Event metadata
+  clears before invocation. New recording folder links both earlier attempts and
+  retains the no-rerun guard.
+- Primary verified56 focused tests in22.86s, Ruff clean and four import contracts
+  kept. Real CLI offline rehearsal used fresh auth-free home and loopback stub:
+  three-request normal case passed with actual tool result in turn2; intentional
+  canary echo was refused as MODEL_CANARY_DISCLOSED. No external model calls in
+  rehearsal. No Node/full pytest/Docker or public-panel changes this turn.
+- ONE live attempt PASSED all3 turns: round trip and canary passed, zero native
+  events or disclosure, two count-only startup warnings per turn. One fixed local
+  application read, zero PayPal calls. Input/output tokens by turn:8838/46,
+  9020/28,8731/69; totals26589 input,143 output,26732 overall. Times11.610s,
+  8.469s,9.141s. Subscription dollar cost unavailable.
+- Evidence: `recordings/real_model/2026-11-04-c67-cli-stage1-rehearsed/` contains
+  run.json and offline-rehearsal.json. Exact identity remains only in run record/
+  Run details. No retries, week, pilot or evaluation. STOP: stage two requires
+  new owner instruction. Primary handles README/decisions and commit/push; no merge.
+
+### C67 prior stage-one repeat history (stopped, failed)
 
 - Own `CounterSign-c67`, branch `razeef/c67-real-gemini`; source fix `7a992cc`.
   Owner approved exactly one repeat, at most three turns, then stop on failure.
