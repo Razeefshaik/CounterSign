@@ -277,6 +277,11 @@ def create_app(
     app.add_middleware(
         FaultMiddleware, store=app.state.store, negative_values=negative_values
     )
+    # C65: outermost user middleware observes fault responses and lost responses too.
+    from mock_paypal.call_log import CallLogMiddleware
+    from mock_paypal.call_log import router as call_router
+    app.include_router(call_router())
+    app.add_middleware(CallLogMiddleware, store=app.state.store)
     return app
 
 

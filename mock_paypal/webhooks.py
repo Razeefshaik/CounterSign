@@ -190,6 +190,10 @@ class WebhookService:
             "event_id":record["event"]["id"], "webhook_id":id,
             "status":status, "at":timestamp(self.store.clock.now),
         })
+        # C65: public delivery evidence contains no URL, body, signature or resource ID.
+        from mock_paypal.call_log import append
+        append(self.store, method="POST", route="/webhooks/paypal", status=status,
+               direction="PayPal to app", incomplete=not status)
 
     def valid(self, body):
         record = self.store.webhooks.events.get(body.get("webhook_event", {}).get("id"))

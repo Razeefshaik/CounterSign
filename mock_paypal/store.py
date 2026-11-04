@@ -2,6 +2,7 @@
 
 import random
 import secrets
+from collections import deque  # C65
 from datetime import timedelta
 
 from mock_paypal.clock import MockClock
@@ -33,6 +34,10 @@ class MockStore:
         self.config = MockConfig()
         self.tokens = {}
         self.records = {}
+        # C65: counters cover the week even when the bounded detail log fills up.
+        self.calls = deque(maxlen=500)
+        self.call_sequence = 0
+        self.call_counts = {}
         self.payouts = PayoutState()
         self.faults = FaultState()
         self.refunds = []
