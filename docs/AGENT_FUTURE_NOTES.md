@@ -35,7 +35,7 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
-## C67 stage one (owner Nov 5 addendum; live approval pending)
+## C67 stage one (owner Nov 5 addendum; stopped, failed)
 
 Current owner addendum supersedes the new-run provider choice below. Stay in
 CounterSign-c67 / `razeef/c67-real-gemini`, resume basee40bc11; preserve other
@@ -53,26 +53,34 @@ Startup pins installed version and verifies the native-tool wire proof. Bundled
 catalog instructions remain identical; only shell_type disabled, apply_patch null,
 experimental tools empty and tool-producing feature gates off. Actual loopback
 HTTP probe used no login/model backend/external target and captured zero native
-tools. Native/unknown JSON events kill the subprocess and fail the call; runner
+tools. This does not establish authenticated native-tool absence. Native/unknown
+JSON events kill the subprocess and fail the call; runner
 records failure with no automatic rerun. Hosted runtime and boot refuse provider.
 
 Evidence: `recordings/real_model/2026-11-04-c67-cli-stage1/offline-proof.json` and
 `design-demos/reference/c67/STAGE1.md`. These establish offline request boundaries,
-not live model behavior. Live round trip/canary remain UNRUN while the three-turn
-budget reply is pending; subscription cost is unavailable. No new run record.
-Never retry a quota/usage stop; map it to MODEL_QUOTA_EXHAUSTED.
+not live model behavior. Owner then approved three turns; runner invoked ONCE.
+First turn aborted after3.469s with MODEL_NATIVE_TOOL_FORBIDDEN; child killed,
+no retry, zero application read executions. Rejected item type was not retained:
+do not infer which native capability or financial action. Round trip failed,
+canary NOT RUN, stage one NOT PASSED. Actual metadata:
+`recordings/real_model/2026-11-04-c67-cli-stage1/run.json`. Tokens and subscription
+cost unavailable for the aborted call. No subsequent CLI/model calls, week,
+pilot or evaluation. Never retry automatically.
 
 Public heading Real AI agent week. Exact new model identity, CLI version and date
-belong only in the eventual run record and small linked Run details, which must
+belong only in the actual run record and small linked Run details, which must
 disclose the CLI's own system instructions. Earlier Oct27 record stays unchanged
 with accurate identity in Run details. Free-provider attempt is removed from the
 panel and retained in decisions log. Unused OpenRouter integration remains.
 
 Primary checks:69 focused Python passed, then30 provider/runner passed after
-three additional tests; overlapping counts, not99 unique tests. All133 Node,
-Ruff and four import contracts passed. No full pytest/model calls/PayPal calls.
-Primary commits/pushes reviewable offline work before yielding pending approval;
-do not merge, claim live smoke success or start later stages.
+three additional tests; overlapping counts, not99 unique tests. Final134 Node,
+Ruff and four import contracts pass; follow-up11 publication Python and7 panel
+tests pass. No full pytest or PayPal calls. Public failure status/report and
+existing preview static files updated without a Docker build; evidence is
+committed with this note. Push this branch only. Do not merge, claim stage-one success, retry model
+calls or start later stages.
 
 ### C67 Nov 4 history (superseded provider choice; quota-stopped)
 

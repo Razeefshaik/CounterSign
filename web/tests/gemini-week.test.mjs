@@ -35,6 +35,17 @@ test("public headings have no model or vendor identity; details remain accurate"
   assert.ok(!/Gemini|Gemma|OpenRouter|gpt-|codex-cli/.test(publicText));
   assert.match(datasetPickerHTML(),/Real AI agent week/);
 });
+test("failed stage one remains failed and the canary is never presented as passed",()=>{
+  const current=structuredClone(data);
+  current.stage_one={...current.stage_one,status:"failed",round_trip:"failed",
+    error:"MODEL_NATIVE_TOOL_FORBIDDEN",canary:{status:"not_run"},turns:[{status:"failed"}]};
+  const html=modelWeekHTML(current);
+  assert.match(html,/Stage 1 stopped: MODEL_NATIVE_TOOL_FORBIDDEN/);
+  assert.match(html,/Canary: not_run/);
+  assert.ok(!html.includes("Canary: passed"));
+  current.stage_one.error='<script>bad()</script>';
+  assert.ok(!modelWeekHTML(current).includes("<script>"));
+});
 test("source validation refuses sandbox, duplicate runs and unsafe links",()=>{
   for(const change of [v=>v.weeks[0].ground="sandbox",v=>v.weeks[0].source="javascript:alert(1)",
     v=>v.weeks.push(v.weeks[0])]){

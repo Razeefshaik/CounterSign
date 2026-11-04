@@ -83,6 +83,8 @@ def bundle(root=ROOT):
     if (root / STAGE_ONE).exists():
         saved = json.loads((root / STAGE_ONE).read_text())
         stage.update({key: saved[key] for key in ("status", "round_trip", "canary", "turns")})
+        if saved.get("error"):
+            stage["error"] = saved["error"]
         stage["run_details"] = f"{saved['model']} · {saved['cli_version']} · {saved['date']}"
     dataset = {"id": "c67-real-model", "label": "Real AI agent, mock PayPal",
         "ground": "mock", "status": "not_run", "runs": [], "summary": [], "k": 1,

@@ -11,7 +11,7 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## C67 stage one (owner Nov 5 addendum; live approval pending)
+## C67 stage one (owner Nov 5 addendum; stopped, failed)
 
 - Same isolated `CounterSign-c67` / `razeef/c67-real-gemini`; resume base
   `e40bc11`. New local-only codex_cli provider and offline proof are implemented;
@@ -21,14 +21,18 @@ staged, sandbox and real-model evidence stay distinct.
 - Installed-version pin plus bundled catalog preserve original CLI instructions
   while disabling native capabilities and feature gates. Actual unauthenticated
   loopback wire proof captured zero native tools, without login or model backend.
-  Native/unknown JSON events kill the process; the runner records failure and
-  refuses automatic rerun. Hosted runtime and boot refuse this provider.
+  This does not establish authenticated native-tool absence. Native/unknown JSON
+  events kill the process; hosted runtime and boot refuse this provider.
 - Primary verified 69 focused Python passed, then 30 provider/runner passed
-  after three added tests (overlapping counts); all133 Node passed, Ruff clean,
+  after three added tests (overlapping counts); final134 Node passed, Ruff clean,
   four import contracts kept. No full pytest or new Docker build.
-- Live two-turn round trip and one-turn canary have NOT run: three-turn budget
-  approval remains pending; subscription cost unavailable. No new run record,
-  week, pilot or evaluation. Stop after stage one and report to owner.
+- Owner approved three turns; stage-one runner invoked ONCE. First turn aborted
+  after3.469s with MODEL_NATIVE_TOOL_FORBIDDEN; child killed, no retry, application
+  reads0. Rejected item type was not retained: do not infer a native capability
+  or financial action. Round trip failed; canary NOT RUN; stage one NOT PASSED.
+  No week/pilot/evaluation or further model/CLI calls. Aborted-call tokens and
+  subscription cost unavailable. Actual metadata:
+  `recordings/real_model/2026-11-04-c67-cli-stage1/run.json`.
 - Public heading is Real AI agent week; exact identity/date belong only in the
   run record and linked Run details, including CLI-owned system-instruction
   disclosure. Earlier Oct27 evidence stays unchanged; prior free-provider attempt
@@ -36,7 +40,9 @@ staged, sandbox and real-model evidence stay distinct.
   updated without rebuilding: nine light/dark/phone captures pass, no overflow,
   runtime errors/warnings or non-GET requests; see reference/c67/stage1/.
   Evidence: `design-demos/reference/c67/STAGE1.md` and stage-one offline proof.
-  Primary will commit/push offline work; no merge or other worktree/service edits.
+  Public failure status/report and preview updated without rebuilding; final
+  follow-up11 Python publication and7 panel tests pass. Evidence committed with
+  this note; push this branch only. No merge or other worktree edits.
 
 ### C67 Nov 4 history (superseded provider choice; quota-stopped)
 

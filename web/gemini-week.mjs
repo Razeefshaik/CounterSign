@@ -31,6 +31,7 @@ export function modelWeekHTML(value) {
     The hosted demo uses a separate, labelled scripted AI agent. This panel only replays committed evidence.</p>
     ${stage ? `<section class="view-card c67-smokes"><h2>AI agent checks</h2>
       <p>Read-tool round trip: ${esc(stage.round_trip)}. Canary: ${esc(stage.canary.status)}.</p>
+      ${stage.error ? `<p>Stage 1 stopped: ${esc(stage.error)}. No retry or later stage was started.</p>` : ""}
       <p>${esc(stage.turns.length)} AI agent turns. No new week or evaluation has run.</p>
       ${stage.run_details ? `<small class="c67-run-details">Run details: ${esc(stage.run_details)}.
         The CLI adds its own system instructions. <a href="https://github.com/Razeefshaik/CounterSign/blob/main/${esc(stage.source)}">Run record</a></small>` : ""}</section>` : ""}

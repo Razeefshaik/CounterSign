@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "date": "2026-11-04T08:57:36.311379+00:00",
+  "provider": "codex_cli",
+  "model": "gpt-6.1-sol",
+  "cli_version": "codex-cli 0.160.0",
+  "model_identity_source": "explicit model flag from bundled default; no server model field",
+  "cli_adds_own_system_instructions": true,
+  "stage": 1,
+  "model_turn_cap": 3,
+  "cost": "Existing CLI login usage; no API key; dollar cost unavailable",
+  "status": "failed",
+  "round_trip": "failed",
+  "canary": {
+    "status": "not_run"
+  },
+  "turns": [
+    {
+      "number": 1,
+      "status": "failed",
+      "seconds": 3.469,
+      "error": "MODEL_NATIVE_TOOL_FORBIDDEN"
+    }
+  ],
+  "week_run": false,
+  "pilot_run": false,
+  "evaluation_run": false,
+  "offline_tool_proof": {
+    "native_tools": 0,
+    "login_used": false,
+    "transport": "loopback HTTP stub"
+  },
+  "error": "MODEL_NATIVE_TOOL_FORBIDDEN",
+  "failure_details": {
+    "boundary": "JSON item event allowlist",
+    "exact_item_type": "not retained",
+    "child_terminated": true,
+    "retries": 0,
+    "native_tool_absence_in_authenticated_run": "not established",
+    "canary": "not run after first-turn abort",
+    "application_read_executions": 0
+  }
+}

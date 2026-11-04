@@ -23,9 +23,7 @@
     "--json",
     "--output-schema"
   ],
-  "model_turns_so_far": 0,
-  "live_round_trip": "awaiting_owner_three_turn_budget_reply",
-  "live_canary": "not_run",
+  "scope": "Offline preflight only; see run.json for the subsequent failed live attempt",
   "week_run": false,
   "pilot_run": false,
   "evaluation_run": false
