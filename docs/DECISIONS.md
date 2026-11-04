@@ -630,3 +630,19 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Change | Source | Decision | Reason |
 | --- | --- | --- | --- |
 | When a passkey prompt fails with NotAllowedError, the decision view offers **Set up a passkey on this device**; that click registers this device's own passkey (skipping setup if the device already holds one) and then countersigns. The server is unchanged | Video capture review, Nov 4 | Accept | The server keeps one shared list of owner passkeys, so on the shared hosted demo every visitor after the first was sent straight to a signing prompt for another visitor's passkey and could never countersign |
+
+## Nov 5 C62 Friday checkpoint
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Persist the quiescent mock as allowlisted JSON data with shared references, random/id counters and explicit pending-event descriptors | C62 state review | Accept | Copying only resource records loses pending payouts, webhook signatures and future clock behavior; executable callbacks must never be serialized |
+| Expose fixed-name checkpoint operations only on the configured loopback mock; refuse uploaded contents, query paths and unsupported active timers | C62 security requirements | Accept | Only baked files or container-written snapshots may be restored, never network-supplied state or code |
+
+| Friday boot and restore | Bake real scripted steps 1–6, preserve their dates and IDs, and clone the cleanly stopped PostgreSQL cluster; rebind only the runner identity to the random per-boot DSN and callback. Monday remains an explicit start option. |
+| Restore boundary | Use a single constrained PostgreSQL transaction, serialize owner decisions, block data access during cross-store restoration, and retain a local mock rollback file; preserve owner passkeys/counters and discard challenges. |
+| Idle and binding | Use monotonic time since demo/owner POST, wait for active commands/decisions/challenges, and invalidate fresh-Friday status after a verified-payee edit so stale bindings are not mistaken for an unsigned fresh run. |
+| Staged expiry | Retain C55 staged approvals and real-time passkey challenges; clear cached mock authentication after restore and project cash age and maker 30-day sums at the staged clock, without changing live views or schema. |
+| Written contract 1.0.9 | Owner approved documenting the fixed no-input Friday API and additive checkpoint state fields; keep the dashboard's existing advertised 1.0.6 metadata. |
+
+| Hosted checkpoint measurements | One final image build; inspect Size 238,402,125 → 250,255,901 bytes (+11,853,776); restore 0.734 s unrestricted and 0.985 s at one CPU, so visitors return to the unsigned run without replay. |
+| Friday guide | Show the story only for the API-confirmed unsigned Friday checkpoint; reuse the guarded demo controller for Back to Friday and confirmed Monday restart. |

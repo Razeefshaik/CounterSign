@@ -1,6 +1,6 @@
 # CounterSign: Contracts between core and mate
 
-**Contract version 1.0.8 (Nov 3, 2026).** C51 adds owner passkey endpoints in section 3. C48 adds the MCP gateway in section 7; existing dashboard response shapes and their advertised 1.0.6 version remain unchanged. 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
+**Contract version 1.0.9 (Nov 5, 2026).** C62 adds the hosted Friday checkpoint restore below; the dashboard metadata remains 1.0.6. C51 adds owner passkey endpoints in section 3. C48 adds the MCP gateway in section 7; existing dashboard response shapes and their advertised 1.0.6 version remain unchanged. 1.0.6 adds saved demo comparisons, proposal read traces and the generated results data bundle. 1.0.5 adds the read-only shield playground (section 3). 1.0.4 documents payout-run request refresh after expiry or stale binding, plus its audit event. 1.0.3 replaced the mock's payout idempotency rules with the D6 sandbox behaviour (section 5). 1.0.2 added the INJECTION_GUARD rule. 1.0.1 added the "Simulated: mock PayPal" label (sections 2.1 and 3). Every change needs owner approval and a version bump. The design behind these contracts is in `docs/HANDOFF.md`, `docs/PLAN.md` and `docs/DECISIONS.md`.
 
 Anything marked **[pending Dn]** depends on day one sandbox check Dn (`docs/PLAN.md` section 1.3). For each one, implement the stated default behind a config switch. When `docs/SANDBOX_FINDINGS.md` records the real behaviour, the default is replaced.
 
@@ -440,6 +440,36 @@ owner tokens. Existing proposal approval fields supply the signed timeline.
   - **503:** `DEMO_CLOCK_UNAVAILABLE`.
 
 ---
+
+### C62: hosted Friday checkpoint (written contract 1.0.9)
+
+Only the hosted demo on the loopback mock with its baked checkpoint exposes this
+capability. `POST /api/v1/demo/friday` takes no body or query parameters and starts
+an asynchronous restore of the image's fixed Friday artifact. It returns 202 with
+the demo state; poll `GET /api/v1/demo/state` until `running` is false. It shares
+the step/reset gate: 409 `DEMO_BUSY` while a step or owner decision is active;
+requests during the restore may receive 503 `DEMO_BUSY`. No supplied snapshot or
+filename is accepted (422 `INVALID_REQUEST`). An instance without the artifact
+returns 409 `DEMO_CHECKPOINT_UNAVAILABLE`; failed restores report
+`DEMO_RESTORE_FAILED` without private details. A failed cross-store rollback
+requires restarting the container before money or data routes reopen.
+
+Demo state adds `checkpoint: "friday" | null` and `friday_available: boolean`.
+The checkpoint label requires a restored step 6 with its original unsigned,
+waiting proposal/run; signing or changing its verified-payee binding removes it.
+The availability field means the hosted artifact can be restored, not that an
+arbitrary local demo can do so. Successful restore records
+`last_result: {action: "friday", ok: true, code: "DEMO_FRIDAY_RESTORED"}`.
+`POST /api/v1/demo/reset` still restarts at Monday. Passkeys and increasing
+signature counters survive a Friday restore; old challenges are cleared.
+
+Hosted defaults are `COUNTERSIGN_HOSTED_START=friday` and
+`COUNTERSIGN_HOSTED_IDLE_MINUTES=20` (0 disables idle restore). Activity is any
+demo/owner POST measured with a monotonic clock. Idle restore skips fresh Friday,
+active commands/owner decisions and unexpired passkey challenges. Dashboard cash
+age and maker 30-day totals use staged time on the mock; live calculations and
+real-time passkey challenge expiry are unchanged. The checkpoint is simulated,
+never new sandbox or model evidence.
 
 ## 4. Core engine interface: `src/countersign/harness.py`
 

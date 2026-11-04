@@ -173,6 +173,11 @@ def parse_amounts(body: Any) -> dict[str, Money]:
 
 
 class PayPalHTTP:
+    # C62: a restored mock has a new token store; retain the client/pool, not its token.
+    def clear_authentication(self):
+        self._token = ""
+        self._expires = 0
+
     def __init__(
         self,
         settings: PayPalSettings,

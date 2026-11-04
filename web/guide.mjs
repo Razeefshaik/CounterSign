@@ -1,6 +1,7 @@
 // C57: display guidance from confirmed demo state; demo.mjs owns every request.
 import {esc} from "./views.mjs";
 import {resultText} from "./demo.mjs";
+import {fridayStory, fridayButton} from "./friday.mjs"; // C62
 
 const local = (label, target) => ({label, target, href:"#overview"});
 const route = (label, href) => ({label, href});
@@ -36,12 +37,14 @@ export function guideView(state, {notice = ""} = {}) {
   const status = notice || (busy || state.last_result?.ok === false ? resultText(state) : "");
   const close = '<button type="button" class="guide-close" data-guide-action="dismiss" aria-label="Dismiss week guidance"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>';
   const feedback = `<p class="guide-status" role="status" ${status ? "" : "hidden"}>${esc(status)}</p>`;
+  const story = fridayStory(state, feedback, close); // C62: API-confirmed checkpoint only.
+  if (story) return story;
   if (model.kind === "start") return `<div class="guide-start"><div class="guide-copy"><h2 id="guide-title" tabindex="-1">See CounterSign handle one week of disputes and payouts</h2><p>A staged week on a PayPal mock built from real sandbox recordings. ${esc(state.total)} steps; each one takes a few seconds.</p></div>${close}<div class="guide-actions"><button type="button" class="primary" data-guide-action="step" ${busy ? "disabled" : ""}><span aria-hidden="true">▶</span> ${busy ? "Running…" : "Start the week"}</button><details class="guide-explainer"><summary>What am I looking at?</summary><p>The AI proposes. The shield checks named rules. The owner countersigns payments and refunds. Only then does the adapter call PayPal. In this staged week, PayPal and the owner clicks are simulated; the model is scripted.</p></details></div>${feedback}</div>`;
   const links = model.links.map(link => `<a href="${esc(link.href)}"${link.target ? ` data-guide-target="${esc(link.target)}"` : ""}>${esc(link.label)} <span aria-hidden="true">→</span></a>`).join("");
-  return `<div class="guide-hint${model.owner && !model.complete ? " guide-owner" : ""}"><div class="guide-copy"><p id="guide-title" class="guide-label" tabindex="-1">${esc(model.label)}</p><p class="guide-direction">${esc(model.text)} ${links}</p></div>${close}${model.complete ? `<div class="guide-actions"><button type="button" class="secondary" data-guide-action="reset" ${busy ? "disabled" : ""}>Restart the week</button><a href="#proof">Sandbox proof <span aria-hidden="true">→</span></a></div>` : ""}${feedback}</div>`;
+  return `<div class="guide-hint${model.owner && !model.complete ? " guide-owner" : ""}"><div class="guide-copy"><p id="guide-title" class="guide-label" tabindex="-1">${esc(model.label)}</p><p class="guide-direction">${esc(model.text)} ${links}</p></div>${close}${model.complete ? `<div class="guide-actions"><button type="button" class="secondary" data-guide-action="reset" ${busy ? "disabled" : ""}>Restart the week</button>${fridayButton(state)}<a href="#proof">Sandbox proof <span aria-hidden="true">→</span></a></div>` : ""}${feedback}</div>`;
 }
 
-export function createGuide(document, {step, reset} = {}) {
+export function createGuide(document, {step, reset, friday} = {}) {
   const host = document.getElementById("week-guide");
   const view = document.defaultView || globalThis;
   let state = null, notice = "", previous = null, pulsed = false;
@@ -65,6 +68,7 @@ export function createGuide(document, {step, reset} = {}) {
     if (action === "dismiss") {dismissed.add(state?.step); render();}
     if (action === "step") step?.();
     if (action === "reset") reset?.();
+    if (action === "friday") friday?.(); // C62: same shared demo request guard.
     const target = event.target.closest?.("[data-guide-target]")?.dataset.guideTarget;
     const section = target && document.getElementById(target);
     if (section) {
@@ -75,7 +79,7 @@ export function createGuide(document, {step, reset} = {}) {
   };
   return {
     update(value, message = "") {
-      if (previous > 0 && value?.step === 0) dismissed.clear();
+      if ((previous > 0 && value?.step === 0) || (previous !== 6 && value?.checkpoint === "friday")) dismissed.clear(); // C62
       previous = value?.step; state = value; notice = message;
       render();
       if (!pulsed && value?.step === 1 && !value.running && !view.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {

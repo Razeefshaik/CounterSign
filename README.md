@@ -71,10 +71,11 @@ Open **http://localhost:8080**. Use `localhost`, not `127.0.0.1`: browsers allow
 
 | Do this | And see |
 | --- | --- |
-| Press **Start the week**, then **Next step** | A staged week plays out, with a hint after each step saying where to look |
-| At step 6, open **Review and sign** | 10 named checks, the exact payload hash, the owner's decision |
+| It opens on **Friday**, with the story so far | Monday to Thursday already happened, and the weekly payout run is waiting for you |
+| Open **Review and sign** | 10 named checks, the exact payload hash, the owner's decision |
 | Click **Countersign with passkey** | Your device signs; the timeline records "Countersigned with passkey" |
 | Press **Next step** again | A lost response is recovered: one payment, in Execution history |
+| **Watch from Monday**, or at the end **Back to Friday** | Replay the whole week, or restore the unsigned run in about a second |
 | Open **Try to trick the agent** | A hostile buyer message goes through the real shield and is refused |
 | Open **Evaluation replay** | All 480 evaluation runs in AG Grid, with one-click slices and CSV export |
 | Open **Sandbox proof** | 13 checks on the real sandbox, each fact linked to its recording |
@@ -457,6 +458,14 @@ decision and safety layer.
   demo refuses to start if PayPal or model credentials are set.
 
 ## Run from source and run the tests
+
+The image bakes a checkpoint by playing the real scripted steps 1–6, on the mock.
+It restores the PostgreSQL, mock and week records on each boot. An idle instance
+returns to unsigned Friday after 20 minutes without a demo or owner POST; it waits
+for active decisions and passkey prompts. `COUNTERSIGN_HOSTED_IDLE_MINUTES=0`
+disables this. Set `COUNTERSIGN_HOSTED_START=monday` to boot with the old empty
+marketplace instead; optional `COUNTERSIGN_HOSTED_SEED=week` requires that setting.
+No external service or model is called to create or restore this checkpoint.
 
 <details>
 <summary><b>Run from source: the mock demo week in a terminal</b></summary>

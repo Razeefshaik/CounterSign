@@ -1,0 +1,12 @@
+/* C62: use the established glass palette and keep the story within the guide. */
+.guide-friday { display:grid; grid-template-columns:minmax(0,1fr) 36px; gap:14px 20px; }
+.guide-friday h2 { max-width:760px; margin:8px 0 10px; font-size:clamp(22px,2.1vw,32px); line-height:1.18; text-wrap:balance; }
+.guide-friday .guide-copy > p:last-child { max-width:920px; line-height:1.65; }
+.guide-friday .guide-actions { margin-top:18px; flex-wrap:wrap; gap:16px; }
+.guide-friday .primary { display:inline-flex; align-items:center; gap:12px; text-decoration:none; color:white; padding:8px 16px; border-radius:10px; background:var(--accent); }
+.guide-passkey { font-size:12px; color:var(--ink-2); }
+@media(max-width:600px) {
+  .guide-friday { gap:14px 8px; }
+  .guide-friday .guide-actions { align-items:flex-start; gap:14px; }
+  .guide-friday .guide-passkey { flex-basis:100%; }
+}

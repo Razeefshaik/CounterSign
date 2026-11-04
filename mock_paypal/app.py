@@ -103,6 +103,16 @@ def create_app(
         if control_enabled is None
         else control_enabled
     )
+    # C62: only hosted/build configuration supplies this local baked-file root.
+    checkpoint_directory = os.environ.get("COUNTERSIGN_MOCK_CHECKPOINT_DIR")
+    if enabled and checkpoint_directory:
+        from mock_paypal.checkpoint import build_router as checkpoint_router
+
+        app.include_router(checkpoint_router(
+            checkpoint_directory, allow_save=os.environ.get("COUNTERSIGN_FRIDAY_BUILD") == "1",
+            backup_directory=os.environ.get("COUNTERSIGN_MOCK_CHECKPOINT_BACKUP"),
+            callback_url=os.environ.get("COUNTERSIGN_MOCK_CALLBACK_URL"),
+        ))
 
     @app.middleware("http")
     async def protocol(request: Request, call_next):

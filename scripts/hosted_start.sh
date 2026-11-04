@@ -24,9 +24,27 @@ PG_BIN="${COUNTERSIGN_PG_BIN:-/usr/lib/postgresql/16/bin}"
 TEMPLATE="${COUNTERSIGN_PG_TEMPLATE:-/home/app/pgtemplate}"
 STATE="${COUNTERSIGN_HOSTED_STATE:-/tmp/countersign}"
 SEED="${COUNTERSIGN_HOSTED_SEED:-none}"
+START="${COUNTERSIGN_HOSTED_START:-friday}" # C62
+IDLE="${COUNTERSIGN_HOSTED_IDLE_MINUTES:-20}"
+FRIDAY="${COUNTERSIGN_FRIDAY_ROOT:-/home/app/friday}"
+BUILD_FRIDAY=0
 APP_PID="" MOCK_PID=""
 
 log() { printf '[hosted] %s\n' "$*"; }
+
+# C62: validate before opening a service or touching any disposable data.
+case "${1:-}" in ""|--build-template|--build-friday) ;; *) log "unknown hosted argument"; exit 64 ;; esac
+case "$START" in friday|monday) ;; *) log "COUNTERSIGN_HOSTED_START must be friday or monday"; exit 64 ;; esac
+case "$IDLE" in *[!0-9]*|"") log "COUNTERSIGN_HOSTED_IDLE_MINUTES must be a nonnegative integer"; exit 64 ;; esac
+if [ "${#IDLE}" -gt 5 ] || [ "$IDLE" -gt 10080 ]; then
+  log "COUNTERSIGN_HOSTED_IDLE_MINUTES must be between 0 and 10080"; exit 64
+fi
+if [ "${1:-}" = --build-friday ]; then BUILD_FRIDAY=1; START=monday; SEED=none; IDLE=0; fi
+# C62: a chosen Monday boot stays on Monday unless idle return is asked for.
+if [ "$START" = monday ] && [ -z "${COUNTERSIGN_HOSTED_IDLE_MINUTES:-}" ]; then IDLE=0; fi
+if [ "$START" = friday ] && [ "$SEED" = week ]; then
+  log "COUNTERSIGN_HOSTED_SEED=week requires COUNTERSIGN_HOSTED_START=monday"; exit 64
+fi
 
 pg_start() {  # pg_start DATA SOCKET_DIR LISTEN
   "$PG_BIN/pg_ctl" -D "$1" -l "$2/postgres.log" -w -t 300 start -o \
@@ -67,6 +85,8 @@ export MOCK_PAYPAL_CLIENT_ID=mock-client
 export MOCK_PAYPAL_CLIENT_SECRET=mock-secret
 # M15: the dashboard reads the engine's own records, not contract fixtures.
 export COUNTERSIGN_DASHBOARD_SOURCE=database
+export COUNTERSIGN_HOSTED_START="$START" COUNTERSIGN_HOSTED_IDLE_MINUTES="$IDLE" # C62
+export COUNTERSIGN_FRIDAY_ROOT="$FRIDAY" COUNTERSIGN_FRIDAY_BUILD="$BUILD_FRIDAY"
 unset PAYPAL_WEBHOOK_ID COUNTERSIGN_LLM_PROVIDER COUNTERSIGN_LLM_MODEL
 
 cleanup() {
@@ -92,24 +112,39 @@ rm -rf "$STATE"
 mkdir -p "$STATE"
 chmod 700 "$STATE"
 log "starting PostgreSQL 16"
-cp -a "$TEMPLATE" "$STATE/pgdata"
+# C62: Friday is a cleanly stopped physical clone, with the same per-boot password reset.
+SOURCE="$TEMPLATE"
+if [ "$START" = friday ]; then SOURCE="$FRIDAY/pgdata"; fi
+[ -d "$SOURCE" ] || { log "hosted PostgreSQL template is missing"; exit 1; }
+cp -a "$SOURCE" "$STATE/pgdata"
+chmod 700 "$STATE/pgdata" # C62: retain PostgreSQL's requirement across host filesystems.
 pg_start "$STATE/pgdata" "$STATE" 127.0.0.1
 DB_PASSWORD="$(head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n')"
 printf "ALTER ROLE countersign PASSWORD '%s';\n" "$DB_PASSWORD" \
   | "$PG_BIN/psql" -h "$STATE" -p "$PG_PORT" -U countersign -d postgres -q -v ON_ERROR_STOP=1
 export DATABASE_URL="postgresql://countersign:$DB_PASSWORD@127.0.0.1:$PG_PORT/countersign_demo"
 unset DB_PASSWORD
+# C62: the build and runtime share the exact week runner and callback address.
+export COUNTERSIGN_DEMO_ROOT="$STATE/week" COUNTERSIGN_DEMO_APP_URL="http://127.0.0.1:$PORT"
 
 # 2. Mock on loopback with a minimal environment (it never sees the database URL).
 log "starting the PayPal mock on loopback"
 env -i PATH="$PATH" HOME="${HOME:-/tmp}" PYTHONPATH="${PYTHONPATH:-}" LANG=C.UTF-8 \
-  PYTHONUNBUFFERED=1 MOCK_CONTROL=1 python -m mock_paypal >"$STATE/mock.log" 2>&1 &
+  PYTHONUNBUFFERED=1 MOCK_CONTROL=1 COUNTERSIGN_MOCK_CHECKPOINT_DIR="$FRIDAY" \
+  COUNTERSIGN_FRIDAY_BUILD="$BUILD_FRIDAY" COUNTERSIGN_MOCK_CHECKPOINT_BACKUP="$STATE/mock-backup" \
+  COUNTERSIGN_MOCK_CALLBACK_URL="http://127.0.0.1:$PORT/webhooks/paypal" \
+  python -m mock_paypal >"$STATE/mock.log" 2>&1 &
 MOCK_PID=$!
 wait_for_port "$MOCK_PORT" 600 || { log "mock did not start"; exit 1; }
-REHEARSAL="$(python -m scripts.mock_rehearsal --root "$STATE/week" --app-port "$PORT" --reset)" \
+if [ "$START" = friday ]; then # C62: load only the image's named artifact.
+  PAYPAL_WEBHOOK_ID="$(python -m scripts.friday_checkpoint boot --directory "$FRIDAY" \
+    --app-url "$COUNTERSIGN_DEMO_APP_URL")" || { log "Friday setup failed"; exit 1; }
+else
+  REHEARSAL="$(python -m scripts.mock_rehearsal --root "$STATE/week" --app-port "$PORT" --reset)" \
   || { log "mock setup failed"; exit 1; }
 PAYPAL_WEBHOOK_ID="$(printf '%s\n' "$REHEARSAL" \
   | sed -n 's/^Mock ready at .*; webhook \(WH-MOCK-[A-Za-z0-9_-]*\)$/\1/p')"
+fi
 [ -n "$PAYPAL_WEBHOOK_ID" ] || { log "mock webhook registration not found"; exit 1; }
 export PAYPAL_WEBHOOK_ID
 
@@ -122,6 +157,19 @@ uvicorn --factory countersign.main:create_hosted_app --host 0.0.0.0 --port "$POR
 APP_PID=$!
 wait_for_port "$PORT" 600 || { log "app did not start"; exit 1; }
 log "dashboard ready"
+
+# C62: play real steps 1–6, capture logical/mock/week state, then stop PostgreSQL
+# cleanly before copying the physical boot template. No service survives this RUN.
+if [ "$BUILD_FRIDAY" = 1 ]; then
+  python -m scripts.friday_checkpoint build --directory "$FRIDAY" \
+    --app-url "$COUNTERSIGN_DEMO_APP_URL" >"$STATE/friday-build.log" 2>&1 \
+    || { log "Friday checkpoint build failed"; cat "$STATE/friday-build.log"; exit 1; }
+  cleanup
+  cp -a "$STATE/pgdata" "$FRIDAY/pgdata"
+  rm -f "$FRIDAY/pgdata/postmaster.opts"
+  log "Friday checkpoint built"
+  exit 0
+fi
 
 # 4. Optional scripted demo week, off by default so visitors can step it. M15
 #    bounds the mock's balance history at 256 snapshots. The checkpoint resumes

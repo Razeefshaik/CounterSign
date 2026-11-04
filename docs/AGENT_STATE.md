@@ -1,6 +1,6 @@
 # CounterSign agent state
 
-Updated: Nov 3, 2026. Context keeper: **Professor Pickle**. This summary does not
+Updated: Nov 4, 2026. Context keeper: **Professor Pickle**. This summary does not
 replace AGENTS.md or required source documents. Read those and relevant future
 notes before changes. Never store secrets, environment values, real emails or
 raw model output here.
@@ -11,7 +11,29 @@ The model reads and proposes; deterministic code authorizes and performs writes.
 PostgreSQL owns state/reservations/inbox. Money is integer minor units. Mock,
 staged, sandbox and real-model evidence stay distinct.
 
-## Current feature: C58 evaluation explorer (Nov 3)
+## Current feature: C62 Friday checkpoint (ready for review)
+
+- Own `CounterSign-c62`, branch `razeef/c62-friday-checkpoint`, base `75c95cb`.
+  Code: `6b1ddfd`, `68b3de6`, `27b012b`, `5c1d657`. No merge. Written contract
+  1.0.9 approved; advertised dashboard version remains 1.0.6.
+- Hosted default is a baked unsigned Friday from real scripted steps 1–6.
+  Atomic constrained DB restore retains passkeys, clears challenges, restores
+  mock timers/random/signatures, rebinds trusted identity and clears auth cache.
+  Idle restoration waits for owner/demo actions and fresh passkey challenges.
+- Final built image: **20 new focused Python passed**, including **4 live PG16
+  integration tests** in owned `countersign_c62`; **127 Node passed**, Ruff clean,
+  **4 import contracts kept**. No broad/full pytest. Both plain and real WebAuthn
+  approval pass at real clock +45 days; actual API plain approval returns 201.
+- One final Docker build. Friday boot 17.188 s unrestricted, 12.032 s at one CPU;
+  restore 0.734 s / 0.985 s. Real step 7 passes; same image Monday boots at step 0.
+  Inspect Size 238,402,125 → 250,255,901 bytes. Six actual browser captures in
+  `design-demos/reference/c62/`, zero uncaught runtime exceptions or overflow.
+- Preview `http://localhost:8198`, own `countersign-c62-preview` at one CPU.
+  Do not touch 8180/8196/8197. No secrets, .env reads, real PayPal/LLM calls,
+  dependencies or styles.css changes. Full evidence/shared inserts in C62 README.
+  Branch pushed to origin; owner reviews, Claude integrates/full-tests later.
+
+## Earlier feature: C58 evaluation explorer (Nov 3)
 
 - Isolated worktree `CounterSign-c58`, branch `razeef/c58-eval-explorer`, base
   upstream/main `97a464b`. Code commits: `01656d3` bundle/tests and `dae163b`

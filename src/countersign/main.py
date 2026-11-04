@@ -142,6 +142,11 @@ def create_app(
             # M17: present only in demo mode on the loopback mock, when configured.
             demo_bar = dashboard.configured_demo_bar(runtime)
             if demo_bar is not None:
+                # C62: enabled only by a validated baked checkpoint in the hosted image.
+                from countersign.api.friday import configure as configure_friday
+
+                demo_bar.friday = configure_friday(db, runtime, demo_bar, transport=transport)
+                app.state.friday = demo_bar.friday
                 app.include_router(dashboard.build_demo_router(demo_bar), prefix="/api/v1")
             # C32: read-only shield playground, demo mode on the mock only.
             if playground.playground_allowed(runtime):
@@ -176,6 +181,8 @@ def create_app(
                 yield
             finally:
                 stop.set()
+                if demo_bar is not None and demo_bar.friday is not None:  # C62
+                    await demo_bar.friday.close()
                 if task is not None:
                     await task
                 if demo_bar is not None and demo_bar.running:
@@ -192,6 +199,10 @@ def create_app(
             raise RuntimeError("CounterSign application lifecycle failed") from None
 
     result = FastAPI(title="CounterSign", lifespan=lifespan)
+    # C62: the middleware is inert unless runtime config enables Friday checkpoints.
+    from countersign.api.friday import DemoActivityMiddleware
+
+    result.add_middleware(DemoActivityMiddleware, state=result.state)
 
     @result.exception_handler(HTTPException)
     async def http_error(request, exc):

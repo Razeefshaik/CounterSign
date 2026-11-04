@@ -520,6 +520,9 @@ class DbSource:
         next_cursor = self._cursor(resource, filters, page[-1]) if len(rows) > limit else None
         documents = [self._present(resource, masked(row["doc"])) for row in page]
         await self._add_traces(resource, documents)
+        if resource == "makers":  # C62: restored weeks retain staged age windows.
+            from countersign.api.friday_clock import project
+            await project(self, resource, documents)
         return documents, next_cursor
 
     async def _add_traces(self, resource, documents):
@@ -614,7 +617,10 @@ class DbSource:
             row = await (await conn.execute("SELECT doc FROM v_dash_cash")).fetchone()
         if row is None:
             raise DashboardUnavailable("Cash snapshot unavailable")
-        return masked(row["doc"])
+        document = masked(row["doc"])
+        from countersign.api.friday_clock import project  # C62
+        await project(self, "cash", [document])
+        return document
 
 
 @asynccontextmanager
@@ -950,6 +956,7 @@ class DemoBar:
         self.task = None
         self.action = None
         self.last = None
+        self.friday = None  # C62: optional baked-checkpoint controller, hosted only.
         # Earlier resets leave sibling roots behind; continue after the newest.
         resets = [
             int(path.name.rsplit("-", 1)[1])
@@ -1029,6 +1036,8 @@ class DemoBar:
             ],
             "next_label": upcoming,
             "last_result": self.last,
+            "checkpoint": None,  # C62: fresh restore is confirmed by the async state route.
+            "friday_available": self.friday is not None and not self.friday.broken,
         }
 
     async def _execute(self, action, arguments):
@@ -1054,6 +1063,16 @@ class DemoBar:
             return "DEMO_DISABLED"
         if self.running:
             return "DEMO_BUSY"
+        # C62: owner decisions and all demo commands share the same process gate.
+        if self.friday is not None:
+            if self.friday.owner_active:
+                return "DEMO_BUSY"
+            if self.friday.broken:
+                return "DEMO_RESTORE_FAILED"
+        if action == "friday":
+            return self.friday.start() if self.friday is not None else "DEMO_CHECKPOINT_UNAVAILABLE"
+        if action not in {"step", "reset"}:
+            return "DEMO_ACTION_REFUSED"
         if action == "step":
             date, _, _ = self._checkpoint()
             if self.state()["complete"]:
@@ -1104,7 +1123,7 @@ def build_demo_router(bar: DemoBar):
     async def demo_state():
         if not demo_bar_allowed(bar.runtime):
             return refused()
-        return bar.state()
+        return await bar.friday.state() if bar.friday is not None else bar.state()  # C62
 
     async def begin(action):
         if not demo_bar_allowed(bar.runtime):
@@ -1116,6 +1135,9 @@ def build_demo_router(bar: DemoBar):
             messages = {
                 "DEMO_BUSY": "A staged step is already running",
                 "DEMO_WEEK_COMPLETE": "The staged week is complete; reset to replay it",
+                "DEMO_RESTORE_FAILED": "The Friday restore failed; restart the container",  # C62
+                "DEMO_CHECKPOINT_UNAVAILABLE": "No Friday checkpoint is available",
+                "DEMO_ACTION_REFUSED": "Unsupported demo command",
             }
             return error(409, problem, messages[problem])
         return JSONResponse(status_code=202, content=bar.state())
@@ -1127,5 +1149,12 @@ def build_demo_router(bar: DemoBar):
     @result.post("/demo/reset", name="demo_reset")
     async def demo_reset():
         return await begin("reset")
+
+    # C62: no body, query or filename can supply a snapshot.
+    @result.post("/demo/friday", name="demo_friday")
+    async def demo_friday(request: Request):
+        if request.url.query or await request.body():
+            return error(422, "INVALID_REQUEST", "Friday restore takes no parameters")
+        return await begin("friday")
 
     return result

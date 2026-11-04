@@ -9,7 +9,9 @@ const messages = {
 
 export function resultText(state) {
   const last = state?.last_result;
+  if (state?.running && state.action === "friday") return "Returning to the unsigned Friday run…";
   if (state?.running) return state.action === "reset" ? "Restarting the staged week…" : "Running the next staged step…";
+  if (last?.action === "friday") return last.ok ? "Friday restored. The run is waiting for your signature." : "Friday could not be restored. Try again or restart the container.";
   if (!last) return state?.step ? "" : "Nothing has run yet. Run the first staged step to begin the week.";
   if (last.action === "reset") return last.ok ? "Week restarted from an empty marketplace. Nothing has run yet." : `The restart stopped (${last.code}). Try again, or restart the container.`;
   if (state.complete) return "Week complete: every staged step has run. Restart the week to replay it.";
@@ -99,6 +101,7 @@ export function createDemoBar(document, {fetcher = fetch, onChange = async () =>
       }
     },
     step: () => send("step"),
+    friday: () => send("friday"), // C62
     reset, // C57: reuse confirmation, request handling and polling.
     get state() {return state;},
   };

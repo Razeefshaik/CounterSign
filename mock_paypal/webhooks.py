@@ -159,35 +159,37 @@ class WebhookService:
         for _ in range(copies):
             delivery_headers = headers or self.headers(record, id)
 
+            # C62: descriptors retain data, not serialized Python callbacks.
             async def deliver(delivery_headers=delivery_headers):
-                if state is not self.store.webhooks or id not in state.registrations:
-                    return
-                url = state.registrations[id]["url"]
-                status = None
-                try:
-                    if self.delivery:
-                        status = await self.delivery(url, delivery_headers, record["raw"])
-                    else:
-                        async with httpx.AsyncClient(
-                            trust_env=False, follow_redirects=False, timeout=5
-                        ) as client:
-                            status = (
-                                await client.post(
-                                    url, headers=delivery_headers, content=record["raw"]
-                                )
-                            ).status_code
-                except httpx.HTTPError:
-                    status = 0
-                state.deliveries.append(
-                    {
-                        "event_id": record["event"]["id"],
-                        "webhook_id": id,
-                        "status": status,
-                        "at": timestamp(self.store.clock.now),
-                    }
-                )
+                await self.deliver(state, record, id, delivery_headers)
 
-            self.store.clock.schedule(delay, deliver)
+            self.store.clock.schedule(delay, deliver, checkpoint={
+                "kind":"deliver", "state":state, "record":record,
+                "webhook_id":id, "headers":delivery_headers,
+            })
+
+    async def deliver(self, state, record, id, delivery_headers):
+        # C62: same delivery implementation for live and restored event queues.
+        if state is not self.store.webhooks or id not in state.registrations:
+            return
+        url = state.registrations[id]["url"]
+        status = None
+        try:
+            if self.delivery:
+                status = await self.delivery(url, delivery_headers, record["raw"])
+            else:
+                async with httpx.AsyncClient(
+                    trust_env=False, follow_redirects=False, timeout=5
+                ) as client:
+                    status = (await client.post(
+                        url, headers=delivery_headers, content=record["raw"]
+                    )).status_code
+        except httpx.HTTPError:
+            status = 0
+        state.deliveries.append({
+            "event_id":record["event"]["id"], "webhook_id":id,
+            "status":status, "at":timestamp(self.store.clock.now),
+        })
 
     def valid(self, body):
         record = self.store.webhooks.events.get(body.get("webhook_event", {}).get("id"))

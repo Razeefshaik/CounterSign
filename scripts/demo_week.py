@@ -25,6 +25,7 @@ from psycopg.conninfo import conninfo_to_dict
 from countersign.agent.models import ChatModelConfig, ModelError, ScriptedModel
 from countersign.agent.reads import MoneyGraphQueries, custom_tools
 from countersign.agent.tools import ReadTool, ToolRegistry
+from countersign.api.friday_data import identity as checkpoint_identity  # C62
 from countersign.config import PayPalSettings, load_settings
 from countersign.db import Repositories
 from countersign.db.ids import uuid7
@@ -1662,21 +1663,10 @@ async def run_cli(args):
     store = Checkpoint(
         Path(args.root) / run_date.isoformat(),
         target=args.target,
-        identity={
-            "database": settings.database_url,
-            "base": settings.paypal.base_url,
-            "client": settings.paypal.client_id,
-            "webhook": settings.paypal.webhook_id,
-            "makers": emails,
-            "settlement": options.settlement,
-            "reason_a": options.reason_a,
-            "evidence_branch": options.evidence_available,
-            "app": app_url,
-            # Omitted for the default to preserve C25's original scripted-run
-            # fingerprint. Configured runs bind all model identifiers, so a
-            # switch of mode/provider/model still refuses an existing run.
-            **({"model": model_identity(model)} if isinstance(model, ChatModelConfig) else {}),
-        },
+        # C62: one identity definition also rebinds trusted baked mock checkpoints.
+        identity=checkpoint_identity(settings, emails, app_url, settlement=options.settlement,
+            reason_a=options.reason_a, evidence_branch=options.evidence_available,
+            model=model_identity(model) if isinstance(model, ChatModelConfig) else None),
         redactor=redactor,
     )
     if args.pause_after_step:

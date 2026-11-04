@@ -95,7 +95,9 @@ class PayoutService:
                 del state.sender_keys[sender_id]
 
         seconds = self.store.config.key_retention_days * 86400
-        self.store.clock.schedule(seconds, forget)
+        self.store.clock.schedule(seconds, forget, checkpoint={  # C62
+            "kind":"forget", "state":state, "sender_id":sender_id, "batch_id":batch.id,
+        })
 
     def get_batch(self, batch_id: str) -> PayoutBatch:
         try:
@@ -142,44 +144,49 @@ class PayoutService:
             self.store.record_transaction(-item.debited_minor, item.transaction_id)
         state.batches[batch.id] = batch
 
-        def process():
-            # Reset replaces state and clock, so old events cannot affect a new run.
-            if self.store.payouts is not state:
-                return
-            batch.status = "PROCESSING"
-            self.store.emit(
-                "PAYMENT.PAYOUTSBATCH.PROCESSING",
-                self.create_doc(batch, "http://localhost:8099"),
-            )
-            stuck = False
-            for item_id in batch.item_ids:
-                item = state.items[item_id]
-                if item.status == "PENDING":
-                    rule = self.forced_outcome(item)
-                    if rule is None:
-                        target = (
-                            "SUCCESS"
-                            if item.payload["receiver"] in state.registered_receivers
-                            else "UNCLAIMED"
-                        )
-                        self.transition(item, target)
-                    elif rule["to"] == "PENDING":
-                        item.synthesised, stuck = True, True
-                    else:
-                        if rule.get("errors") is not None:
-                            item.errors = deepcopy(rule["errors"])
-                        self.transition(item, rule["to"], synthesised=True)
-            if stuck:
-                return  # A stuck item keeps its batch PROCESSING; no completion event.
-            batch.status = "SUCCESS"  # Batch processed; individual outcomes can differ.
-            batch.completed_at = self.store.clock.now
-            self.store.emit(
-                "PAYMENT.PAYOUTSBATCH.SUCCESS",
-                self.create_doc(batch, "http://localhost:8099"),
-            )
-
-        self.store.clock.schedule(self.store.config.payout_processing_seconds, process)
+        # C62: the same callback body is reusable after a data-only clock restore.
+        self.store.clock.schedule(
+            self.store.config.payout_processing_seconds,
+            lambda: self.process_batch(state, batch),
+            checkpoint={"kind":"process", "state":state, "batch":batch},
+        )
         return batch
+
+    def process_batch(self, state, batch):
+        # C62: extracted unchanged from create's scheduled callback.
+        if self.store.payouts is not state:
+            return
+        batch.status = "PROCESSING"
+        self.store.emit(
+            "PAYMENT.PAYOUTSBATCH.PROCESSING",
+            self.create_doc(batch, "http://localhost:8099"),
+        )
+        stuck = False
+        for item_id in batch.item_ids:
+            item = state.items[item_id]
+            if item.status == "PENDING":
+                rule = self.forced_outcome(item)
+                if rule is None:
+                    target = (
+                        "SUCCESS"
+                        if item.payload["receiver"] in state.registered_receivers
+                        else "UNCLAIMED"
+                    )
+                    self.transition(item, target)
+                elif rule["to"] == "PENDING":
+                    item.synthesised, stuck = True, True
+                else:
+                    if rule.get("errors") is not None:
+                        item.errors = deepcopy(rule["errors"])
+                    self.transition(item, rule["to"], synthesised=True)
+        if stuck:
+            return
+        batch.status = "SUCCESS"
+        batch.completed_at = self.store.clock.now
+        self.store.emit(
+            "PAYMENT.PAYOUTSBATCH.SUCCESS",
+            self.create_doc(batch, "http://localhost:8099"),
+        )
 
     def forced_outcome(self, item: PayoutItem) -> dict | None:
         """First /_mock/payout-outcomes rule due for this receiver, or None (M14)."""
@@ -258,7 +265,9 @@ class PayoutService:
                 ):
                     self.transition(item, "RETURNED")
 
-            self.store.clock.schedule(30 * 86400, expire)
+            self.store.clock.schedule(30 * 86400, expire, checkpoint={  # C62
+                "kind":"expire", "state":state, "item":item, "revision":revision,
+            })
 
     def reprice_unclaimed(self):
         for item in self.store.payouts.items.values():
