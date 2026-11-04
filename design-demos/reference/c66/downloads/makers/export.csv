@@ -1,0 +1,4 @@
+﻿"Maker","State","Amount","Held","Note"
+"Maker C","Needs your signature","$600.00","$0.00","Waiting for your signature"
+"Maker B","Needs your signature","$486.00","$54.00","Waiting for your signature · $54 held for a dispute"
+"Maker A","Held","$360.00","$360.00","Held while a buyer's dispute is open"

@@ -1,0 +1,6 @@
+﻿"Maker","Amount","State","Attempt","PayPal item status","PayPal item"
+"Maker B","$486.00","APPROVED","","",""
+"Maker A","$360.00","RESERVED","","",""
+"Maker C","$300.00","APPROVED","","",""
+"Maker C","$300.00","","2","",""
+"Maker B","$54.00","RESERVED","","",""

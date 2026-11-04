@@ -1,0 +1,169 @@
+{
+  "origin": "http://127.0.0.1:8200",
+  "week": true,
+  "checks": [
+    {
+      "view": "incidents",
+      "rows": 5,
+      "cols": 6,
+      "floating": true,
+      "total": "Showing 5 of 5 · $760.00",
+      "overflow": false,
+      "saved_views": [
+        {
+          "id": "owner",
+          "count": 0
+        },
+        {
+          "id": "held",
+          "count": 3
+        },
+        {
+          "id": "blocked",
+          "count": 0
+        },
+        {
+          "id": "all",
+          "count": 5
+        }
+      ],
+      "csv": true,
+      "exported_rows": 3,
+      "enter": true,
+      "refresh": true
+    },
+    {
+      "view": "audit",
+      "rows": 49,
+      "cols": 8,
+      "floating": true,
+      "total": "Showing 49 of 49 · —",
+      "overflow": false,
+      "saved_views": [
+        {
+          "id": "blocked",
+          "count": 0
+        },
+        {
+          "id": "signed",
+          "count": 0
+        },
+        {
+          "id": "writes",
+          "count": 2
+        },
+        {
+          "id": "all",
+          "count": 49
+        }
+      ],
+      "csv": true,
+      "exported_rows": 0,
+      "enter": true,
+      "refresh": true
+    },
+    {
+      "view": "runs",
+      "rows": 5,
+      "cols": 6,
+      "floating": true,
+      "total": "Showing 5 of 5 · $1,500.00",
+      "overflow": false,
+      "saved_views": [
+        {
+          "id": "waiting",
+          "count": 2
+        },
+        {
+          "id": "held",
+          "count": 2
+        },
+        {
+          "id": "paid",
+          "count": 0
+        },
+        {
+          "id": "all",
+          "count": 5
+        }
+      ],
+      "csv": true,
+      "exported_rows": 5,
+      "enter": true,
+      "refresh": true
+    },
+    {
+      "view": "makers",
+      "rows": 3,
+      "cols": 5,
+      "floating": true,
+      "total": "Showing 3 of 3 · $1,446.00",
+      "overflow": false,
+      "saved_views": [
+        {
+          "id": "held",
+          "count": 2
+        },
+        {
+          "id": "unverified",
+          "count": 0
+        },
+        {
+          "id": "all",
+          "count": 3
+        }
+      ],
+      "csv": true,
+      "exported_rows": 3,
+      "enter": true,
+      "refresh": true
+    },
+    {
+      "view": "audit",
+      "phone_no_overflow": true,
+      "pinned": true
+    },
+    {
+      "view": "runs",
+      "phone_no_overflow": true,
+      "pinned": true
+    },
+    {
+      "view": "makers",
+      "phone_no_overflow": true,
+      "pinned": true
+    },
+    {
+      "friday_to_end": true,
+      "incident_grid_retained": true,
+      "change_flash": true
+    },
+    {
+      "storage_denied_render_and_reset": true
+    }
+  ],
+  "runtime_exceptions": [],
+  "console_warnings": [],
+  "non_get_requests": [
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8200/api/v1/demo/step"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8200/api/v1/demo/step"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8200/api/v1/demo/step"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8200/api/v1/demo/step"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8200/api/v1/demo/step"
+    }
+  ]
+}

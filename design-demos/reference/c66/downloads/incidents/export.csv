@@ -1,0 +1,4 @@
+﻿"Incident","State","At risk","Maker","Dispute","Updated"
+"Dispute PP-D …436D1F · Maker A · $400.00","WAITING_EXTERNAL","$400.00","Maker A","PP-D-0000000EA3F951436D1F","Wed 04 Nov, 09:00 UTC"
+"Returned payout · Maker C · $300.00","RESOLVED","$300.00","Maker C","","Thu 05 Nov, 09:01 UTC"
+"Dispute PP-D …A02517 · Maker B · $60.00","WAITING_EXTERNAL","$60.00","Maker B","PP-D-000000178869B4A02517","Thu 05 Nov, 09:00 UTC"
