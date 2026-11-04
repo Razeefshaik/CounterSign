@@ -669,3 +669,84 @@ Put this in the repo as `docs/DECISIONS.md`. Every review suggestion from Oct 23
 | Compute pinned totals from every filtered loaded row, keep currencies separate, and include observed reserved obligations in run rows with separate Held back and Paid views | C66 data review | Accept | A filtered amount is neither the payout manifest nor a cash balance; held shares and missing values must not become invented payments |
 | Export the filtered sorted view with formatted money and dates, exclude pinned summaries and neutralise spreadsheet formula prefixes | Owner C66 prompt | Accept | Downloads must match what the viewer filtered without exposing executable spreadsheet values |
 | Keep row Enter/click on existing incident, decision, run-reference and maker-dialog surfaces; link known audit rules to their existing decision explanations | Owner C66 prompt | Accept | Operational grids should lead to the same evidence and approval boundaries rather than create a second write path |
+
+## Nov 5 C68 Readme
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Lead the README with the marketplace audience, Friday decision, every product page, actual PayPal calls, AI boundary and exact official judging terms | Owner C68 brief; official Devpost rules checked Nov 4 | Accept | A judge reading only the text and images needs the user benefit and working evidence before implementation detail |
+| Count 17 runtime HTTP method/path pairs, excluding sandbox setup/control calls, and link each PayPal product to its code and recorded evidence | PayPalRead, PayPalWrite, webhook verifier, OAuth client and toolkit GET guard on base 745c9b4 | Accept | A listed counting scope can be audited without implying that every implemented endpoint had a separate successful sandbox check |
+| Describe 16 named safety boundaries as 14 pure rules plus execution recheck and webhook authenticity; identify 10 applicable payout-proposal checks | shield/engine.py; shield/rules/__init__.py; tests/unit/shield/test_shield_engine.py | Accept | The earlier phrase describing every named boundary as a pure rule overstated what the proposal engine evaluates |
+| Preserve simulated/scripted labels, the lower measured model-disabled completion score, targeted-rerun caveats and COMPLETE_WITH_GAPS real-model evidence | Published C31/M21/C33 results and real-model recording | Accept | A blocked mock action, a targeted rerun and a real-model choice to WAIT are different evidence and cannot be substituted for one another |
+| Remove unsupported current full-suite totals and cloud timing language; link scoped C62 validation and distinguish local Docker measurements from Render | Existing submission prose versus committed C62 evidence | Accept | The repeated 4,097 Python / 124 web / 10 skipped figures have no linked committed run artifact; C68 neither ran that suite nor verified public hosting |
+| Keep the existing image assets, label earlier captures, and mark the missing Try to trick screenshot rather than substitute another page | Visual review of docs/media and docs/media/submission | Accept | C68 permits documentation edits only, and a screenshot must depict the page its caption names |
+| Close the existing source-run code fence and details block, preserve the technical sections, and change only the YouTube description's tool-list line | README render audit and owner C68 scope | Accept | The open fence swallowed later headings, while video chapter edits belong to the separate recut |
+| Use official prize names and the end-of-judging access time; keep hosted/video URL placeholders and deployment checks open | Official Devpost rules, sections 1, 4, 6 and 8 | Accept | Prepared deployment materials and prize evidence are not a completed hosted deployment or an award |
+
+### C68 evidence ledger
+
+This is a documentation-only branch, `razeef/c68-readme`, from fresh `origin/main`
+at `745c9b4`, including C62 merge `134c610`. Only README and submission text change,
+plus this append. Existing agent-state notes are stale in places; the five-file
+C68 scope excludes rewriting them. No new model, PayPal, database or application-test
+run is claimed. The throwaway link/wording checker is outside the repository.
+
+| Figure or bounded claim retained | Source and scope |
+| --- | --- |
+| Friday 9 AM; $1,500 owed/naive comparison, $1,800 available, $1,086 protected payout and $414 held | [C25b decision](#oct-27-c25b-no-hold-demo), [mock week walkthrough](walkthrough/c25-demo-week.md); fixed staged USD example, not customer savings |
+| Maker A $400 order / $360 share; B $60 disputed order / $54 share and $486 eligible share; C $300 current plus $300 returned resend | [Mock scenario](walkthrough/c25-demo-week.md); three makers, 90 percent maker share, C's historical payout separate from current orders |
+| $360 released and paid following week; $354 available; B's $60 refund stays pending | [Real-model mock week record](../recordings/real_model/2026-10-27/README.md) and C25b scenario; not a sandbox balance reconstruction |
+| 16 named boundaries, 14 pure shield rules, 10 applicable pre-execution payout checks | [Rule names](../src/countersign/shield/engine.py), [registry](../src/countersign/shield/rules/__init__.py), [applicability assertion](../tests/unit/shield/test_shield_engine.py) |
+| 17 runtime endpoints: 10 resource GETs, four executor POSTs, one signature POST, one OAuth POST and toolkit Transaction Search GET | [Full method/path inventory](../README.md#paypal-calls); count unique method plus normalized path, ignoring IDs/query strings; sandbox setup excluded |
+| Five toolkit reads; three application reads; six MCP reads and five proposal tools | [Toolkit registry](../src/countersign/agent/tools.py), [actual MCP tool list](../design-demos/reference/c48/http.json); no agent write or owner-approval tool |
+| Agent Toolkit 1.11.0, MCP SDK 2.3.0, AG Grid Community 32.3.9, PostgreSQL 16, Python 3.12 and WebAuthn package | [Toolkit pin](../src/countersign/agent/toolkit_child.py), [project metadata](../pyproject.toml), [AG Grid decision](#nov-3-c49-ag-grid), [runtime image](../Dockerfile); versions are implementation metadata, not evaluation counts |
+| 13 D1–D13 checks, 1,041 exchange attempts, 47 successful signature checks | [C50 decision](#nov-3-c50-sandbox-proof), [recordings index](../recordings/sandbox/INDEX.md); 1,007 responses plus 34 transport errors; signature count includes a simulator event |
+| Four DIFFERENT summary checks; about 30 s payout, 14 negative-test values, 1.4–2.4 h balance lag and the recorded duplicate/out-of-order/missing deliveries | [Sandbox findings](SANDBOX_FINDINGS.md), D3/D6/D7/D8/D9/D11/D12; observations from those checks, not timing promises or exhaustive fault coverage |
+| 480 historical runs = 48 scenarios times five runs for each of two systems; CounterSign 170/240 and 34/48 at 5/5; rules-only 215/240 and 43/48 | [C31 results README](../eval/results/2026-10-27-model-none-c31/README.md), [summary](../eval/results/2026-10-27-model-none-c31/summary.json); mock and model disabled |
+| Four measured invariant counters zero for both systems; eleven missing-agent-action scenarios | Same C31 files; zero observations do not establish universal safety, and the model-off failure list remains visible |
+| Three targeted 0/5 to 5/5 gains; 185/240 explicitly implied, not a measured new full score | [M21 targeted results](../eval/results/2026-10-27-m21-three-gaps/README.md), [C33 targeted results](../eval/results/2026-10-27-c33-failed-replacement/README.md) |
+| Gemini 3.5 Flash configured default; recorded gemini-3.5-flash-lite week COMPLETE_WITH_GAPS with WAIT on both baits | [Model setting](../src/countersign/agent/runtime.py), [recorded week](../recordings/real_model/2026-10-27/README.md); provider choice is not a real-model benchmark result |
+| Four import contracts; 390 px phone; steps 1–6 baked, unsigned Friday step 6, default 20-minute idle restoration | [Project contracts](../pyproject.toml), [C62 record](../design-demos/reference/c62/README.md), [hosted start](../scripts/hosted_start.sh); Monday start defaults idle return off |
+| One intended payment after staged lost response; 400 duplicate with original-batch link; MCP written:false | [C25 mock scenario](walkthrough/c25-demo-week.md), [D6](../recordings/sandbox/2026-10-24/D6/), [MCP preview](../design-demos/reference/c48/http.json); transport and money effects have separate provenance |
+| Nov 12 noon PT deadline, Dec 15 08:00 PT access end, equal-weight criteria with ordered tiebreak; one Grand or Honorable plus one Sponsor | [Official rules](https://paypalaihackathon.devpost.com/rules), checked Nov 4; Nov 11 remains the team's earlier submission target |
+| Project first commit Oct 23, 2026; Apache-2.0 licence | `git log --max-parents=0` gives `10e3cb7`, 2026-10-23; [licence](../LICENSE). Protocol versions, localhost ports, step indices and upload order are identifiers/instructions, not outcome statistics |
+
+### C68 omissions and capture handoff
+
+- Dropped the unsupported current-main 4,097 Python / 124 web / 10 skipped test
+  claim; no committed test-run artifact was found. C62's focused report remains
+  linked without adding its counts to an older suite total.
+- Dropped cloud cold-start promises inferred from local Docker timing, and the
+  unverified broad claim that PayPal itself lacks confirmation controls.
+- Use existing `submission/01-command-center-light.png`, its dark variant and
+  `submission/07-phone.png` as earlier glass-theme captures: they lack the C62 Friday
+  story/restore affordances and retain broader sandbox wording that Aman is updating.
+- `submission/02-decision-passkey.png` predates the new-device recovery wording and
+  shows signing controls, not a completed signature. The same asset illustrates
+  Decisions and passkey review with that limit stated.
+- `docs/media/runs.png`, `cash.png` and `graph.png` use the earlier non-glass shell;
+  Payout runs also predates the current grid. Keep the current page descriptions
+  in text and replace those captures when Aman supplies new assets.
+- `submission/03-incident-desk-ag-grid.png`, `04-sandbox-proof.png`,
+  `05-maker-dialog.png`, `06-execution-history-ag-grid.png` and
+  `08-evaluation-explorer-ag-grid.png` show the relevant implemented surfaces but
+  retain the old step/restart chrome. Recapture them in the current hosted build.
+- No Try to trick page image exists under the allowed media directories. Its
+  tour cell explicitly says screenshot pending and links the implementation.
+- Keep `‹HOSTED URL›` and `‹YOUTUBE URL›`; no deployment, final upload, submission,
+  merge, source-code edits, new dependencies or environment-file reads occurred.
+
+### C68 verification and next step
+
+- Throwaway documentation checker: 435 checks passed, covering 248 local file/anchor
+  references, closed fences, exact criterion names, required section order, retained
+  placeholders and the unchanged YouTube chapters. The pitch is 191 characters.
+- Markdown parser confirms the two-column tour and visible technical headings.
+  AST extraction matches the documented runtime endpoint list. `git diff --check`
+  is clean. External URLs were inventoried; the official rules were read live.
+- No application tests were required or run for this docs-only task. The keeper's
+  review corrected the pure-rule count and clarified that only owner-tier recorded
+  MCP proposals need owner approval; recording alone does not authorize a payment.
+- Owner next: review the C68 branch, integrate later evidence in the named PayPal
+  calls, AG Grid and Real Gemini headings, replace the stale/missing captures,
+  verify the public deployment and video, then fill the retained placeholders.

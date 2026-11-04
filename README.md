@@ -1,13 +1,13 @@
 <div align="center">
 
-<a href="#try-it-in-a-minute"><img src="docs/media/banner.png" alt="CounterSign: the AI proposes, the code countersigns. A safety layer between AI agents and PayPal, with 16 named rules, an owner passkey and one write adapter." width="100%"></a>
+<a href="#try-it-in-a-minute"><img src="docs/media/banner.png" alt="CounterSign: the AI proposes, the code countersigns. A safety layer between AI agents and PayPal, with 16 named safety boundaries, an owner passkey and one write adapter." width="1200"></a>
 
 ### The lock between AI agents and your PayPal money.
 
 ![PayPal sandbox: 13 checks recorded](https://img.shields.io/badge/PayPal%20sandbox-13%20checks%20recorded-2650d6)
-![Shield: 16 named rules](https://img.shields.io/badge/shield-16%20named%20rules-2650d6)
+![Safety: 16 named boundaries](https://img.shields.io/badge/safety-16%20named%20boundaries-2650d6)
 ![Invariant violations: 0 in 480 mock runs](https://img.shields.io/badge/invariant%20violations-0%20in%20480%20mock%20runs-2ea043)
-![Tests: 4,097 Python and 124 web](https://img.shields.io/badge/tests-4%2C097%20Python%20%C2%B7%20124%20web-2ea043)
+[![Checks: evidence and limits](https://img.shields.io/badge/checks-evidence_and_limits-2ea043)](#results)
 ![MCP server](https://img.shields.io/badge/MCP-server-0a0a0a)
 ![AG Grid Community](https://img.shields.io/badge/AG%20Grid-Community-0a0a0a)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
@@ -21,8 +21,8 @@
 
 <p>
 <a href="#the-story-in-60-seconds">The story in 60 seconds</a> ·
-<a href="#everything-countersign-does">Every feature</a> ·
-<a href="#built-with-and-how-each-piece-is-used">Built with</a> ·
+<a href="#every-feature">Every feature</a> ·
+<a href="#how-we-use-paypal">PayPal + AI</a> ·
 <a href="#the-evidence-against-each-judging-criterion">Judging criteria</a> ·
 <a href="#what-we-verified-in-the-real-paypal-sandbox">Sandbox proof</a> ·
 <a href="#try-it-in-a-minute">Run it</a>
@@ -30,31 +30,231 @@
 
 </div>
 
-## What is CounterSign?
-
-**CounterSign sits between AI agents and PayPal. The agent can read and propose. It cannot move money.** Deterministic code checks every proposal against 16 named safety rules, the owner signs anything that sends money out, and only then does one adapter make the PayPal call.
-
-> A prompt that says "please confirm" is a request. CounterSign is a lock.
-
 <div align="center">
-<img src="docs/media/countersign-lock.gif" alt="The lock closes, CounterSign appears, and the AI proposes while the code countersigns." width="100%">
+<img src="docs/media/countersign-lock.gif" alt="The lock closes, CounterSign appears, and the AI proposes while the code countersigns." width="1200">
 </div>
 
-PayPal now gives AI agents tools that act on money. Nothing in PayPal makes an agent ask a human first. CounterSign is that boundary, enforced in code, and tested against the real PayPal sandbox before a line of the product was written.
+## What is CounterSign?
 
-Built for the [PayPal AI Hackathon](https://paypalaihackathon.devpost.com/). PayPal sandbox only. Open source under [Apache-2.0](LICENSE).
+**CounterSign lets marketplaces and platforms that pay many sellers through PayPal
+use AI to investigate disputes and payouts, while keeping payment authority in code
+and the owner's hands.** The merchant gets a decision to review, its evidence, and
+the checks that allow or stop it.
+
+A buyer disputes an order. A maker's payout is stuck. An agent suggests a refund or
+a resend. Those decisions touch the same money. CounterSign links the order, maker
+share, dispute and payout attempt before acting. In the staged week, it holds back
+**$414 of disputed shares** instead of paying them out with the rest.
+
+The agent can read and propose. It cannot execute a payment. **16 named safety
+boundaries** cover 14 pure shield rules, execution recheck and webhook authenticity.
+Payments and buyer refunds require an approval bound to the exact details; the owner
+can countersign with a passkey. Only the executor's adapter makes financial writes.
+Built for the [PayPal AI Hackathon](https://paypalaihackathon.devpost.com/), using the
+PayPal sandbox and a labelled local mock. [Apache-2.0](LICENSE).
 
 ## The story in 60 seconds
 
-1. **Friday, 9 AM.** A marketplace owes its makers $1,500, and $1,800 is available. A naive agent sees enough cash and pays everyone, **including $414 of disputed shares**.
-2. **CounterSign holds that $414 back** and proposes one exact run: **$1,086** to two makers.
-3. **The shield runs 10 named checks** on the proposal, each with its rule, and stops at one: the owner must approve this exact payload.
-4. **The owner countersigns with a passkey,** on their own device, bound to the payload hash. A plain approval can never claim that signature.
-5. **We cut the network right after PayPal accepts the payout.** The executor retries with the same keys, PayPal links back to the original batch, and there is **exactly one payment**.
-6. **An outside agent, connected over MCP, is tricked into refunding a buyer to a stranger's account.** BLOCK, three rules named, `written: false`.
-7. **The key assumptions behind this were tested on the real PayPal sandbox first.** Four were wrong, and the design changed to match PayPal.
+The hosted build opens on **unsigned Friday**. This is a scripted replay on a PayPal
+mock, labelled **Simulated: mock PayPal**. The naive comparison is a read-only
+simulation, not another payment.
 
-![CounterSign command center: the weekly payout run waits for the owner's signature](docs/media/submission/01-command-center-light.png)
+1. **Friday, 9 AM.** The marketplace owes $1,500 and has $1,800 available. A naive
+   payout includes $414 of shares whose orders are disputed.
+2. **CounterSign holds that $414 back:** Maker A's $360 and Maker B's $54. It prepares
+   **$1,086** for Maker B and Maker C instead.
+3. **Review and sign** shows 10 applicable checks and the exact payout details.
+   The owner countersigns with a passkey, or uses plain approval. A plain approval
+   does not receive a passkey signature label.
+4. **A staged network cut hides an accepted payout response.** The executor retries
+   the same request, follows the original-batch link in PayPal's 400 response, and
+   confirms one payment for that intended payout.
+5. **Try a refund to another account.** The scripted proposal is stopped. The
+   [recorded MCP preview](design-demos/reference/c48/http.json) also returns
+   `BLOCK`, names `PAYEE_INTEGRITY` and `INJECTION_GUARD`, and says `written: false`.
+6. **Follow the next week.** A staged seller win releases A's $360. The owner
+   approves it only after reconciliation; $354 remains available. B's separate
+   $60 buyer refund still waits for review.
+
+[Trace the amounts and staged events](docs/walkthrough/c25-demo-week.md).
+Choose **Watch from Monday** for the earlier events, or **Back to Friday** at the
+end to restore the unsigned run. [Friday checkpoint evidence](design-demos/reference/c62/README.md).
+
+## Tour the product
+
+Every page answers a merchant question. Click an image for the full capture.
+These are existing captures: the submission gallery predates the Friday story card,
+and the Payout runs, Cash and Money graph images show an earlier visual shell.
+The Try to trick page still needs its own capture.
+
+| Review and act | Follow the money and the evidence |
+| --- | --- |
+| **Command center.** See the next owner decision and where maker money stands.<br>[<img src="docs/media/submission/01-command-center-light.png" alt="Command center in the light glass theme, with a payout waiting for review" height="280">](docs/media/submission/01-command-center-light.png) | **Decisions.** Review the proposal, applicable rules and exact details before approving.<br>[<img src="docs/media/submission/02-decision-passkey.png" alt="Decision view with applicable payout checks and the owner review panel" height="280">](docs/media/submission/02-decision-passkey.png) |
+| **Incident desk.** Filter disputes and stuck payouts, then open the decision that needs attention.<br>[<img src="docs/media/submission/03-incident-desk-ag-grid.png" alt="Incident desk using AG Grid Community" height="280">](docs/media/submission/03-incident-desk-ag-grid.png) | **Payout runs.** Inspect each maker line, its latest attempt and the run total.<br>[<img src="docs/media/runs.png" alt="Earlier capture of payout lines and replacement details" height="280">](docs/media/runs.png) |
+| **Cash.** See spendable cash, balance freshness and outflows since the last refresh.<br>[<img src="docs/media/cash.png" alt="Earlier capture of the cash calculation and dispute earmarks" height="280">](docs/media/cash.png) | **Money graph.** Follow a dispute through its order, maker share and hold.<br>[<img src="docs/media/graph.png" alt="Earlier capture of the linked dispute, order, maker and reserve records" height="280">](docs/media/graph.png) |
+| **Execution history.** Trace shield verdicts, owner decisions and PayPal operations in one record.<br>[<img src="docs/media/submission/06-execution-history-ag-grid.png" alt="Execution history in AG Grid with operation and proposal links" height="280">](docs/media/submission/06-execution-history-ag-grid.png) | **Evaluation replay.** Find failed scenarios, compare systems and export the filtered historical runs.<br>[<img src="docs/media/submission/08-evaluation-explorer-ag-grid.png" alt="Historical model-disabled evaluation explorer in AG Grid" height="280">](docs/media/submission/08-evaluation-explorer-ag-grid.png) |
+| **Sandbox proof.** Open each recorded PayPal check and the source behind its findings.<br>[<img src="docs/media/submission/04-sandbox-proof.png" alt="Sandbox proof with source-linked recorded checks" height="280">](docs/media/submission/04-sandbox-proof.png) | **Try to trick the agent.** Submit a hostile buyer note and inspect the fooled-agent proposal and real shield verdict.<br>Screenshot pending. The [working page](web/trick.mjs) previews against the staged records, rolls back the attempt and makes no model call. |
+| **The maker's money map.** Open a maker and distinguish paid, queued and disputed shares.<br>[<img src="docs/media/submission/05-maker-dialog.png" alt="Maker B money map with its own visible simulation label" height="280">](docs/media/submission/05-maker-dialog.png) | **Passkey countersign.** Bind owner approval to the exact payout details using a device credential.<br>[<img src="docs/media/submission/02-decision-passkey.png" alt="Passkey setup and countersign controls; this capture is before signing" height="280">](docs/media/submission/02-decision-passkey.png) |
+| **Dark theme.** Read the same decisions and evidence in a dark workspace.<br>[<img src="docs/media/submission/01-command-center-dark.png" alt="Command center in the dark glass theme" height="280">](docs/media/submission/01-command-center-dark.png) | **Phone.** Review the staged week and reach the owner action on a narrow screen.<br>[<img src="docs/media/submission/07-phone.png" alt="Phone layout of the command center with the simulation label" height="280">](docs/media/submission/07-phone.png) |
+
+## How we use PayPal
+
+PayPal is the system whose disputes, payout states, balances and signed events the
+product has to reconcile. We recorded **13 sandbox checks** and changed the design
+when observed behavior disagreed with an assumption. [Findings](docs/SANDBOX_FINDINGS.md)
+and [recordings index](recordings/sandbox/INDEX.md) stay separate from the mock demo.
+
+### PayPal calls
+
+**17 distinct runtime HTTP method/path pairs.** This counts the 10 fixed resource
+reads, four executor write operations, signature verification, OAuth and the
+toolkit's Transaction Search read. IDs and query strings do not create extra
+endpoints. Sandbox setup and test controls are excluded. The linked recordings show
+observed requests for each product, not a separate successful sandbox test of every
+runtime path.
+
+| PayPal product | Actual runtime endpoints | What the merchant gets | Code and recorded sandbox evidence |
+| --- | --- | --- | --- |
+| **Payouts** | `POST /v1/payments/payouts`<br>`GET /v1/payments/payouts/{batch_id}`<br>`GET /v1/payments/payouts-item/{item_id}`<br>`POST /v1/payments/payouts-item/{item_id}/cancel` | A weekly run built from single-item attempts; confirmed batch/item states; cancellation before a permitted resend. A lost response is reconciled against the original batch. | [Reads](src/countersign/paypal/read.py), [writes and duplicate response handling](src/countersign/paypal/write.py); [D3](recordings/sandbox/2026-10-23/D3/), [D5](recordings/sandbox/2026-10-24/D5/), [D6](recordings/sandbox/2026-10-24/D6/) |
+| **Disputes** | `GET /v1/customer/disputes`<br>`GET /v1/customer/disputes/{dispute_id}`<br>`POST /v1/customer/disputes/{dispute_id}/provide-evidence`<br>`POST /v1/customer/disputes/{dispute_id}/accept-claim` | Identify the disputed order, hold its maker share, submit eligible merchant evidence, and leave a buyer refund to the owner. | [Reads](src/countersign/paypal/read.py), [writes](src/countersign/paypal/write.py); [D8](recordings/sandbox/2026-10-24/D8/), [D9](recordings/sandbox/2026-10-24/D9/), [D10 evidence and claim acceptance](recordings/sandbox/2026-10-24/D10/) |
+| **Orders v2** | `GET /v2/checkout/orders/{order_id}` | Read the order that the complaint and maker share belong to. | [Reader](src/countersign/paypal/read.py), [toolkit guard](src/countersign/agent/toolkit_child.py); [D2 order read](recordings/sandbox/2026-10-23/D2/08_approved_inr_400.json) |
+| **Payments v2** | `GET /v2/payments/captures/{capture_id}` | Check the capture state; the recorded dispute hold appeared as `PENDING`, not an increase in `withheld`. | [Reader](src/countersign/paypal/read.py); [D8 capture read](recordings/sandbox/2026-10-24/D8/04_hold_capture_inr_400.json) |
+| **Shipment tracking** | `GET /v1/shipping/trackers` | Read merchant-uploaded tracking before an evidence proposal. This is not independent carrier confirmation. | [Reader](src/countersign/paypal/read.py), [toolkit guard](src/countersign/agent/toolkit_child.py); [D2 tracking read](recordings/sandbox/2026-10-23/D2/26_get_tracking.json) |
+| **Reporting** | `GET /v1/reporting/balances`<br>`GET /v1/reporting/transactions` | Show cash with its refresh time; make Transaction Search available through the read-only toolkit. Transaction Search lag remains unverified. | [Balance reader](src/countersign/paypal/read.py), [Transaction Search guard](src/countersign/agent/toolkit_child.py); [D12](recordings/sandbox/2026-10-24/D12/) |
+| **Webhooks** | `POST /v1/notifications/verify-webhook-signature`<br>`GET /v1/notifications/webhooks-events`<br>`GET /v1/notifications/webhooks-events/{event_id}` | Verify deliveries and backfill events; a fresh resource GET confirms state before reconciliation. | [Verifier](src/countersign/paypal/webhook_verify.py), [event reader](src/countersign/paypal/read.py); [D11 signatures and event list](recordings/sandbox/2026-10-26/D11/) |
+| **OAuth** | `POST /v1/oauth2/token` | Authenticate the sandbox adapters. The hosted mock demo needs no PayPal credentials. | [HTTP client](src/countersign/paypal/http.py); [D1](recordings/sandbox/2026-10-23/D1/) |
+
+Sandbox setup also records order creation, capture and tracking upload through
+Orders v2. Dispute staging, adjudication and webhook registration/simulation belong
+to [sandbox checks](scripts/sandbox_checks/) and [sandbox controls](src/countersign/paypal/sandbox_controls.py),
+not the agent's capabilities or the endpoint count above. The sandbox rejected API
+dispute creation; the recorded disputes were opened in the Resolution Center.
+
+### PayPal Agent Toolkit allowlist
+
+The pinned Python toolkit exposes exactly these **five reads** to the agent:
+`list_disputes`, `get_dispute`, `get_shipment_tracking`, `get_order_details` and
+`list_transactions`. CounterSign adds `get_payout_item`, fixed-query
+`query_money_graph` and `simulate` reads of its own.
+
+`accept_dispute_claim` and `create_refund` are **not enabled**. The toolkit's
+`disputes.create` switch is not set because it enables claim acceptance. An isolated
+process checks the exact tool set and permits only OAuth plus fixed GET paths.
+[Allowlist and request guard](src/countersign/agent/toolkit_child.py),
+[registry](src/countersign/agent/tools.py), [D13 recording](recordings/sandbox/2026-10-24/D13/).
+
+## How we use AI
+
+**Gemini, through LangChain, investigates the messy part of the job.** The Incident
+Commander receives an incident and sanitized context. It can read disputes, orders,
+tracking and transactions through the toolkit, inspect payout items and linked
+money records, and ask the what-if simulator. Buyer messages and tool responses
+remain untrusted data.
+
+It returns one validated structured proposal: `incident_id`, `action`, `params`,
+`evidence_refs`, `rationale` and `expected_effect`. Injection flags travel with it.
+The model may recommend waiting, submitting evidence, cancelling an unclaimed item,
+drafting a maker note or requesting owner approval. A draft is not a sent message.
+The model cannot approve, change a trusted payee or execute a PayPal write.
+[Commander](src/countersign/agent/commander.py), [proposal validation](src/countersign/agent/proposal.py),
+[model boundary](src/countersign/agent/models.py).
+
+**The MCP gateway gives outside agents the same boundary.** Six read tools and five
+proposal tools expose incidents, makers, cash and shield verdicts. Hosted HTTP
+forces rollback preview; local stdio can opt into recording a proposal. Neither
+mode grants approval or execution. SDK transcripts establish the transport flow;
+the Claude Desktop configuration is a setup recipe, not a claim that a particular
+desktop client was tested. [Gateway walkthrough](docs/walkthrough/c48-mcp-gateway.md),
+[actual HTTP preview](design-demos/reference/c48/http.json).
+
+**Prompt injection is tested as untrusted input.** The message scanner can flag a
+destination change, but permission still comes from the shield and authoritative
+records. The Try to trick page builds the proposal a fooled agent would make and
+runs the real shield in a rolled-back preview; it does not call Gemini.
+[Message checks](src/countersign/agent/safety.py), [playground](src/countersign/api/playground.py).
+
+### Real Gemini evidence
+
+The hosted week uses a **labelled scripted model** and makes no provider calls.
+The separate recorded `gemini-3.5-flash-lite` week ran on the **mock**, with result
+`COMPLETE_WITH_GAPS`: it submitted evidence, cancelled the stuck payout, left the
+refund to the owner and chose `WAIT` on both unsafe baits. Those shield-block moments
+were therefore absent from the real-model run. The scripted replay shows them.
+This is a recorded week, not a published real-model benchmark score.
+[Real-model recording](recordings/real_model/2026-10-27/README.md).
+
+## Every feature
+
+| Area | What the merchant gets | Implementation |
+| --- | --- | --- |
+| Safety checks | An allow, stop or owner-review verdict, with each applicable rule named | [Pure shield registry](src/countersign/shield/rules/__init__.py), execution recheck and webhook verification |
+| Exact owner approval | Review the payout or refund details; expired or changed details need a new approval | [Approval service](src/countersign/approvals/service.py) |
+| Passkey countersign | Sign the exact payload with a device credential; plain approval remains available | [Passkeys](src/countersign/approvals/passkeys.py), [browser flow](web/passkey.mjs) |
+| Weekly payout runs | Pay eligible maker shares together, with a separate attempt and status for each line | [Payout runs](src/countersign/approvals/service.py), [run view](web/views.mjs) |
+| Dispute holds | Keep disputed maker shares out of payouts until a confirmed outcome releases them | [Reconciliation](src/countersign/reconcile/), [ledger](src/countersign/ledger/) |
+| Lost-response recovery | Resolve an uncertain payment using the saved payload, the same keys and fresh PayPal reads | [Executor](src/countersign/executor/), [write adapter](src/countersign/paypal/write.py) |
+| Webhook inbox | Verify events, deduplicate deliveries and confirm resource state before updating records | [Inbox](src/countersign/inbox/), [reconciler](src/countersign/reconcile/) |
+| Incident Commander | Get an evidence-based proposal and explanation from bounded read-only investigation | [Agent](src/countersign/agent/) |
+| MCP gateway | Let an external agent read and propose under the same owner controls | [Gateway](src/countersign/gateway/) |
+| Money maps and cash | Follow orders, maker shares, holds and payout attempts; see freshness beside the cash calculation | [Views](web/views.mjs), [maker map](web/plot.mjs) |
+| Operational grids | Search incidents and execution history, inspect payout attempts and filter larger maker lists | [AG Grid bridge](web/grid.mjs) |
+| Evaluation replay | Inspect historical runs and paired failures, filter totals and export CSV; traces remain separately labelled | [Explorer](web/eval-explorer.mjs), [replay](web/replay.mjs) |
+| Sandbox proof | Follow each observed PayPal behavior to its committed recording | [Proof page](web/proof.mjs), [recordings index](recordings/sandbox/INDEX.md) |
+| Try to trick the agent | Inspect a hostile-message proposal and its refusal without saving or paying | [Playground](src/countersign/api/playground.py), [page](web/trick.mjs) |
+| Guided replay | Start at the Friday decision, watch from Monday, then restore unsigned Friday | [Friday flow](web/friday.mjs), [guide](web/guide.mjs) |
+| Light, dark and phone | Use the same decisions and visible simulation labels with keyboard focus and reduced-motion support | [Dashboard](web/index.html) |
+
+### AG Grid
+
+**AG Grid Community 32.3.9** is vendored with its MIT licence. It powers the Incident
+desk, Execution history, payout lines/resends and larger maker lists. Text and
+number filters, sortable columns, pagination and keyboard row opening support
+actual API records. Payout runs pin the API total; the original HTML remains the
+fallback if the vendor cannot load. [Bridge](web/grid.mjs), [licence](web/vendor/LICENSE.txt).
+
+The historical explorer uses the same Community library for all **480 model-disabled
+mock runs**. Choose a system, find failures, inspect paired scenarios, sort across
+columns, read totals for the current filter and export CSV. It does not invent a
+trace for a historical run that has no saved trace. [Explorer](web/eval-explorer.mjs),
+[evaluation source](eval/results/2026-10-27-model-none-c31/README.md).
+
+### Render
+
+The [Render Blueprint](render.yaml) defines a Docker web service, a health check on
+`/api/v1/meta`, and manual deployment. The image runs PostgreSQL 16 and the PayPal
+mock on loopback, restores unsigned Friday at boot and refuses PayPal or model
+credentials. [Deployment and smoke-test runbook](docs/walkthrough/c27-hosting.md).
+Public deployment and the hosted smoke test remain pending until `‹HOSTED URL›`
+is filled. Local Docker measurements are not Render measurements.
+
+## Made for these prizes
+
+These are evidence paths for category review, not award claims. The
+[official prize list](https://paypalaihackathon.devpost.com/rules) sets eligibility.
+
+| Prize | Evidence in this build |
+| --- | --- |
+| **Best Use of PayPal + AI** | The commander reads PayPal evidence and proposes; code checks, binds owner approval and performs the write.<br>[PayPal calls](#paypal-calls), [AI boundary](#how-we-use-ai), [sandbox findings](docs/SANDBOX_FINDINGS.md). |
+| **Best Use of Agentic Commerce** | An external MCP client gets proposal verdicts rather than payment authority; the owner remains in the loop.<br>[Gateway code](src/countersign/gateway/), [actual preview transcript](design-demos/reference/c48/http.json). |
+| **Most Impactful** | Marketplaces paying many makers can connect disputed orders to the shares they should hold back; the example withholds $414 of maker shares.<br>[Staged week and its limits](docs/walkthrough/c25-demo-week.md), [historical results](#results). |
+| **Best Demo Delivery** | Friday starts with a concrete decision; Monday replay, named checks, money maps and source-linked proof explain what happened.<br>[Product tour](#tour-the-product), [checkpoint evidence](design-demos/reference/c62/README.md), [video plan](docs/submission/VIDEO-SCRIPT.md). |
+| **Most Creative** | Model output becomes an untrusted proposal, with a code verdict and an optional passkey over the exact payout details.<br>[Architecture](#how-it-works), [approval binding](src/countersign/approvals/), [MCP flow](docs/walkthrough/c48-mcp-gateway.md). |
+| **Best Use of AG Grid** | Community grids handle operational records; the historical explorer adds paired presets, filtered totals and CSV export.<br>[Operational grids](web/grid.mjs), [evaluation explorer](web/eval-explorer.mjs), [source runs](eval/results/2026-10-27-model-none-c31/README.md). |
+| **Best Use of Render** | A deployable Docker Blueprint, health check and no-key Friday checkpoint prepare the working demo for hosted review.<br>[Blueprint](render.yaml), [hosting runbook](docs/walkthrough/c27-hosting.md); a verified public Render URL is still required. |
+
+## The evidence against each judging criterion
+
+The [official criteria](https://paypalaihackathon.devpost.com/rules) have equal
+weight; their listed order breaks ties. Each answer can be inspected without
+running the project.
+
+| Criterion | What is demonstrated | Evidence |
+| --- | --- | --- |
+| **Technological Implementation** | PayPal resource reads, guarded writes, signature verification and reconciliation; Gemini read/propose tools; a shared MCP boundary, bound owner approval and write-ahead execution | [Endpoint inventory](#paypal-calls), [agent](src/countersign/agent/), [executor](src/countersign/executor/), [sandbox recordings](recordings/sandbox/INDEX.md) |
+| **Design** | A merchant can move from an incident to a decision, sign the exact details, follow the payout and inspect its evidence in a light, dark or phone workspace | [Every page](#tour-the-product), [view routing](web/workspace.mjs), [passkey flow](web/passkey.mjs) |
+| **Potential Impact** | A specific marketplace payout problem: sufficient cash does not make a disputed share payable. The mock example protects $414; no customer savings or production adoption is claimed | [Staged scenario](docs/walkthrough/c25-demo-week.md), [measured failures and limits](#results) |
+| **Innovation/Idea** | Agent suggestions cross a deterministic authorization boundary; an outside MCP agent gets the same checks and cannot sign for the owner | [Shield registry](src/countersign/shield/rules/__init__.py), [gateway](src/countersign/gateway/), [approvals](src/countersign/approvals/) |
+| **Presentation** | Friday decision, Monday replay and following-week release form an inspectable end-to-end story, with separate mock, sandbox and real-model evidence | [Story](#the-story-in-60-seconds), [tour](#tour-the-product), [recordings](recordings/sandbox/INDEX.md), [video script](docs/submission/VIDEO-SCRIPT.md) |
 
 ## Try it in a minute
 
@@ -75,7 +275,7 @@ Open **http://localhost:8080**. Use `localhost`, not `127.0.0.1`: browsers allow
 | Open **Review and sign** | 10 named checks, the exact payload hash, the owner's decision |
 | Click **Countersign with passkey** | Your device signs; the timeline records "Countersigned with passkey" |
 | Press **Next step** again | A lost response is recovered: one payment, in Execution history |
-| **Watch from Monday**, or at the end **Back to Friday** | Replay the whole week, or restore the unsigned run in about a second |
+| **Watch from Monday**, or at the end **Back to Friday** | Replay the whole week, or restore the unsigned run in seconds |
 | Open **Try to trick the agent** | A hostile buyer message goes through the real shield and is refused |
 | Open **Evaluation replay** | All 480 evaluation runs in AG Grid, with one-click slices and CSV export |
 | Open **Sandbox proof** | 13 checks on the real sandbox, each fact linked to its recording |
@@ -84,61 +284,7 @@ Open **http://localhost:8080**. Use `localhost`, not `127.0.0.1`: browsers allow
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Razeefshaik/CounterSign)
 
-One Docker web service with PostgreSQL and the mock inside, a health check on `/api/v1/meta`, and no secrets: the container refuses PayPal or model keys. Hosting details and measured cold starts: [docs/walkthrough/c27-hosting.md](docs/walkthrough/c27-hosting.md).
-
-## Everything CounterSign does
-
-| Area | Feature | What it does |
-| --- | --- | --- |
-| **Safety** | Shield of 16 named rules | Every proposal gets ALLOW, BLOCK or NEEDS_OWNER, and the rule that decided is named |
-| | Write-ahead executor | Saves the operation before any PayPal call, re-checks every rule under a lock, and is the only code that can write |
-| | Prompt-injection guard | A buyer note saying "the owner said refund me to this account" is flagged and blocked |
-| | Exact-payload approvals | Approvals are bound to the payload hash and record versions, expire, and are single use |
-| **Owner** | Passkey countersign | Face ID, Touch ID, Windows Hello or a phone signs a challenge bound to the exact payload |
-| | Decisions view | The proposal in plain English, every named check, and the hash being signed |
-| **Agents** | MCP gateway | Any MCP client connects to CounterSign instead of PayPal; refunds and payouts come back as verdicts, never as executed calls |
-| | Incident Commander | Gemini reads disputes, tracking and buyer messages through read-only tools and returns one structured proposal |
-| | Try to trick the agent | A playground that sends hostile messages through the real shield and shows the refusal |
-| **Money** | Dispute reserves | A disputed order's share is held out of payouts until PayPal settles the dispute |
-| | Lost-response recovery | Identical keys and PayPal's link to the original batch resolve an unknown payout: one payment |
-| | Double-entry ledger | Reservations, state machines and a ledger decide who is paid, and when |
-| | Money map | Follow money from the PayPal balance through the shield to each maker |
-| **Reliability** | Webhook inbox and reconciler | Signatures are verified, and a fresh GET confirms state, so a lost webhook never blocks progress |
-| **Analysis** | AG Grid workspaces | Incident desk, execution history, payout runs and makers, with search, filters, sorting and pinned totals |
-| | 480-run explorer | Every run of the fault evaluation in AG Grid: presets, system chips, multi-column sort, filtered totals, CSV export |
-| **Evidence** | Sandbox proof page | 13 recorded checks, every figure linked to its recording, with real PayPal debug ids |
-| **Experience** | Guided start | One button starts the staged week, and a hint after each step says where to look |
-| | Glass dashboard | Light and dark themes, down to a 390 px phone, with reduced-motion support |
-
-![The decision view: 10 named checks, the exact payload hash, and Countersign with passkey](docs/media/submission/02-decision-passkey.png)
-
-## Built with, and how each piece is used
-
-| Resource | How CounterSign uses it |
-| --- | --- |
-| **PayPal Payouts** | Weekly maker runs: create one item per attempt, show batch and item, cancel unclaimed items |
-| **PayPal Disputes** | List, show, provide evidence and accept claim, only after the shield and the owner allow it |
-| **PayPal Orders v2, Payments v2, shipment tracking** | Read orders, captures and trackers, including the capture status that reveals a dispute hold |
-| **PayPal Reporting** | Balances, always shown with their freshness time |
-| **PayPal Webhooks** | Signature verification, plus event listing as a backfill source |
-| **PayPal Agent Toolkit** | The agent's five read-only tools behind an exact allowlist; write tools are never enabled |
-| **PayPal sandbox** | 13 checks and 1,041 recorded HTTP exchange attempts before the product was built |
-| **Google Gemini, through LangChain** | Reads messy buyer messages and dispute details and returns one structured proposal. A real Gemini week is recorded on the mock; the demo plays a labelled scripted model |
-| **Model Context Protocol (official Python SDK)** | The gateway that lets any AI agent read and propose under the same rules as our own |
-| **AG Grid Community** | The incident desk, execution history, payout runs, makers and the 480-run explorer |
-| **Render** | The one-click [`render.yaml`](render.yaml) blueprint for the hosted demo |
-| **WebAuthn (py_webauthn)** | Passkey countersigns, verified on the server |
-| **Python, FastAPI, PostgreSQL 16, Alembic, Docker** | The app, a transactional database that holds the inbox and ledger, and the one-command container |
-
-## The evidence against each judging criterion
-
-| Criterion | Evidence |
-| --- | --- |
-| **Technological implementation** | 16 pure-function rules, a write-ahead executor, state machines with compare-and-swap, and four import contracts that stop the agent or gateway reaching the write adapter. 4,097 Python and 124 web tests pass, with Ruff clean |
-| **Design** | A light and dark glass dashboard, guided start, plain-English decisions and a phone layout |
-| **Potential impact** | PayPal does not make an agent ask a human before merchant-side money actions. CounterSign gives any merchant or marketplace using agents that boundary, and any MCP agent can connect to it |
-| **Innovation** | The AI proposes and the code countersigns: untrusted model output is treated like untrusted input, and the owner signs the exact payload with a passkey |
-| **Presentation** | A video under 3 minutes, a guided demo, an open repository, and every figure traceable to a committed result or recording |
+One Docker web service with PostgreSQL and the mock inside, a health check on `/api/v1/meta`, and no secrets: the container refuses PayPal or model keys. Hosting instructions and local Docker cold-start measurements: [docs/walkthrough/c27-hosting.md](docs/walkthrough/c27-hosting.md).
 
 # Under the hood
 
@@ -156,30 +302,27 @@ Disputes and payouts are handled separately, and that goes wrong:
 3. Payout items get stuck: PENDING, UNCLAIMED (often an email typo), ONHOLD,
    BLOCKED, FAILED, and later RETURNED, REFUNDED or REVERSED.
 4. Hurried resends and naive retries pay the same maker twice.
-5. PayPal shows disputes in its Resolution Center, but **nothing connects a dispute
-   to the maker payouts it affects.**
+5. The marketplace must connect each PayPal dispute to the maker shares and payout
+   attempts it affects.
 
-PayPal now gives AI agents tools that act on money: the Agent Toolkit and hosted MCP
-servers. A July 2026 review of the toolkit
-([Vorp Labs](https://vorplabs.com/agent-tools/paypal-agent-toolkit)) points out that
-PayPal does not enforce a human confirmation before merchant-side money actions:
-refunds, dispute acceptance and payouts "need application-level approval controls",
-and a system prompt telling an agent to confirm first is not an access-control
-boundary. **CounterSign is that boundary**, enforced in code and tested.
+The merchant needs an application boundary between an agent's suggestion and a
+payment. CounterSign adds exact-payload owner approval and deterministic checks
+to this prototype's payout and buyer-refund paths. A text request to confirm is
+not an authorization check.
 
 ## What the AI does, and what the code does
 
 | The AI (Gemini, read-only tools) | Deterministic code |
 | --- | --- |
-| Reads unstructured buyer complaints, dispute details and tracking data, and judges how strong the evidence is | 16 named shield rules return ALLOW, BLOCK or NEEDS_OWNER, and name the rule that decided |
+| Reads unstructured buyer complaints, dispute details and tracking data, and judges how strong the evidence is | Applicable shield rules return ALLOW, BLOCK or NEEDS_OWNER, and name the rule that decided |
 | Flags suspicious text: prompt injection, "refund me to this other account", payee change requests | The executor saves an operation record **before** any PayPal call, and re-checks every rule inside a locked transaction |
 | Drafts a note to a maker and a plain-English brief for the owner | Idempotency keys come from the payout line id and attempt number, so a retry is always identical |
 | Turns the what-if simulator's output into a recommendation | The ledger, reservations and state machines decide who is paid, and when |
 | Returns **one structured proposal** per step | Webhook signatures are verified with PayPal, then the resource state is confirmed by a GET |
 
 Everything that must give the same answer every time is code. The model can be
-wrong, slow, or misled by a buyer's message. The worst it can do is produce a
-proposal that the shield refuses. Outside agents connecting over MCP get exactly the
+wrong, slow, or misled by a buyer's message. Its output is validated as an untrusted proposal; it can still delay work or
+propose an incorrect action, which the shield must assess. Outside agents connecting over MCP get exactly the
 same treatment as our own.
 
 ### Model used
@@ -204,7 +347,7 @@ flowchart LR
     REC --> INC[Incidents]
     INC --> AG[Incident Commander<br/>Gemini, read-only tools]
     EXT[Any AI agent<br/>over MCP] --> GW[MCP gateway<br/>reads + proposals only]
-    AG -->|one proposal| SH{Shield<br/>16 named rules}
+    AG -->|one proposal| SH{Shield<br/>14 pure rules}
     GW -->|one proposal| SH
     SH -->|BLOCK| LOG[Audit log]
     SH -->|NEEDS_OWNER| OW[Owner countersign<br/>passkey, bound to exact payload]
@@ -269,8 +412,8 @@ is checked by tests. Full detail: [HANDOFF section 10](docs/HANDOFF.md) and the
   them back. The owner approves the exact run **once**: B $486, C $300 and C's $300
   resend to the owner-verified email, **$1,086** in total. The $60 refund waits for
   the owner.
-- **Following week:** the sandbox settles A's dispute for the marketplace (a
-  **staged** sandbox action, not something the AI caused). The reconciler sees the
+- **Following week:** a staged seller-win event settles A's dispute for the marketplace
+  in the mock replay, not something the AI caused. The reconciler sees the
   outcome, the reserve is released, and only then is Maker A paid $360.
 
 **Three safety moments in the week:**
@@ -290,7 +433,7 @@ payout. The dashboard always shows a "Simulated: mock PayPal" label in mock mode
 
 ## What we verified in the real PayPal sandbox
 
-Before building, we ran 13 checks (D1 to D13) against the real sandbox and recorded
+We ran 13 checks (D1 to D13) against the real sandbox and recorded
 every request and response: **1,041 recorded HTTP exchange attempts, 47 webhook
 signature checks, real payouts and disputes**. Four results were **DIFFERENT** from what we expected,
 and we changed the design to match PayPal, not the other way round.
@@ -347,16 +490,19 @@ runs per system; source
 - The plain-LLM baseline runs only against the mock with mock-only tools and is
   never given sandbox credentials; it needs a model key and is not reported here.
 
-**A real Gemini model ran the whole demo week** (`gemini-3.5-flash-lite`, on the
+**A real Gemini week completed with gaps** (`gemini-3.5-flash-lite`, on the
 mock; [recordings/real_model/2026-10-27](recordings/real_model/2026-10-27/README.md)):
 it submitted evidence, cancelled the stuck payout on its own (confirmed RETURNED by
 GET), drafted a note to Maker A, left the $60 refund to the owner (NEEDS_OWNER), and
 chose **WAIT** on both the "refund to another account" bait and the settled-retry
-bait. Friday's $1,086 was paid once.
+bait. Friday's $1,086 was paid once. The recorded status is `COMPLETE_WITH_GAPS`, not
+a full fault-evaluation score.
 
-**Test suite:** 4,097 Python tests (unit, integration on PostgreSQL 16, property
-and contract) and 124 web tests pass on `main`; Ruff clean; four import contracts
-kept.
+**Validation evidence:** the [C62 report](design-demos/reference/c62/README.md)
+records its focused Python/PostgreSQL checks, web checks, Ruff and import-linter
+results. Those checks cover that feature's source, not a newly run full suite on
+this documentation branch. Four import contracts define the agent, write-adapter,
+pure-shield and gateway boundaries in [pyproject.toml](pyproject.toml).
 
 Zero measured violations do not establish universal safety. Disputes opened on
 captures already settled into available remain untested.
@@ -381,8 +527,8 @@ Two modes:
 - **Preview** (default, and forced on the hosted demo): the verdict comes back and
   nothing is stored. Try it at `‹HOSTED URL›/mcp` (Streamable HTTP).
 - **Record** (local stdio only, opt-in): the proposal is stored through the same
-  code path as our own agent, appears in Decisions, and waits for the owner to
-  countersign.
+  binding path as our own agent and appears in Decisions. Owner-tier proposals
+  require the normal owner approval; a recorded BLOCK remains blocked.
 
 Claude Desktop configuration for a local, migrated demo database and mock (replace
 the paths and the database URL):
@@ -477,6 +623,24 @@ You need Python 3.12, Docker (for PostgreSQL 16) and Git.
 ```powershell
 py -3.12 -m venv .venv
 .venv\Scripts\python.exe -m pip install -e ".[dev]"
+```
+
+Then follow the [mock week runbook](docs/walkthrough/c25-demo-week.md) for isolated
+database setup and CLI execution. The Docker command above is the complete
+no-key demo route. For tests, use a disposable PostgreSQL database through
+`COUNTERSIGN_TEST_DATABASE_URL`; toolkit-dependent checks also need the documented
+isolated toolkit interpreter. Do not point tests at a shared demo database.
+
+```powershell
+.venv\Scripts\python.exe -m pytest
+.venv\Scripts\python.exe -m ruff check .
+.venv\Scripts\lint-imports.exe
+node --test web/tests/*.test.mjs
+```
+
+These are reproduction commands, not checks newly executed for C68.
+
+</details>
 
 ## Dashboard
 
