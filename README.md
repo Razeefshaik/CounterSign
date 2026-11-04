@@ -13,8 +13,8 @@
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue)](LICENSE)
 
 <p>
-<a href="‹HOSTED URL›"><img src="https://img.shields.io/badge/Live_demo-No_account_needed-2650d6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live demo"></a>
-<a href="‹YOUTUBE URL›"><img src="https://img.shields.io/badge/Demo-Under_3_minutes-ff0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Demo video"></a>
+<a href="https://countersign-demo-q0g7.onrender.com"><img src="https://img.shields.io/badge/Live_demo-No_account_needed-2650d6?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Live demo"></a>
+<a href="https://youtu.be/4z9gzn-6XVk"><img src="https://img.shields.io/badge/Demo-Under_3_minutes-ff0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Demo video"></a>
 <a href="recordings/sandbox/INDEX.md"><img src="https://img.shields.io/badge/Proof-Sandbox_recordings-0a0a0a?style=for-the-badge&logo=paypal&logoColor=white" alt="Sandbox recordings"></a>
 <a href="#try-it-in-a-minute"><img src="https://img.shields.io/badge/Run_it-One_Docker_command-2496ed?style=for-the-badge&logo=docker&logoColor=white" alt="Run it with Docker"></a>
 </p>
@@ -224,8 +224,8 @@ The [Render Blueprint](render.yaml) defines a Docker web service, a health check
 `/api/v1/meta`, and manual deployment. The image runs PostgreSQL 16 and the PayPal
 mock on loopback, restores unsigned Friday at boot and refuses PayPal or model
 credentials. [Deployment and smoke-test runbook](docs/walkthrough/c27-hosting.md).
-Public deployment and the hosted smoke test remain pending until `‹HOSTED URL›`
-is filled. Local Docker measurements are not Render measurements.
+The public demo is live at https://countersign-demo-q0g7.onrender.com.
+Local Docker measurements are not Render measurements.
 
 ## Made for these prizes
 
@@ -525,7 +525,7 @@ at PayPal:
 Two modes:
 
 - **Preview** (default, and forced on the hosted demo): the verdict comes back and
-  nothing is stored. Try it at `‹HOSTED URL›/mcp` (Streamable HTTP).
+  nothing is stored. Try it at `https://countersign-demo-q0g7.onrender.com/mcp` (Streamable HTTP).
 - **Record** (local stdio only, opt-in): the proposal is stored through the same
   binding path as our own agent and appears in Decisions. Owner-tier proposals
   require the normal owner approval; a recorded BLOCK remains blocked.
