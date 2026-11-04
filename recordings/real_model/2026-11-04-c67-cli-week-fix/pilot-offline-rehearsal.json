@@ -1,0 +1,60 @@
+{
+  "stage": "pilot offline rehearsal",
+  "status": "blocked",
+  "model_calls": 0,
+  "subprocesses": 0,
+  "requested_scenarios_per_system": 5,
+  "k": 1,
+  "selection_rule": "first five committed mock scenarios in existing sorted loader order",
+  "scenarios": [
+    {
+      "id": "clean_run_three_makers",
+      "sha256": "56b7a30530f8a3b8b34d9268ca75653856347c257fb3d9527497342ad96459c3"
+    },
+    {
+      "id": "demo_week",
+      "sha256": "b11ac98182bc029b08e414770d00988445832bb1fbaf650726a8d8d09db01237"
+    },
+    {
+      "id": "F01_timeout_after_payout_created",
+      "sha256": "c5c5ed3d200c014ce1d6bd4917012f47585c5c7958019daea1a3ce8dfe85d880"
+    },
+    {
+      "id": "F_blocked_new_payout_not_retried",
+      "sha256": "5cf250f738144c9bb53cf9e9a55eb35f3928e3653f665ab66616dcab27bbdd25"
+    },
+    {
+      "id": "F_blocked_prior_payout_not_replaced",
+      "sha256": "29b740c4dde135e2dfbee11fd3ab7c8aa873731804ceb35240430db0e4ff18cc"
+    }
+  ],
+  "systems": [
+    "countersign",
+    "baseline_llm",
+    "rules_only"
+  ],
+  "countersign_read_schema": "accepted by existing schema adapter",
+  "baseline_schema": "rejected before any turn by existing eight-read provider allowlist",
+  "error": "MODEL_TOOL_NOT_ALLOWED",
+  "baseline_original_tools": [
+    "get_balances",
+    "list_disputes",
+    "get_dispute",
+    "get_payout_batch",
+    "get_payout_item",
+    "create_payout",
+    "cancel_payout_item",
+    "provide_evidence",
+    "accept_claim",
+    "request_owner_approval"
+  ],
+  "counterSign_guard_changed": false,
+  "baseline_tools_or_prompts_changed": false,
+  "live_pilot_started": false,
+  "completed_scenarios": 0,
+  "quota_stops": 0,
+  "security_stop": false,
+  "seconds_per_scenario": null,
+  "full_round_projected_hours": null,
+  "next_step": "A separate mock-baseline provider adaptation needs owner direction; no second fix attempted."
+}

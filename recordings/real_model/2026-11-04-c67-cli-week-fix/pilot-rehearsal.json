@@ -1,0 +1,233 @@
+{
+  "baseline_cli_turns": 0,
+  "baseline_configuration_failures": 5,
+  "cells": [
+    {
+      "cli_turns": 0,
+      "complete_attempts": 0,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "clean_run_three_makers",
+      "seconds": 1.428,
+      "system": "rules_only",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 0,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "demo_week",
+      "seconds": 1.467,
+      "system": "rules_only",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 0,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "F01_timeout_after_payout_created",
+      "seconds": 0.645,
+      "system": "rules_only",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 0,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "F_blocked_new_payout_not_retried",
+      "seconds": 0.711,
+      "system": "rules_only",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 0,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "F_blocked_prior_payout_not_replaced",
+      "seconds": 0.632,
+      "system": "rules_only",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 1,
+      "error": "EVALUATION_FAILED",
+      "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+      "passed": false,
+      "scenario_id": "clean_run_three_makers",
+      "seconds": 0.446,
+      "system": "baseline_llm",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 1,
+      "error": "EVALUATION_FAILED",
+      "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+      "passed": false,
+      "scenario_id": "demo_week",
+      "seconds": 0.795,
+      "system": "baseline_llm",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 1,
+      "error": "EVALUATION_FAILED",
+      "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+      "passed": false,
+      "scenario_id": "F01_timeout_after_payout_created",
+      "seconds": 0.572,
+      "system": "baseline_llm",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 1,
+      "error": "EVALUATION_FAILED",
+      "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+      "passed": false,
+      "scenario_id": "F_blocked_new_payout_not_retried",
+      "seconds": 0.528,
+      "system": "baseline_llm",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 1,
+      "error": "EVALUATION_FAILED",
+      "model_failure": "MODEL_TOOL_NOT_ALLOWED",
+      "passed": false,
+      "scenario_id": "F_blocked_prior_payout_not_replaced",
+      "seconds": 0.445,
+      "system": "baseline_llm",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 0,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "clean_run_three_makers",
+      "seconds": 6.936,
+      "system": "countersign",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 3,
+      "error": null,
+      "model_failure": null,
+      "passed": false,
+      "scenario_id": "demo_week",
+      "seconds": 9.213,
+      "system": "countersign",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 0,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "F01_timeout_after_payout_created",
+      "seconds": 4.284,
+      "system": "countersign",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 1,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "F_blocked_new_payout_not_retried",
+      "seconds": 5.37,
+      "system": "countersign",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    },
+    {
+      "cli_turns": 0,
+      "complete_attempts": 1,
+      "error": null,
+      "model_failure": null,
+      "passed": true,
+      "scenario_id": "F_blocked_prior_payout_not_replaced",
+      "seconds": 4.903,
+      "system": "countersign",
+      "tokens": {
+        "in": 0,
+        "out": 0
+      }
+    }
+  ],
+  "completed_cells": 15,
+  "full_round_started": false,
+  "k": 1,
+  "model_calls": 0,
+  "offline": true,
+  "prompts_scenarios_metrics_unchanged": true,
+  "requested_cells": 15,
+  "reruns": 0,
+  "scenario_ids": [
+    "clean_run_three_makers",
+    "demo_week",
+    "F01_timeout_after_payout_created",
+    "F_blocked_new_payout_not_retried",
+    "F_blocked_prior_payout_not_replaced"
+  ],
+  "status": "completed_with_baseline_configuration_failures",
+  "stop_code": null
+}
