@@ -662,3 +662,14 @@ Implementation and evidence dated November 4, 2026; heading retained from the ow
 | Keep the successful two-request Gemini smoke separate from the earlier Gemini week and subsequent free Gemma attempt | Owner chose free models after smoke | Accept | Gemma is not Gemini; access checks and model-disabled results cannot be relabelled as a real Gemini evaluation |
 | Stop after free Gemma returned 429 on all three smoke requests; publish no new week decisions or comparison score | Owner approved free Gemma with quota stop | Accept | The tool round trip prerequisite failed; switching models or rerunning to improve results would misrepresent evidence |
 | Add opt-in proposal/read/rationale/flags/verdict recording and scoped read-only evidence UI with separate dataset selection | Owner C67 follow-up | Accept | New evidence must reflect actual decisions; the unchanged Oct 27 recording must show Not recorded for omitted details |
+
+### C67 owner addendum: local CLI, stage one only
+
+| Change | Source | Decision | Reason |
+| --- | --- | --- | --- |
+| Replace the new-run provider with a keyless local CLI client; retain the unused OpenRouter option | Owner Nov 5 addendum | Accept | Use the existing CLI login without loading any environment or auth-file values into application code |
+| Disable native tool features and remove only shell/file-edit/experimental capabilities from a copy of the bundled startup catalog; preserve the CLI's own instructions | Stage-one source audit and offline wire proof | Accept | A read-only sandbox still permits file reads; the actual model request must have zero native tools before hostile input is tested |
+| Fail closed on every native or unknown tool event, kill the child, record a failed run, and never retry | Owner security conditions | Accept | Event monitoring supplements capability removal and must never turn a forbidden action into a successful result |
+| Name the panel Real AI agent week; put identity only in the run record and linked small Run details, including the CLI-instructions disclosure | Owner Nov 5 wording | Accept | Judges should see the AI agent's behavior first without relabelling one model's evidence as another's |
+| Remove the previous free-provider attempt from the panel; preserve its 429 stop here as historical evidence | Owner Nov 5 wording | Accept | The failed Gemma attempt was three HTTP 429 responses at zero cost and was never a completed week or evaluation |
+| Complete offline stage-one work while the required three-turn budget reply is pending; start no later stage | Owner stage order and original Budget rule | Accept | A local CLI login still uses a rate-limited service; elapsed time is not approval |

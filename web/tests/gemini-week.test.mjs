@@ -8,10 +8,9 @@ const data = JSON.parse(await readFile(new URL("../results/real-model-evidence.j
 test("recordings show missing fields and a stopped attempt without invented decisions",()=>{
   const html=modelWeekHTML(data);
   assert.match(html,/Not recorded/);
-  assert.match(html,/Gemma via OpenRouter/);
   assert.match(html,/Gemini via Google/);
-  assert.match(html,/MODEL_QUOTA_EXHAUSTED/);
-  assert.match(html,/No model week decisions were recorded/);
+  assert.ok(!html.includes("Gemma") && !html.includes("OpenRouter"));
+  assert.match(html,/No new week or evaluation has run/);
   assert.match(html,/COMPLETE_WITH_GAPS/);
   assert.ok(!html.includes("Refund was blocked"));
 });
@@ -27,8 +26,14 @@ test("historical and real dataset labels stay separate; unavailable is never zer
   assert.match(html,/No score is available/);
   assert.ok(!html.includes("170/240") && !html.includes("215/240"));
   assert.match(datasetPickerHTML(),/Historical · mock · model disabled/);
-  assert.match(datasetPickerHTML(),/Real Gemma, mock PayPal/);
+  assert.match(datasetPickerHTML(),/Real AI agent, mock PayPal/);
   assert.throws(()=>modelResultsHTML({...data.datasets[0],summary:[{pass_rate:0}]}));
+});
+test("public headings have no model or vendor identity; details remain accurate",()=>{
+  const html=modelWeekHTML(data);
+  const publicText=html.replace(/<small\b[\s\S]*?<\/small>/g,"");
+  assert.ok(!/Gemini|Gemma|OpenRouter|gpt-|codex-cli/.test(publicText));
+  assert.match(datasetPickerHTML(),/Real AI agent week/);
 });
 test("source validation refuses sandbox, duplicate runs and unsafe links",()=>{
   for(const change of [v=>v.weeks[0].ground="sandbox",v=>v.weeks[0].source="javascript:alert(1)",

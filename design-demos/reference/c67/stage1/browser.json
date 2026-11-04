@@ -1,0 +1,42 @@
+{
+  "origin": "http://127.0.0.1:8201",
+  "evidence": "Actual built C67 container; recorded model evidence and honest prerequisite stop",
+  "checks": [
+    {
+      "name": "light",
+      "width": 1440,
+      "height": 1080,
+      "theme": "light",
+      "overflow": false,
+      "banner_visible": true,
+      "missing_fields_honest": true,
+      "datasets_separate": true,
+      "decision_link": true
+    },
+    {
+      "name": "dark",
+      "width": 1440,
+      "height": 1080,
+      "theme": "dark",
+      "overflow": false,
+      "banner_visible": true,
+      "missing_fields_honest": true,
+      "datasets_separate": true,
+      "decision_link": true
+    },
+    {
+      "name": "phone",
+      "width": 390,
+      "height": 844,
+      "theme": "light",
+      "overflow": false,
+      "banner_visible": true,
+      "missing_fields_honest": true,
+      "datasets_separate": true,
+      "decision_link": true
+    }
+  ],
+  "runtime_exceptions": [],
+  "console_warnings": [],
+  "non_get_requests": []
+}

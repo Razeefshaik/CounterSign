@@ -14,7 +14,7 @@ import {mountGrid, mountAuditGrid, runRows, runTotal} from "./grid.mjs";
 
 const titles = {overview: "Command center", incidents: "Incident desk", decision: "Decision", runs: "Payout runs", audit: "Execution history", cash: "Cash", graph: "Money graph", trick: "Try to trick the agent", replay: "Evaluation replay"};
 titles.proof = "Sandbox proof"; // C50
-titles["model-week"] = "Recorded model weeks"; // C67
+titles["model-week"] = "Real AI agent week"; // C67
 export function route(hash) {
   const [name, id] = hash.replace(/^#/, "").split("/");
   return {name: Object.hasOwn(titles, name) ? name : "overview", id: id || ""};
@@ -112,7 +112,7 @@ export function createWorkspaceViews(document, location, fetcher = fetch) {
             if (ticket !== serial) return;
           }
           html = decisionView(doc, workspace.meta, staged, {run});
-          html = '<p><a href="#model-week">View recorded real model weeks</a></p>' + html; // C67
+          html = '<p><a href="#model-week">Real AI agent week</a></p>' + html; // C67
         } else {html = runView(doc); gridRun = doc;} // C49
       } else if (current.name === "audit") {gridAudit = await client.list("audit-log"); html = auditView(gridAudit);} // C49
       else if (current.name === "cash") html = cashView(await client.singleton("cash"));

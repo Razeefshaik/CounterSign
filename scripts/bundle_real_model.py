@@ -12,6 +12,7 @@ EARLIER = "recordings/real_model/2026-10-27"
 CURRENT = "recordings/real_model/2026-11-04-c67"
 RESULTS = "eval/results/2026-11-04-c67-gemma"
 EVIDENCE = "design-demos/reference/c67"
+STAGE_ONE = "recordings/real_model/2026-11-04-c67-cli-stage1/run.json"
 FIELDS = ("system", "scenario_id", "k", "fault_class", "provenance", "passed",
           "correct_final_action", "task_completed", "invariants", "makers_paid_on_time",
           "owner_escalations", "duration_ms", "model", "ground", "llm_calls", "tokens", "error")
@@ -67,42 +68,27 @@ def earlier_week(root):
                     "settled_retry": "Settled-retry bait"}.get(row.get("step"), row["action"]))), None),
             "source": EARLIER + "/run.jsonl", "line": number})
     return {"id": "gemini-2026-10-27", "date": "2026-10-27",
-        "label": "Recorded real model run · earlier Gemini week",
+        "label": "Earlier real AI agent week",
         "provider_label": "Gemini via Google", "model": identity["model"],
         "ground": "mock", "status": "COMPLETE_WITH_GAPS", "decisions": decisions,
         "note": "Reads, proposal parameters, rationale and flags were not recorded. "
-                "The model chose WAIT for both baits; no shield BLOCK is recorded for them.",
+                "The AI agent chose WAIT for both baits; no shield BLOCK is recorded for them.",
         "source": EARLIER + "/README.md"}
 
 
 def bundle(root=ROOT):
-    smoke = json.loads((root / EVIDENCE / "smoke.json").read_text())
-    free_smoke = json.loads((root / EVIDENCE / "gemma-smoke.json").read_text())
-    status = json.loads((root / CURRENT / "status.json").read_text())
-    current = {"id": "gemma-2026-11-04", "date": "2026-11-04",
-        "label": "Gemma via OpenRouter · new mock week",
-        "provider_label": "Gemma via OpenRouter", "model": status["model"],
-        "ground": "mock", "status": status["week_status"], "decisions": [],
-        "note": status["reason"], "source": CURRENT + "/README.md"}
-    events = root / CURRENT / "run.jsonl"
-    if events.exists():
-        current["decisions"] = [row["decision"] for line in events.read_text().splitlines()
-            if (row := json.loads(line)).get("event") == "RECORDED_MODEL_DECISION"]
-    dataset = {"id": "c67-real-model", "label": "Real Gemma, mock PayPal",
-        "model": status["model"], "ground": "mock", "status": status["evaluation_status"],
-        "reason": status["reason"], "runs": [], "summary": [], "k": 1}
-    result_path = root / RESULTS / "runs.jsonl"
-    if status["evaluation_status"] == "complete":
-        rows = [json.loads(line) for line in result_path.read_text().splitlines()]
-        scenarios = {json.loads(p.read_text())["id"] for p in (root / "eval/scenarios").glob("*.json")
-                     if json.loads(p.read_text())["ground"] == "mock"}
-        projected = validated_evaluation(rows, k=1, scenario_ids=scenarios, model=status["model"])
-        published = json.loads((root / RESULTS / "summary.json").read_text())
-        if projected["summary"] != published:
-            raise ValueError("C67_SUMMARY_MISMATCH")
-        dataset.update(projected)
-    value = {"schema_version": 1, "weeks": [current, earlier_week(root)],
-             "smokes": [smoke, free_smoke], "datasets": [dataset]}
+    # Nov 5 owner scope: stage 1 only; no older provider attempt in the panel.
+    stage = {"status": "not_run", "round_trip": "not_run", "canary": {"status": "not_run"},
+             "turns": [], "source": STAGE_ONE}
+    if (root / STAGE_ONE).exists():
+        saved = json.loads((root / STAGE_ONE).read_text())
+        stage.update({key: saved[key] for key in ("status", "round_trip", "canary", "turns")})
+        stage["run_details"] = f"{saved['model']} · {saved['cli_version']} · {saved['date']}"
+    dataset = {"id": "c67-real-model", "label": "Real AI agent, mock PayPal",
+        "ground": "mock", "status": "not_run", "runs": [], "summary": [], "k": 1,
+        "reason": "Stage 1 covers access and canary checks only. No new week, pilot or evaluation has run."}
+    value = {"schema_version": 1, "weeks": [earlier_week(root)],
+             "smokes": [], "stage_one": stage, "datasets": [dataset]}
     private_guard(value)
     return value
 

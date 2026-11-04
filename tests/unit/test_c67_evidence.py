@@ -66,12 +66,13 @@ def test_recording_contains_observed_fields_only_and_no_private_assistant_histor
 def test_committed_bundle_matches_sources_and_does_not_invent_new_scores():
     expected = bundle(ROOT)
     assert json.loads((ROOT / "web/results/real-model-evidence.json").read_text()) == expected
-    current, earlier = expected["weeks"]
-    assert current["status"] == "not_run" and not current["decisions"]
+    assert len(expected["weeks"]) == 1 and not expected["smokes"]
+    earlier = expected["weeks"][0]
     assert earlier["model"] == "gemini-3.5-flash-lite"
     assert all(row["rationale"] is None and row["reads"] is None for row in earlier["decisions"])
     assert sum(row["action"] == "WAIT" for row in earlier["decisions"]) == 2
     assert not expected["datasets"][0]["summary"] and not expected["datasets"][0]["runs"]
+    assert expected["datasets"][0]["label"] == "Real AI agent, mock PayPal"
 
 
 @pytest.mark.parametrize("private", ["sk-or-v1-" + "q" * 64,

@@ -6,6 +6,7 @@ body[data-route="model-week"] .simulation {z-index:50}
 .c67-disclosure {padding:16px;background:var(--surface);color:var(--ink)}
 .c67-model-page p,.c67-model-page a {overflow-wrap:anywhere}
 .c67-status {font-weight:600;color:var(--ink);margin:0}
+.c67-run-details {display:block;font-size:12px;color:var(--ink-2);overflow-wrap:anywhere;line-height:1.6}
 .c67-decision {border-top:1px solid var(--line);padding-top:14px;min-width:0}
 .c67-decision summary {cursor:pointer;display:flex;justify-content:space-between;gap:16px;padding:6px 0}
 .c67-decision summary span {flex-shrink:0;color:var(--ink-2)}

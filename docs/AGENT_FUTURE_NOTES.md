@@ -35,7 +35,46 @@ Current M21 branch references are in the M21 section below.
 - Git remotes: origin is amanxsays/CounterSign; upstream is Razeefshaik/CounterSign.
   Fetch both; upstream/main is the integration source. Preserve local work.
 
-## C67 real-model evidence (Nov 4; quota-stopped, incomplete)
+## C67 stage one (owner Nov 5 addendum; live approval pending)
+
+Current owner addendum supersedes the new-run provider choice below. Stay in
+CounterSign-c67 / `razeef/c67-real-gemini`, resume basee40bc11; preserve other
+worktrees/services. Own8201 preview now serves updated static wording without a
+new build; nine light/dark/phone captures pass with no overflow, runtime errors,
+warnings or non-GET requests. Evidence: reference/c67/stage1/.
+Stage1 only: implement provider, live two-turn read-tool round trip and one
+canary, then STOP for owner. No week, pilot, evaluation or new Docker build.
+
+New codex_cli.py/codex_cli_proof.py provide a keyless local client: one ephemeral
+process per model turn, required ignore/isolation flags, minimal OS/login-location
+environment, new empty temporary CWD outside repository, JSON schema offering
+only existing application reads. Never read/copy auth or environment files.
+Startup pins installed version and verifies the native-tool wire proof. Bundled
+catalog instructions remain identical; only shell_type disabled, apply_patch null,
+experimental tools empty and tool-producing feature gates off. Actual loopback
+HTTP probe used no login/model backend/external target and captured zero native
+tools. Native/unknown JSON events kill the subprocess and fail the call; runner
+records failure with no automatic rerun. Hosted runtime and boot refuse provider.
+
+Evidence: `recordings/real_model/2026-11-04-c67-cli-stage1/offline-proof.json` and
+`design-demos/reference/c67/STAGE1.md`. These establish offline request boundaries,
+not live model behavior. Live round trip/canary remain UNRUN while the three-turn
+budget reply is pending; subscription cost is unavailable. No new run record.
+Never retry a quota/usage stop; map it to MODEL_QUOTA_EXHAUSTED.
+
+Public heading Real AI agent week. Exact new model identity, CLI version and date
+belong only in the eventual run record and small linked Run details, which must
+disclose the CLI's own system instructions. Earlier Oct27 record stays unchanged
+with accurate identity in Run details. Free-provider attempt is removed from the
+panel and retained in decisions log. Unused OpenRouter integration remains.
+
+Primary checks:69 focused Python passed, then30 provider/runner passed after
+three additional tests; overlapping counts, not99 unique tests. All133 Node,
+Ruff and four import contracts passed. No full pytest/model calls/PayPal calls.
+Primary commits/pushes reviewable offline work before yielding pending approval;
+do not merge, claim live smoke success or start later stages.
+
+### C67 Nov 4 history (superseded provider choice; quota-stopped)
 
 Owner-invoked `CODEX-PROMPT-C67-REAL-GEMINI.md`; own CounterSign-c67 branch
 `razeef/c67-real-gemini`, base745c9b4 including C62, preview8201. Keep other

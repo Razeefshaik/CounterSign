@@ -49,8 +49,8 @@ try {
     const state=await evaluate(`({theme:document.documentElement.dataset.theme,overflow:document.documentElement.scrollWidth>innerWidth,
       banner:document.querySelector('#simulation').textContent,text:document.querySelector('.c67-model-page').textContent})`);
     check(state.theme===theme && !state.overflow && state.banner.includes("Simulated: mock PayPal"),"theme/viewport/banner");
-    check(state.text.includes("MODEL_QUOTA_EXHAUSTED") && state.text.includes("Gemma via OpenRouter") && state.text.includes("Gemini via Google"),"separate real provider evidence");
-    check(state.text.includes("No model week decisions were recorded") && state.text.includes("Not recorded"),"no invented decisions or missing fields");
+    check(state.text.includes("AI agent checks") && !state.text.includes("Gemma") && !state.text.includes("OpenRouter"),"current public AI agent wording");
+    check(state.text.includes("No new week or evaluation has run") && state.text.includes("Not recorded"),"no invented decisions or missing fields");
     await capture(name+"-model-status");
     await evaluate("{const d=document.querySelector('[data-week=gemini-2026-10-27] .c67-decision'); d.open=true; d.scrollIntoView({block:'center',behavior:'instant'});}");
     await capture(name+"-earlier-decision");

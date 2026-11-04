@@ -1,4 +1,8 @@
-# C67: real Gemini evidence
+# C67: real AI agent evidence
+
+The owner's later addendum supersedes the provider plan in this historical report.
+Current stage-one status is in [STAGE1.md](STAGE1.md). No new week or evaluation
+has run. Public headings use AI agent; identity belongs in linked Run details.
 
 ## Prediction, recorded before any model call
 
@@ -29,7 +33,7 @@ The unchanged model-disabled results remain CounterSign 170/240 and rules-only 2
 
 ## Suggested README text (README itself unchanged)
 
-> Gemini via OpenRouter passed a real two-call read-only tool round trip with `google/gemini-3.5-flash` on November 4, 2026. This checks provider access and tool turns; it is not a financial evaluation. A subsequent owner-selected free Gemma attempt was rate limited before its tool round trip completed, so no new model week or comparison score is available. The earlier Gemini week and model-disabled 48-scenario comparison remain separately labelled.
+> Real AI agent week replays recorded decisions and the shield's verdicts. The hosted demo uses a separate, labelled scripted AI agent. New AI agent checks are limited to a read-tool round trip and a file-injection canary; no new comparison score exists. Run details link to the exact identity and instructions used. The earlier recorded week and model-disabled evaluation remain separate evidence.
 
 ## Scope and validation
 

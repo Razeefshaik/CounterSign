@@ -1,0 +1,32 @@
+{
+  "stage": 1,
+  "status": "offline_checks_passed",
+  "transport": "loopback HTTP stub; no model backend",
+  "requests_observed": 1,
+  "native_tools_in_request": 0,
+  "login_used": false,
+  "external_connections": 0,
+  "cli_version_pinned_and_checked": true,
+  "original_cli_system_instructions_preserved": true,
+  "catalog_overrides": {
+    "shell_type": "disabled",
+    "apply_patch_tool_type": null,
+    "experimental_supported_tools": []
+  },
+  "required_flags": [
+    "--ephemeral",
+    "--ignore-user-config",
+    "--ignore-rules",
+    "--skip-git-repo-check",
+    "--sandbox read-only",
+    "-C <new empty temporary directory outside repository>",
+    "--json",
+    "--output-schema"
+  ],
+  "model_turns_so_far": 0,
+  "live_round_trip": "awaiting_owner_three_turn_budget_reply",
+  "live_canary": "not_run",
+  "week_run": false,
+  "pilot_run": false,
+  "evaluation_run": false
+}
